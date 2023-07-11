@@ -47,7 +47,3 @@ class ActionExampleDescriptor extends ActionDescriptorBase {
 
 }
 module.exports = ActionExampleDescriptor
-
-
-// To add this action to the builder, you must add a reference in
-// source/lib/actionsv2/catalog/ActionDescriptors.js

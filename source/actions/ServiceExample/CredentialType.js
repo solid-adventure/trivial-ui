@@ -9,10 +9,3 @@ class ServiceExampleCredentials extends CredentialTypeBase {
     }
 }
 module.exports = ServiceExampleCredentials
-
-// Fields listed here will be manged by the Credentials Vault
-
-
-// A reference to this file must be added to source/lib/actionsv2/catalog/CredentialTypes, eg:
-
-// ServiceExampleCredentials: require('../actions/ServiceExample/CredentialType'),

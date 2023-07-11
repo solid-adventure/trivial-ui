@@ -3,7 +3,7 @@ const ActionBase = require('../../../base/ActionBase')
 class ActionExample extends ActionBase {
   async perform() {
 
-    // let api_key = this.config.{{serviceName}}.api_key
+    // let api_key = this.config.ServiceExample.api_key
     const res = await this.fetch( this.url,
       {
         method: 'POST',
