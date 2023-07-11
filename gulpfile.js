@@ -1,13 +1,12 @@
 const gulp = require('gulp')
 const nodemon = require('gulp-nodemon')
-const todo = require('gulp-todo')
 const sass = require('gulp-sass')(require('sass'))
 const fs = require('fs').promises
 const util = require('util')
 const webpack = util.promisify(require('webpack'))
 const merge = require('merge-stream')
 const { ActionRegistry } = require('trivial-core')
-const dynamicModelsDir = 'source/lib/models-dynamic'
+const actionRegistry = new ActionRegistry()
 
 let staticFolders = [
   {
@@ -58,8 +57,12 @@ function sassFiles(){
   return merge(tasks)
 }
 
-async function actionRegistry() {
-  let actionRegistry = new ActionRegistry()
+function actionFiles(){
+  return gulp.src(`source/actions/**`)
+    .pipe(gulp.dest(`${actionRegistry.actionsRoot}/actionsv2/actions`))
+}
+
+async function buildActions() {
   return actionRegistry.build()
 }
 
@@ -70,14 +73,14 @@ gulp.task('pack', async () => {
     throw new Error(stats.compilation.errors.join('\n'))
 })
 
-gulp.task('build', gulp.series(staticFiles, sassFiles, actionRegistry, 'pack'))
+gulp.task('build', gulp.series(staticFiles, sassFiles, actionFiles, buildActions, 'pack'))
 
 
 gulp.task('start', gulp.series('build', (done) => {
   nodemon({
     script: 'serve.js',
     ext: 'js html scss vue',
-    ignore: ['public','slugs', 'tmp', dynamicModelsDir, 'templates', 'test'],
+    ignore: ['public','slugs', 'tmp', 'test'],
     tasks: ['build'],
     delay: '300',
   // , env: { 'NODE_ENV': 'development' }
@@ -85,17 +88,6 @@ gulp.task('start', gulp.series('build', (done) => {
   })
 }))
 
-gulp.task('todo', () => {
-  return gulp.src([
-    '*.js',
-    'templates/**/*.js',
-    'templates/**/app/public/components/*.js',
-    'templates/**/app/public/views/*.html',
-    'templates/**/app/public/assets/stylesheets/*.css'
-  ])
-    .pipe(todo())
-    .pipe(gulp.dest('./'))
-})
 
 gulp.task('clean', async () => {
   await fs.rmdir(__dirname + '/public/assets/js', {recursive: true})
@@ -103,7 +95,6 @@ gulp.task('clean', async () => {
   await fs.rmdir(__dirname + '/public/components', {recursive: true})
   await fs.rmdir(__dirname + '/public/packs', {recursive: true})
   await fs.rmdir(__dirname + '/public/views', {recursive: true})
-  await fs.rmdir(dynamicModelsDir, {recursive: true})
 })
 
 gulp.task('default', gulp.series('start'))
