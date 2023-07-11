@@ -1,0 +1,16 @@
+<html>
+<head>
+	<title>Trivial: App</title>
+  <%- include('../_head.html') -%>
+</head>
+
+<body>
+  <div id="activity" data-app-id="<%= app_id %>"> 
+    <super-bar></super-bar>
+    <nav-tree :selected-title="'activity'"></nav-tree>
+    <instance-activity></instance-activity>
+  </div>
+</body>
+
+<script type="text/javascript" src='/packs/apps/Activity.js'></script>
+</html>

@@ -1,0 +1,46 @@
+input[type=text], input[type=password] {
+  box-sizing: border-box;
+  padding: 1em;
+  border: 1px solid $input-border-color;
+  border-radius: 0px;
+  margin-left: 0;
+}
+
+select {
+  height: 3em;
+  border: 1px solid $input-border-color;
+  border-radius: 0px;
+  margin-left: 0;
+}
+
+textarea {
+  border-radius: 0px;
+}
+
+.code-entry {
+  font-family: $code-font;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  padding: 0.2em 0 0.6em 0;
+}
+
+button:disabled {
+  opacity: 0.5;
+}
+
+.button-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+
+  .button-small.save {
+    margin: 0 0 0.5em auto;
+  }
+
+  .button-small.delete {
+    margin: 0 0 0.5em 0;
+  }
+}

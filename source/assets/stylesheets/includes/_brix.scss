@@ -1,0 +1,25 @@
+
+/* nunito-sans-regular - latin */
+@font-face {
+  font-family: 'Brix Sans';
+  font-style: normal;
+  font-weight: 100;
+  src: local(''),
+       url('../fonts/brix-sans/Brix-Sans-Light.ttf') format('truetype'); /* Safari, Android, iOS */
+}
+
+@font-face {
+  font-family: 'Brix Sans';
+  font-weight: 400;
+  src: local(''),
+       url('../fonts/brix-sans/Brix-Sans-Medium.ttf') format('truetype'); /* Safari, Android, iOS */
+}
+
+@font-face {
+  font-family: 'Brix Sans';
+  font-style: italic;
+  font-weight: 100;
+  src: local(''),
+       url('../fonts/brix-sans/Brix-Sans-Light-Italic.ttf') format('truetype'); /* Safari, Android, iOS */
+}
+

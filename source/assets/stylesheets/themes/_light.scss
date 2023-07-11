@@ -1,0 +1,43 @@
+@use 'sass:color';
+
+// Light theme, by Brian Fong
+$background: #ffffff;
+$background-high-contrast: #ffffff;
+$surface: #fafafa;
+$surface-secondary: #ffffff;
+$primary: #4c46fe;
+$primary-darker: #3430a4;
+$secondary: #716ff3;
+$secondary-darker:  rgb(196 106 189);
+$accent: #a3adfe;
+$error: #ff7a7a;
+
+$series-1: rgba(255,96,132, 0.5) !default; // 50% red
+$series-2: rgba(168,153,238,0.5) !default; // 50% purple
+$series-3: #f89467 !default; // orange
+$series-4: #a4d976 !default; // green
+
+$on-background: #1b1817;
+$on-background-high-contrast: #1b1817;
+$on-surface: #413836;
+$on-surface-secondary: #413836;
+$on-primary: #ffffff;
+$on-primary-darker: rgb(255, 255, 255);
+$on-secondary: #d4d9ff;
+$on-secondary-darker: rgb(32 59 61);
+$on-accent: #1b1817;
+$on-error: rgb(255, 255, 255);
+
+$link: #6473e7;
+
+$scrim-opacity: 0.32;
+$scrim-color: color.change($on-surface, $alpha: $scrim-opacity);
+$input-border-color: color.adjust($background, $lightness: -30%);
+$table-column-head-color: $primary;
+$success-icon: url("/assets/images/check-circle.svg");
+$webhook-pre-color: $primary;
+$auth-text-field-color: $primary;
+$auth-button-font-color: $background-high-contrast;
+$logo: url("/assets/images/trivial-logo-simplified-dark-on-light.svg");
+$auth-border-color: $primary;
+$auth-button-gradient: linear-gradient(45deg, #45c400, #00bdef, #2567ff);

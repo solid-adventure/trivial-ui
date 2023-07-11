@@ -1,0 +1,38 @@
+<html>
+  <head>
+  	<title>Trivial Download</title>
+    <%- include('_head.html') -%>
+  </head>
+
+  <body>
+    <div style="display: flex; flex-direction: column; align-items: center; margin-top: 200px; text-align: center;">
+      <img src="/assets/images/trivial-logo-simplified-light-on-dark.svg" style="height: 40px;" />
+      <div style="margin-top: 20px;">Download complete, you may close this window.</div>
+    </div>
+  </body>
+
+  <script type="text/javascript">
+
+    // Redirects a GET to POST to prevent eager-rendering browsers from trigger file downloads, assuming the eager reander will not execute JS
+
+    let p = new URLSearchParams(window.location.search)
+    let targeturl = p.get('u')
+
+    download(targeturl)
+
+    function download(targeturl) {
+      if (!targeturl) { return false }
+      console.log(`downloading url...`)
+      let f = document.createElement('form');
+      f.action=window.location.href
+      f.method='POST';
+      document.body.appendChild(f);
+      f.addEventListener("submit", (event) => {
+        console.log('form submitted.')
+        event.preventDefault()
+      })
+      f.submit();
+    }
+    
+  </script>
+</html>

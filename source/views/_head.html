@@ -1,0 +1,10 @@
+<link rel="shortcut icon" href="/assets/images/favicon.png" type="image/png" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<% if (locals.current_user) { -%>
+<link rel="stylesheet" href="<%= current_user.stylesheet %>">
+<% } else { -%>
+<link rel="stylesheet" href="/assets/stylesheets/app-light.css">
+<% } -%>
+<script>featureManagerInit = <%- JSON.stringify(featureSettings) %></script>
+<%- include('_posthog.html') -%>
+<%- include('_chaport.html') -%>

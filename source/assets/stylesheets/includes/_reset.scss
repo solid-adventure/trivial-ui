@@ -1,0 +1,15 @@
+/*
+ * This file is for browser-defined styles we want to reset to a
+ * more neutral appearance before we apply our own styling.
+ */
+
+input, button, select, textarea {
+  font-family: inherit;
+}
+
+input[type=button], button {
+  border: 0px none;
+  font-size: inherit;
+  font-weight: inherit;
+  margin: 0;
+}

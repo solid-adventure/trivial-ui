@@ -1,0 +1,92 @@
+.overlay {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    width: 340px;
+    text-align: center;
+}
+
+.text-field{
+    border-width: 0 0 1px;
+    border-color: var(--on-accent) var(--on-accent) var(--auth-border-color);
+    background-color: transparent;
+    font-family: 'Helveticaneue Light',sans-serif;
+    font-size: 18px;
+    font-weight: 300;
+    padding-right: 20px;
+    border-bottom-width: 1px;
+    color: var(--auth-text-field-color);
+    padding: 8px 12px;
+    width: 100%;
+    border-radius: 0px;
+}
+
+.text-field:focus{
+    outline: none;
+    border-color: var(--on-accent) var(--on-accent) var(--link);
+}
+
+.button{
+    padding: 12px 20px;
+    border-radius: 0px;
+    background-color: var(--primary);
+    display: inline-block;
+    border: 0;
+    cursor: pointer;
+    color: var(--auth-button-font-color);
+}
+
+.button.clicked{
+    opacity: .4;
+    cursor: initial
+}
+
+.brand img {
+    width: 212px;
+    height: auto;
+    margin-bottom: 50px;
+    content: var(--logo);
+}
+
+.submit {
+    display: inline-block;
+    float: right;
+}
+
+.container a{
+    color: var(--link);
+}
+
+.container ::placeholder{
+    color: var(--accent);
+}
+
+.button:hover{
+    background: var(--auth-button-gradient);
+    background-size: 600% 600%;
+
+    -webkit-animation: OrangePurple 16s ease infinite;
+    -moz-animation: OrangePurple 16s ease infinite;
+    animation: OrangePurple 16s ease infinite;
+}
+
+@-webkit-keyframes OrangePurple {
+    0%{background-position:82% 0%}
+    50%{background-position:19% 100%}
+    100%{background-position:82% 0%}
+}
+@-moz-keyframes OrangePurple {
+    0%{background-position:82% 0%}
+    50%{background-position:19% 100%}
+    100%{background-position:82% 0%}
+}
+@keyframes OrangePurple {
+    0%{background-position:82% 0%}
+    50%{background-position:19% 100%}
+    100%{background-position:82% 0%}
+}
