@@ -1,6 +1,6 @@
 {
   "name": "trivial-ui",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "app.js",
   "dependencies": {
@@ -33,7 +33,7 @@
     "request": "^2.88.2",
     "socksjs": "^0.5.0",
     "sql-formatter": "^12.1.2",
-    "trivial-core": "^1.2.1",
+    "trivial-core": "^1.2.2",
     "type-is": "^1.6.18",
     "url": "^0.11.0",
     "vue2-ace-editor": "^0.0.15",
