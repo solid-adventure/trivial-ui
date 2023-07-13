@@ -537,9 +537,6 @@ const store = new Vuex.Store({
     },
 
     async loadCredentialSetAndSecret({ commit }, { id }) {
-      if (id === -1) {
-        return {"credential_set":{"id":"-1","name":"E-Commerce DB (Sample)","credential_type":"PostgreSQLCredentials","created_at":"2023-03-29T22:28:04.216Z","updated_at":"2023-03-29T22:28:21.031Z"},"credentials":{"user":"_blank","password":"_blank","port":"5432","host":"host","database":"sample-ecommerce-trivial-1680545100"}}
-      }
       const data = await fetchJSON(`/proxy/trivial?path=/credential_sets/${id}`)
       commit('updateCredentialSet', data.credential_set)
       return data

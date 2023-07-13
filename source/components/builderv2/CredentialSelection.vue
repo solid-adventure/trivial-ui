@@ -70,10 +70,6 @@
         return null === this.credentialSetId
       },
 
-      isSampleDb() {
-        return -1 === this.credentialSetId 
-      },
-
       ...mapState([
         'credentialSets',
         'currentAction',
@@ -97,7 +93,7 @@
         this.credentialSetId = data.id
       },
 
-      ...mapActions(['loadCredentialSets']), 
+      ...mapActions(['loadCredentialSets']),
       ...mapMutations([
         'incrementTour',
         'setCurrentCredentialSet'
@@ -116,11 +112,10 @@
       <div class="form-row">
         <select v-model="credentialSetId">
           <option :value="null">New</option>
-          <option :value="-1">E-Commerce DB (Sample)</option>
           <option v-for="cred in existingCreds" :key="cred.id" :value="cred.id">{{cred.name}}</option>
         </select>
         <button v-if="isNewSet" class="button-small" @click="editCredentials">Create</button>
-        <button v-if="!isNewSet && !isSampleDb" class="button-small" @click="editCredentials">Configure</button>
+        <button v-if="!isNewSet" class="button-small" @click="editCredentials">Configure</button>
         <CredentialSetEditor
           v-if="editing"
           :value="credentialSetId"
