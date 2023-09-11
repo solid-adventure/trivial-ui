@@ -40,6 +40,13 @@ npm install npm@7.16.0 -g
  9. Visit http://localhost:3000 and sign in with your credentials for the staging environment.
  10. To build a demo app, click the "New App" button after you log in.
 
+## Registering New Users
+By default, new user registration is disabled. Set the env var `ENABLE_REGISTRATION=TRUE` and restart the server to enable.
+
+To create a one-off user without enabling registration, visit [http://localhost:3000/register?enableFeatures=registration](http://localhost:3000/register?enableFeatures=registration)
+
+Note that this allows users to sign up to create their own apps. It does not allow them to see apps created by other users or share apps through a customer entity, which requires manual configuration.
+
 ## Starting the server
 This will build the app, start the server, and restart when changes are detected.
 
