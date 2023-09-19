@@ -1,11 +1,12 @@
 <script>
   import ConfigResolver from 'trivial-core/lib/ConfigResolver'
-
+  import CodeCompletingInput from '../transform-editors/CodeCompletingInput.vue'
+  import { mapActions, mapState } from 'vuex'
 
 
   export default {
     components: {
-      editor: require('vue2-ace-editor')
+      CodeCompletingInput
     },
 
     props: {
@@ -20,7 +21,15 @@
       return {
         reveal: false,
         content: '',
-        aceTheme: ''
+        loadingDataSample: false
+      }
+    },
+
+    watch: {
+      content: {
+        handler(val) {
+          this.setValue(this.name, val)
+        }
       }
     },
 
@@ -28,12 +37,28 @@
 
       configResolver() {
         return new ConfigResolver(this.credentials)
-      }
+      },
+
+      runtimeDataSample() {
+        return {
+          initialPayload: (this.dataSample || {}).payload
+        }
+      },
+
+      customFunctions() {
+        return this.$store.state.manifest.content.definitions.filter(d => d.type === 'function')
+      },
+
+      ...mapState([
+        'dataSample'
+      ])
 
     },
 
    mounted() {
       this.content = this.valueOf(this.config[this.name])
+      this.requireDataSample()
+      .then(s => this.loadingDataSample = false)
     },
 
     methods: {
@@ -49,52 +74,58 @@
         return this.configResolver.setValue(this.config, name, val)
       },
 
-      humanize(value) {
-        return String(value).replaceAll('_', ' ')
-      },
-
-      input(event) {
-        this.setValue(this.name, event.target.value)
-      },
-
-      aceInput(event) {
-        this.setValue(this.name, event)
-      },
-
-      requireForTheme() {
-        let userTheme
-        try {
-          userTheme = this.$store.state.user.color_theme
-        } catch (e) { }
-        if (!userTheme || userTheme == 'Dark' ) {
-          require('brace/theme/monokai')
-          this.aceTheme = 'monokai'
-        } else {
-          require('brace/theme/chrome')
-          this.aceTheme = 'chrome'
+      editorOptions(field) {
+        return {
+          name: this.name,
+          field: field,
+          config: this.config,
+          credentials: this.credentials,
+          context: this.context
         }
+      },
 
+      placeholder(field) {
+        return field.placeholder
+      },
+
+      help(field) {
+        return field.help
       },
 
 
-      editorInit(editor) {
-            require('brace/ext/language_tools') //language extension prerequsite...
-            require('brace/mode/javascript')    //language
-            require('brace/snippets/javascript') //snippet
-            this.requireForTheme()
-        }
+      ...mapActions([
+        'requireDataSample'
+      ])
+
+
     }
   }
 </script>
 
 <template>
   <div :key="name" class="field" :class="{required: field.required}">
-    <h3>If</h3>
-    <editor v-model="content" @init="editorInit" @input="aceInput" lang="javascript" :theme="aceTheme" width="100%" height="80" :options="{useWorker: false, showPrintMargin: false}"></editor>
+    <h3 class="label">When</h3>
+    <em class="help">{{ help(field) }}</em>
+    <CodeCompletingInput v-if="!loadingDataSample"
+      v-model="content"
+      :options="editorOptions(field)"
+      :sample="runtimeDataSample"
+      :placeholder="placeholder(field)"
+      :blocks="customFunctions"
+      :expand-errors="true"
+      :show-reference-errors="true"></CodeCompletingInput>
   </div>
 </template>
 
 <style lang="scss" scoped>
 
+h3.label {
+  margin-bottom: 0;
+}
+
+em.help {
+  color: var(--on-background-40);
+  margin-bottom: 1em;
+}
 
 </style>
