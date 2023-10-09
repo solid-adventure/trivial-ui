@@ -73,7 +73,7 @@
     "test": "mocha 'test/**/*.js'"
   },
   "engines": {
-    "node": "18.17.x",
+    "node": "18.17.6",
     "npm": "9.8.x"
   },
   "author": "",
