@@ -90,11 +90,15 @@ gulp.task('start', gulp.series('build', (done) => {
 
 
 gulp.task('clean', async () => {
-  await fs.rmdir(__dirname + '/public/assets/js', {recursive: true})
-  await fs.rmdir(__dirname + '/public/assets/stylesheets', {recursive: true})
-  await fs.rmdir(__dirname + '/public/components', {recursive: true})
-  await fs.rmdir(__dirname + '/public/packs', {recursive: true})
-  await fs.rmdir(__dirname + '/public/views', {recursive: true})
+  try {
+    await fs.rmdir(__dirname + '/public/assets/js', {recursive: true})
+    await fs.rmdir(__dirname + '/public/assets/stylesheets', {recursive: true})
+    await fs.rmdir(__dirname + '/public/components', {recursive: true})
+    await fs.rmdir(__dirname + '/public/packs', {recursive: true})
+    await fs.rmdir(__dirname + '/public/views', {recursive: true})
+  } catch(e) {
+    console.log(e)
+  }
 })
 
 gulp.task('default', gulp.series('start'))

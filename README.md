@@ -8,7 +8,7 @@ This Vue app provides an example UI for [trivial-core](https://github.com/solid-
 
 #### Node.js
 
-Lupin uses Node 14.17.6 and npm 7.16.0. You should install [nvm](https://github.com/nvm-sh/nvm) to manage Node versions:
+Lupin uses Node 18.17.0 and npm 9.8.1. You should install [nvm](https://github.com/nvm-sh/nvm) to manage Node versions:
 
 ```
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
@@ -17,21 +17,21 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
 Then install the correct version of Node:
 
 ```
-nvm install 14.17.6
-nvm use 14.17.6
+nvm install 18.17.0
+nvm use 18.17.0
 ```
 
 And the required version of npm:
 
 ```
-npm install npm@7.16.0 -g
+npm install npm@9.8.1 -g
 ```
 
 ## Setup
 
  1. Clone this repo into a location of your choice: `git clone git@github.com:solid-adventure/trivial-ui.git`
  2. Switch to the newly created directory: `cd trivial-ui`
- 3. Make sure you are using the correct node version: `nvm use 14.17.6`
+ 3. Make sure you are using the correct node version: `nvm use 18.17.0`
  4. Install node packages: `npm install`
  5. Create a new file named `.env` based on `.env.example`: `cp .env.example .env`
  6. Open the newly created `.env` with your text editor and change the value for `COOKIE_SIGNATURE` to a random string of your choice. If you are on a Mac, you can run `dd if=/dev/urandom bs=1 count=24 | base64 | pbcopy` on the command line to copy a random string to the clipboard.
