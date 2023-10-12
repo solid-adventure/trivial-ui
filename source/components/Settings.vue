@@ -1,6 +1,10 @@
 <template>
   <div class="SettingsContainer">
     <h2>Account Settings</h2>
+    <div class="section">
+      <OrganizationsManager></OrganizationsManager>
+    </div>
+    <br/>
     <a href="/changepassword">Change password</a><br />
     <a href="/signout">Sign out</a><br>
     <div class="section">
@@ -21,10 +25,12 @@
 
 <script>
   import CredentialsVault from './builderv2/CredentialsVault.vue'
+  import OrganizationsManager from './builderv2/OrganizationsManager.vue'
 
   export default {
     components: {
-      CredentialsVault
+      CredentialsVault,
+      OrganizationsManager
     },
   }
 </script>
