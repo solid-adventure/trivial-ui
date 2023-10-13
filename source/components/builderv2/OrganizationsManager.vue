@@ -23,7 +23,7 @@ export default {
                     body: JSON.stringify({
                         path: `/organizations`,
                         name: this.newOrgName,
-                        billing_email: 'test@1.com' // have to get current users email
+                        billing_email: this.$store.state.user.email
                     })
                 });
             }
