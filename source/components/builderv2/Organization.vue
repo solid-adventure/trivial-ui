@@ -42,7 +42,7 @@ export default {
       <form>
         <input type="text" placeholder="user id" v-model="newUserId" />
         <input type="text" placeholder="role" v-model="newUserRole" />
-        <button @click="clickNewUser(e, organization.id)">Add User</button>
+        <button @click="clickNewUser($event, organization.id)">Add User</button>
       </form>
     </HideableSection>
   </span>

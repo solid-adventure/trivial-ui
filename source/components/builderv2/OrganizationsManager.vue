@@ -10,11 +10,8 @@ export default {
             organizations: []
         };
     },
-    async created() {
-        await this.loadOrganizations()
-            .then(response => {
-            this.injectOrganizationUsers(response);
-        });
+    created() {
+        this.loadOrganizations()
     },
     methods: {
         async newOrganization(e) {
@@ -35,12 +32,9 @@ export default {
                 this.errorMessage = error.message;
             }
             this.newOrgName = '';
-            await this.loadOrganizations()
-                .then(response => {
-                this.injectOrganizationUsers(response);
-            });
+            this.loadOrganizations()
         },
-        async newUser(orgId, userId, role) {
+        async newUser({orgId, userId, role}) {
             try {
                 await fetch('proxy/trivial', {
                     method: 'POST',
@@ -56,10 +50,7 @@ export default {
                 console.log('[OrganizationsManager][newUser] Error: ', error);
                 this.errorMessage = error.message;
             }
-            await this.newUserloadOrganizations()
-                .then(response => {
-                this.injectOrganizationUsers(response);
-            });
+            this.loadOrganizations()
         },
         async removeOrganization(orgId) {
             try {
@@ -72,12 +63,9 @@ export default {
                 console.log('[OrganizationsManager][removeOrganization] Error: ', error);
                 this.errorMessage = error.message;
             }
-            await this.loadOrganizations()
-                .then(response => {
-                this.injectOrganizationUsers(response);
-            });
+            this.loadOrganizations()
         },
-        async removeRole(orgId, userId) {
+        async removeRole({orgId, userId}) {
             try {
                 await fetch(`proxy/trivial?path=/organizations/${orgId}/delete_org_role`, {
                     method: 'DELETE',
@@ -91,12 +79,9 @@ export default {
                 console.log('[OrganizationsManager][removeRole] Error: ', error);
                 this.errorMessage = error.message;
             }
-            await this.loadOrganizations()
-                .then(response => {
-                this.injectOrganizationUsers(response);
-            });
+            this.loadOrganizations()
         },
-        async loadOrganizations() {
+        async fetchOrganizations() {
             try {
                 let orgs = await fetchJSON(`/proxy/trivial?path=/organizations`);
                 return orgs;
@@ -115,6 +100,12 @@ export default {
             const responses = await Promise.all(promises);
             responses.forEach((org, i) => { orgs[i].users = org.users; });
             this.organizations = orgs;
+        },
+        async loadOrganizations(){
+            await this.fetchOrganizations()
+                .then(response => {
+                this.injectOrganizationUsers(response);
+            });
         }
     },
     components: { Organization }
