@@ -1,12 +1,12 @@
 <template>
   <div class="SettingsContainer">
     <h2>Account Settings</h2>
-    <div class="section">
-      <OrganizationsManager></OrganizationsManager>
-    </div>
     <br/>
     <a href="/changepassword">Change password</a><br />
     <a href="/signout">Sign out</a><br>
+    <div class="section">
+      <OrganizationsManager></OrganizationsManager>
+    </div>
     <div class="section">
       <CredentialsVault></CredentialsVault>
     </div>

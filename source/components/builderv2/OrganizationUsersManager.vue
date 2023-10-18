@@ -12,9 +12,6 @@ export default {
         };
     },
     methods: {
-        clickRemoveOrganization(orgId) {
-            this.$emit('removeorganization', orgId);
-        },
         clickRemoveRole(orgId, userId) {
             this.$emit('removerole', {orgId, userId});
         },
@@ -28,12 +25,9 @@ export default {
 };
 </script>
 <template>
-  <span>
-    ID: {{ organization.id }} Name: {{ organization.name }} Billing Email: {{ organization.billing_email }}
-    <button @click="clickRemoveOrganization(organization.id)">remove</button>
-    <HideableSection :initially-hidden="true" display-name="Users">
-      <span v-for="user in organization.users" :key="user.user_id">
-        User: {{ JSON.stringify(user) }}
+    <td><HideableSection :initially-hidden="true" display-name="Users">
+      <span v-for="user in organization.users" :key="user.user_id" class="user">
+        {{ JSON.stringify(user) }}
         <button @click="clickRemoveRole(organization.id, user.user_id)">remove</button>
         <br />
       </span>
@@ -44,8 +38,10 @@ export default {
         <input type="text" placeholder="role" v-model="newUserRole" />
         <button @click="clickNewUser($event, organization.id)">Add User</button>
       </form>
-    </HideableSection>
-  </span>
+    </HideableSection></td>
 </template>
 <style lang="scss" scoped>
+.user{
+    padding: 0.25rem 0.5rem;
+}
 </style>
