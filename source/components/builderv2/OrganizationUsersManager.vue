@@ -27,7 +27,7 @@ export default {
 <template>
     <td><HideableSection :initially-hidden="true" display-name="Users">
       <span v-for="user in organization.users" :key="user.user_id" class="user">
-        {{ JSON.stringify(user) }}
+        Name:{{ user.name }} , Email:{{ user.email }}
         <button @click="clickRemoveRole(organization.id, user.user_id)">remove</button>
         <br />
       </span>
@@ -35,7 +35,11 @@ export default {
       <br />
       <form>
         <input type="text" placeholder="user id" v-model="newUserId" />
-        <input type="text" placeholder="role" v-model="newUserRole" />
+        <select name="rolelist" id="roles" v-model="newUserRole">
+            <option value="" selected disabled hidden>role</option>
+            <option value="member">Member</option>
+            <option value="admin">Admin</option>
+        </select>
         <button @click="clickNewUser($event, organization.id)">Add User</button>
       </form>
     </HideableSection></td>
