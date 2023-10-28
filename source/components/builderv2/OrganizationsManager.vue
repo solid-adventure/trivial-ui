@@ -38,61 +38,6 @@ export default {
             this.newOrgName = '';
             this.loadOrganizations()
         },
-        async newUser({orgId, userId, role}) {
-            if(userId ==='' || role ===''){
-                this.setMessage('New users need both a user ID and role.')
-                return
-            }
-            try {
-                await fetch('proxy/trivial', {
-                    method: 'POST',
-                    headers: { 'content-type': 'application/json' },
-                    body: JSON.stringify({
-                        path: `/organizations/${orgId}/create_org_role`,
-                        user_id: userId,
-                        role: role
-                    })
-                });
-            }
-            catch (error) {
-                console.log('[OrganizationsManager][newUser] Error: ', error);
-                this.setMessage(error.message)
-            }
-            this.loadOrganizations()
-        },
-        async removeOrganization(orgId) {
-            try {
-                let remove = await fetch(`proxy/trivial?path=/organizations/${orgId}`, {
-                    method: 'DELETE',
-                    headers: { 'content-type': 'application/json' }
-                });
-                if(remove.status!== 204) throw new Error(`Error: ${remove.status}`)
-                this.setMessage('Organization successfully removed!')
-            }
-            catch (error) {
-                console.log('[OrganizationsManager][removeOrganization] Error: ', error);
-                this.setMessage(error.message)
-            }
-            this.loadOrganizations()
-        },
-        async removeRole({orgId, userId}) {
-            try {
-                let remove = await fetch(`proxy/trivial?path=/organizations/${orgId}/delete_org_role`, {
-                    method: 'DELETE',
-                    headers: { 'content-type': 'application/json' },
-                    body: JSON.stringify({
-                        user_id: userId
-                    })
-                });
-                if(remove.status!== 204) throw new Error(`Error: ${remove.status}`)
-                this.setMessage('User successfully removed!')
-            }
-            catch (error) {
-                console.log('[OrganizationsManager][removeRole] Error: ', error);
-                this.setMessage(error.message)
-            }
-            this.loadOrganizations()
-        },
         async fetchOrganizations() {
             try {
                 let orgs = await fetchJSON(`/proxy/trivial?path=/organizations`);
@@ -120,9 +65,12 @@ export default {
             });
         }, 
         setMessage(newMessage){
-            // this.message = newMessage
             setTimeout(() => { this.message = newMessage }, 250)
             setTimeout(() => { this.message = null }, 2500)
+        },
+        navigateTo(orgId){
+            // TODO replace with navigation
+           window.location.href = `http://localhost:3000/organizations/${orgId}/edit`
         }
     },
     components: { OrganizationUsersManager }
@@ -149,15 +97,9 @@ export default {
             </tr>
         </thead>
         <tbody>
-            <tr v-for="org in organizations" :key="org.id">
+            <tr v-for="org in organizations" :key="org.id" @click="navigateTo(org.id)">
                 <td>{{ org.name }}</td>
                 <td>{{ org.billing_email }}</td>
-                <td><button @click="removeOrganization(org.id)" class="remove-organization">remove</button></td>
-                <OrganizationUsersManager 
-                :organization="org"
-                @newuser="newUser"
-                @removerole="removeRole"
-                ></OrganizationUsersManager>
             </tr>
         </tbody>
     </table>
@@ -187,9 +129,22 @@ export default {
     }
 
     tbody {
+        tr{
+            cursor: pointer;
+        }
+
         tr:nth-child(even) {
           background-color: var(--on-background-20);
         }
+
+        tr:hover {
+          background-color: var(--primary);
+
+          td {
+            color: var(--on-primary);
+          }
+        }
+
 
         td {
           margin: 0;

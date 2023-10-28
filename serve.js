@@ -501,6 +501,10 @@ serve.get('/apps/:id/builder2/*', Session.validate, (req, res) => {
 	res.render('apps/builder2.html', {app_id: req.params.id})
 })
 
+serve.get('/organizations/:id/edit', Session.validate, (req, res) =>{
+  res.render('organizations/edit.html', {org_id: req.params.id})
+})
+
 serve.get('/webhooks/:id', Session.validate, (req,res) => {
   res.render('apps/webhookdisplay.html', {webhook_id: req.params.id})
 })
