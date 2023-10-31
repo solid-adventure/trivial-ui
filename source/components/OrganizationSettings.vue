@@ -4,11 +4,11 @@
     <h1>{{ organization.name }}</h1>
 
     
-      <form id="editOrgForm">
-        <label >Name<input type="text" :placeholder="organization.name" v-model="updatedName"></label>
-        <label>Billing Email<input type="text" :placeholder="organization.billing_email" v-model="updatedBillingEmail"></label>
-        <button class="button-medium" @click="editOrganization">Update Organization</button>
-      </form>
+    <form id="editOrgForm">
+      <label >Name<input type="text" :placeholder="organization.name" v-model="updatedName"></label>
+      <label>Billing Email<input type="text" :placeholder="organization.billing_email" v-model="updatedBillingEmail"></label>
+      <button class="button-medium" @click="editOrganization">Update Organization</button>
+    </form>
 
     <table class="organization-users">
       <caption>Users</caption>
@@ -28,10 +28,15 @@
       </tbody>
     </table>
 
-    <p>Add New User</p>
+    <p>Invite New User</p>
     <form id="newUserForm">
       <label >Email<input type="text" placeholder="newuser@email.com" v-model="newUserEmail"></label>
-      <button class="button-medium" @click="newUser">Add User</button>
+      <select name="rolelist" id="roles" v-model="newUserRole">
+          <option value="" selected disabled hidden>role</option>
+          <option value="member">Member</option>
+          <option value="admin">Admin</option>
+      </select>
+      <button class="button-medium" @click="newOrganizationUser">Invite</button>
     </form>
 
     <button class="deleteOrganization" @click="deleteOrganization">Delete Org</button>
@@ -46,6 +51,7 @@ export default {
   data(){
     return {
       newUserEmail: '',
+      newUserRole: '',
       organization: null,
       updatedBillingEmail:'',
       updatedName: ''
@@ -66,28 +72,26 @@ export default {
           console.log('[OrganizationSettings][loadOrganization] Error:', error)
       }
     },
-    async newUser(){
-      // TODO look up user by email 
-      try{
-        await fetch('proxy/trivial', {
-          method: 'POST',
-          headers: {'content-type': 'application/json'},
-          body: JSON.stringify({
-            path: `/organizations/${this.orgId}/create_org_role`
-          })
-        })
-      } catch(error){
-        console.log('[OrganizationSettings][loadOrganization] Error:', error)
+    async newOrganizationUser(e){
+      e.preventDefault()
+      if(!this.newUserEmail.length || !this.newUserRole.length) return // not enough input to add user
+      let userId = this.userIdByEmail(this.newUserEmail) // first look up user by email to get user id
+      if(userId !== null) this.createRole(userId) // if user exists, create role with existing user
+      else { // else, create user, passing the email and a dummy name and password
+        let user = await this.createUser(this.newUserEmail, `${this.organization.name} Member`, '1234')
+        this.createRole(user.id)
       }
+      this.newUserEmail = this.newUserRole = ''
     },
 
-    async editOrganization(){
+    async editOrganization(e){
+      e.preventDefault()
       let updatedParams = {}
       if(this.updatedBillingEmail !== this.organization.billing_email) updatedParams.billing_email = this.updatedBillingEmail
       if(this.updatedName !== this.organization.name) updatedParams.name = this.updatedName
       if(!updatedParams.name && !updatedParams.billing_email) return // no updates provided
       try{
-        let response = await fetchJSON('/proxy/trivial', {
+        let response = await fetchJSON('/proxy/trivial', {  
           method: 'PUT',
           headers: { 'content-type': 'application/json' },
           body: JSON.stringify({
@@ -98,6 +102,7 @@ export default {
       } catch(error){
         console.log('[OrganizationSettings][editOrganization] Error:', error)
       }
+      this.updatedBillingEmail = this.updatedName = ''
     },
 
     async deleteOrganization() {
@@ -115,6 +120,22 @@ export default {
       }
     },
 
+    async createUser(email, name, password){
+      try{
+        let user = await fetch(`/proxy/trivial?path=/users`,{
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            email,
+            name,
+            password
+          })
+        })
+      } catch(error){
+        console.log('[OrganizationsManager][createUser]', error);
+      }
+    },
+
     async deleteUser(name){
       if(confirm(`Are you sure you want to delete ${name} from the ${this.organization.name} Organization?`))
       try{
@@ -128,6 +149,28 @@ export default {
       }
     }
   },
+
+  async userIdByEmail(email){
+    // look up user by email and return user ID if found 
+    // else return null
+  },
+
+  async createRole(id){
+    try{
+      await fetch('proxy/trivial', {
+        method: 'POST',
+        headers: {'content-type': 'application/json'},
+        body: JSON.stringify({
+          path: `/organizations/${this.orgId}/create_org_role`,
+          user_id: id,
+          role: this.newUserRole
+        })
+      })
+    } catch(error){
+      console.log('[OrganizationSettings][createRole] Error:', error)
+    }
+
+  }
 }
 </script>
 <style lang="scss">
