@@ -74,11 +74,12 @@ export default {
     },
     async newOrganizationUser(e){
       e.preventDefault()
-      if(!this.newUserEmail.length || !this.newUserRole.length) return // not enough input to add user
+      if(!this.newUserEmail.length || !this.newUserRole.length) return
       let userId = this.userIdByEmail(this.newUserEmail) // first look up user by email to get user id
       if(userId !== null) this.createRole(userId) // if user exists, create role with existing user
-      else { // else, create user, passing the email and a dummy name and password
-        let user = await this.createUser(this.newUserEmail, `${this.organization.name} Member`, '1234')
+      else { // else, create user, passing the email and a temp name and password
+        let tempPassword = this.generateRandString()
+        let user = await this.createUser(this.newUserEmail, `${this.organization.name} Member`, tempPassword)
         this.createRole(user.id)
       }
       this.newUserEmail = this.newUserRole = ''
@@ -169,7 +170,22 @@ export default {
     } catch(error){
       console.log('[OrganizationSettings][createRole] Error:', error)
     }
+  },
 
+  generateRandString(){
+    var d = new Date().getTime();//Timestamp
+    var d2 = ((typeof performance !== 'undefined') && performance.now && (performance.now()*1000)) || 0;//Time in microseconds since page-load or 0 if unsupported
+    return 'xxxxxxxx-xxxx-4xxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random() * 16;//random number between 0 and 16
+        if(d > 0){//Use timestamp until depleted
+            r = (d + r)%16 | 0;
+            d = Math.floor(d/16);
+        } else {//Use microseconds since page-load if supported
+            r = (d2 + r)%16 | 0;
+            d2 = Math.floor(d2/16);
+        }
+        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+    });
   }
 }
 </script>
