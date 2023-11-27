@@ -35,10 +35,11 @@ npm install npm@9.8.1 -g
  4. Install node packages: `npm install`
  5. Create a new file named `.env` based on `.env.example`: `cp .env.example .env`
  6. Open the newly created `.env` with your text editor and change the value for `COOKIE_SIGNATURE` to a random string of your choice. If you are on a Mac, you can run `dd if=/dev/urandom bs=1 count=24 | base64 | pbcopy` on the command line to copy a random string to the clipboard.
- 7. Save your changes to `.env`
- 8. Start the server by running `gulp`.
- 9. Visit http://localhost:3000 and sign in with your credentials for the staging environment.
- 10. To build a demo app, click the "New App" button after you log in.
+ 7. Save your changes to `.env`.
+ 8. Install gulp globally by running `npm install -g gulp`.
+ 9. Start the server by running `gulp`.
+ 10. Visit http://localhost:3000 and sign in with your credentials for the staging environment.
+ 11. To build a demo app, click the "New App" button after you log in.
 
 ## Registering New Users
 By default, new user registration is disabled. Set the env var `ENABLE_REGISTRATION=TRUE` and restart the server to enable.
