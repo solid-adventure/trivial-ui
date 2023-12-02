@@ -1,22 +1,29 @@
 <template>
   <div class="OrganizationSettings">
 
-    <h1>{{ organization.name }}</h1>
+    <h1>{{ organization.name }} | Users And Roles</h1>
 
-    
+<!--
     <form id="editOrgForm">
       <label >Name<input type="text" :placeholder="organization.name" v-model="updatedName"></label>
       <label>Billing Email<input type="text" :placeholder="organization.billing_email" v-model="updatedBillingEmail"></label>
       <button class="button-medium" @click="editOrganization">Update Organization</button>
-    </form>
+    </form> -->
 
+    <div class="action-row">
+      <a :href="newInvitationPath" class="button-medium">Add New User</button>
+      </a>
+    </div>
     <table class="organization-users">
       <caption>Users</caption>
       <thead>
         <tr>
           <th class="name">Name</th>
           <th class="email">Email</th>
-          <th class="remove"></th>
+          <th class="role">Organization Role</th>
+          <th class="status">Status</th>
+          <th class="created_at">Date Added</th>
+          <th class="actions">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -28,7 +35,7 @@
       </tbody>
     </table>
 
-    <p>Invite New User</p>
+<!--     <p>Invite New User</p>
     <form id="newUserForm">
       <label >Email<input type="text" placeholder="newuser@email.com" v-model="newUserEmail"></label>
       <select name="rolelist" id="roles" v-model="newUserRole">
@@ -36,8 +43,7 @@
           <option value="member">Member</option>
           <option value="admin">Admin</option>
       </select>
-      <button class="button-medium" @click="newOrganizationUser">Invite</button>
-    </form>
+    </form> -->
 
     <button class="deleteOrganization" @click="deleteOrganization">Delete Org</button>
   </div>
@@ -60,6 +66,12 @@ export default {
 
   created(){
     this.loadOrganization()
+  },
+
+  computed: {
+    newInvitationPath(){
+      return `/organizations/${this.orgId}/invitations/new`
+    }
   },
 
   methods: {
@@ -190,43 +202,49 @@ export default {
 }
 </script>
 <style lang="scss">
- .OrganizationSettings{ 
+ .OrganizationSettings {
   height: 100%;
   margin: 2em;
   width: calc(100% - 4em);
   top: 80px;
   position: relative;
- } 
-
- #editOrgForm, #newUserForm{
-  label{
-    margin-right: 1em;
-  }
-  label > input{
-    margin-left: 1em;
-  }
  }
 
- .organization-users{
+div.action-row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+ // #editOrgForm, #newUserForm{
+ //  label{
+ //    margin-right: 1em;
+ //  }
+ //  label > input{
+ //    margin-left: 1em;
+ //  }
+ // }
+
+ table.organization-users {
   width: 100%;
   margin-block: 3em;
-  
-  thead th{
-    margin: 0;
-    padding: 0.25rem 0.5rem;
-    font-size: 1.25em;
-    font-weight: bold;
-    border-bottom: 1px solid var(--on-background);
-    text-align: left;
+}
+ //  thead th{
+ //    margin: 0;
+ //    padding: 0.25rem 0.5rem;
+ //    font-size: 1.25em;
+ //    font-weight: bold;
+ //    border-bottom: 1px solid var(--on-background);
+ //    text-align: left;
 
-    &.name {width: 20%;}
-    &.email {width: 40%;}
-    &.remove {width: 40%;}
-  }
- }
- .deleteOrganization{
-  position: absolute;
-  right: 2em;
- }
+ //    &.name {width: 20%;}
+ //    &.email {width: 40%;}
+ //    &.remove {width: 40%;}
+ //  }
+ // }
+ // .deleteOrganization{
+ //  position: absolute;
+ //  right: 2em;
+ // }
 
 </style>

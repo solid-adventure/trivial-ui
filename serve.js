@@ -505,6 +505,10 @@ serve.get('/organizations/:id/edit', Session.validate, (req, res) =>{
   res.render('organizations/edit.html', {org_id: req.params.id})
 })
 
+serve.get('/organizations/:id/invitations/new', Session.validate, (req, res) =>{
+  res.render('organizations/invitations/new.html', {org_id: req.params.id})
+})
+
 serve.get('/webhooks/:id', Session.validate, (req,res) => {
   res.render('apps/webhookdisplay.html', {webhook_id: req.params.id})
 })
@@ -621,16 +625,16 @@ serve.all('/proxy/:service', (req, res) => {
 
 
   serviceSpec.injectCredentials(req, serviceReq)
-  // req.log.debug({proxyRequest: serviceReq}, 'proxy request')
+  req.log.debug({proxyRequest: serviceReq}, 'proxy request')
   request(serviceReq,
   (error, response, body) => {
-    // req.log.debug({
-    //   err: error,
-    //   proxyResponse: {
-    //     status: response && response.statusCode ? response.statusCode : undefined,
-    //     body: body
-    //   }
-    // }, 'proxy response')
+    req.log.debug({
+      err: error,
+      proxyResponse: {
+        status: response && response.statusCode ? response.statusCode : undefined,
+        body: body
+      }
+    }, 'proxy response')
 
     if (error) {
       let code = (response && response.statusCode) ? response.statusCode : 500

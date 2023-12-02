@@ -70,7 +70,7 @@ export default {
         },
         navigateTo(orgId){
             // TODO replace with navigation
-           window.location.href = `http://localhost:3000/organizations/${orgId}/edit`
+           window.location.href = `/organizations/${orgId}/edit`
         }
     },
     components: { OrganizationUsersManager }
