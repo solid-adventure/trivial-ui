@@ -3,8 +3,10 @@
 
     <Notices></Notices>
 
+    <!-- TODO make this a component and pass the items as props -->
+    <!-- Once it's a component, spruce up the styling -->
     <div class="breadcrumb">
-      <span class="history">Users and Roles</span>
+      <span class="history"><a :href="`/organizations/${this.orgId}/edit`">Users and Roles</a></span>
       <span class="spacer">></span>
       <span class="active"><strong>Add New User</strong></span>
     </div>
@@ -46,7 +48,6 @@
 import { fetchJSON } from 'trivial-core/lib/component-utils'
 import Notifications from './notifications'
 import Notices from './Notices.vue'
-
 
 export default {
   inject: ['orgId'],

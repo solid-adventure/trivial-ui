@@ -35,16 +35,6 @@
       </tbody>
     </table>
 
-<!--     <p>Invite New User</p>
-    <form id="newUserForm">
-      <label >Email<input type="text" placeholder="newuser@email.com" v-model="newUserEmail"></label>
-      <select name="rolelist" id="roles" v-model="newUserRole">
-          <option value="" selected disabled hidden>role</option>
-          <option value="member">Member</option>
-          <option value="admin">Admin</option>
-      </select>
-    </form> -->
-
     <button class="deleteOrganization" @click="deleteOrganization">Delete Org</button>
   </div>
 </template>
