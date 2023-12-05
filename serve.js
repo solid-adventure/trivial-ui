@@ -629,7 +629,7 @@ serve.all('/proxy/:service', (req, res) => {
 
 
   serviceSpec.injectCredentials(req, serviceReq)
-  req.log.debug({proxyRequest: serviceReq}, 'proxy request')
+  // req.log.debug({proxyRequest: serviceReq}, 'proxy request')
   request(serviceReq,
   (error, response, body) => {
     // req.log.debug({
