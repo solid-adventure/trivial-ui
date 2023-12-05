@@ -33,10 +33,10 @@
         <div class="form-input radio-group">
           <input type="radio" id="member" name="role" value="member" v-model="newUserRole">
           <label for="member">Member</label>
-          <span class="help"><em>Help text describing what this does, which should take 2-3 sentences and fill about this much space.</em></span>
+          <span class="help"><em>User will have view-only privileges of all apps and users in this organization. They will only be able to update apps they have been explicitly granted permissions for, or if they are the owner of the app</em></span>
           <input type="radio" id="admin" name="role" value="admin" v-model="newUserRole">
           <label for="admin">Admin</label>
-          <span class="help"><em>Show how Admin is different than member, which will take 3-4 sentences. It'll take a little more space, about this much.</em></span>
+          <span class="help"><em>User will be able to edit all apps in this organization, as well as add and remove users</em></span>
         </div>
         <button class="button-medium full-width">Save and Send Invite</button>
       </form>
