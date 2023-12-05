@@ -31,11 +31,11 @@
         <span class="section">Role</span>
         <span v-if="errors.newUserRole" class="form-error">{{ errors.newUserRole }}</span>
         <div class="form-input radio-group">
-          <input type="radio" id="memberRole" name="role" v-model="newUserRoleMember">
-          <label for="memberRole">Member</label>
+          <input type="radio" id="member" name="role" value="member" v-model="newUserRole">
+          <label for="member">Member</label>
           <span class="help"><em>Help text describing what this does, which should take 2-3 sentences and fill about this much space.</em></span>
-          <input type="radio" id="adminRole" name="role" v-model="newUserRoleAdmin">
-          <label for="adminRole">Admin</label>
+          <input type="radio" id="admin" name="role" value="admin" v-model="newUserRole">
+          <label for="admin">Admin</label>
           <span class="help"><em>Show how Admin is different than member, which will take 3-4 sentences. It'll take a little more space, about this much.</em></span>
         </div>
         <button class="button-medium full-width">Save and Send Invite</button>
@@ -56,8 +56,7 @@ export default {
     return {
       newUserName: '',
       newUserEmail: '',
-      newUserRoleMember: false,
-      newUserRoleAdmin: false,
+      newUserRole: '',
       errors: {
         newUserName: null,
         newUserEmail: null,
@@ -76,11 +75,6 @@ export default {
       return `/organizations/${this.orgId}/invitations/new`
     },
 
-    newUserRole() {
-      return this.newUserRoleAdmin ? 'admin' : 'member'
-
-    },
-
   },
 
   methods: {
@@ -96,8 +90,7 @@ export default {
         valid = false
         this.errors.newUserEmail = 'Email is required'
       }
-
-      if (this.newUserRoleMember === false && this.newUserRoleAdmin === false) {
+      if (this.newUserRole === '') {
         valid = false
         this.errors.newUserRole = 'Role is required'
       }
