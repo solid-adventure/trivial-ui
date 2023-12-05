@@ -216,7 +216,7 @@ serve.get('/signout', Session.validate, (req, res) => {
   res.render('signout.html')
 })
 
-serve.get('/changepassword', (req,res) => {
+serve.get('/changepassword', Session.validate, (req,res) => {
   res.render('changepassword.html')
 })
 
@@ -632,22 +632,19 @@ serve.all('/proxy/:service', (req, res) => {
   req.log.debug({proxyRequest: serviceReq}, 'proxy request')
   request(serviceReq,
   (error, response, body) => {
-    req.log.debug({
-      err: error,
-      proxyResponse: {
-        status: response && response.statusCode ? response.statusCode : undefined,
-        body: body
-      }
-    }, 'proxy response')
+    // req.log.debug({
+    //   err: error,
+    //   proxyResponse: {
+    //     status: response && response.statusCode ? response.statusCode : undefined,
+    //     body: body
+    //   }
+    // }, 'proxy response')
 
     if (error) {
       let code = (response && response.statusCode) ? response.statusCode : 500
       return res.status(code).json({ type: 'error', statusCode: code, body: body });
     }
     try {
-
-req.log.debug({proxyResponse: response.headers}, 'proxy response headers')
-
       serviceSpec.setSpecHeaders(res, response.headers)
       res.status(response.statusCode).json(JSON.parse(body));
     } catch {
