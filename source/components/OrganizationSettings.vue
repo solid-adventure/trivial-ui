@@ -4,6 +4,8 @@
     <div class="breadcrumb">
       <span class="history"><a href="/settings">Settings</a></span>
       <span class="spacer">></span>
+      <span class="history">{{ organization.name }}</span>
+      <span class="spacer">></span>
       <span class="active"><strong>Users And Roles</strong></span>
     </div>
 
@@ -46,7 +48,7 @@
         </tbody>
       </table>
 
-      <button class="button-small deleteOrganization" @click="deleteOrganization">Delete Org</button>
+      <button v-if="orgDeletable" class="button-small deleteOrganization" @click="deleteOrganization">Delete Org</button>
     </div>
   </div>
 </template>
@@ -82,6 +84,10 @@ export default {
 
     lastAdmin() {
       return this.users.filter(u => u.role == 'admin').length == 1
+    },
+
+    orgDeletable() {
+      return this.users.length == 0
     },
 
   },

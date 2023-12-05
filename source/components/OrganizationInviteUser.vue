@@ -8,6 +8,11 @@
     <div class="breadcrumb">
       <span class="history"><a :href="`/organizations/${this.orgId}/edit`">Users and Roles</a></span>
       <span class="spacer">></span>
+
+<!--  TODO: add this back in when we have a way to get the organization name
+      <span class="history">{{ organization.name }}</span>
+      <span class="spacer">></span>
+ -->
       <span class="active"><strong>Add New User</strong></span>
     </div>
 
