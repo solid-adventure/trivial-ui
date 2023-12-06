@@ -40,6 +40,50 @@ a, input, textarea, select, button {
   }
 }
 
+table.spaced {
+  border-collapse: collapse;
+  width: 100%;
+  max-width: 100%;
+  margin-bottom: 1rem;
+  background-color: transparent;
+
+  thead {
+    tr {
+      background-color: var(--background);
+
+      th {
+        font-weight: 400;
+        padding: 2rem 0.75rem;
+        vertical-align: middle;
+        text-align: left;
+      }
+
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid $background-80;
+
+      td {
+        font-weight: 100;
+        padding: 0.75rem;
+        vertical-align: middle;
+        text-align: left;
+
+      }
+
+    }
+
+  }
+
+
+
+
+}
+
+
+
 .main-btn {
   display: inline-block;
   font-weight: 400;

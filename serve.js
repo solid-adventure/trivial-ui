@@ -220,6 +220,10 @@ serve.get('/changepassword', Session.validate, (req,res) => {
   res.render('changepassword.html')
 })
 
+serve.get('/acceptinvitation', (req,res) => {
+  res.render('acceptinvitation.html')
+})
+
 serve.get('/recoverpassword', (req,res) => {
   res.render('recoverpassword.html')
 })
@@ -499,6 +503,14 @@ serve.get('/apps/:id/panels', Session.validate, (req, res) => {
 
 serve.get('/apps/:id/builder2/*', Session.validate, (req, res) => {
 	res.render('apps/builder2.html', {app_id: req.params.id})
+})
+
+serve.get('/organizations/:id/edit', Session.validate, (req, res) =>{
+  res.render('organizations/edit.html', {org_id: req.params.id})
+})
+
+serve.get('/organizations/:id/invitations/new', Session.validate, (req, res) =>{
+  res.render('organizations/invitations/new.html', {org_id: req.params.id})
 })
 
 serve.get('/webhooks/:id', Session.validate, (req,res) => {

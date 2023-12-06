@@ -1,0 +1,15 @@
+<html>
+<head>
+	<title>Trivial: Invite to Organization</title>
+  <%- include('../../_head.html') -%>
+</head>
+
+<body>
+  <div id="organization-invitations-new" data-org-id="<%= org_id %>">
+    <super-bar></super-bar>
+    <organization-invite-user></organization-invite-user>
+  </div>
+</body>
+
+<script type="text/javascript" src='/packs/organizations/invitations/New.js'></script>
+</html>
