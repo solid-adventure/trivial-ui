@@ -69,7 +69,7 @@
   },
   "scripts": {
     "start": "node serve.js",
-    "build": "gulp --series clean build",
+    "build": "export NODE_OPTIONS=--openssl-legacy-provider && gulp --series clean build",
     "test": "mocha 'test/**/*.js'"
   },
   "engines": {
