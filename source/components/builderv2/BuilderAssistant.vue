@@ -1,5 +1,5 @@
 <template>
-  <div v-if="assistantSuggestions.length > 0"class="container">
+  <div v-if="assistantSuggestions.length > 0" class="container">
     <h2>Trivi Sez:</h2>
     <ul>
       <li v-for="suggestion in assistantSuggestions">

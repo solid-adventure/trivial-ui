@@ -37,7 +37,7 @@
   import Clipboard from '../../lib/Clipboard'
   import CreatePanel from './CreatePanel.vue'
   import DashboardSettings from './DashboardSettings.vue'
-  import DatePicker from 'vue2-datepicker';
+  import DatePicker from 'vue-datepicker-next';
   import Notices from '../Notices.vue'
   import PanelBase from './PanelBase.vue'
   import { mapState } from 'vuex'

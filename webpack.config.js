@@ -1,61 +1,79 @@
-require('dotenv').config()
-const path = require('path')
-const glob = require('glob')
-const { VueLoaderPlugin } = require('vue-loader')
+require("dotenv").config();
+const path = require("path");
+const glob = require("glob");
+const autoprefixer = require("autoprefixer");
+const { VueLoaderPlugin } = require("vue-loader");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
-const mode = process.env['NODE_ENV'] === 'production' ? 'production' : 'development'
+const mode =
+  process.env["NODE_ENV"] === "production" ? "production" : "development";
+const isDevelopment = mode == "development";
 
 module.exports = {
-  devtool: 'inline-source-map',
+  devtool: "inline-source-map",
   mode: mode,
-  entry: glob.sync('./source/packs/**/*.js')
-  .reduce((obj,file) => {
-      obj[path.relative('./source/packs', file).replace(/\.js$/, '')] = file
-      return obj
-    }, {}),
+  entry: glob.sync("./source/packs/**/*.js").reduce((obj, file) => {
+    obj[path.relative("./source/packs", file).replace(/\.js$/, "")] = file;
+    return obj;
+  }, {}),
   output: {
-    path: path.resolve(__dirname, 'public/packs'),
-    filename: '[name].js'
+    path: path.resolve(__dirname, "public/packs"),
+    filename: "[name].js",
   },
   module: {
     rules: [
       {
         test: /\.vue$/,
-        loader: 'vue-loader'
+        loader: "vue-loader"
       },
       {
-        test: /\.css$/,
+        test: /\.module\.s(a|c)ss$/,
         use: [
-          'vue-style-loader',
+          isDevelopment ? "style-loader" : MiniCssExtractPlugin.loader,
           {
-            loader:  'css-loader',
+            loader: "css-loader",
             options: {
-              url: false
-            }
-          }
-        ]
+              modules: true,
+              sourceMap: isDevelopment,
+            },
+          },
+          {
+            loader: "sass-loader",
+            options: {
+              sourceMap: isDevelopment,
+            },
+          },
+        ],
       },
       {
-        test: /\.scss$/,
+        test: /\.s(a|c)ss$/,
+        exclude: /\.module.(s(a|c)ss)$/,
         use: [
-          'vue-style-loader',
+          "svg-url-loader",
+          isDevelopment ? "style-loader" : MiniCssExtractPlugin.loader,
           {
-            loader:  'css-loader',
+            loader: "css-loader",
             options: {
-              url: false
+              esModule: false
             }
           },
-          'sass-loader'
-        ]
-      }
-    ]
+          {
+            loader: "sass-loader",
+            options: {
+              sourceMap: isDevelopment,
+            },
+          },
+        ],
+      },
+    ],
   },
   plugins: [
-    new VueLoaderPlugin()
+    new VueLoaderPlugin(),
+    new MiniCssExtractPlugin(),
   ],
   resolve: {
     fallback: {
-      'vm': false
+      vm: false,
     }
-  }
-}
+    },
+};

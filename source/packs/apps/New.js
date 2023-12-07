@@ -1,17 +1,16 @@
 import SuperBar from '../../components/SuperBar.vue'
 import NewAppForm from '../../components/NewAppForm.vue'
 import store from '../../store'
-import Vue from 'vue/dist/vue.esm'
+import {createApp} from 'vue/dist/vue.runtime.esm-bundler'
 
 
 console.log('[New] initializing')
 store.dispatch('init', {})
 
-let new_app = new Vue({
-  el: '#new_app',
-  store,
-  components: {
-    'super-bar': SuperBar,
-    'new-app-form': NewAppForm,
-  }
-})
+let index = createApp(NewAppForm);
+index.component("super-bar", SuperBar);
+index.component("new-app-form", NewAppForm);
+
+index.use(store);
+
+index.mount("#new_app");

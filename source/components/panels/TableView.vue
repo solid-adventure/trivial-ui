@@ -154,6 +154,7 @@
   import Format from '../../lib/Format'
   import Popover from '../controls/Popover.vue'
   import * as XLSX from 'xlsx/xlsx.mjs';
+  import { nextTick } from 'vue'
 
   export default {
 
@@ -474,7 +475,7 @@
       },
 
       handleFieldInput(val) {
-        this.$set(this.rows[this.selectedRow], this.selectedColumn, val.currentTarget.value)
+        this.rows[this.selectedRow][this.selectedColumn] = val.currentTarget.value;
       },
 
       handlePromptFieldInput(event) {
@@ -550,8 +551,7 @@
           // TODO write to Notification
           console.warn(response)
         }
-        // this.rows[row][column] = suggested
-        this.$set(this.rows[row], column, suggested)
+        this.rows[row][column] = suggested
 
       },
 
@@ -682,7 +682,7 @@
       },
 
       async sparkle() {
-        await this.$nextTick()
+        await nextTick()
         for (let row_i of [...this.rows.keys()]) {
           let row = this.rows[row_i]
           for (let col_i of [...row.keys()]) {

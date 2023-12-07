@@ -29,7 +29,7 @@
       this.observer.observe(this.$refs.inner)
     },
 
-    beforeDestroy() {
+    beforeUnmount() {
       this.observer.disconnect()
     },
 

@@ -1,9 +1,9 @@
-<template>
+<BaseLayout>
   <div class="InstanceManager">
     <div class="button-row">
       <Notices :pinned="false"></Notices>
       <div class="button-row-actions">
-        <slot name="buttons"></slot>
+        <template v-slot:buttons></template>
       </div>
     </div>
 
@@ -18,7 +18,7 @@
     </div>
     <slot></slot>
   </div>
-</template>
+</BaseLayout>
 
 <style lang="scss" scoped>
   .InstanceManager {

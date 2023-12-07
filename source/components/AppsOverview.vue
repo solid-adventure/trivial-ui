@@ -70,7 +70,7 @@
         </tbody>
       </table>
       <p v-if="hasNoApps" class="no-apps">
-        <em>You do not have any apps. Click <sttrong>New</sttrong> to create a new app.</em>
+        <em>You do not have any apps. Click <strong>New</strong> to create a new app.</em>
       </p>
 
       <p v-if="hasNoSearchResults" class="no-apps">

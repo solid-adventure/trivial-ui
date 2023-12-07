@@ -1,11 +1,11 @@
 import Register from '../components/Register.vue'
-import Vue from 'vue/dist/vue.esm'
+import {createApp} from 'vue/dist/vue.runtime.esm-bundler'
 
 console.log(`[Register] Initializing`)
 
-let register = new Vue({
-    el: '#register',
-    components: {
-        'register': Register
-    }
-})
+let index = createApp(Register);
+index.component("register", Register);
+
+index.use(store);
+
+index.mount("#register");

@@ -8,6 +8,7 @@ const request = require('request');
 let dotEnvConfig = require('dotenv').config();
 const dotEnv = dotEnvConfig["parsed"]
 const Session = require(`${__dirname}/Session.js`)
+const createError = require('http-errors')
 
 const {
   // ActionCreator,
@@ -244,7 +245,7 @@ serve.get('/settings', Session.validate, (req,res) => {
   res.render('settings.html', {app_id: 'TrivialBuilder'})
 })
 
-serve.get('/playground', Session.validate, (req,res) => {
+serve.get('/playground', Session.validate, (req,res,next) => {
   try {
     let url = new URL(process.env.PLAYGROUND_PATH, process.env.LUPIN_URL)
     res.redirect(url)

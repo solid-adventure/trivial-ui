@@ -73,7 +73,7 @@
         )
         await this.callAfterAdd(newDef)
         if (newDef.credentials) {
-          this.$set(this.credentials, newDef.action.identifier, newDef.credentials)
+          this.credentials[newDef.action.identifier] = newDef.credentials;
         }
         return newDef.action
       },
@@ -98,7 +98,7 @@
         iter.eachChild(child => this.destroyAction(child))
 
         if (def.identifier in this.credentials) {
-          this.$delete(this.credentials, def.identifier)
+          delete this.credentials[def.identifier]
         }
       },
 

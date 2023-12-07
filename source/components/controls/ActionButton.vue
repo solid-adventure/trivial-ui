@@ -1,7 +1,5 @@
 <template>
-  <div :class="{working: working}" @click.prevent="click" :disabled="disabled" v-html="content" >
-    <slot></slot>
-  </div>
+  <div :class="{working: working}" @click.prevent="click" :disabled="disabled" v-html="content"></div>
 </template>
 
 <script>

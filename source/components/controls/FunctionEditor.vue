@@ -49,7 +49,7 @@
     },
 
     components: {
-      editor: require('vue2-ace-editor')
+      editor: require('vue3-ace-editor')
     },
 
     computed: {
@@ -75,7 +75,7 @@
           userTheme = this.$store.state.user.color_theme
         } catch (e) { }
         if (!userTheme || userTheme == 'Dark') {
-          require('brace/theme/monokai')
+          require('ace-builds/src-noconflict/theme-monokai')
           this.aceTheme = 'monokai'
         } else {
           this.aceTheme = 'chrome'
@@ -84,11 +84,11 @@
       },
 
       editorInit(editor) {
-        require('brace/theme/chrome') // theme boilerplate
-        require('brace/ext/language_tools') //language extension prerequsite...
-        require('brace/mode/javascript')    //language
-        require('brace/mode/sql')    //language
-        require('brace/snippets/javascript') //snippet
+        require('ace-builds/src-noconflict/theme-chrome') // theme boilerplate
+        require('ace-builds/src-noconflict/ext-language_tools') //language extension prerequsite...
+        require('ace-builds/src-noconflict/mode-javascript')    //language
+        require('ace-builds/src-noconflict/mode-sql')    //language
+        require('ace-builds/src-noconflict/snippets/javascript') //snippet
         this.requireForTheme()
       }
 

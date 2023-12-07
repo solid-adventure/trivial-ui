@@ -9,7 +9,7 @@
 
 <script>
   import PanelBase from './PanelBase.vue'
-  import { HotTable } from '@handsontable/vue';
+  import { HotTable } from '@handsontable/vue3';
   import { registerAllModules } from 'handsontable/registry';
 
   // register Handsontable's modules

@@ -25,7 +25,7 @@
 
         <ActionButton id="copy_app" class="button-small" :action="copyApp" value="Copy" working-value="Copying..."></ActionButton>
         <transition name="fade">
-            <div v-if="copyMessage" v-html="copyMessage"class="message"></div>
+            <div v-if="copyMessage" v-html="copyMessage" class="message"></div>
         </transition>
       </div>
 

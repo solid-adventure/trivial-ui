@@ -5,7 +5,7 @@
 
   export default {
     components: {
-      editor: require('vue2-ace-editor')
+      editor: require('vue3-ace-editor')
     },
 
     props: {
@@ -67,10 +67,10 @@
           userTheme = this.$store.state.user.color_theme
         } catch (e) { }
         if (!userTheme || userTheme == 'Dark' ) {
-          require('brace/theme/monokai')
+          require('ace-builds/src-noconflict/theme-monokai')
           this.aceTheme = 'monokai'
         } else {
-          require('brace/theme/chrome')
+          require('ace-builds/src-noconflict/theme-chrome')
           this.aceTheme = 'chrome'
         }
 
@@ -78,9 +78,9 @@
 
 
       editorInit(editor) {
-            require('brace/ext/language_tools') //language extension prerequsite...
-            require('brace/mode/javascript')    //language
-            require('brace/snippets/javascript') //snippet
+            require('ace-builds/src-noconflict/ext-language_tools') //language extension prerequsite...
+            require('ace-builds/src-noconflict/mode-javascript')    //language
+            require('ace-builds/src-noconflict/snippets/javascript') //snippet
             this.requireForTheme()
         }
     }

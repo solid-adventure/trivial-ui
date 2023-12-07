@@ -31,6 +31,8 @@
   import notifications from '../components/notifications'
   import Notices from '../components/Notices.vue'
 
+  import { nextTick } from 'vue'
+
   export default {
     data(){
       return {
@@ -59,7 +61,7 @@
       toggleNewActionFormDisplay() {
         this.displayNewActionForm = !this.displayNewActionForm
         if (!this.displayNewActionForm) { return false }
-        this.$nextTick(() => {
+        nextTick(() => {
           this.$refs.service.focus()
         })
       },
@@ -93,7 +95,7 @@
   }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
   .actions-container {
     padding: calc(80px + 3.625em + 1px + 1em) 4em 4em 4em;
   }

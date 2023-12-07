@@ -20,7 +20,7 @@
       </div>
       <div v-for="(appSheetId, index) in appSheetIds">
         <div :class="{hidden: !sheetIsActive(index)}">
-          <TableView :app_id="appSheetId" :displayName="false" :options="params" v-on="$listeners" :isActive="sheetIsActive(index)"/>
+          <TableView :app_id="appSheetId" :displayName="false" :options="params" v-bind="$attrs" :isActive="sheetIsActive(index)"/>
           <a v-if="editMode" href='#' v-on:click.prevent="deleteSheet(appSheetId)" class="button-medium secondary-button headroom legroom">Delete Sheet</a>
         </div>
       </div>

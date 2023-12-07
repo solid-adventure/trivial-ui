@@ -1,11 +1,10 @@
 import AccountLocked from "../components/AccountLocked.vue";
-import Vue from "vue/dist/vue.esm";
+import {createApp} from 'vue/dist/vue.runtime.esm-bundler'
 
 console.log(`[Account Locked] initializing`);
 
-let signIn = new Vue({
-  el: "#account_locked",
-  components: {
-    "account-locked": AccountLocked,
-  },
-});
+let index = createApp(AccountLocked);
+index.component("account-locked", AccountLocked);
+
+
+index.mount("#account_locked");
