@@ -27,35 +27,16 @@ module.exports = {
         loader: "vue-loader"
       },
       {
-        test: /\.module\.s(a|c)ss$/,
-        use: [
-          isDevelopment ? "style-loader" : MiniCssExtractPlugin.loader,
-          {
-            loader: "css-loader",
-            options: {
-              modules: true,
-              sourceMap: isDevelopment,
-            },
-          },
-          {
-            loader: "sass-loader",
-            options: {
-              sourceMap: isDevelopment,
-            },
-          },
-        ],
+        test: /\.svg$/,
+        loader: "svg-url-loader"
       },
       {
         test: /\.s(a|c)ss$/,
         exclude: /\.module.(s(a|c)ss)$/,
         use: [
-          "svg-url-loader",
-          isDevelopment ? "style-loader" : MiniCssExtractPlugin.loader,
+          "vue-style-loader",
           {
             loader: "css-loader",
-            options: {
-              esModule: false
-            }
           },
           {
             loader: "sass-loader",

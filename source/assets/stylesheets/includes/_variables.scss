@@ -60,13 +60,13 @@ $scrim-opacity: 0.32 !default;
 $scrim-color: color.change($on-surface, $alpha: $scrim-opacity) !default;
 $input-border-color: color.adjust($background, $lightness: -30%) !default;
 $table-column-head-color: $accent !default;
-$success-icon: url("/assets/images/check-circle-light.svg") !default;
-$error-icon: url("/assets/images/check-exclamation.svg") !default;
+$success-icon: url("/source/assets/images/check-circle-light.svg") !default;
+$error-icon: url("/source/assets/images/check-exclamation.svg") !default;
 $webhook-pre-color: #98a3ff !default;
 $auth-text-field-color: #e9ecff !default;
 $auth-button-font-color: $on-background-high-contrast !default;
-$logo: url("/assets/images/trivial-logo-simplified-light-on-dark.svg") !default;
-$loading: url("/assets/images/trivial-loading.gif") !default;
+$logo: url("/source/assets/images/trivial-logo-simplified-light-on-dark.svg") !default;
+$loading: red; //url("/source/assets/images/trivial-loading.gif") !default;
 
 $auth-border-color: $accent !default;
 $auth-button-gradient: linear-gradient(45deg, #5147fe, #b61df6, #f46721) !default;

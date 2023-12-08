@@ -733,7 +733,7 @@
   .refresh-icon {
     height: 1em;
     width: 1em;
-    background-image: url("/assets/images/sync-solid.svg");
+    background-image: url("/source/assets/images/sync-solid.svg");
     background-color: transparent;
     display: block;
     cursor: hand;

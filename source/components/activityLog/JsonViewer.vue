@@ -173,7 +173,7 @@
   .history li.null {
   	color: var(--secondary);
   	text-decoration: line-through;
-  	background-image: url("/assets/images/check-exclamation-light.svg");
+  	background-image: url("/source/assets/images/check-exclamation-light.svg");
   	background-repeat: no-repeat;
   	background-position: left center;
   }
