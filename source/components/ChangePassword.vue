@@ -96,9 +96,6 @@ export default {
                   password: this.new_password,
                   password_confirmation: this.confirm_password,
                   current_password: this.current_password,
-                  config: {
-                      check_current_password_before_update: true
-                  }
                 })
               })
               this.message = 'Password successfully updated!'
