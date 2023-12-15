@@ -2,6 +2,9 @@
   <div class="function-editor">
     <!-- NOTE: this does not emit changes to the parent; the parent watches via @input -->
     <!--       If we wanted to turn on automcompletions from Ace, this would need to emit it's changes -->
+
+    <!-- NOTE: this is largely similar to field-editors/JavascriptEditor.vue, and suggests a refactor is possible -->
+
     <v-ace-editor
       v-model:value="content"
       @init="editorInit"
