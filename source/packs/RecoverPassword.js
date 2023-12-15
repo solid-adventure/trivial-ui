@@ -6,6 +6,4 @@ console.log(`[RecoverPassword] Initializing`)
 let index = createApp(RecoverPassword);
 index.component("recover_password", RecoverPassword);
 
-index.use(store);
-
 index.mount("#recover_password");
