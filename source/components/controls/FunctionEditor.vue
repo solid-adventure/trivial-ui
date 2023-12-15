@@ -1,6 +1,14 @@
 <template>
   <div class="function-editor">
-    <editor :value="value" @init="editorInit" @input="aceInput" :lang="optionsWithDefaults.lang" :theme="aceTheme" :width="optionsWithDefaults.width" :height="optionsWithDefaults.height" :options="{useWorker: false, showPrintMargin: false}"></editor>
+    <!-- NOTE: this does not emit changes to the parent; the parent watches via @input -->
+    <!--       If we wanted to turn on automcompletions from Ace, this would need to emit it's changes -->
+    <v-ace-editor
+      v-model:value="content"
+      @init="editorInit"
+      useWorker="false"
+      showPrintMargin="false"
+      :style="{height: optionsWithDefaults.height}"
+    />
   </div>
 </template>
 
@@ -31,9 +39,17 @@
 </style>
 
 <script>
+
+  import { VAceEditor } from 'vue3-ace-editor';
+  import 'ace-builds/src-noconflict/mode-json';
+  import 'ace-builds/src-noconflict/theme-chrome';
+
   export default {
     props: {
-      value: String,
+      modelValue: {
+        type: String,
+        default: '',
+      },
       options: {
         type: Object,
         required: false,
@@ -44,15 +60,17 @@
 
     data() {
       return {
-        aceTheme: ''
+        aceTheme: '',
+        content: this.modelValue
       }
     },
 
     components: {
-      editor: require('vue3-ace-editor')
+      VAceEditor
     },
 
     computed: {
+
       optionsWithDefaults() {
         let defaults = {
           width: "100%",
@@ -64,10 +82,6 @@
     },
 
     methods: {
-
-      aceInput(event) {
-        this.$emit('input', event)
-      },
 
       requireForTheme() {
         let userTheme
@@ -84,12 +98,12 @@
       },
 
       editorInit(editor) {
-        require('ace-builds/src-noconflict/theme-chrome') // theme boilerplate
-        require('ace-builds/src-noconflict/ext-language_tools') //language extension prerequsite...
-        require('ace-builds/src-noconflict/mode-javascript')    //language
-        require('ace-builds/src-noconflict/mode-sql')    //language
-        require('ace-builds/src-noconflict/snippets/javascript') //snippet
-        this.requireForTheme()
+        // require('ace-builds/src-noconflict/theme-chrome') // theme boilerplate
+        // require('ace-builds/src-noconflict/ext-language_tools') //language extension prerequsite...
+        // require('ace-builds/src-noconflict/mode-javascript')    //language
+        // require('ace-builds/src-noconflict/mode-sql')    //language
+        // require('ace-builds/src-noconflict/snippets/javascript') //snippet
+        // this.requireForTheme()
       }
 
     }
