@@ -4,6 +4,7 @@ const glob = require("glob");
 const autoprefixer = require("autoprefixer");
 const { VueLoaderPlugin } = require("vue-loader");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const webpack = require('webpack');
 
 const mode =
   process.env["NODE_ENV"] === "production" ? "production" : "development";
@@ -51,6 +52,11 @@ module.exports = {
   plugins: [
     new VueLoaderPlugin(),
     new MiniCssExtractPlugin(),
+    new webpack.DefinePlugin(
+    {
+      __VUE_OPTIONS_API__: true,
+      __VUE_PROD_DEVTOOLS__: !isDevelopment,
+    }),
   ],
   resolve: {
     fallback: {
