@@ -13,7 +13,6 @@ let index = createApp(InstanceActivity);
 index.provide('appId', appId)
 index.component("super-bar", SuperBar);
 index.component("nav-tree", NavTree);
-index.component("instance-activity", InstanceActivity);
 
 index.use(store);
 

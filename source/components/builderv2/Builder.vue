@@ -254,6 +254,7 @@
 </script>
 
 <template>
+  <super-bar></super-bar>
   <div class="builder" :style="{paddingLeft: this.leftNavWidth}">
     <ChangeSequence v-if="displayChangeSequence" @close="displayChangeSequence=false" />
 <!-- Note: this is a copy of NavTree to handle the complexities of the nested Builder -->

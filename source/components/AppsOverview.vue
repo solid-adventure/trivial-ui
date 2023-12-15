@@ -1,5 +1,6 @@
 <template>
   <div class="overview">
+    <super-bar></super-bar>
     <div class="overview-container">
       <div class="title-row">
         <div class="search-container">

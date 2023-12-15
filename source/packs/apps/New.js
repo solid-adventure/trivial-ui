@@ -9,7 +9,6 @@ store.dispatch('init', {})
 
 let index = createApp(NewAppForm);
 index.component("super-bar", SuperBar);
-index.component("new-app-form", NewAppForm);
 
 index.use(store);
 
