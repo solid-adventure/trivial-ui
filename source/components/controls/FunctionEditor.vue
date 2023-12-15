@@ -5,6 +5,8 @@
     <v-ace-editor
       v-model:value="content"
       @init="editorInit"
+      :lang="optionsWithDefaults.lang"
+      :theme="aceTheme"
       useWorker="false"
       showPrintMargin="false"
       :style="{height: optionsWithDefaults.height}"
@@ -40,9 +42,14 @@
 
 <script>
 
-  import { VAceEditor } from 'vue3-ace-editor';
-  import 'ace-builds/src-noconflict/mode-json';
-  import 'ace-builds/src-noconflict/theme-chrome';
+  import { VAceEditor } from 'vue3-ace-editor'
+  import 'ace-builds/src-noconflict/mode-json'
+  import 'ace-builds/src-noconflict/mode-javascript'     // language
+  import 'ace-builds/src-noconflict/mode-sql'            // language
+  import 'ace-builds/src-noconflict/theme-chrome';       // light theme
+  import 'ace-builds/src-noconflict/theme-monokai'       // dark theme
+  import 'ace-builds/src-noconflict/ext-language_tools'  // language extension prerequsite...
+  import 'ace-builds/src-noconflict/snippets/javascript' // snippet
 
   export default {
     props: {
@@ -83,27 +90,20 @@
 
     methods: {
 
-      requireForTheme() {
+      setTheme() {
         let userTheme
         try {
           userTheme = this.$store.state.user.color_theme
         } catch (e) { }
         if (!userTheme || userTheme == 'Dark') {
-          require('ace-builds/src-noconflict/theme-monokai')
           this.aceTheme = 'monokai'
         } else {
           this.aceTheme = 'chrome'
         }
-
       },
 
       editorInit(editor) {
-        // require('ace-builds/src-noconflict/theme-chrome') // theme boilerplate
-        // require('ace-builds/src-noconflict/ext-language_tools') //language extension prerequsite...
-        // require('ace-builds/src-noconflict/mode-javascript')    //language
-        // require('ace-builds/src-noconflict/mode-sql')    //language
-        // require('ace-builds/src-noconflict/snippets/javascript') //snippet
-        // this.requireForTheme()
+        this.setTheme()
       }
 
     }
