@@ -219,23 +219,13 @@
          return undefined === this.currentError
        },
 
-      hasError: function() {
-        if (this.value && this.parser.parseError) {
-          return true
-        } else if (this.showReferenceErrors) {
-          return this.resolvedValue === undefined && this.parser.referenceError
-        } else {
-          return false
-        }
+      hasError() {
+        return this.value && this.parser.parseError
       },
 
-      currentError: function() {
-        if (this.parser.parseError) {
+      currentError() {
           return this.parser.parseError
-        } else if (this.showReferenceErrors && this.resolvedValue === undefined) {
-          return this.parser.referenceError
-        }
-      }
+      },
 
     },
 
