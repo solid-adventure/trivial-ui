@@ -17,7 +17,7 @@
         <option v-for="rangeName of dateRangeNames">{{rangeName}}</option>
         <option name="Custom">Custom</option>
       </select>
-      <date-picker prefix-class="xmx" v-model="namedDateRange" :range="true"></date-picker>
+      <date-picker prefix-class="xmx" v-model:value="namedDateRange" :range="true"></date-picker>
      </div>
       <div class="panels-container">
         <div class="row" v-for="childApp in partialWidthPanels">
