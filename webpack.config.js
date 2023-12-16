@@ -28,16 +28,16 @@ module.exports = {
         loader: "vue-loader"
       },
       {
-        test: /\.svg$/,
-        loader: "svg-url-loader"
-      },
-      {
         test: /\.s(a|c)ss$/,
         exclude: /\.module.(s(a|c)ss)$/,
         use: [
           "vue-style-loader",
           {
             loader: "css-loader",
+            options: {
+              sourceMap: isDevelopment,
+              url: false,
+            },
           },
           {
             loader: "sass-loader",
