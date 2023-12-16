@@ -144,6 +144,7 @@
           chartOptions: {},
           errors: '',
           datasets: [],
+          description: '',
           labels: [],
           title: '',
           chart: null,

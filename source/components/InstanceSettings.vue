@@ -1,4 +1,6 @@
 <template>
+  <super-bar></super-bar>
+  <nav-tree selected-title="settings"></nav-tree>
   <div class="InstanceSettings">
     <div id="messages">{{errorMessage}}</div>
 

@@ -6,12 +6,13 @@
              name="search_code"
              :class="{error: hasError}"
              autocomplete="off"
-             :value="value"
+             :value="modelValue"
              :placeholder="placeholder"
              @input="input"
              @blur="blur"
              @keydown="keydown"
-             ref="input">
+             ref="input"
+             >
       <ul ref="list" class="completions" v-if="showList">
         <li v-for="(str, idx) in matchingCompletions"
             @mousedown="complete(str)"
@@ -127,7 +128,7 @@
     },
 
     props: {
-      value: String,
+      modelValue: String,
       sample: Object,
       schema: [Object, Function],
       variable: String,
@@ -161,7 +162,7 @@
 
     computed: {
       completionGenerator: function() {
-        const gen = new CodeCompletionGenerator(this.value, {
+        const gen = new CodeCompletionGenerator(this.modelValue, {
           insertionCol: this.$refs.input ? this.$refs.input.selectionEnd : -1,
           schema: this.schema,
           dataSample: this.sample,
@@ -205,7 +206,7 @@
       },
 
       hasError: function() {
-        if (this.value && this.completionGenerator.parseError) {
+        if (this.modelValue && this.completionGenerator.parseError) {
           return true
         } else if (this.showReferenceErrors) {
           return this.resolvedValue === undefined && this.completionGenerator.referenceError
@@ -233,7 +234,7 @@
 
     methods: {
       input(event) {
-        this.$emit('input', event.target.value)
+        this.$emit('update:modelValue', event.target.value)
         this.open = true
       },
 
@@ -243,7 +244,7 @@
 
       complete(str) {
         if (str) {
-          this.$emit('input', this.completionGenerator.complete(str))
+          this.$emit('update:modelValue', this.completionGenerator.complete(str))
         }
         this.open = false
       },
@@ -254,7 +255,7 @@
             event.preventDefault()
             this.open = true
           }
-          if ('Enter' === event.code && this.value) {
+          if ('Enter' === event.code && this.modelValue) {
             this.$emit('submit')
           }
           return

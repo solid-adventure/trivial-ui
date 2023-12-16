@@ -13,6 +13,8 @@
 
 <template>
   <div class="InstanceActivity">
+    <super-bar></super-bar>
+    <nav-tree :selected-title="'activity'"></nav-tree>
     <WebhooksTable></WebhooksTable>
   </div>
 </template>

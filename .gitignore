@@ -1,12 +1,5 @@
 /node_modules/*
-/templates/**/node_modules
 .env
-/slugs/*
 /tmp/*
 README.html
-public/assets/js
-public/assets/stylesheets
-public/components
-public/packs
-public/views
-/source/lib/models-dynamic/
+public/*

@@ -1,4 +1,5 @@
 <template>
+    <super-bar></super-bar>
     <div class="PageContainer">
         <div class="Col1">
             <Notices></Notices>

@@ -4,6 +4,7 @@ const glob = require("glob");
 const autoprefixer = require("autoprefixer");
 const { VueLoaderPlugin } = require("vue-loader");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const webpack = require('webpack');
 
 const mode =
   process.env["NODE_ENV"] === "production" ? "production" : "development";
@@ -27,16 +28,16 @@ module.exports = {
         loader: "vue-loader"
       },
       {
-        test: /\.svg$/,
-        loader: "svg-url-loader"
-      },
-      {
         test: /\.s(a|c)ss$/,
         exclude: /\.module.(s(a|c)ss)$/,
         use: [
           "vue-style-loader",
           {
             loader: "css-loader",
+            options: {
+              sourceMap: isDevelopment,
+              url: false,
+            },
           },
           {
             loader: "sass-loader",
@@ -51,6 +52,11 @@ module.exports = {
   plugins: [
     new VueLoaderPlugin(),
     new MiniCssExtractPlugin(),
+    new webpack.DefinePlugin(
+    {
+      __VUE_OPTIONS_API__: true,
+      __VUE_PROD_DEVTOOLS__: !isDevelopment,
+    }),
   ],
   resolve: {
     fallback: {

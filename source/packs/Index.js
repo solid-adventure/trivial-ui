@@ -9,8 +9,6 @@ store.dispatch('init', {})
 
 let index = createApp(AppsOverview);
 index.component("super-bar", SuperBar);
-index.component('apps-overview', AppsOverview);
 index.use(store);
-
 index.mount("#index");
 

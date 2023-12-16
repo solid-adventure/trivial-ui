@@ -8,7 +8,6 @@ store.dispatch("init", {});
 
 let index = createApp(Settings);
 index.component("super-bar", SuperBar);
-index.component("settings", Settings);
 index.use(store);
 
 index.mount("#settings");
