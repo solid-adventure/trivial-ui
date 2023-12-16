@@ -1,9 +1,9 @@
 <template>
     <label class="switch">
-      <input type="checkbox" @input="emitClick" :checked="value">
-      <span class="slider round" :class="{toggled: value}" :style="{background: backgroundColor}">
-        <Icon v-if="value && onIcon" :icon="onIcon"></Icon>
-        <Icon v-if="!value && offIcon" :icon="offIcon"></Icon>
+      <input type="checkbox" @input="emitClick" :checked="modelValue">
+      <span class="slider round" :class="{toggled: modelValue}" :style="{background: backgroundColor}">
+        <Icon v-if="modelValue && onIcon" :icon="onIcon"></Icon>
+        <Icon v-if="!modelValue && offIcon" :icon="offIcon"></Icon>
       </span>
       <span class="on-off-label" v-if="displayOnOff">{{ onOff }}</span>
     </label>
@@ -98,7 +98,7 @@ export default {
   },
 
   props: {
-    value: {
+    modelValue: {
       type: Boolean,
       default: true,
       required: true
@@ -124,7 +124,7 @@ export default {
 
   computed: {
     onOff() {
-      return this.value ? "ON" : "OFF"
+      return this.modelValue ? "ON" : "OFF"
     },
 
     backgroundColor() {
@@ -138,7 +138,7 @@ export default {
 
   methods: {
     emitClick(event){
-      this.$emit('input', event.currentTarget.checked)
+      this.$emit('update:modelValue', event.currentTarget.checked)
     }
   }
 }
