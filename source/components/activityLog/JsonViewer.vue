@@ -1,6 +1,5 @@
 <template>
   <div class="viewer-container">
-
       <div class="heading-row">
         <h2>Errors</h2>
          <a v-if="this.webhook.activity_type == 'request'" href="#" class="button-medium headroom-mini" @click.prevent="resendPayload">{{resendText}}</a>
@@ -44,7 +43,6 @@
         </li>
       </ul>
     </div>
-  </div>
 </template>
 
 <style lang="scss" scoped>
@@ -175,7 +173,7 @@
   .history li.null {
   	color: var(--secondary);
   	text-decoration: line-through;
-  	background-image: url("/assets/images/check-exclamation-light.svg");
+  	background-image: url("/source/assets/images/check-exclamation-light.svg");
   	background-repeat: no-repeat;
   	background-position: left center;
   }

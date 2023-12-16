@@ -7,6 +7,7 @@
   import { mapState, mapActions } from 'vuex'
   import parse from '../../lib/pg-connection-string'
   import { track } from '../../../lib/TrackingService'
+  import {nextTick} from 'vue'
 
   export default {
 
@@ -176,7 +177,7 @@
       setConnectionUrlFieldVisible() {
         this.connectionUrlFieldVisible = true
         this.importConnectionButtonVisible = false
-        this.$nextTick(() => {this.$refs.connectionUrlInput.focus()})
+        nextTick(() => {this.$refs.connectionUrlInput.focus()})
       },
 
       setCredentialsFromConnectionUrl(connectionUrl) {

@@ -1,6 +1,18 @@
 <template>
   <div class="function-editor">
-    <editor :value="value" @init="editorInit" @input="aceInput" :lang="optionsWithDefaults.lang" :theme="aceTheme" :width="optionsWithDefaults.width" :height="optionsWithDefaults.height" :options="{useWorker: false, showPrintMargin: false}"></editor>
+
+    <!-- NOTE: this is largely similar to field-editors/JavascriptEditor.vue, and suggests a refactor is possible -->
+
+    <v-ace-editor
+      v-model:value="content"
+      @init="editorInit"
+      @change="() => $emit('update:modelValue', content)"
+      :lang="optionsWithDefaults.lang"
+      :theme="aceTheme"
+      useWorker="false"
+      showPrintMargin="false"
+      :style="{height: optionsWithDefaults.height}"
+    />
   </div>
 </template>
 
@@ -31,9 +43,22 @@
 </style>
 
 <script>
+
+  import { VAceEditor } from 'vue3-ace-editor'
+  import 'ace-builds/src-noconflict/mode-json'
+  import 'ace-builds/src-noconflict/mode-javascript'     // language
+  import 'ace-builds/src-noconflict/mode-sql'            // language
+  import 'ace-builds/src-noconflict/theme-chrome';       // light theme
+  import 'ace-builds/src-noconflict/theme-monokai'       // dark theme
+  import 'ace-builds/src-noconflict/ext-language_tools'  // language extension prerequsite...
+  import 'ace-builds/src-noconflict/snippets/javascript' // snippet
+
   export default {
     props: {
-      value: String,
+      modelValue: {
+        type: String,
+        default: '',
+      },
       options: {
         type: Object,
         required: false,
@@ -44,15 +69,17 @@
 
     data() {
       return {
-        aceTheme: ''
+        aceTheme: '',
+        content: this.modelValue
       }
     },
 
     components: {
-      editor: require('vue2-ace-editor')
+      VAceEditor
     },
 
     computed: {
+
       optionsWithDefaults() {
         let defaults = {
           width: "100%",
@@ -65,31 +92,20 @@
 
     methods: {
 
-      aceInput(event) {
-        this.$emit('input', event)
-      },
-
-      requireForTheme() {
+      setTheme() {
         let userTheme
         try {
           userTheme = this.$store.state.user.color_theme
         } catch (e) { }
         if (!userTheme || userTheme == 'Dark') {
-          require('brace/theme/monokai')
           this.aceTheme = 'monokai'
         } else {
           this.aceTheme = 'chrome'
         }
-
       },
 
       editorInit(editor) {
-        require('brace/theme/chrome') // theme boilerplate
-        require('brace/ext/language_tools') //language extension prerequsite...
-        require('brace/mode/javascript')    //language
-        require('brace/mode/sql')    //language
-        require('brace/snippets/javascript') //snippet
-        this.requireForTheme()
+        this.setTheme()
       }
 
     }

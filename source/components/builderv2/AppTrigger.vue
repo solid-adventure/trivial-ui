@@ -210,7 +210,7 @@
         :action="resendLast"></ActionButton>
     </div>
     <div v-if="inCustomMode">
-      <div class="secondary-button" @click="configureData">Edit Payload</span></div>
+      <div class="secondary-button" @click="configureData">Edit Payload</div>
       <ActionButton
         ref="sendCustomButton"
         class="button-medium"
@@ -221,7 +221,6 @@
     <div v-if="inSelectMode">
       <em>No app trigger selected</em>
     </div>
-
   </div>
 </template>
 

@@ -328,7 +328,7 @@ $time-hover-background-color: mix($background, $calendar-active-background-color
 // $input-border-radius: 4px;
 // $sidebar-margin-left: 100px;
 
-@import '../../../node_modules/vue2-datepicker/scss/index.scss';
+@import '../../../node_modules/vue-datepicker-next/scss/index.scss';
 
 
 .#{$namespace}-input {

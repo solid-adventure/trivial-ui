@@ -1,5 +1,6 @@
 <template>
   <div class="dashboard-container">
+    <super-bar></super-bar>
     <Notices :pinned="false"></Notices>
     <DashboardSettings v-if="this.settingsPanelOpen" @close="toggleSettings" :dateRangeNames="dateRangeNames" :appId="this.app_id"></DashboardSettings>
     <h1>{{this.app.descriptive_name}}</h1>
@@ -16,7 +17,7 @@
         <option v-for="rangeName of dateRangeNames">{{rangeName}}</option>
         <option name="Custom">Custom</option>
       </select>
-      <date-picker prefix-class="xmx" v-model="namedDateRange" :range="true"></date-picker>
+      <date-picker prefix-class="xmx" v-model:value="namedDateRange" :range="true"></date-picker>
      </div>
       <div class="panels-container">
         <div class="row" v-for="childApp in partialWidthPanels">
@@ -37,7 +38,7 @@
   import Clipboard from '../../lib/Clipboard'
   import CreatePanel from './CreatePanel.vue'
   import DashboardSettings from './DashboardSettings.vue'
-  import DatePicker from 'vue2-datepicker';
+  import DatePicker from 'vue-datepicker-next';
   import Notices from '../Notices.vue'
   import PanelBase from './PanelBase.vue'
   import { mapState } from 'vuex'

@@ -1,5 +1,4 @@
-import Vue from 'vue/dist/vue.esm'
-import Vuex from 'vuex'
+import { createStore } from 'vuex'
 import { fetchJSON } from 'trivial-core/lib/component-utils'
 import KeyboardControl from '../lib/KeyboardControl'
 import notifications from '../components/notifications'
@@ -8,9 +7,7 @@ import FeatureManager from 'trivial-core/lib/FeatureManager'
 import ReconnectingWebSocket from 'reconnecting-websocket'
 import ActionPath from 'trivial-core/lib/actionsv2/ActionPath'
 
-Vue.use(Vuex)
-
-const store = new Vuex.Store({
+const store = createStore({
 
   state: {
     user: {},

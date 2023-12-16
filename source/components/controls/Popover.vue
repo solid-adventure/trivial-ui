@@ -145,7 +145,7 @@
       }
     },
 
-    beforeDestroy() {
+    beforeUnmount() {
       this.disconnect()
     },
 

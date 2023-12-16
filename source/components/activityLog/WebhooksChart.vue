@@ -74,7 +74,7 @@ export default {
     this.fetchData()
   },
 
-  destroyed() {
+  unmounted() {
     if (this.chart)
       this.chart.destroy()
   },

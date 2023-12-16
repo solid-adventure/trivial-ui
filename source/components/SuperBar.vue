@@ -8,9 +8,9 @@
     <!-- <span><a href="/settings">Account</a></span> -->
     <span class="settings">
       <div class ="theme">
-        <ToggleButton 
-          @input="updateToggleButtonState" 
-          :value="active" 
+        <ToggleButton
+          @update:modelValue="updateToggleButtonState"
+          :modelValue="active"
           off-icon="sun"
           on-icon="moon"
           theme-override="dark"></ToggleButton>

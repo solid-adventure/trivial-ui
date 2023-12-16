@@ -313,7 +313,7 @@ import { mapActions, mapState } from 'vuex'
 
     toggleExpanded(id) {
       this.expanded = {}
-      this.$set(this.expanded, id, true)
+      this.expanded[id] = true;
     },
 
     successClassFromStatus(status) {

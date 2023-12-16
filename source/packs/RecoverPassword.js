@@ -1,11 +1,9 @@
 import RecoverPassword from '../components/RecoverPassword.vue'
-import Vue from 'vue/dist/vue.esm'
+import {createApp} from 'vue/dist/vue.runtime.esm-bundler'
 
 console.log(`[RecoverPassword] Initializing`)
 
-let registerPassword = new Vue({
-    el: '#recover_password',
-    components: {
-        'recover-password': RecoverPassword
-    }
-})
+let index = createApp(RecoverPassword);
+index.component("recover_password", RecoverPassword);
+
+index.mount("#recover_password");

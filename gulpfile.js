@@ -10,10 +10,13 @@ const actionRegistry = new ActionRegistry()
 
 let staticFolders = [
   {
-    from: 'assets/js/**/*.js',
-    to: 'assets/js'
+    from: 'assets/images/**/*',
+    to: 'assets/images'
   },
   {
+    from: 'assets/fonts/**/*',
+    to: 'assets/fonts'
+  },  {
     from: 'components/**/*.js',
     to: 'components'
   },

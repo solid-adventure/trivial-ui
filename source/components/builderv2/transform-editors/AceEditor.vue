@@ -2,7 +2,7 @@
   <div class="autocomplete-input" :class="{expanded: showList}">
     <div class="autocomplete-container">
       <Component v-if="suggestionHelperType" :is="suggestionHelperType" @handleSuggestion="handleSuggestion" @handleRunQuery="syntheticRunQueryClick" />
-      <FunctionEditor :value="valueWithoutBackticks" @input="handleInput" :options="options" />
+      <FunctionEditor :modelValue="valueWithoutBackticks" @input="handleInput" :options="options" />
       <ActionButton v-if="previewHelperType" ref="runQueryButton" value='Preview<span class="shortcut"> ⌘ + return</span>' :action="runQuery" class="button button-small preview-button" workingValue="Running..." />
       <ul ref="list" class="completions" v-if="showList">
         <li v-for="(str, idx) in matchingCompletions"
@@ -146,7 +146,7 @@
         default: {},
         required: false
       },
-      value: String,
+      modelValue: String,
       sample: Object,
       schema: [Object, Function],
       variable: String,
@@ -192,7 +192,7 @@
       },
 
       valueWithoutBackticks() {
-        let out = this.value.trim()
+        let out = this.modelValue.trim()
         if (out[0] == '`' && out[out.length -1] == '`') {
           out = out.slice(1)
           out = out.slice(0, out.length - 1)
@@ -202,7 +202,7 @@
       },
 
       completionGenerator: function() {
-        const gen = new CodeCompletionGenerator(this.value, {
+        const gen = new CodeCompletionGenerator(this.modelValue, {
           insertionCol: this.$refs.input ? this.$refs.input.selectionEnd : -1,
           schema: this.schema,
           dataSample: this.sample,
@@ -249,7 +249,7 @@
       },
 
       hasError: function() {
-        if (this.value && this.completionGenerator.parseError) {
+        if (this.modelValue && this.completionGenerator.parseError) {
           return true
         } else if (this.showReferenceErrors) {
           return this.resolvedValue === undefined && this.completionGenerator.referenceError
@@ -306,19 +306,20 @@
         await this.$root.$refs.QueryHelper.runQuery()
       },
 
-      handleInput(val) {
+      handleInput(event) {
+        let val = event.target.value
         if (this.backticksRemoved) { val = `\`${val}\``}
-        this.$emit('input', val)
+        this.$emit('update:modelValue', val)
         this.open = true
       },
 
       handleSuggestion(val) {
-        this.$emit('input', val)
+        this.$emit('update:modelValue', val)
       },
 
       complete(str) {
         if (str) {
-          this.$emit('input', this.completionGenerator.complete(str))
+          this.$emit('update:modelValue', this.completionGenerator.complete(str))
         }
         this.open = false
       },

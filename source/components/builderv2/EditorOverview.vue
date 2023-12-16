@@ -78,7 +78,7 @@
 
       handleActionEnabledToggle(val) {
         let a = new ActionEnabler(this.action)
-        this.value = val ? a.enable() : a.disable()
+        val ? a.enable() : a.disable()
       },
 
       syntheticClickToggle() {
@@ -117,7 +117,8 @@ hiddenByTour("custom-functions")  {{ hiddenByTour("custom-functions") }}
       </div>
       <div v-if="action.identifier != 1 && !playgroundMode " class="disable-group">
         <p class="toggle-label">Action On/Off</p>
-        <ToggleButton ref="ActionEnabledToggle" @input="handleActionEnabledToggle" v-model="action.enabled" :value="action.enabled"></ToggleButton>
+        <!-- v-model="action.enabled" -->
+        <ToggleButton ref="ActionEnabledToggle" @update:modelValue="handleActionEnabledToggle" :modelValue="action.enabled"></ToggleButton>
       </div>
     </div>
     <HideableSection v-if="fullDescription && !hiddenByTour('action-info')" class="action-info">

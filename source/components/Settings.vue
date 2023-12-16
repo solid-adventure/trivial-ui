@@ -1,4 +1,5 @@
 <template>
+  <super-bar></super-bar>
   <div class="SettingsContainer">
     <h2>Account Settings</h2>
     <br/>
@@ -13,7 +14,7 @@
   </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
   .SettingsContainer {
     padding: calc(80px + 3.625em + 1px + 1em) 4em 4em 4em;
   }

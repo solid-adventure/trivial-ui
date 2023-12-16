@@ -101,7 +101,8 @@
         <div v-for="(action, label) in configActions" class="config-action">
           <ActionButton
             class="button-small"
-            :action="actionPerformer(action)">{{label}}</ActionButton>
+            :value="label"
+            :action="actionPerformer(action)"></ActionButton>
         </div>
       </HideableSection>
     </div>

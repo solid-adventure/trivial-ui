@@ -1,11 +1,11 @@
 import FunctionWriter from '../components/FunctionWriter.vue'
-import Vue from 'vue/dist/vue.esm'
+import {createApp} from 'vue/dist/vue.runtime.esm-bundler'
 
 console.log(`[FunctionWriter] Initializing`)
 
-let functionWriter = new Vue({
-    el: '#functionWriter',
-    components: {
-        'function-writer': FunctionWriter
-    }
-})
+let index = createApp(FunctionWriter);
+index.component("function-writer", FunctionWriter);
+
+index.use(store);
+
+index.mount("#functionWriter");

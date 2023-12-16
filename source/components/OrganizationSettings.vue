@@ -20,8 +20,7 @@
       </form> -->
 
       <div class="action-row">
-        <a :href="newInvitationPath" class="button-medium">Add New User</button>
-        </a>
+        <a :href="newInvitationPath" class="button-medium">Add New User</a>
       </div>
       <table class="spaced organization-users">
         <thead>

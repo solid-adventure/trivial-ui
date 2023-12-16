@@ -1,11 +1,11 @@
 import SignIn from '../components/SignIn.vue'
-import Vue from 'vue/dist/vue.esm'
+import {createApp} from 'vue/dist/vue.runtime.esm-bundler'
+import store from '../store'
 
 console.log(`[Sign In] initializing`)
 
-let signIn = new Vue({
-    el: '#sign_in',
-    components: {
-        'sign-in': SignIn
-    }
-})
+let index = createApp(SignIn)
+
+index.use(store)
+index.component('sign-in', SignIn)
+index.mount("#sign_in")
