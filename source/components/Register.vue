@@ -150,7 +150,7 @@ export default {
                 }
                 TrackingService.identify(user)
                 TrackingService.track('User Signup', user)
-                window.location = '/playground'
+                window.location = '/'
 		    }
         },
 
