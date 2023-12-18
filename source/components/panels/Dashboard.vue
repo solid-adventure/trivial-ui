@@ -356,11 +356,14 @@
       margin-top: 3em;
       display: flex;
       flex-direction: column;
-
+      
       @media only screen and (min-width: 600px) {
-        flex-direction: row;
+        flex-flow: row wrap;
         justify-content: space-between;
       } 
+      .panel{
+        margin-top: 1em;
+      }
     }
   }
 
