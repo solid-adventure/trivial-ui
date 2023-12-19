@@ -72,6 +72,7 @@ $auth-border-color: $accent !default;
 $auth-button-gradient: linear-gradient(45deg, #5147fe, #b61df6, #f46721) !default;
 
 $super-bar-background: #000 !default;
+$super-bar-background-active: $scrim-color !default;
 $toggle-background-light: #eee !default;
 $toggle-background-dark: #333 !default;
 
@@ -182,6 +183,7 @@ $tool-tip-background: $background-high-contrast !default;
   --tool-tip-background: #{$tool-tip-background};
 
   --super-bar-background: #{$super-bar-background};
+  --super-bar-background-active: #{$super-bar-background-active};
   --toggle-background-light: #{$toggle-background-light};
   --toggle-background-dark: #{$toggle-background-dark};
 }
