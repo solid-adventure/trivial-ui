@@ -138,7 +138,7 @@
   }
 
  .tab.active, .active{
-    background-color: var(--accent-20);
+    background-color: var(--table-column-head-color);
     color: var(--on-background);
     border-bottom: 0;
     border-color: var(--accent);
