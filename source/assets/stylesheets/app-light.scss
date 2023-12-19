@@ -1,15 +1,14 @@
 @use 'sass:color';
 
-// Light theme, by Brian Fong
 $background: #ffffff;
 $background-high-contrast: #ffffff;
 $surface: #fafafa;
 $surface-secondary: #ffffff;
-$primary: #6bebd4; // #4c46fe;
+$primary: #3b6da1;;
 $primary-darker: #3430a4;
 $secondary: #716ff3;
 $secondary-darker:  rgb(196 106 189);
-$accent: #53cdb7;
+$accent: #99bee4;
 $error: #ff7a7a;
 
 $series-1: rgba(255,96,132, 0.5); // 50% red
@@ -28,19 +27,26 @@ $on-secondary-darker: rgb(32 59 61);
 $on-accent: #1b1817;
 $on-error: rgb(255, 255, 255);
 
-$link: #53cdb7;
+$link: #3b6da1;
 
 $scrim-opacity: 0.32;
 $scrim-color: color.change($on-surface, $alpha: $scrim-opacity);
 $input-border-color: color.adjust($background, $lightness: -30%);
-$table-column-head-color: #ebeafb;
+$table-column-head-color: #eef3f7;
+$table-row-hover-background: #e5e5e5;
+$on-table-row-hover-background: #000;
 $success-icon: url("/assets/images/check-circle.svg");
-$webhook-pre-color: $primary;
+$webhook-pre-color: #8d99b1;
 $auth-text-field-color: $primary;
 $auth-button-font-color: $background-high-contrast;
 $logo: url("/assets/images/trivial-logo-simplified-dark-on-light.svg");
 $auth-border-color: $primary;
 $auth-button-gradient: linear-gradient(45deg, #45c400, #00bdef, #2567ff);
 
+$super-bar-background: #303030;
+$toggle-background-light: #eee;
+$toggle-background-dark: #000;
+
 // Import defaults last, as they include fallbacks that aren't set here
 @import "app";
+

@@ -95,6 +95,8 @@ $tab-selected-border: $on-background !default;
 
 $table-head-border: $on-background-40 !default;
 $table-striping: $surface !default;
+$table-row-hover-background: #6a6a6a !default;
+$on-table-row-hover-background: #e4e4e4 !default;
 
 $chart-inactive: $on-background-20 !default;
 $chart-success: $series-1 !default;
@@ -153,6 +155,9 @@ $tool-tip-background: $background-high-contrast !default;
   --scrim-color: #{$scrim-color};
   --input-border-color: #{$input-border-color};
   --table-column-head-color: #{$table-column-head-color};
+  --table-row-hover-background: #{$table-row-hover-background};
+  --on-table-row-hover-background: #{$on-table-row-hover-background};
+
   --success-icon: #{$success-icon};
   --error-icon: #{$error-icon};
   --webhook-pre-color: #{$webhook-pre-color};
