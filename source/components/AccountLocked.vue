@@ -14,7 +14,6 @@
 </template>
 
 <style lang="scss" scoped>
-@import "../assets/stylesheets/includes/variables";
 @import "../assets/stylesheets/includes/auth";
 .contactSupport {
   margin: 20px 0;

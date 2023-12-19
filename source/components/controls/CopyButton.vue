@@ -19,7 +19,6 @@
 </template>
 
 <style lang="scss" scoped>
-  @import "../../assets/stylesheets/includes/variables";
 
   .color-success {
     fill: green;

@@ -13,7 +13,6 @@
     </div>
 </template>
 <style lang="scss" scoped>
-  @import "../assets/stylesheets/includes/variables";
 
 .overlay{
     position: absolute;

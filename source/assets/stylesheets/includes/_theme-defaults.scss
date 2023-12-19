@@ -72,6 +72,7 @@ $auth-border-color: $accent !default;
 $auth-button-gradient: linear-gradient(45deg, #5147fe, #b61df6, #f46721) !default;
 
 $super-bar-background: #000 !default;
+$super-bar-background-active: $scrim-color !default;
 $toggle-background-light: #eee !default;
 $toggle-background-dark: #333 !default;
 
@@ -95,6 +96,8 @@ $tab-selected-border: $on-background !default;
 
 $table-head-border: $on-background-40 !default;
 $table-striping: $surface !default;
+$table-row-hover-background: #6a6a6a !default;
+$on-table-row-hover-background: #e4e4e4 !default;
 
 $chart-inactive: $on-background-20 !default;
 $chart-success: $series-1 !default;
@@ -153,6 +156,9 @@ $tool-tip-background: $background-high-contrast !default;
   --scrim-color: #{$scrim-color};
   --input-border-color: #{$input-border-color};
   --table-column-head-color: #{$table-column-head-color};
+  --table-row-hover-background: #{$table-row-hover-background};
+  --on-table-row-hover-background: #{$on-table-row-hover-background};
+
   --success-icon: #{$success-icon};
   --error-icon: #{$error-icon};
   --webhook-pre-color: #{$webhook-pre-color};
@@ -177,6 +183,7 @@ $tool-tip-background: $background-high-contrast !default;
   --tool-tip-background: #{$tool-tip-background};
 
   --super-bar-background: #{$super-bar-background};
+  --super-bar-background-active: #{$super-bar-background-active};
   --toggle-background-light: #{$toggle-background-light};
   --toggle-background-dark: #{$toggle-background-dark};
 }

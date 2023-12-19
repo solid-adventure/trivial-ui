@@ -191,8 +191,8 @@
         }
 
         &:hover {
-          background-color: var(--accent);
-          color: var(--on-accent);
+          background-color: var(--table-row-hover-background);
+          color: var(--on-table-row-hover-background);
         }
 
         td {

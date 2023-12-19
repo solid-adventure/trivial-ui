@@ -18,7 +18,6 @@
 </template>
 
 <style lang="scss" scoped>
-    @import "../assets/stylesheets/includes/variables";
     @import "../assets/stylesheets/includes/auth";
     .container {
         text-align: left;

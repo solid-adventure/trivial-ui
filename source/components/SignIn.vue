@@ -22,7 +22,6 @@
 </template>
 
 <style lang="scss" scoped>
-@import "../assets/stylesheets/includes/variables";
 @import "../assets/stylesheets/includes/auth";
 
 .text-field {

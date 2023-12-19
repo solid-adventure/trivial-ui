@@ -134,7 +134,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @import "../../../assets/stylesheets/includes/variables";
 
   .query-helper-container {
     padding-top: 1em;
