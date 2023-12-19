@@ -46,7 +46,6 @@
 </template>
 
 <style lang="scss" scoped>
-  @import "../../assets/stylesheets/includes/variables";
 
   div::-webkit-scrollbar { /* Safari, Chrome*/
     display: none;

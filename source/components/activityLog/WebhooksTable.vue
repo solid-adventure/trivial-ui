@@ -53,7 +53,6 @@
 </template>
 
 <style lang="scss" scoped>
-  @import "../../assets/stylesheets/includes/variables";
 
  .chart-area {
   margin: 4em 0;

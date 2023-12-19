@@ -28,7 +28,6 @@
 </template>
 
 <style lang="scss" scoped>
-  @import "../../assets/stylesheets/includes/variables";
 
 	.search-box {
 	    width: 12em;

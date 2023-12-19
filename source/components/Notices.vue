@@ -18,7 +18,6 @@
 </template>
 
 <style lang="scss" scoped>
-  @import "../assets/stylesheets/includes/variables";
 
   .flush .messages {
     margin-top: 0;
