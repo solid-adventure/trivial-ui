@@ -39,10 +39,10 @@ $series-4: #a4d976 !default; // green
 
 $on-background: #c7c0b8 !default;
 $on-background-high-contrast: #ffffff !default;
-$on-background-80: tone-for($on-background, $background, 80%);
-$on-background-60: tone-for($on-background, $background, 60%);
-$on-background-40: tone-for($on-background, $background, 40%);
-$on-background-20: tone-for($on-background, $background, 20%);
+$on-background-80: tone-for($on-background, $background, 80%) !default;
+$on-background-60: tone-for($on-background, $background, 60%) !default;
+$on-background-40: tone-for($on-background, $background, 40%) !default;
+$on-background-20: tone-for($on-background, $background, 20%) !default;
 $on-surface: #b0b6ec !default;
 $on-surface-secondary: #c7c0b8 !default;
 $on-primary: #ffffff !default;
@@ -71,9 +71,9 @@ $loading: url("/assets/images/trivial-loading.gif") !default;
 $auth-border-color: $accent !default;
 $auth-button-gradient: linear-gradient(45deg, #5147fe, #b61df6, #f46721) !default;
 
-$super-bar-background: #000;
-$toggle-background-light: #eee;
-$toggle-background-dark: #333;
+$super-bar-background: #000 !default;
+$toggle-background-light: #eee !default;
+$toggle-background-dark: #333 !default;
 
 //
 // Typography

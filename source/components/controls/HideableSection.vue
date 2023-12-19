@@ -82,7 +82,7 @@
       position: absolute;
       top: 0;
       background-color: transparent;
-      color: var(--on-secondary);
+      color: var(--link);
       cursor: pointer;
       padding-left: 20px;
       text-transform: uppercase;
@@ -95,14 +95,14 @@
         width: 0;
         height: 0;
         border: 6px solid transparent;
-        border-bottom-color: var(--accent);
+        border-bottom-color: var(--link);
         opacity: .8;
       }
 
       &.closed:before {
         top: 9px;
         border-bottom-color: transparent;
-        border-top-color: var(--accent);
+        border-top-color: var(--link);
       }
     }
 
