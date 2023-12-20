@@ -1,5 +1,5 @@
 <template>
-  <super-bar></super-bar>
+  <!-- <super-bar></super-bar> -->
   <div class="SettingsContainer">
     <h2>Account Settings</h2>
     <br/>

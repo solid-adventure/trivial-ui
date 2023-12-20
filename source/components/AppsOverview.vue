@@ -1,6 +1,6 @@
 <template>
   <div class="overview">
-    <super-bar></super-bar>
+    <!-- <super-bar></super-bar> -->
     <div class="overview-container">
       <div class="title-row">
         <div class="search-container">
@@ -220,6 +220,7 @@
   import SearchField from './controls/SearchField.vue'
   import StatusLine from './StatusLine.vue'
   import SortableHead from './controls/SortableHead.vue'
+  import store from '../store'
 
 
 
@@ -251,7 +252,7 @@
     created() {
       let params =  new URLSearchParams(window.location.search)
       this.panelTypeFilter = params.get('paneltype') || 'dashboard'
-
+      store.dispatch('setIsAuthenticated', {isAuthenticated: true});
       this.loadStats(this.chartType)
     },
 

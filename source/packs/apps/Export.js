@@ -18,4 +18,3 @@ index.component("instance-export", InstanceExport);
 index.use(store);
 
 index.mount("#export");
-show.use(store);

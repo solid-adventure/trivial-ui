@@ -56,7 +56,6 @@ import { fetchJSON } from 'trivial-core/lib/component-utils'
 import Icon from './Icon.vue'
 
 export default {
-  inject: ['orgId'],
 
   data(){
     return {
@@ -64,6 +63,7 @@ export default {
       updatedBillingEmail:'',
       updatedName: '',
       users: [],
+      orgId: this.$route.params.id
     }
   },
 

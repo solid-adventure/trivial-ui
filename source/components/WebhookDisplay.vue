@@ -66,10 +66,10 @@
   import CopyButton from './controls/CopyButton.vue'
   import { mapMutations } from 'vuex'
   export default {
-    inject: ['webhookId'],
 
     data(){
         return {
+            webhookId: this.$route.params.id,
             webhook: null,
             loading: true,
             errorMessage: null,

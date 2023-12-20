@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard-container">
-    <super-bar></super-bar>
+    <!-- <super-bar></super-bar> -->
     <Notices :pinned="false"></Notices>
     <DashboardSettings v-if="this.settingsPanelOpen" @close="toggleSettings" :dateRangeNames="dateRangeNames" :appId="this.app_id"></DashboardSettings>
     <h1>{{this.app.descriptive_name}}</h1>
