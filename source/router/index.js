@@ -42,7 +42,7 @@ const routes = [
     { path: '/apps/:id/settings2', component: InstanceSettings }, 
     { path: '/apps/:id/activity', component: InstanceActivity }, 
     // revisit Export crazy template
-    { path: '/apps/:id/export', component: InstanceExport }, 
+    // { path: '/apps/:id/export', component: InstanceExport }, 
     { path: '/apps/:id/builder2', component: Builder }, 
     // Route below seems to be a duplicate of /apps/:id which defaults to Panels component
     { path: '/apps/:id/panels', component: Panels }, 
@@ -53,7 +53,7 @@ const routes = [
     // the actual webhook display component
     // Open to discussing if we should just add the app-manager to the
     // componment, create a new component or render a custom component
-    { path: '/webhooks/:id', component: WebhookDisplay },
+    // { path: '/webhooks/:id', component: WebhookDisplay },
     
     //Dead component, API post is commented out?
     { path: '/actions', component: Actions },

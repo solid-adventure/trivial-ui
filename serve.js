@@ -547,7 +547,6 @@ serve.all('/proxy/:service', (req, res) => {
 // End Proxy Section
 
 serve.get('*',Session.validate, (req, res) => {
-  // Make sure the path here is correct for your Vue app's entry point (usually index.html)
   res.render('main.html', {
     analytics_id: process.env.ANALYTICS_ID,
     app_id: 'TrivialBuilder'
