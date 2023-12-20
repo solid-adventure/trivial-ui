@@ -236,14 +236,13 @@
 
         <div class="grab"><img src='/assets/images/grabby-dots-01.svg' class='grabby-dots'/></div>
         <div class="icon" :style="{'background-image': iconUrl(action.def)}"></div>
-        <a href="#" @click.prevent="edit(action.def)" class='description'>
-          <div class="description">
-            <h2 class='title'>{{definitionName(action.def)}}<span class='edit-icon'>✏️</span></h2>
-            <!-- <p class='description'>Description text</p> -->
-          </div>
-        </a>
-        <div class="delete">
-          <button class="delete" @click="deleteAction(action.def)" aria-label="delete"><Icon icon="times-circle" class="icon"></Icon></button>
+        <div class="description">
+          <h2 class='title'>{{definitionName(action.def)}}</h2>
+          <!-- <p class='description'>Description text</p> -->
+        </div>
+        <div class="action-buttons">
+          <button class="edit" @click="edit(action.def)" aria-label="edit"><Icon icon="edit"></Icon></button>
+          <button class="delete" @click="deleteAction(action.def)" aria-label="delete"><Icon icon="trash"></Icon></button>
         </div>
         </li>
       </ul>
@@ -319,11 +318,11 @@
       position: relative;
       z-index: 2;
       border-radius: 0px;
-      border: 1px solid var(--accent);
       display: flex;
       align-items: center;
       cursor: pointer;
-      box-shadow: 4px 4px 0px 0px var(--surface);
+      box-shadow: 4px 4px 4px 0px var(--accent-20);
+      min-height: 4em;
       &.inserting {
         box-shadow: 5px 5px 4px 1px var(--surface);
         z-index: 100;
@@ -339,8 +338,7 @@
       }
 
       img.grabby-dots {
-        height: 30px;
-        opacity: 0.3;
+        height: 1em;
       }
 
       .icon, .grab, .description {
@@ -375,30 +373,16 @@
 
       }
 
-      .delete {
-        display: none;
-        background: transparent;
-        color: var(--on-background);
-        cursor: pointer;
-        margin: 0 .5em 0 0;
+      div.action-buttons {
+        margin-right: 1em;
 
-        .icon {
-          font-size: 1.5em;
+        button {
+          background-color: transparent;
+          margin-right: 0.5em;
         }
+
       }
 
-      &:hover .delete {
-        display: block;
-      }
-
-      .edit-icon {
-        display: none;
-        transform: scale(-1,1);
-        margin-left: 1em;      }
-
-      &:hover .edit-icon {
-        display: inline-block;
-      }
 
 
     }
