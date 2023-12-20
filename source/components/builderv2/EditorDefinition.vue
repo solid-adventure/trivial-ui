@@ -34,6 +34,10 @@
         return this.descriptor.allowFieldCreation
       },
 
+      actionSlotDisplayName() {
+        return this.descriptor.actionSlotDisplayName || this.descriptor.slotName
+      },
+
       descriptor() {
         return ActionDescriptors.forType(this.action.type)
       },
@@ -64,7 +68,7 @@
       <ActionSlot
         v-for="slotName in descriptor.actionSlots"
         :key="slotName"
-        :name="slotName"
+        :name="actionSlotDisplayName"
         :actions="action.definition[slotName]"
         :nextIdentifier="nextIdentifier"
         :credentials="credentials"
