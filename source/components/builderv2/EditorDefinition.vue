@@ -35,7 +35,7 @@
       },
 
       actionSlotDisplayName() {
-        return this.descriptor.actionSlotDisplayName || this.descriptor.slotName
+        return this.descriptor.actionSlotDisplayName || this.descriptor.actionSlots[0] || ''
       },
 
       descriptor() {
