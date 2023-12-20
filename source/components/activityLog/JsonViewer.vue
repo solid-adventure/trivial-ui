@@ -186,8 +186,6 @@
     position: absolute;
     top: 0.5em;
     right: 0.5em;
-    background-color: var(--background);
-    color: var(--accent);
     font-size: 1.2em;
 
   }

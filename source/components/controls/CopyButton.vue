@@ -29,7 +29,7 @@
     cursor: pointer;
     background-color: transparent;
     .icon {
-      fill: var(--accent);
+      fill: var(--link);
     }
     .message {
       background: var(--tool-tip-background);
