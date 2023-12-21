@@ -44,7 +44,8 @@
         displayVault: false,
         buildDirty: false,
         buildInProgress: false,
-        displayChangeSequence: false
+        displayChangeSequence: false,
+        loaded: false
       }
     },
 
@@ -80,6 +81,7 @@
 
       this.subscribeWebhookEvents(this.webhookListener)
       await this.loadCredentialSets()
+      this.loaded = true
     },
 
     watch: {
@@ -278,7 +280,7 @@
         <Notices :pinned="false" class="right"></Notices>
       </div>
     </div>
-    <BuilderAssistant :app="app" :actions="program.definition.actions" :nextIdentifier="nextIdentifier"/>
+    <BuilderAssistant v-if="loaded" :app="app" :actions="program.definition.actions" :nextIdentifier="nextIdentifier"/>
     <div v-if="!displayVault">
       <div class="action-body" ref="actionbody">
         <Editor
