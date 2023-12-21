@@ -1,5 +1,5 @@
 <template>
-  <div class="OrganizationInviteUser">
+  <div class="page-container">
 
     <Notices></Notices>
 
@@ -136,80 +136,69 @@ export default {
 }
 </script>
 <style lang="scss">
- .OrganizationInviteUser {
-  height: 100%;
-  margin: 2em 10em;
-  width: calc(100% - 20em);
-  top: 80px;
-  position: relative;
- }
 
-div.page-inset {
-  background: var(--surface);
-  padding: 2em 6em;
-  border-radius: 1em;
-  border: 1px solid var(--background-80);
-  margin: 2em;
-  min-width: 18em;
-}
+  div.page-inset {
+    padding: 2em 6em;
+  }
 
-div.action-row {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
+  div.action-row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
 
-div.form-input {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 1em;
+  div.form-input {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1em;
 
-  label, div.label-with-error {
+    label, div.label-with-error {
+      margin-bottom: 0.5em;
+    }
+
+  }
+
+  .form-error {
+    color: var(--error);
+    margin-left: 0.5em;
+  }
+
+  .form-error::before {
+    content: '* ';
+  }
+
+  span.section {
     margin-bottom: 0.5em;
+    display: inline-block;
   }
 
-}
+  div.radio-group {
+    flex-direction: row;
+    align-content: flex-start;
+    flex-wrap: wrap;
+    max-width: 26em;
 
-.form-error {
-  color: var(--error);
-  margin-left: 0.5em;
-}
-
-.form-error::before {
-  content: '* ';
-}
-
-span.section {
-  margin-bottom: 0.5em;
-  display: inline-block;
-}
-
-div.radio-group {
-  flex-direction: row;
-  align-content: flex-start;
-  flex-wrap: wrap;
-
-  input {
-    margin-right: 1em;
-    border: 0px;
-    width: 1.25em;
-    height: 1.25em;
+    input {
+      margin-right: 1em;
+      border: 0px;
+      width: 1.25em;
+      height: 1.25em;
+    }
   }
-}
 
-div.radio-group > .help {
-  margin-block-end: 1em;
-  margin-left: 2.25em;
-  color: var(--on-surface-secondary);
-}
+  div.radio-group > .help {
+    margin-block-end: 1em;
+    margin-left: 2.25em;
+    color: var(--on-surface-secondary);
+  }
 
-.full-width {
-  width: 100%;
-}
+  .full-width {
+    width: 100%;
+  }
 
- table.organization-users {
-  width: 100%;
-  margin-block: 3em;
-}
+   table.organization-users {
+    width: 100%;
+    margin-block: 3em;
+  }
 
 </style>
