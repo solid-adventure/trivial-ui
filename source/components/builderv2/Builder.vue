@@ -59,6 +59,9 @@
     },
 
     async created() {
+      if (!this.$store.app) {
+        await this.loadApp({app_id: this.$route.params.id})
+      }
       await this.loadCredentialsOrDraft()
       const manifest = await this.loadManifestOrDraft()
       const migrator = new ManifestMigrator(manifest.content)
@@ -237,6 +240,7 @@
       },
 
       ...mapActions([
+        'loadApp',
         'loadCredentialSets',
         'loadCredentialsOrDraft',
         'loadManifestOrDraft',

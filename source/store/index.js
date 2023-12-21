@@ -314,6 +314,12 @@ const store = createStore({
       commit('setApps', apps)
     },
 
+    async loadApp({ commit }, { app_id }) {
+      console.log('[store][loadApp] loading app: ', app_id)
+      const app = await fetchJSON(`/proxy/trivial?path=/apps/${app_id}`)
+      commit('setApp', app)
+    },
+
     async setIsAuthenticated({state, commit}, {isAuthenticated}) {
       commit('setIsAuthenticated', isAuthenticated)
     },
