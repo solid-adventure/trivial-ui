@@ -1,14 +1,13 @@
 <script>
-  import ActionDescriptors from 'trivial-core/lib/actionsv2/catalog/ActionDescriptors'
   import { mapActions, mapMutations, mapState } from 'vuex'
   import Icon from '../Icon.vue'
-  import ProgramTree from './ProgramTree.vue'
+  // import ProgramTree from './ProgramTree.vue'
 
   export default {
 
     components: {
       Icon,
-      ProgramTree,
+      // ProgramTree,
     },
 
     props: {
