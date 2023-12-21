@@ -16,6 +16,11 @@
         type: String,
         required: false
       },
+      programTitle: {
+        type: String,
+        required: false,
+        default: 'App Builder'
+      },
       program: {
         type: Object,
         required: false
@@ -33,20 +38,15 @@
 
       navigateTo(action) {
         this.$emit('programNavigate', action)
-      }
+      },
 
     },
 
     computed: {
 
-      descriptor() {
-        return ActionDescriptors.forType(this.program.type)
-      },
-
-      programTitle() {
-        const appType = this.descriptor.definitionTitle(this.program)
+      humanizedProgramTitle() {
         // ReceiveWebhook is an unfriendly and hard to scrub default, so we'll just call it App Builder
-        return appType == 'ReceiveWebhook' ? "App Builder" : appType
+        return this.programTitle == 'ReceiveWebhook' ? "App Builder" : this.programTitle
       },
 
       ...mapState([
@@ -65,9 +65,7 @@
     <a href="builder2">
       <div class="title" :class="selected('builder')">
         <Icon icon="contract"></Icon>
-
-
-        <span>{{ programTitle }}</span>
+        <span>{{ humanizedProgramTitle }}</span>
         <!-- This almost works, but navigateTo is causing the page to reload and drop the action -->
         <!-- Questioning the concept, not worth fixing right now -->
         <!-- <ProgramTree v-if="program" :value="program" :selected="selectedAction" @navigate="navigateTo"></ProgramTree> -->

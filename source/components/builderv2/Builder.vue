@@ -317,56 +317,6 @@
       font-family: inherit;
     }
 
-    .navtree {
-      position: fixed;
-      top: 80px;
-      left: 0;
-      box-sizing: border-box;
-      padding: 0;
-      width: 23em;
-      height: 100%;
-      overflow: auto;
-      border-right: 1px solid var(--on-background-20);
-      background-color: var(--surface);
-
-      .app-name-container {
-        padding: 1em;
-        font-size: 1.5em;
-      }
-
-      h2 {
-        font-weight: 200;
-        margin: 1em 0;
-        font-size: 1.25em;
-        a {
-          color: var(--on-background)
-        }
-      }
-
-
-      .unselected, .selected {
-        padding: 1em;
-      }
-
-      .selected {
-        background-color: var(--background);
-
-        h2 {
-          font-weight: 400;
-        }
-
-      }
-
-      .unselected:hover {
-        background-color: var(--background-high-contrast);
-      }
-
-      .nav-link.active {
-        font-weight: 400;
-      }
-
-    }
-
     .action-bar {
       position: fixed;
       top: 80px;
