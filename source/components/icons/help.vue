@@ -6,10 +6,10 @@
 <template>
 <svg version="1.1" id="svg2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
    viewBox="0 0 200 200" style="enable-background:new 0 0 200 200;" xml:space="preserve">
-<!-- <svg:style type="text/css">
+<svg:style type="text/css">
   .st0{fill:none;}
   .st1{fill:#939598;}
-</svg:style> -->
+</svg:style>
 <path id="path2382" class="st0" d="M197.1,100c0,53.6-43.5,97.1-97.1,97.1c-53.6,0-97.1-43.5-97.1-97.1c0,0,0,0,0,0
   C2.9,46.4,46.4,2.9,100,2.9C153.6,2.9,197.1,46.4,197.1,100C197.1,100,197.1,100,197.1,100z"/>
 <g id="layer1">

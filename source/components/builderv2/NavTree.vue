@@ -1,4 +1,5 @@
 <script>
+  import ActionDescriptors from 'trivial-core/lib/actionsv2/catalog/ActionDescriptors'
   import { mapActions, mapMutations, mapState } from 'vuex'
   import Icon from '../Icon.vue'
   import ProgramTree from './ProgramTree.vue'
@@ -37,6 +38,17 @@
     },
 
     computed: {
+
+      descriptor() {
+        return ActionDescriptors.forType(this.program.type)
+      },
+
+      programTitle() {
+        const appType = this.descriptor.definitionTitle(this.program)
+        // ReceiveWebhook is an unfriendly and hard to scrub default, so we'll just call it App Builder
+        return appType == 'ReceiveWebhook' ? "App Builder" : appType
+      },
+
       ...mapState([
         'app'
       ])
@@ -50,19 +62,25 @@
     <div class='app-name-container'>
       <h1><a :href="`/apps/${this.app.name}`">{{this.app.descriptive_name}}</a></h1>
     </div>
+    <a href="builder2">
+      <div class="title" :class="selected('builder')">
+        <Icon icon="contract"></Icon>
+
+
+        <span>{{ programTitle }}</span>
+        <!-- This almost works, but navigateTo is causing the page to reload and drop the action -->
+        <!-- Questioning the concept, not worth fixing right now -->
+        <!-- <ProgramTree v-if="program" :value="program" :selected="selectedAction" @navigate="navigateTo"></ProgramTree> -->
+      </div>
+    </a>
     <a href="activity">
-      <div :class="selected('activity')">
+      <div class="title" :class="selected('activity')">
         <Icon icon="code"></Icon>
         <span>Activity Log</span>
       </div>
     </a>
-    <div :class="selected('builder')">
-      <Icon icon="contract"></Icon>
-      <span>App Builder</span>
-      <ProgramTree v-if="program" :value="program" :selected="selectedAction" @navigate="navigateTo"></ProgramTree>
-    </div>
     <a href="settings2">
-      <div :class="selected('settings')">
+      <div class="title" :class="selected('settings')">
         <Icon icon="gear"></Icon>
         <span>Settings</span>
       </div>
@@ -77,7 +95,7 @@
       top: 80px;
       left: 0;
       box-sizing: border-box;
-      padding: 0;
+      padding: 0 2em;
       width: 23em;
       height: 100%;
       overflow: auto;
@@ -89,27 +107,30 @@
         font-size: 1.5em;
       }
 
-      h2 {
-        font-weight: 200;
-        margin: 1em 0;
-        font-size: 1.25em;
-        a {
-          color: var(--on-background)
-        }
+      .title {
+        font-size: 1.15em;
       }
 
+      .icon-wrapper {
+        vertical-align: top;
+        margin-right: 0.5em;
+        margin-top: 0.1em;
+      }
 
       .unselected, .selected {
         padding: 1em;
+        margin: 0 2em;
+        border-radius: 1em;
+      }
+
+      .unselected {
+        color: var(--on-surface);
       }
 
       .selected {
-        background-color: var(--background);
-
-        h2 {
-          font-weight: 400;
-        }
-
+        color: var(--primary);
+        background-color: var(--secondary);
+        font-weight: bold;
       }
 
       .unselected:hover {
