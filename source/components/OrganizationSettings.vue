@@ -1,5 +1,5 @@
 <template>
-  <div class="OrganizationSettings">
+  <div class="page-container">
 
     <div class="breadcrumb">
       <span class="history"><a href="/settings">Settings</a></span>
@@ -10,7 +10,7 @@
     </div>
 
     <div class="page-inset">
-      <h1>{{ organization.name }} | Users And Roles</h1>
+      <h2>{{ organization.name }} | Users And Roles</h2>
 
   <!--
       <form id="editOrgForm">
@@ -167,36 +167,20 @@ export default {
 }
 </script>
 <style lang="scss">
- .OrganizationSettings {
-  height: 100%;
-  margin: 2em;
-  width: calc(100% - 4em);
-  top: 80px;
-  position: relative;
- }
 
-div.page-inset {
-  background: var(--surface);
-  padding: 2em 3em;
-  border-radius: 1em;
-  border: 1px solid var(--background-80);
-  margin: 2em;
-  min-width: 18em;
-}
+  div.action-row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
 
-div.action-row {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
+  table.organization-users {
+    width: 100%;
+    margin-block: 3em;
+  }
 
-table.organization-users {
-  width: 100%;
-  margin-block: 3em;
-}
-
-span.admin {
-  font-weight: bold;
-}
+  span.admin {
+    font-weight: bold;
+  }
 
 </style>

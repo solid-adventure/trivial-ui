@@ -82,7 +82,20 @@ table.spaced {
 
 }
 
+div.page-container {
+  top: 80px;
+  margin: 2em;
+  position: relative;
+}
 
+div.page-inset {
+  background: var(--surface);
+  padding: 2em 3em;
+  border-radius: 1em;
+  border: 1px solid var(--background-80);
+  margin: 2em 2em 12em 2em;
+  min-width: 18em;
+}
 
 .main-btn {
   display: inline-block;
