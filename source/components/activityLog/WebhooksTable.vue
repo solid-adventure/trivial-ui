@@ -228,7 +228,7 @@ import { mapActions, mapState } from 'vuex'
 
   computed: {
     appId() {
-      return this.app.name
+      return this.$route.params.id;
     },
 
     pageTitle() {

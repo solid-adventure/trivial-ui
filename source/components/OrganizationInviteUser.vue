@@ -55,13 +55,13 @@ import Notifications from './notifications'
 import Notices from './Notices.vue'
 
 export default {
-  inject: ['orgId'],
 
   data(){
     return {
       newUserName: '',
       newUserEmail: '',
       newUserRole: '',
+      orgId: this.$route.params.id,
       errors: {
         newUserName: null,
         newUserEmail: null,

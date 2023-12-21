@@ -9,8 +9,7 @@ module.exports = class Session {
 	// We are continuing to rely on the tokened URLs to provide some small level of privacy, combined with the Rails app, which
 	// does validate authorization
 	static async validate(req, res, next) {
-
-		let destination = req.route.path
+		let destination = req.originalUrl
 		let authorized = false
 
   	let token = req.signedCookies["trivial-access-token"]
@@ -39,7 +38,7 @@ module.exports = class Session {
     }
 
 	 	// Only redirect if we're not already there to prevent self-referential loop, e.g., on /login with no session
-		if (destination != req.route.path) {
+		if (destination != req.originalUrl) {
 			res.redirect(destination)
 		} else {
       next()

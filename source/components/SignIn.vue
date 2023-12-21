@@ -40,8 +40,12 @@
 
 <script>
 import TrackingService from '../../lib/TrackingService';
+import store from '../store'
 TrackingService.identifyLandingReferer();
 export default {
+    created() {
+        store.dispatch('setIsAuthenticated', {isAuthenticated: false});
+    },
     data(){
         return {
             state: null,

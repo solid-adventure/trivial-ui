@@ -205,64 +205,6 @@ const performAction = async (req, res) => {
   }
 }
 
-serve.get('/', Session.validate, (req, res) => {
-	res.render('index.html', {app_id: 'TrivialBuilder'})
-})
-
-serve.get('/signin', Session.validate, (req, res) => {
-	res.render(`signin.html`)
-})
-
-serve.get('/signout', Session.validate, (req, res) => {
-  res.render('signout.html')
-})
-
-serve.get('/changepassword', Session.validate, (req,res) => {
-  res.render('changepassword.html')
-})
-
-serve.get('/acceptinvitation', (req,res) => {
-  res.render('acceptinvitation.html')
-})
-
-serve.get('/recoverpassword', (req,res) => {
-  res.render('recoverpassword.html')
-})
-
-serve.get('/resetpassword', Session.validateForReset, (req,res) => {
-  if (req.query.hasOwnProperty('access-token')) {
-    res.redirect('/resetpassword')
-  } else {
-    res.render('resetpassword.html')
-  }
-})
-
-serve.get('/register', Session.validate, (req,res) => {
-  res.render('register.html', {analytics_id: process.env.ANALYTICS_ID})
-})
-
-serve.get('/settings', Session.validate, (req,res) => {
-  res.render('settings.html', {app_id: 'TrivialBuilder'})
-})
-
-serve.get('/playground', Session.validate, (req,res,next) => {
-  try {
-    let url = new URL(process.env.PLAYGROUND_PATH, process.env.LUPIN_URL)
-    res.redirect(url)
-  } catch(e) {
-    next(createError(404, 'playground location not found'));
-  }
-
-})
-
-serve.get('/apps/new', Session.validate, (req, res) => {
-  res.render('apps/new.html')
-})
-
-serve.get('/account-locked', Session.validate, (req, res) => {
-  res.render('account-locked.html')
-})
-
 serve.post('/actions/:service/:action/perform', Session.validate, (req, res) => {
   performAction(req, res)
 })
@@ -473,53 +415,6 @@ serve.post('/csv-to-json', upload.single('file'), (req, res) => {
   convertCsvToJson(req, res)
 })
 
-serve.get('/apps/:id', Session.validate, (req, res) => {
-	res.render('apps/panels.html', {app_id: req.params.id})
-})
-
-serve.get('/apps/:id/action/:perform/:actionIdentifier', Session.validate, (req, res) => {
-	res.render('apps/show.html', {app_id: req.params.id})
-})
-
-serve.get('/apps/:id/settings2', Session.validate, (req, res) => {
-  res.render('apps/settings2.html', {app_id: req.params.id})
-})
-
-serve.get('/apps/:id/activity', Session.validate, (req, res) => {
-  res.render('apps/activity.html', {app_id: req.params.id})
-})
-
-serve.get('/apps/:id/export', Session.validate, (req, res) => {
-	res.render('apps/export.html', {app_id: req.params.id})
-})
-
-serve.get('/apps/:id/builder2', Session.validate, (req, res) => {
-	res.render('apps/builder2.html', {app_id: req.params.id})
-})
-
-serve.get('/apps/:id/panels', Session.validate, (req, res) => {
-  res.render('apps/panels.html', {app_id: req.params.id})
-})
-
-
-serve.get('/apps/:id/builder2/*', Session.validate, (req, res) => {
-	res.render('apps/builder2.html', {app_id: req.params.id})
-})
-
-serve.get('/organizations/:id/edit', Session.validate, (req, res) =>{
-  res.render('organizations/edit.html', {org_id: req.params.id})
-})
-
-serve.get('/organizations/:id/invitations/new', Session.validate, (req, res) =>{
-  res.render('organizations/invitations/new.html', {org_id: req.params.id})
-})
-
-serve.get('/webhooks/:id', Session.validate, (req,res) => {
-  res.render('apps/webhookdisplay.html', {webhook_id: req.params.id})
-})
-
-
-
 // const actionCreatorPaths = function() {
 //   serve.get('/actions', Session.validate, (req,res) => {
 //     res.render('actions.html')
@@ -597,10 +492,6 @@ serve.get('/oauth2/authorization_response', retrieveCode)
 
 serve.post('/protocol/:credentialSetId/:protocolMethod', callProtocol)
 
-serve.get('/javascript-function-writer', (req, res) => {
-  res.render('function-writer.html', {analytics_id: process.env.ANALYTICS_ID})
-})
-
 serve.post('/proxy/:service/cookies', (req, res) => {
   const serviceSpec = new APISpec(req.service)
   serviceSpec.setCookies(res, req.body)
@@ -654,6 +545,14 @@ serve.all('/proxy/:service', (req, res) => {
   })
 })
 // End Proxy Section
+
+serve.get('*',Session.validate, (req, res) => {
+  res.render('main.html', {
+    analytics_id: process.env.ANALYTICS_ID,
+    app_id: 'TrivialBuilder'
+  })
+});
+
 
 const httpServer = serve.listen(port, () => {
   logger.info(`Server running at http://localhost:${port}/`);
