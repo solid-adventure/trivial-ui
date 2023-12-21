@@ -7,8 +7,8 @@
   import ActionIterator from 'trivial-core/lib/actionsv2/catalog/ActionIterator'
   import ChangeSequence from './help/ChangeSequence.vue'
   import ConfigResolver from 'trivial-core/lib/ConfigResolver'
+  import NavTree from './NavTree.vue'
   import Notifications from '../notifications'
-  import ProgramTree from './ProgramTree.vue'
   import CustomFunctionList from '../CustomFunctionList.vue'
   import BuildButton from '../controls/BuildButton.vue'
   import Notices from '../Notices.vue'
@@ -28,8 +28,8 @@
       CredentialsVault,
       CustomFunctionList,
       Editor,
+      NavTree,
       Notices,
-      ProgramTree,
       PayloadEditor,
       Confirmation
     },
@@ -261,26 +261,7 @@
   <!-- <super-bar></super-bar> -->
   <div class="builder" :style="{paddingLeft: this.leftNavWidth}">
     <ChangeSequence v-if="displayChangeSequence" @close="displayChangeSequence=false" />
-<!-- Note: this is a copy of NavTree to handle the complexities of the nested Builder -->
-    <div v-if="!playgroundMode" class="navtree">
-      <div class='app-name-container'>
-        <h1><a :href="`/apps/${this.app.name}`">{{this.app.descriptive_name}}</a></h1>
-      </div>
-      <a href="activity">
-        <div class='unselected'>
-          <h2>📓 Activity Log</h2>
-        </div>
-      </a>
-      <div class='selected'>
-        <h2>🛠 App Builder</h2>
-        <ProgramTree :value="program" :selected="selectedAction" @navigate="navigateTo"></ProgramTree>
-      </div>
-      <a href="settings2">
-        <div class='unselected'>
-          <h2>⚙️ Settings</h2>
-        </div>
-      </a>
-    </div>
+    <NavTree :selectedTitle="'builder'" :program="program" :selectedAction="selectedAction" @programNavigate="navigateTo"></NavTree>
     <div v-if="!playgroundMode" class="action-bar">
       <div class="action-holder">
         <div class="trigger-section">

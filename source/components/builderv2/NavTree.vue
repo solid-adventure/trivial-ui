@@ -1,11 +1,26 @@
 <script>
   import { mapActions, mapMutations, mapState } from 'vuex'
+  import Icon from '../Icon.vue'
+  import ProgramTree from './ProgramTree.vue'
 
   export default {
+
+    components: {
+      Icon,
+      ProgramTree,
+    },
 
     props: {
       selectedTitle: {
         type: String,
+        required: false
+      },
+      program: {
+        type: Object,
+        required: false
+      },
+      selectedAction: {
+        type: Object,
         required: false
       }
     },
@@ -13,7 +28,12 @@
     methods: {
       selected(title) {
         return this.selectedTitle === title ? 'selected' : 'unselected'
+      },
+
+      navigateTo(action) {
+        this.$emit('programNavigate', action)
       }
+
     },
 
     computed: {
@@ -26,28 +46,28 @@
 </script>
 
 <template>
-
-    <div class="navtree">
-      <div class='app-name-container'>
-        <h1><a :href="`/apps/${this.app.name}`">{{this.app.descriptive_name}}</a></h1>
-      </div>
-      <a href="activity">
-      <div :class="selected('activity')">
-        <h2>📓 Activity Log</h2>
-      </div>
-      </a>
-      <a href="builder2">
-        <div :class="selected('builder')">
-          <h2>🛠 App Builder</h2>
-        </div>
-        </a>
-      <a href="settings2">
-        <div :class="selected('settings')">
-          <h2>⚙️ Settings</h2>
-        </div>
-      </a>
+  <div class="navtree">
+    <div class='app-name-container'>
+      <h1><a :href="`/apps/${this.app.name}`">{{this.app.descriptive_name}}</a></h1>
     </div>
-
+    <a href="activity">
+      <div :class="selected('activity')">
+        <Icon icon="code"></Icon>
+        <span>Activity Log</span>
+      </div>
+    </a>
+    <div :class="selected('builder')">
+      <Icon icon="contract"></Icon>
+      <span>App Builder</span>
+      <ProgramTree v-if="program" :value="program" :selected="selectedAction" @navigate="navigateTo"></ProgramTree>
+    </div>
+    <a href="settings2">
+      <div :class="selected('settings')">
+        <Icon icon="gear"></Icon>
+        <span>Settings</span>
+      </div>
+    </a>
+  </div>
 </template>
 
 <style lang="scss" scoped>
