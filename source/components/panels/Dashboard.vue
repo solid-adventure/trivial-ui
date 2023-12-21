@@ -309,6 +309,7 @@
 
     h1 {
       display: inline;
+      margin-right: 10px;
     }
 
     h2 {
