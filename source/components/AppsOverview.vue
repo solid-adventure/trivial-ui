@@ -1,19 +1,28 @@
 <template>
-  <div class="overview">
+  <div class="page-container">
     <!-- <super-bar></super-bar> -->
-    <div class="overview-container">
+    <div class="page-inset">
+
+      <!-- TODO: dynamic -->
+      <h2>Customer Contracts</h2>
       <div class="title-row">
         <div class="search-container">
           <SearchField v-if="!hasNoApps" :searchTerm="searchTerm" v-on:update="searchTerm=$event"></SearchField>
         </div>
       </div>
+      <div class="new-button-container">
+        <!-- TODO Dynamic -->
+        <a class="button-medium headroom-small" :href="`/apps/new?paneltype=${this.panelTypeFilter}`">Add New Contract</a>
+      </div>
+
+
 <!--       <div class="tabs-container">
         <div v-for="group of panelTypeGroups" class="tab" :class="{active: group.filter == panelTypeFilter }">
           <a href="#" v-on:click.prevent="panelTypeFilter=group.filter" >{{group.name}}</a>
         </div>
       </div>
  -->
-      <table class="stats">
+      <table class="stats spaced">
         <thead class="active">
           <SortableHead
           class="app-name"
@@ -78,10 +87,6 @@
         <em>No results</em>
       </p>
 
-
-      <div><a class="button-medium headroom-small" :href="`/apps/new?paneltype=${this.panelTypeFilter}`">New</a></div>
-
-
     </div>
   </div>
 </template>
@@ -105,6 +110,13 @@
   .search-container {
     margin-top: 3em;
     margin-bottom: 2em;
+  }
+
+  .new-button-container {
+    margin-bottom: 2em;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
   }
 
   h1 {
@@ -142,70 +154,6 @@
     color: var(--on-background);
     border-bottom: 0;
     border-color: var(--accent);
-  }
-
-  table.stats {
-    width: 100%;
-    border-collapse: collapse;
-    border: none;
-
-    thead {
-      font-weight: bold;
-      text-transform: uppercase;
-      border-bottom: 1px solid var(--table-head-border);
-
-      th {
-        &.app-name { width: 20%; }
-        &.panel-type { width: 20%; }
-        &.last-run { width: 15%; }
-        &.edit { width: 10%; }
-        &.status { width: 20%; }
-        &.period { width: 15%; }
-
-        span {
-          font-weight: 100;
-        }
-
-        button {
-          background: transparent;
-          color: inherit;
-          display: inline;
-          cursor: pointer;
-          margin-bottom: -.5em;
-          padding-bottom: .5em;
-
-          &.selected {
-            margin-bottom: calc(-.5em - 2px);
-            border-bottom: 3px solid var(--on-background);
-          }
-        }
-      }
-    }
-
-    tbody {
-      tr {
-        cursor: pointer;
-
-        &:nth-child(even) {
-          background-color: var(--table-striping);
-        }
-
-        &:hover {
-          background-color: var(--table-row-hover-background);
-          color: var(--on-table-row-hover-background);
-        }
-
-        td {
-          border: none;
-          padding: .5em;
-          font-weight: 100;
-
-          a {
-            color: inherit;
-          }
-        }
-      }
-    }
   }
 
   .no-apps {
