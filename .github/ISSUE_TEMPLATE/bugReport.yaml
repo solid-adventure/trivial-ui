@@ -1,0 +1,41 @@
+name: Bug Report
+description: File a bug report
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: input
+    id: contact
+    attributes:
+      label: Contact Details
+      description: How can we get in touch with you if we need more info?
+      placeholder: ex. email@example.com
+    validations:
+      required: false
+  - type: textarea
+    id: summary
+    attributes:
+      label: A brief summary of the issue
+      description: Also tell us, what did you expect to happen?
+      placeholder: Tell us what you see!
+      value: "I expected _ to occur when _, but I was instead presented with _."
+    validations:
+      required: true
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Include steps to reproduce
+      description: What steps did you take for the error to occur?
+      placeholder: Step 1 
+      value: "1. I clicked on ..\n2. Then I typed ..\n3. [Error occured]"
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
+      render: shell
