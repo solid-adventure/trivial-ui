@@ -56,7 +56,7 @@
               @click.prevent="setChartType('weekly')">W</button>
           </th>
         </thead>
-        <tbody>
+        <tbody v-if="appsLoaded">
           <tr v-for="app in sortedApps" :key="app.id">
             <td><a :href="`/apps/${app.name}/`">{{app.descriptive_name}}</a></td>
             <td v-if="displayPanelTypeColumn">
@@ -75,6 +75,11 @@
                 </StatusLine>
               </a>
             </td>
+          </tr>
+        </tbody>
+        <tbody v-else>
+          <tr>
+            <td>Loading...</td>
           </tr>
         </tbody>
       </table>

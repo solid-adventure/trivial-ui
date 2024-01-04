@@ -27,7 +27,8 @@
   </div>
 </template>
 
-<style lang="scss" scoped>
+<!-- Deliberately unscoped to allow icon overriddes -->
+<style lang="scss" >
 
 	.search-box {
 	    width: 30em;
@@ -66,7 +67,6 @@
 		    color: var(--background-80);
 	    }
 
-	    // TODO This isn't hitting, need to override in Icon.vue
 	    .icon-wrapper svg {
 		    	width: unset;
 		    	height: 100%;
