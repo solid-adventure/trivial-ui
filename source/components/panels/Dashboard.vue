@@ -45,7 +45,6 @@
 
 
   // Panels
-  import Contract from './Contract.vue'
   import Headline from './Headline.vue'
   import LineChart from './LineChart.vue'
   import notifications from '../notifications'
@@ -62,7 +61,6 @@
       Notices,
 
       // Panels
-      Contract,
       DatePicker,
       Headline,
       LineChart,
