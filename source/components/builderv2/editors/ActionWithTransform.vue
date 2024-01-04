@@ -67,6 +67,10 @@
         return this.actionDescriptor.getCredentialTypes()
       },
 
+      displayCredentials() {
+        return Object.keys(this.actionCredentialType).length > 0
+      },
+
       transformDescriptor() {
         return ActionDescriptors.forType(this.transform.type)
       },
@@ -124,14 +128,14 @@
 </script>
 
 <template>
-  <div>
+  <div class="page-inset">
     <EditorOverview :value="action"></EditorOverview>
     <EditorDefinition
       :value="action"
       :credentials="credentials"
       :nextIdentifier="nextIdentifier"
       @edit="edit"></EditorDefinition>
-    <HideableSection v-if="!hiddenByTour('credentials')" :initially-hidden="false" display-name="Credentials">
+    <HideableSection v-if="displayCredentials && !hiddenByTour('credentials')" :initially-hidden="false" display-name="Credentials">
       <EditorConfig :value="action" :credentials="credentials"></EditorConfig>
     </HideableSection>
       <div class="transform-fields">

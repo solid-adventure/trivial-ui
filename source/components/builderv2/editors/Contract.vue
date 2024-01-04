@@ -54,7 +54,7 @@
 </script>
 
 <template>
-  <div>
+  <div class="page-inset">
     <!-- <EditorOverview :value="action" :displayDescriptorName=false></EditorOverview> -->
     <!-- <EditorAdvanced :value="action"></EditorAdvanced> -->
     <EditorDefinition
