@@ -12,7 +12,8 @@ const store = createStore({
   state: {
     user: {},
     app: {},
-    appsLoaded: false,
+    isAuthenticated: true,
+    showSuperBar: false,
     apps: [],
     manifest: {
       id: null,
@@ -70,6 +71,9 @@ const store = createStore({
       if (state.tourStep >= state.tourSteps.length) {
         state.tourMode = false
       }
+    },
+    setIsAuthenticated(state,isAuthenticated) {
+      state.isAuthenticated = isAuthenticated
     },
 
     setPlaygroundMode(state) {
@@ -308,6 +312,16 @@ const store = createStore({
     async loadApps({ commit }) {
       const apps = await fetchJSON('/proxy/trivial?path=/apps')
       commit('setApps', apps)
+    },
+
+    async loadApp({ commit }, { app_id }) {
+      console.log('[store][loadApp] loading app: ', app_id)
+      const app = await fetchJSON(`/proxy/trivial?path=/apps/${app_id}`)
+      commit('setApp', app)
+    },
+
+    async setIsAuthenticated({state, commit}, {isAuthenticated}) {
+      commit('setIsAuthenticated', isAuthenticated)
     },
 
     checkURLState({ state, commit }) {

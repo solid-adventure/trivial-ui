@@ -6,7 +6,6 @@
   import 'ace-builds/src-noconflict/theme-monokai'       // dark theme
   import 'ace-builds/src-noconflict/ext-language_tools'  // language extension prerequsite...
   import 'ace-builds/src-noconflict/snippets/javascript' // snippet
-
   export default {
     components: {
       VAceEditor

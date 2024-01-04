@@ -87,13 +87,11 @@ export default {
         <button class="button-medium" @click="newOrganization">Add New Organization</button>
       </form>
     </span>
-    <table class="organization-sets">
+    <table class="spaced">
         <thead>
             <tr>
                 <th class="name">Name</th>
                 <th class="billing-email">Billing Email</th>
-                <th class="remove"></th>
-                <th class="users"></th>
             </tr>
         </thead>
         <tbody>
@@ -108,55 +106,6 @@ export default {
   
 </template>
 <style lang="scss" scoped>
-.organization-sets {
-    width: 100%;
-    border-collapse: collapse;
-    font-weight: inherit;
-
-    thead th {
-        margin: 0;
-        padding: 0.25rem 0.5rem;
-        font-size: 1.25em;
-        font-weight: bold;
-        border-bottom: 1px solid var(--on-background);
-        text-align: left;
-
-        &.id { width: 10%; }
-        &.name { width: 20%; }
-        &.billing-email { width: 30%; }
-        &.remove { width: 10%; }
-        &.users { width: 40%; }
-    }
-
-    tbody {
-        tr{
-            cursor: pointer;
-        }
-
-        tr:nth-child(even) {
-          background-color: var(--on-background-20);
-        }
-
-        tr:hover {
-          background-color: var(--primary);
-
-          td {
-            color: var(--on-primary);
-          }
-        }
-
-
-        td {
-          margin: 0;
-          padding: 0.25em 0.5em;
-        }
-
-        td .remove-organization:hover{
-            background-color: var(--primary);
-            color: var(--on-primary);
-        }
-      }
-}
 
 #messages{
     margin: 2rem 0;

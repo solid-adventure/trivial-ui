@@ -3,7 +3,7 @@
     <div class="container">
       <span class="brand"><img /></span>
       <h1>Account Locked</h1>
-      <h4>{{ locked_reason }}</h4>
+      <h4>{{ currentUserMessage }}</h4>
       <a class="contactSupport" href="mailto:support@withtrivial.com"
         >Contact Support</a
       >
@@ -14,7 +14,6 @@
 </template>
 
 <style lang="scss" scoped>
-@import "../assets/stylesheets/includes/variables";
 @import "../assets/stylesheets/includes/auth";
 .contactSupport {
   margin: 20px 0;
@@ -23,11 +22,15 @@
 </style>
 
 <script>
+  import store from '../store'
 export default {
-  data() {
-    return {
-      locked_reason: window.lockedReason,
-    };
+  created() {
+    store.dispatch('setIsAuthenticated', {isAuthenticated: false});
+  },
+  computed: {
+    currentUserMessage() {
+      return this.$store?.state?.user?.account_locked_reason;
+    },
   },
 };
 </script>

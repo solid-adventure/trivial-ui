@@ -1,5 +1,5 @@
 <template>
-  <super-bar></super-bar>
+  <!-- <super-bar></super-bar> -->
   <nav-tree selected-title="settings"></nav-tree>
   <div class="InstanceSettings">
     <div id="messages">{{errorMessage}}</div>
@@ -150,13 +150,15 @@
   import ManifestMigrator from 'trivial-core/lib/ManifestMigrator'
   import { track } from '../../lib/TrackingService'
   import FeatureManager from 'trivial-core/lib/FeatureManager'
+  import NavTree from './builderv2/NavTree.vue'
 
   export default {
-    inject: ['appId'],
+    // inject: ['appId'],
 
     components: {
         ActionButton,
-        HideableSection
+        HideableSection,
+        'nav-tree': NavTree
     },
 
     provide: {
@@ -192,6 +194,8 @@
         copyMessage: null,
         panelMessage: null,
         scheduleMessage: null,
+        //assuming path remains as /apps/:id/settings2 or at least includes id param
+        appId: this.$route.params.id
       }
     },
 

@@ -53,7 +53,6 @@
 </template>
 
 <style lang="scss" scoped>
-  @import "../../assets/stylesheets/includes/variables";
 
  .chart-area {
   margin: 4em 0;
@@ -229,7 +228,7 @@ import { mapActions, mapState } from 'vuex'
 
   computed: {
     appId() {
-      return this.app.name
+      return this.$route.params.id;
     },
 
     pageTitle() {

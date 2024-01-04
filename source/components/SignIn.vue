@@ -22,7 +22,6 @@
 </template>
 
 <style lang="scss" scoped>
-@import "../assets/stylesheets/includes/variables";
 @import "../assets/stylesheets/includes/auth";
 
 .text-field {
@@ -41,8 +40,12 @@
 
 <script>
 import TrackingService from '../../lib/TrackingService';
+import store from '../store'
 TrackingService.identifyLandingReferer();
 export default {
+    created() {
+        store.dispatch('setIsAuthenticated', {isAuthenticated: false});
+    },
     data(){
         return {
             state: null,

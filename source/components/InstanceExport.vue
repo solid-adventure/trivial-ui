@@ -65,7 +65,6 @@
   import FeatureManager from 'trivial-core/lib/FeatureManager'
 
   export default {
-    inject: ['appId'],
 
     props: {
       revealDuration: {
@@ -84,7 +83,8 @@
       return {
         manifest: {},
         manifestContent: {},
-        credentials: null
+        credentials: null,
+        appId: this.$route.params.id
       }
     },
 

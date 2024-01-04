@@ -27,7 +27,6 @@
 </template>
 
 <style lang="scss" scoped>
-  @import "../../../assets/stylesheets/includes/variables";
 
   .autocomplete-input {
     flex-grow: 1;

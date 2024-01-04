@@ -9,7 +9,6 @@
 </template>
 
 <style lang="scss" scoped>
-  @import "../../assets/stylesheets/includes/variables";
 
   .typeahead {
     position: relative;

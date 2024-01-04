@@ -18,7 +18,6 @@
 </template>
 
 <style lang="scss" scoped>
-    @import "../assets/stylesheets/includes/variables";
     @import "../assets/stylesheets/includes/auth";
     .container {
         text-align: left;
@@ -40,9 +39,16 @@
   import TrackingService from '../../lib/TrackingService';
   import EditFunction from './EditFunction.vue'
 
+  import store from '../store'
 export default {
     components: {
         EditFunction
+    },
+
+    created() {
+        // This seems to be wrong sadly we can just rename setIsAuthenticated
+        // To 'ShowSuperBar'
+      store.dispatch('setIsAuthenticated', {isAuthenticated: false});
     },
 
     data(){
