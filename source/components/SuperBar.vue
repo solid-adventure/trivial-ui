@@ -69,6 +69,7 @@
     max-width: 4em;
     vertical-align: middle;
     margin-top: -0.5em;
+    content: var(--logo);
   }
 
   .brand {
