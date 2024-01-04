@@ -20,8 +20,8 @@
 
 <script>
   import { mapState } from 'vuex'
+  import Contract from './panels/Contract.vue'
   import Dashboard from './panels/Dashboard.vue'
-  import CSVUpload from './panels/CSVUpload.vue'
   import Headline from './panels/Headline.vue'
   import LineChart from './panels/LineChart.vue'
   import Spreadsheet from './panels/Spreadsheet.vue'
@@ -33,8 +33,8 @@
   export default {
 
     components: {
+      Contract,
       Dashboard,
-      CSVUpload,
       Headline,
       LineChart,
       Spreadsheet,

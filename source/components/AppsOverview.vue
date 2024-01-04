@@ -1,18 +1,14 @@
 <template>
   <div class="page-container">
-    <!-- <super-bar></super-bar> -->
     <div class="page-inset">
-
-      <!-- TODO: dynamic -->
-      <h2>Customer Contracts</h2>
+      <h2>{{ naivePluralizedAppFilter }}</h2>
       <div class="title-row">
         <div class="search-container">
           <SearchField v-if="!hasNoApps" :searchTerm="searchTerm" v-on:update="searchTerm=$event"></SearchField>
         </div>
       </div>
       <div class="new-button-container">
-        <!-- TODO Dynamic -->
-        <a class="button-medium headroom-small" :href="`/apps/new?paneltype=${this.panelTypeFilter}`">Add New Contract</a>
+        <a class="button-medium headroom-small" :href="`/apps/new?paneltype=${this.panelTypeFilter}`">Add New {{ titleizedAppFilter }}</a>
       </div>
 
 
@@ -28,8 +24,9 @@
           class="app-name"
           name="name"
           v-bind="{sortBy, sortAsc}"
-          @sort="setSort">App Name</SortableHead>
+          @sort="setSort">{{ titleizedAppFilter }} Name</SortableHead>
           <SortableHead
+          v-if="displayPanelTypeColumn"
           class="panel-type"
           name="panelType"
           v-bind="{sortBy, sortAsc}"
@@ -62,7 +59,9 @@
         <tbody>
           <tr v-for="app in sortedApps" :key="app.id">
             <td><a :href="`/apps/${app.name}/`">{{app.descriptive_name}}</a></td>
-            <td><a :href="`/apps/${app.name}/`">{{panelType(app)}}</a></td>
+            <td v-if="displayPanelTypeColumn">
+              <a :href="`/apps/${app.name}/`">{{panelType(app)}}</a>
+            </td>
             <td>{{lastRun(app)}}</td>
             <td><a :href="editLink(app)">Edit</a></td>
             <!-- <td><a :href="`/apps/${app.name}/builder2`">Edit</a></td> -->
@@ -257,6 +256,22 @@
         return this.appsLoaded && this.sortedApps.length === 0
       },
 
+      titleizedAppFilter() {
+        if (['any', 'all', 'unset'].includes(this.panelTypeFilter)) {
+          return 'App'
+        }
+        return this.toTitleCase(this.panelTypeFilter)
+      },
+
+      displayPanelTypeColumn() {
+        return ['any', 'all', 'unset'].includes(this.panelTypeFilter)
+      },
+
+      // FACT: If you call something naive, it is illegal to criticize it for being naive.
+      // FACT: This will work until we have a panel type that ends in 's' or follow a different pluralization rule.
+      naivePluralizedAppFilter() {
+        return `${this.titleizedAppFilter}s`
+      },
 
       ...mapState([
         'apps',
@@ -336,7 +351,17 @@
         this.stats = []
         await this.loadStats(type)
         this.chartType = type
+      },
+
+      toTitleCase(str) {
+        return str.replace(
+          /\w\S*/g,
+          function(txt) {
+            return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+          }
+        )
       }
+
     }
   }
 </script>

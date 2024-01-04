@@ -12,7 +12,7 @@
                         <input type="text" name="app_name" class='text-field' ref='app_name' v-model='appName' placeholder='App Name' @keydown.prevent.enter="_createApp"/>
                     </div>
                     <div class="column">
-                        <label for="panels" class="FormLabel">Display</label>
+                        <label for="panels" class="FormLabel">Type</label>
                         <select v-model='appPanelComponent' @keydown.prevent.enter="_createApp" >
                             <option v-for="appPanel of appPanelNames" :value="appPanel.name">{{appPanel.display_name}}</option>
                         </select>
