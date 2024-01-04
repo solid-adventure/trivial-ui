@@ -34,35 +34,13 @@ class AppPanel {
     }
   }
 
-  UnsetAfterCreatePath(id) {
+  ContractAfterCreatePath(id) {
     return `/apps/${id}/builder2`
   }
 
-  PostgresPlaygroundAfterCreatePath(id) {
-    return `/apps/${id}/builder2/action/Magic/Query/7?mode=playground`
+  UnsetAfterCreatePath(id) {
+    return `/apps/${id}/builder2`
   }
-
-  // This works if we ever want to trigger a 2nd app to build, but its slow
-  // PostgresPlaygroundAfterAdd(app) {
-  //   return new Promise( async (resolve, reject) => {
-  //     console.log(`[PostgresPlaygroundAfterAdd]`)
-  //     let appRunnerName = `${app.descriptive_name} Query Runner`
-  //     let appRunner = new App(app.$store)
-  //     let appPanel = new AppPanel('PostgresQueryRunner')
-  //     appRunner.create({name: appRunnerName, panelOptions: appPanel.defaultOptions})
-  //     .then( (appRunnerInstance) => {
-  //       app.setPanelOption(
-  //         {queryRunnerApp: {
-  //           hostname: appRunnerInstance.hostname,
-  //           domain: appRunnerInstance.domain
-  //           }
-  //         })
-  //       })
-  //     .then(x => resolve())
-  //     .catch(e => reject(e))
-  //   })
-
-  // }
 
   DashboardDefaultOptions() {
     return {
@@ -89,11 +67,10 @@ class AppPanel {
 
   static get names() {
     return [
-      {display_name: "CSV Upload", name: "CSVUpload"},
+      {display_name: "Contract", name: "Contract"},
       {display_name: "Headline Card", name: "Headline"},
       {display_name: "Line Chart", name: "LineChart"},
       {display_name: "Dashboard", name: "Dashboard"},
-      {display_name: "PostgreSQL Playground", name: "PostgresPlayground"},
       {display_name: "Workbook", name: "Workbook"},
       {display_name: "None", name: "Unset"}
     ]

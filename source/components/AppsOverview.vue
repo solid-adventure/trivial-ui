@@ -1,26 +1,32 @@
 <template>
-  <div class="overview">
-    <!-- <super-bar></super-bar> -->
-    <div class="overview-container">
+  <div class="page-container">
+    <div class="page-inset">
+      <h2>{{ naivePluralizedAppFilter }}</h2>
       <div class="title-row">
         <div class="search-container">
           <SearchField v-if="!hasNoApps" :searchTerm="searchTerm" v-on:update="searchTerm=$event"></SearchField>
         </div>
       </div>
+      <div class="new-button-container">
+        <a class="button-medium headroom-small" :href="`/apps/new?paneltype=${this.panelTypeFilter}`">Add New {{ titleizedAppFilter }}</a>
+      </div>
+
+
 <!--       <div class="tabs-container">
         <div v-for="group of panelTypeGroups" class="tab" :class="{active: group.filter == panelTypeFilter }">
           <a href="#" v-on:click.prevent="panelTypeFilter=group.filter" >{{group.name}}</a>
         </div>
       </div>
  -->
-      <table class="stats">
+      <table class="stats spaced">
         <thead class="active">
           <SortableHead
           class="app-name"
           name="name"
           v-bind="{sortBy, sortAsc}"
-          @sort="setSort">App Name</SortableHead>
+          @sort="setSort">{{ titleizedAppFilter }} Name</SortableHead>
           <SortableHead
+          v-if="displayPanelTypeColumn"
           class="panel-type"
           name="panelType"
           v-bind="{sortBy, sortAsc}"
@@ -50,10 +56,12 @@
               @click.prevent="setChartType('weekly')">W</button>
           </th>
         </thead>
-        <tbody>
+        <tbody v-if="appsLoaded">
           <tr v-for="app in sortedApps" :key="app.id">
             <td><a :href="`/apps/${app.name}/`">{{app.descriptive_name}}</a></td>
-            <td><a :href="`/apps/${app.name}/`">{{panelType(app)}}</a></td>
+            <td v-if="displayPanelTypeColumn">
+              <a :href="`/apps/${app.name}/`">{{panelType(app)}}</a>
+            </td>
             <td>{{lastRun(app)}}</td>
             <td><a :href="editLink(app)">Edit</a></td>
             <!-- <td><a :href="`/apps/${app.name}/builder2`">Edit</a></td> -->
@@ -69,6 +77,11 @@
             </td>
           </tr>
         </tbody>
+        <tbody v-else>
+          <tr>
+            <td>Loading...</td>
+          </tr>
+        </tbody>
       </table>
       <p v-if="hasNoApps" class="no-apps">
         <em>You do not have any apps. Click <strong>New</strong> to create a new app.</em>
@@ -77,10 +90,6 @@
       <p v-if="hasNoSearchResults" class="no-apps">
         <em>No results</em>
       </p>
-
-
-      <div><a class="button-medium headroom-small" :href="`/apps/new?paneltype=${this.panelTypeFilter}`">New</a></div>
-
 
     </div>
   </div>
@@ -105,6 +114,13 @@
   .search-container {
     margin-top: 3em;
     margin-bottom: 2em;
+  }
+
+  .new-button-container {
+    margin-bottom: 2em;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
   }
 
   h1 {
@@ -142,70 +158,6 @@
     color: var(--on-background);
     border-bottom: 0;
     border-color: var(--accent);
-  }
-
-  table.stats {
-    width: 100%;
-    border-collapse: collapse;
-    border: none;
-
-    thead {
-      font-weight: bold;
-      text-transform: uppercase;
-      border-bottom: 1px solid var(--table-head-border);
-
-      th {
-        &.app-name { width: 20%; }
-        &.panel-type { width: 20%; }
-        &.last-run { width: 15%; }
-        &.edit { width: 10%; }
-        &.status { width: 20%; }
-        &.period { width: 15%; }
-
-        span {
-          font-weight: 100;
-        }
-
-        button {
-          background: transparent;
-          color: inherit;
-          display: inline;
-          cursor: pointer;
-          margin-bottom: -.5em;
-          padding-bottom: .5em;
-
-          &.selected {
-            margin-bottom: calc(-.5em - 2px);
-            border-bottom: 3px solid var(--on-background);
-          }
-        }
-      }
-    }
-
-    tbody {
-      tr {
-        cursor: pointer;
-
-        &:nth-child(even) {
-          background-color: var(--table-striping);
-        }
-
-        &:hover {
-          background-color: var(--table-row-hover-background);
-          color: var(--on-table-row-hover-background);
-        }
-
-        td {
-          border: none;
-          padding: .5em;
-          font-weight: 100;
-
-          a {
-            color: inherit;
-          }
-        }
-      }
-    }
   }
 
   .no-apps {
@@ -309,6 +261,22 @@
         return this.appsLoaded && this.sortedApps.length === 0
       },
 
+      titleizedAppFilter() {
+        if (['any', 'all', 'unset'].includes(this.panelTypeFilter)) {
+          return 'App'
+        }
+        return this.toTitleCase(this.panelTypeFilter)
+      },
+
+      displayPanelTypeColumn() {
+        return ['any', 'all', 'unset'].includes(this.panelTypeFilter)
+      },
+
+      // FACT: If you call something naive, it is illegal to criticize it for being naive.
+      // FACT: This will work until we have a panel type that ends in 's' or follow a different pluralization rule.
+      naivePluralizedAppFilter() {
+        return `${this.titleizedAppFilter}s`
+      },
 
       ...mapState([
         'apps',
@@ -388,7 +356,17 @@
         this.stats = []
         await this.loadStats(type)
         this.chartType = type
+      },
+
+      toTitleCase(str) {
+        return str.replace(
+          /\w\S*/g,
+          function(txt) {
+            return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+          }
+        )
       }
+
     }
   }
 </script>
