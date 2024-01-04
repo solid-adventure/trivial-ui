@@ -62,6 +62,14 @@
         return this.descriptor.fullDescriptionHTML
       },
 
+      hasFullHTMLDescription() {
+        return this.descriptor.fullDescriptionHTML != null && this.descriptor.fullDescriptionHTML !== ""
+      },
+
+      hasShortDescription() {
+        return this.descriptor.shortDescription != null && this.descriptor.shortDescription !== ""
+      },
+
       ...mapGetters([
         'hiddenByTour',
       ]),
@@ -96,42 +104,26 @@
 
 <template>
   <div>
-<!--
-<pre>
-hiddenByTour("action-info") {{ hiddenByTour("action-info") }}
-hiddenByTour("credentials") {{ hiddenByTour("credentials") }}
-hiddenByTour("transform-config") {{ hiddenByTour("transform-config") }}
-hiddenByTour("preview") {{ hiddenByTour("preview") }}
-hiddenByTour("advanced-settings") {{ hiddenByTour("advanced-settings") }}
-hiddenByTour("custom-functions")  {{ hiddenByTour("custom-functions") }}
-</pre>
- -->
-
     <div class="header-section">
       <div class="title-group">
         <div class="icon" :style="{'background-image': iconUrl}"></div>
-        <h2 class="name" v-if="displayDescriptorName">{{descriptor.name}}
-          <CopyButton class="copy copy-path" :value="url" />
-        </h2>
-
+        <div class="name-description">
+          <h2 class="name" v-if="displayDescriptorName">{{descriptor.name}}
+            <CopyButton class="copy copy-path" :value="url" />
+          </h2>
+          <p v-if="hasShortDescription" class="short-description">{{ descriptor.shortDescription }}</p>
+        </div>
       </div>
       <div v-if="action.identifier != 1 && !playgroundMode " class="disable-group">
         <p class="toggle-label">Action On/Off</p>
-        <!-- v-model="action.enabled" -->
         <ToggleButton ref="ActionEnabledToggle" @update:modelValue="handleActionEnabledToggle" :modelValue="action.enabled"></ToggleButton>
       </div>
     </div>
-    <HideableSection v-if="fullDescription && !hiddenByTour('action-info')" class="action-info">
+    <HideableSection v-if="hasFullHTMLDescription && !hiddenByTour('action-info')" class="action-info">
       <div v-html="fullDescription"></div>
-
-      <!-- TEMP Tour concept -->
-      <div v-if="tourMode">
-        <p class="tour-instruction">But first, enter your Postgres details.</p>
-        <button class="button-medium main-btn btn-hover" @click.prevent="incrementTour">Next</button>
-      </div>
-
     </HideableSection>
-    </div>
+
+  </div>
 </template>
 
 <style lang="scss" scoped>
@@ -169,8 +161,19 @@ hiddenByTour("custom-functions")  {{ hiddenByTour("custom-functions") }}
       background-size: contain;
     }
 
-    .name {
+    .name-description {
       margin-left: 1em;
+
+      .name {
+        margin-bottom: 0;
+        color: var(--on-surface);
+      }
+
+      p.short-description {
+        margin-top: 0;
+        color: var(--on-surface-secondary);
+      }
+
     }
 
     .copy-path {
