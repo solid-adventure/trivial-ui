@@ -44,5 +44,3 @@ To initiate a pull request, ensure that you have claimed an available issue or f
 ### Security Issues Notification
 
 You must never report security related issues, vulnerabilities or bugs including sensitive information to the issue tracker in github, or elsewhere in public. Instead sensitive bugs must be sent by email to [security@withtrivial.com](security@withtrivial.com).
-
-### Attribution
