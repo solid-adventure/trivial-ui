@@ -61,7 +61,7 @@
 </script>
 
 <template>
-  <div>
+  <div class='left-inset'>
     <div v-for="(field, name) in visibleFields" :key="keyIdentifierPair(name)">
       <FieldEditor
         :editor="editor(field)"

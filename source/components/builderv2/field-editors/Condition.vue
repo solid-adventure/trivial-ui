@@ -104,16 +104,16 @@
 
 <template>
   <div :key="name" class="field" :class="{required: field.required}">
-    <h3 class="label">When</h3>
-    <em class="help">{{ help(field) }}</em>
+    <label class="label">When</label>
     <CodeCompletingInput v-if="!loadingDataSample"
       v-model="content"
       :options="editorOptions(field)"
       :sample="runtimeDataSample"
       :placeholder="placeholder(field)"
       :blocks="customFunctions"
-      :expand-errors="true"
-      :show-reference-errors="true"></CodeCompletingInput>
+      :expand-errors="false"
+      :show-reference-errors="false"></CodeCompletingInput>
+      <em class="help">{{ help(field) }}</em>
   </div>
 </template>
 

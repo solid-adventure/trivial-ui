@@ -139,16 +139,24 @@
         }
       },
 
+      toTitleCase(str) {
+        if (typeof str !== 'string') { return str }
+        return str.replaceAll("_", " ")
+          .split(" ")
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(" ");
+      },
+
       schemaFieldValueWithFallback(param, path, fallback) {
         try {
           let spec = this.spec(path)
           if (spec && 'undefined' !== typeof spec[param]) {
             return spec[param]
           } else {
-            return fallback
+            return this.toTitleCase(fallback)
           }
         } catch(e) {
-          return fallback
+          return this.toTitleCase(fallback)
         }
       },
 
@@ -229,7 +237,6 @@
 
 <template>
   <div class='transform-fields'>
-    <HideableSection v-if="!hiddenByTour('transform-config')" :display-name="sectionTitle" class="transform-config">
       <div v-for="(xform, idx) in transformations">
         <div class="field" ref="fields">
           <label>
@@ -261,7 +268,7 @@
       </div>
 
       <span v-if="displayFieldCreation">
-        <button v-if="!adding" class="button-small" @click="startAdd">+ Custom Field</button>
+        <button v-if="!adding" class="button-small" @click="startAdd">Add a Custom Field</button>
         <div v-if="adding">
           <div class="field new-section">
             <label>New field name:</label>
@@ -275,7 +282,6 @@
           <button class="button-small" @click="addField" :disabled="!validAddName">Add</button>
         </div>
       </span>
-    </HideableSection>
   </div>
 </template>
 
@@ -285,6 +291,7 @@
     position: relative;
     box-sizing: border-box;
     padding-right: 1.5em;
+    margin-bottom: 1em;
 
     &.new-section {
       margin-top: 1em;
