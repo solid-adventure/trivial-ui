@@ -2,7 +2,7 @@ input[type=text], input[type=password] {
   box-sizing: border-box;
   padding: 1em;
   border: 1px solid $input-border-color;
-  border-radius: 0px;
+  border-radius: 4px;
   margin-left: 0;
 }
 
@@ -24,7 +24,7 @@ textarea {
 .field {
   display: flex;
   flex-direction: column;
-  padding: 0.2em 0 0.6em 0;
+  padding: 0.2em 1.5em 0.6em 0;
 }
 
 button:disabled {
@@ -44,3 +44,17 @@ button:disabled {
     margin: 0 0 0.5em 0;
   }
 }
+
+label {
+  color: var(--on-surface-secondary);
+  margin-bottom: 0.3em;
+  font-weight: 400;
+
+  span.required {
+    font-style: italic;
+    font-size: 0.9em;
+    font-weight: 300;
+  }
+
+}
+

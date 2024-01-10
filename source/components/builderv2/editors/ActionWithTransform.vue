@@ -67,6 +67,10 @@
         return this.actionDescriptor.getCredentialTypes()
       },
 
+      displayCredentials() {
+        return Object.keys(this.actionCredentialType).length > 0
+      },
+
       transformDescriptor() {
         return ActionDescriptors.forType(this.transform.type)
       },
@@ -125,25 +129,27 @@
 
 <template>
   <div>
-    <EditorOverview :value="action"></EditorOverview>
-    <EditorDefinition
-      :value="action"
-      :credentials="credentials"
-      :nextIdentifier="nextIdentifier"
-      @edit="edit"></EditorDefinition>
-    <HideableSection v-if="!hiddenByTour('credentials')" :initially-hidden="false" display-name="Credentials">
-      <EditorConfig :value="action" :credentials="credentials"></EditorConfig>
-    </HideableSection>
-      <div class="transform-fields">
-        <CustomFields
-          :fields="transformDefinitionFields"
-          :data="transform.definition"
-          :credentials="credentials"
-          :context="transform"
-          :allowFieldCreation="allowFieldCreation"
-          ></CustomFields>
-        </div>
-    <EditorAdvanced :value="advancedSettings"></EditorAdvanced>
+    <div class="page-inset">
+      <EditorOverview :value="action"></EditorOverview>
+      <EditorDefinition
+        :value="action"
+        :credentials="credentials"
+        :nextIdentifier="nextIdentifier"
+        @edit="edit"></EditorDefinition>
+      <HideableSection v-if="displayCredentials && !hiddenByTour('credentials')" :initially-hidden="false" display-name="Credentials">
+        <EditorConfig :value="action" :credentials="credentials"></EditorConfig>
+      </HideableSection>
+        <div class="transform-fields">
+          <CustomFields
+            :fields="transformDefinitionFields"
+            :data="transform.definition"
+            :credentials="credentials"
+            :context="transform"
+            :allowFieldCreation="allowFieldCreation"
+            ></CustomFields>
+          </div>
+      <EditorAdvanced :value="advancedSettings"></EditorAdvanced>
+    </div>
   </div>
 </template>
 
