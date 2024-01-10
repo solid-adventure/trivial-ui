@@ -129,11 +129,6 @@
 
 <template>
   <div>
-
-    Customer Contracts > Contract > Rule
-
-    <h2>Edit Rule</h2>
-
     <div class="page-inset">
       <EditorOverview :value="action"></EditorOverview>
       <EditorDefinition

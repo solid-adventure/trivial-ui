@@ -55,9 +55,6 @@
 
 <template>
   <div>
-
-    Customer Contracts > Contract
-
     <div class="page-inset">
       <!-- <EditorOverview :value="action" :displayDescriptorName=false></EditorOverview> -->
       <!-- <EditorAdvanced :value="action"></EditorAdvanced> -->

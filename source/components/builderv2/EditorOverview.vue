@@ -108,7 +108,7 @@
       <div class="title-group">
         <div class="icon" :style="{'background-image': iconUrl}"></div>
         <div class="name-description">
-          <h2 class="name" v-if="displayDescriptorName">{{descriptor.name}}
+          <h2 class="name" v-if="displayDescriptorName"> Editing: {{descriptor.name}}
             <CopyButton class="copy copy-path" :value="url" />
           </h2>
           <p v-if="hasShortDescription" class="short-description">{{ descriptor.shortDescription }}</p>
