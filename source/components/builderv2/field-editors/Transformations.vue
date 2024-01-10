@@ -170,6 +170,11 @@
         }
       },
 
+      isRequired(path) {
+        let spec = this.spec(path)
+        return spec ? spec.required : false
+      },
+
       editorComponentType(path) {
         let fallback = 'CodeCompletingInput'
         try {
@@ -241,6 +246,7 @@
         <div class="field" ref="fields">
           <label>
             <span>{{schemaFieldValueWithFallback('label', xform.to, xform.to)}}</span>
+            <span v-if="isRequired(xform.to)" class='required'>(required)</span>
             <ToolTip
               v-if="possibleValues(xform.to)"
               sizeToAncestor="label"
@@ -325,7 +331,7 @@
     label {
       display: flex;
       flex-direction: row;
-      justify-content: space-between;
+      justify-content: start;
       align-items: center;
       column-gap: .25em;
     }

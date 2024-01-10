@@ -54,14 +54,19 @@
 </script>
 
 <template>
-  <div class="page-inset">
-    <!-- <EditorOverview :value="action" :displayDescriptorName=false></EditorOverview> -->
-    <!-- <EditorAdvanced :value="action"></EditorAdvanced> -->
-    <EditorDefinition
-      :value="action"
-      :credentials="credentials"
-      :nextIdentifier="nextIdentifier"
-      @edit="edit"></EditorDefinition>
+  <div>
+
+    Customer Contracts > Contract
+
+    <div class="page-inset">
+      <!-- <EditorOverview :value="action" :displayDescriptorName=false></EditorOverview> -->
+      <!-- <EditorAdvanced :value="action"></EditorAdvanced> -->
+      <EditorDefinition
+        :value="action"
+        :credentials="credentials"
+        :nextIdentifier="nextIdentifier"
+        @edit="edit"></EditorDefinition>
+    </div>
   </div>
 </template>
 

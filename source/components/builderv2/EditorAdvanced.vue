@@ -33,7 +33,7 @@
 </script>
 
 <template>
-  <div>
+  <div class='advanced-settings'>
     <HideableSection v-if="!hiddenByTour('advanced-settings') && !playgroundMode" :initially-hidden="true" display-name='Advanced' class="advanced-settings">
     <div class="field">
       <label :for="`action_${action.identifier}_name`">Instance Name (optional)</label>
@@ -52,11 +52,9 @@
 </template>
 
 <style lang="scss" scoped>
-  h3 {
-    margin-bottom: 0;
+
+  .advanced-settings {
+    margin-top: 2em;
   }
 
-  .settings {
-    margin-bottom: 1em;
-  }
 </style>

@@ -124,7 +124,7 @@
     </HideableSection>
 
     <div class="field left-inset" v-if="descriptor.nameRequired">
-      <label :for="`action_${action.identifier}_name`">Rule Name (required) </label>
+      <label :for="`action_${action.identifier}_name`">Name <span class='required'>(required)</span> </label>
       <input type="text" :id="`action_${action.identifier}_name`" v-model="action.name" placeholder="A descriptive name for this instance">
       <hr />
     </div>

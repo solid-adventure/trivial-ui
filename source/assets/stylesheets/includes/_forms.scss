@@ -49,4 +49,12 @@ label {
   color: var(--on-surface-secondary);
   margin-bottom: 0.3em;
   font-weight: 400;
+
+  span.required {
+    font-style: italic;
+    font-size: 0.9em;
+    font-weight: 300;
+  }
+
 }
+
