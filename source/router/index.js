@@ -66,7 +66,7 @@ const routes = [
   { path: "/apps/:id/builder2", component: Builder, name: "Builder" },
   // Route below seems to be a duplicate of /apps/:id which defaults to Panels component
   { path: "/apps/:id/panels", component: Panels, name: "Panels" },
-  { path: "/apps/:id/builder2/*", component: Builder, name: "Builder" }, //change this path
+  { path: "/apps/:id/builder2/*", component: Builder, name: "Actions" }, //change this path
   {
     path: "/organizations/:id/edit",
     component: OrganizationSettings,
@@ -83,7 +83,7 @@ const routes = [
   // componment, create a new component or render a custom component
 
   //Dead component, API post is commented out?
-  { path: "/actions", component: Actions, name: "Actions" },
+  // { path: "/actions", component: Actions, name: "Actions" },
 ];
 
 const router = createRouter({
