@@ -49,6 +49,7 @@
 .brand img {
     width: 212px;
     height: auto;
+    max-height: 6em;
     margin-bottom: 50px;
     content: var(--logo-login);
 }
