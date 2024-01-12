@@ -200,10 +200,21 @@
         // ]
       }
     },
-
     created() {
-      let params =  new URLSearchParams(window.location.search)
-      this.panelTypeFilter = params.get('paneltype') || 'dashboard'
+      if (!this.$route.query.panelType) {
+        this.panelTypeFilter = 'dashboard'
+        this.$router.push({query: {panelType: this.panelTypeFilter}})
+      } else {
+        this.panelTypeFilter = this.$route.query.panelType;
+      }
+    },
+    mounted() {
+      if (!this.$route.query.panelType) {
+        this.panelTypeFilter = 'dashboard'
+        this.$router.push({query: {panelType: this.panelTypeFilter}})
+      } else {
+        this.panelTypeFilter = this.$route.query.panelType;
+      }
       store.dispatch('setIsAuthenticated', {isAuthenticated: true});
       this.loadStats(this.chartType)
     },
