@@ -22,7 +22,7 @@ import Actions from "../components/Actions.vue";
 import FunctionWriter from "../components/FunctionWriter.vue";
 
 const routes = [
-  { path: "/", component: AppsOverview, name: "Dashboard" },
+  { path: "/", component: AppsOverview, name: "Home" },
   {
     path: "/signin",
     component: SignIn,
@@ -51,7 +51,7 @@ const routes = [
   // { path: '/playground', component: Playground },
   { path: "/apps/new", component: NewAppForm, name: "New App" },
   { path: "/account-locked", component: AccountLocked, name: "Account Locked" },
-  { path: "/apps/:id", component: Panels, name: "App" },
+  { path: "/apps/:id", component: Panels, name: "Apps" },
 
   // Below path not used and has crazy templating in there
   // { path: '/apps/:id/action/:perform/:actionIdentifier', component: AppAction },

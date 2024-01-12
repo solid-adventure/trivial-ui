@@ -1,7 +1,6 @@
 <template>
     <!-- <super-bar></super-bar> -->
     <div class="page-container">
-        Breadcrumb > New App
         <div class="page-inset">
             <Notices></Notices>
             <div v-if="buildStatus=='initial'" class="FormWrapper">
