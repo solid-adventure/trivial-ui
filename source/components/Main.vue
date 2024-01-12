@@ -91,7 +91,11 @@ export default {
       this.breadcrumbs = resolvedRoutes
         .filter((x) => x.matched && (x.matched.length ?? 0) > 0)
         .map((x) => {
-          return { display: x.name, link: x.href };
+          let displayName = x.name;
+          if (displayName == 'Apps' && store?.state?.app?.descriptive_name) {
+            displayName = store.state.app.descriptive_name
+          }
+          return { display: displayName, link: x.href };
         });
 
         if (!this.breadcrumbs.length) {

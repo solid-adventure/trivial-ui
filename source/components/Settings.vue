@@ -1,19 +1,5 @@
 <template>
-  <!-- <super-bar></super-bar> -->
   <div class="page-container">
-
-
-    <!-- TODO make this a component and pass the items as props -->
-    <!-- Once it's a component, spruce up the styling -->
-    <div class="breadcrumb">
-      <span class="history">Accounts</span>
-      <span class="spacer">></span>
-
-      <span class="history">{{ this.$store.state.user.name }}</span>
-      <span class="spacer">></span>
-
-      <span class="active"><strong>Account Settings</strong></span>
-    </div>
 
     <div class="page-inset">
 

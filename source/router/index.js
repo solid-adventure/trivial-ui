@@ -47,7 +47,7 @@ const routes = [
   },
   { path: "/resetpassword", component: ResetPassword, name: "Reset Password" },
   { path: "/register", component: Register, name: "Register" },
-  { path: "/settings", component: Settings, name: "Settings" },
+  { path: "/settings", component: Settings, name: "Account Settings" },
   // { path: '/playground', component: Playground },
   { path: "/apps/new", component: NewAppForm, name: "New App" },
   { path: "/account-locked", component: AccountLocked, name: "Account Locked" },
