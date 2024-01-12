@@ -201,19 +201,19 @@
       }
     },
     created() {
-      if (!this.$route.query.paneltype) {
+      if (!this.$route.params.paneltype) {
         this.panelTypeFilter = 'dashboard'
-        this.$router.push({query: {panelType: this.panelTypeFilter}})
+        this.$router.push(`/${this.panelTypeFilter}`)
       } else {
-        this.panelTypeFilter = this.$route.query.paneltype;
+        this.panelTypeFilter = this.$route.params.paneltype;
       }
     },
     mounted() {
-      if (!this.$route.query.paneltype) {
+      if (!this.$route.params.paneltype) {
         this.panelTypeFilter = 'dashboard'
-        this.$router.push({query: {panelType: this.panelTypeFilter}})
+        this.$router.push(`/${this.panelTypeFilter}`)
       } else {
-        this.panelTypeFilter = this.$route.query.paneltype;
+        this.panelTypeFilter = this.$route.params.paneltype;
       }
       store.dispatch('setIsAuthenticated', {isAuthenticated: true});
       this.loadStats(this.chartType)

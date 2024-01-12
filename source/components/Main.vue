@@ -8,8 +8,7 @@
 
     <!-- Main content area where router views are rendered -->
     <main>
-      <router-view class="clearSuperbar"
-      ></router-view>
+      <router-view class="clearSuperbar"></router-view>
     </main>
 
     <!-- Common footer for the app -->
@@ -48,7 +47,10 @@ export default {
   },
   watch: {
     async currentRouteName(newVal) {
-      store.dispatch('setCurrentPath', {currentPath: newVal, route: this.$route})
+      store.dispatch("setCurrentPath", {
+        currentPath: newVal,
+        route: this.$route,
+      });
       let vars = {};
       this.loading = true;
       if (this.$route.path.indexOf("/apps") == 0 && this?.$route?.params?.id) {
@@ -92,26 +94,43 @@ export default {
         .filter((x) => x.matched && (x.matched.length ?? 0) > 0)
         .map((x) => {
           let displayName = x.name;
-          if (displayName == 'Apps' && store?.state?.app?.descriptive_name) {
-            displayName = store.state.app.descriptive_name
+          let linkPath = x.href;
+          if (displayName == "Apps" && store?.state?.app?.descriptive_name) {
+            displayName = store.state.app.descriptive_name;
           }
-          return { display: displayName, link: x.href };
+          if (
+            displayName == "PanelType" &&
+            (this.$route?.params?.paneltype ||
+              store?.state?.app?.panels?.component || this.$route?.query?.paneltype)
+          ) {
+            displayName =
+              this.$route?.params?.paneltype ??
+              store?.state?.app?.panels?.component ?? this.$route?.query?.paneltype;
+            displayName = `${displayName
+              .charAt(0)
+              .toUpperCase()}${displayName.slice(1)}`;
+            // Order is important here because we want to generate the link before we make the displayName plural
+            linkPath = `/${displayName}`;
+            if (displayName != "All") {
+              displayName = `${displayName}s`;
+            }
+          }
+          return { display: displayName, link: linkPath };
         });
 
-        if (!this.breadcrumbs.length) {
-          this.breadcrumbs = [{display: 'Home', link: '/'}]
-        }
-        this.loading = false;
+      if (!this.breadcrumbs.length) {
+        this.breadcrumbs = [{ display: "Home", link: "/" }];
+      }
+      this.loading = false;
     },
   },
 };
 </script>
 
 <style lang="scss" scoped>
-
- .clearSuperBar {
-   margin-top: 80px;
- }
+.clearSuperBar {
+  margin-top: 80px;
+}
 
 /* global styles go here */
 </style>
