@@ -166,7 +166,7 @@
     display: flex;
     flex-direction: row;
     border-bottom: 1px solid var(--on-background-40);
-    top: 80px;
+    top: 120px;
     position: sticky;
     background-color: var(--background);
     z-index: 2;
