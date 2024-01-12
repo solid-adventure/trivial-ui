@@ -101,14 +101,19 @@ export default {
           if (
             displayName == "PanelType" &&
             (this.$route?.params?.paneltype ||
-              store?.state?.app?.panels?.component)
+              store?.state?.app?.panels?.component || this.$route?.query?.paneltype)
           ) {
             displayName =
               this.$route?.params?.paneltype ??
-              store?.state?.app?.panels?.component;
-            displayName =
-              displayName.charAt(0).toUpperCase() + displayName.slice(1);
-              linkPath = `/${displayName}`
+              store?.state?.app?.panels?.component ?? this.$route?.query?.paneltype;
+            displayName = `${displayName
+              .charAt(0)
+              .toUpperCase()}${displayName.slice(1)}`;
+            // Order is important here because we want to generate the link before we make the displayName plural
+            linkPath = `/${displayName}`;
+            if (displayName != "All") {
+              displayName = `${displayName}s`;
+            }
           }
           return { display: displayName, link: linkPath };
         });
