@@ -311,7 +311,7 @@ const store = createStore({
 
     async loadApps({ commit }) {
       const apps = await fetchJSON('/proxy/trivial?path=/apps')
-      commit('setApps', apps)
+      await commit('setApps', apps)
     },
     async setIsAuthenticated({state, commit}, {isAuthenticated}) {
       commit('setIsAuthenticated', isAuthenticated)

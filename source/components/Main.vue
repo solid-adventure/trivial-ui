@@ -92,19 +92,16 @@ export default {
       let resolvedRoutes = allBreaks.map((x) =>
         this.$router.resolve({ path: x, params: this.$route.params })
       );
-      // uncomment for debugging.... For some reason I will never understand
-      // the path: /apps/202ad25dd2f883/builder2 does not match with the route
-      //   { path: "/apps/:id/builder2", component: Builder, name: "Builder" },
-      // But it works flawlessly for actual navigation
-      // console.log(allBreaks);
-      // console.dir(this.$route);
-      // console.log(this.$route.params);
-      // console.log(resolvedRoutes);
+
       this.breadcrumbs = resolvedRoutes
         .filter((x) => x.matched && (x.matched.length ?? 0) > 0)
         .map((x) => {
           return { display: x.name, link: x.href };
         });
+
+        if (!this.breadcrumbs.length) {
+          this.breadcrumbs = [{display: 'Dashboard', link: '/'}]
+        }
       this.loadingWatcher = false;
     },
   },

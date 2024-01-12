@@ -317,7 +317,7 @@
 
     .action-bar {
       position: fixed;
-      // top: 80px;
+      top: 120px;
       left: 23em;
       box-sizing: border-box;
       height: 3.625em;

@@ -11,8 +11,8 @@
   background-color: var(--super-bar-background);
   color: var(--on-primary-darker);
   font-size: 1em;
-  // position: fixed;
-  padding-top: 80px;
+  position: fixed;
+  // padding-top: 80px;
   padding-left: 2em;
   // left: 0;
   width: 100%;

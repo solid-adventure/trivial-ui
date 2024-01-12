@@ -87,7 +87,7 @@
   	height: 100%;
   	margin: 2em;
     left: 23em;
-    // top: 80px;
+    top: 80px;
     position: relative;
     width: calc(100% - 27em);
   }
