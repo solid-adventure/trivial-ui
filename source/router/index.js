@@ -23,6 +23,7 @@ import FunctionWriter from "../components/FunctionWriter.vue";
 
 const routes = [
   { path: "/", component: AppsOverview, name: "Home" },
+  { path: "/:paneltype", component: AppsOverview, name: "PanelType" },
   {
     path: "/signin",
     component: SignIn,
