@@ -91,7 +91,6 @@ export default {
     },
     async app(newApp) {
       if (newApp) {
-        console.log('new app')
         window.document.title = `Edit: ${newApp.descriptive_name}`;
       }
     },

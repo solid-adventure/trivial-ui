@@ -39,6 +39,7 @@ export default {
     return {
       lastVars: null,
       breadcrumbs: [],
+      loading: false,
     };
   },
   computed: {
@@ -51,7 +52,9 @@ export default {
   },
   watch: {
     async currentRouteName(newVal) {
+      store.dispatch('setCurrentPath', {currentPath: newVal, route: this.$route})
       let vars = {};
+      this.loading = true;
       if (this.$route.path.indexOf("/apps") == 0 && this?.$route?.params?.id) {
         vars.appId = this.$route.params.id;
       }
@@ -69,7 +72,7 @@ export default {
         vars.orgId !== this.lastVars?.orgId ||
         !this.lastVars
       ) {
-        store.dispatch("init", vars);
+        await store.dispatch("init", vars);
         this.lastVars = vars;
       }
 
@@ -98,6 +101,7 @@ export default {
         if (!this.breadcrumbs.length) {
           this.breadcrumbs = [{display: 'Dashboard', link: '/'}]
         }
+        this.loading = false;
     },
   },
 };
