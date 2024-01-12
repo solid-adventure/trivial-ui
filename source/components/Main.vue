@@ -3,16 +3,12 @@
     <!-- Navbar, sidebar, or other common components can be placed here -->
     <header v-if="this.$store.state.isAuthenticated">
       <SuperBar />
-      <Breadcrumb v-if="breadcrumbs.length > 0" :breadcrumbs="breadcrumbs" />
+      <Breadcrumb :breadcrumbs="breadcrumbs" />
     </header>
 
     <!-- Main content area where router views are rendered -->
     <main>
-      <router-view
-        :class="{
-          hasBreadcrumbs:
-            breadcrumbs.length > 0 && this.$store.state.isAuthenticated,
-        }"
+      <router-view class="clearSuperbar"
       ></router-view>
     </main>
 
@@ -99,7 +95,7 @@ export default {
         });
 
         if (!this.breadcrumbs.length) {
-          this.breadcrumbs = [{display: 'Dashboard', link: '/'}]
+          this.breadcrumbs = [{display: 'Home', link: '/'}]
         }
         this.loading = false;
     },
@@ -108,8 +104,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.hasBreadcrumbs {
-  margin-top: 80px;
-}
+
+ .clearSuperBar {
+   margin-top: 80px;
+ }
+
 /* global styles go here */
 </style>

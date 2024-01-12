@@ -21,6 +21,7 @@
   white-space: nowrap;
   z-index: 100;
   vertical-align: middle;
+  border-top: 1px solid var(--super-bar-background-active);
 
   // span {
   //   padding: 0 0em;
