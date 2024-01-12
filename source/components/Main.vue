@@ -13,9 +13,7 @@
           hasBreadcrumbs:
             breadcrumbs.length > 0 && this.$store.state.isAuthenticated,
         }"
-        v-if="!loadingWatcher"
       ></router-view>
-      <p v-if="loadingWatcher">Loading...</p>
     </main>
 
     <!-- Common footer for the app -->
@@ -40,7 +38,6 @@ export default {
   data() {
     return {
       lastVars: null,
-      loadingWatcher: false,
       breadcrumbs: [],
     };
   },
@@ -55,7 +52,6 @@ export default {
   watch: {
     async currentRouteName(newVal) {
       let vars = {};
-      this.loadingWatcher = true;
       if (this.$route.path.indexOf("/apps") == 0 && this?.$route?.params?.id) {
         vars.appId = this.$route.params.id;
       }
@@ -73,7 +69,7 @@ export default {
         vars.orgId !== this.lastVars?.orgId ||
         !this.lastVars
       ) {
-        await store.dispatch("init", vars);
+        store.dispatch("init", vars);
         this.lastVars = vars;
       }
 
@@ -102,7 +98,6 @@ export default {
         if (!this.breadcrumbs.length) {
           this.breadcrumbs = [{display: 'Dashboard', link: '/'}]
         }
-      this.loadingWatcher = false;
     },
   },
 };
