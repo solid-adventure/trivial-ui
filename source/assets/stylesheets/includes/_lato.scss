@@ -1,8 +1,15 @@
 
-/* nunito-sans-regular - latin */
 @font-face {
   font-family: 'Lato';
   font-style: normal;
+  font-weight: 400;
+  src: local(''),
+       url('../fonts/lato/Lato-Regular.ttf') format('truetype'); /* Safari, Android, iOS */
+}
+
+@font-face {
+  font-family: 'Lato';
+  font-style: thin;
   font-weight: 100;
   src: local(''),
        url('../fonts/lato/Lato-Light.ttf') format('truetype'); /* Safari, Android, iOS */
@@ -10,9 +17,24 @@
 
 @font-face {
   font-family: 'Lato';
-  font-style: italic;
-  font-weight: 100;
+  font-style: bold;
+  font-weight: 700;
   src: local(''),
-       url('../fonts/lato/Lato-Light-Italic.ttf') format('truetype'); /* Safari, Android, iOS */
+       url('../fonts/lato/Lato-Regular.ttf') format('truetype'); /* Safari, Android, iOS */
 }
 
+@font-face {
+  font-family: 'Lato';
+  font-style: italic;
+  font-weight: 400;
+  src: local(''),
+       url('../fonts/lato/Lato-Italic.ttf') format('truetype'); /* Safari, Android, iOS */
+}
+
+@font-face {
+  font-family: 'Lato';
+  font-style: italic;
+  font-weight: 700;
+  src: local(''),
+       url('../fonts/lato/Lato-BoldItalic.ttf') format('truetype'); /* Safari, Android, iOS */
+}
