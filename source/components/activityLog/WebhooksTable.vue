@@ -222,19 +222,16 @@ import { mapActions, mapState } from 'vuex'
     // delay gives a minimum display time to loading state
     setTimeout(this.fetchData, 500)
 
-    document.title = this.pageTitle
-
   },
-
+  watch: {
+    async app(newApp) {
+      window.document.title = `Activity: ${newApp.descriptive_name}`
+    }
+  },
   computed: {
     appId() {
       return this.$route.params.id;
     },
-
-    pageTitle() {
-      return `Activity: ${this.app.descriptive_name}`
-    },
-
     filteredWebhooks() {
       if (this.searchTerm == '') { return this.webhooks }
       let term = this.searchTerm.toLowerCase()

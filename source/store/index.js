@@ -6,10 +6,13 @@ import ManifestMigrator from 'trivial-core/lib/ManifestMigrator'
 import FeatureManager from 'trivial-core/lib/FeatureManager'
 import ReconnectingWebSocket from 'reconnecting-websocket'
 import ActionPath from 'trivial-core/lib/actionsv2/ActionPath'
+import router from '../router'
 
 const store = createStore({
 
   state: {
+    currentPath: '/',
+    route: null,
     user: {},
     app: {},
     isAuthenticated: true,
@@ -65,7 +68,12 @@ const store = createStore({
   },
 
   mutations: {
-
+    setCurrentPath(state, currentPath) {
+      state.currentPath = currentPath
+    },
+    setRoute(state, route) {
+      state.route = route
+    },
     incrementTour(state) {
       state.tourStep++
       if (state.tourStep >= state.tourSteps.length) {
@@ -316,6 +324,11 @@ const store = createStore({
     async setIsAuthenticated({state, commit}, {isAuthenticated}) {
       commit('setIsAuthenticated', isAuthenticated)
     },
+    async setCurrentPath({state, commit}, {currentPath, route}) {
+      commit('setCurrentPath', currentPath)
+      commit('setRoute', route)
+
+    },
 
     checkURLState({ state, commit }) {
       const path = window.location.pathname
@@ -341,7 +354,8 @@ const store = createStore({
     },
 
     async loadCredentials({ commit, state, dispatch }) {
-      const creds = await fetchJSON(`/proxy/trivial?path=/apps/${state.app.name}/credentials`)
+      let appId = state?.app?.name ?? state?.route?.params?.id
+      const creds = await fetchJSON(`/proxy/trivial?path=/apps/${appId}/credentials`)
       commit('setCredentials', creds.credentials)
       dispatch('notifyCredentialsLoaded')
       return creds.credentials
@@ -364,7 +378,8 @@ const store = createStore({
     },
 
     async loadManifest({ commit, state, dispatch }) {
-      const all = await fetchJSON(`/proxy/trivial?path=/manifests&app_id=${state.app.name}`)
+      const appId = state?.app?.name ?? state?.route?.params?.id
+      const all = await fetchJSON(`/proxy/trivial?path=/manifests&app_id=${appId}`)
       const manifest = all[0] || {content: '{}'}
       manifest.content = new ManifestMigrator(JSON.parse(manifest.content)).migrate()
       commit('setManifest', manifest)

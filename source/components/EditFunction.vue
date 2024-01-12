@@ -82,7 +82,7 @@
   .brand img {
       height: 1.5em;
       width: auto;
-      content: var(--logo);
+      content: var(--logo-superbar);
       right: 1em;
       bottom: 1em;
       position: absolute;

@@ -44,16 +44,14 @@
       Workbook
     },
 
-    mounted() {
-      document.title = this.pageTitle
+    watch: {
+      async app(newApp) {
+        if (newApp) {
+          window.document.title = newApp.descriptive_name;
+        }
+      }
     },
-
     computed: {
-
-      pageTitle() {
-        return this.app.descriptive_name
-      },
-
       panelComponent() {
         try {
           return this.app.panels.component

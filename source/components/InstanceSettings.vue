@@ -218,11 +218,6 @@
         }
 
       },
-
-      pageTitle() {
-        return `Settings: ${this.descriptive_name}`
-      },
-
       downloadLink() {
         const base = `/download/${this.appId}`
         const params = FeatureManager.featureParams()
@@ -288,9 +283,9 @@
 
     },
 
-    created() {
-      this.loadManifest()
-      this.loadApp()
+    async created() {
+      await this.loadManifest()
+      await this.loadApp()
     },
 
     methods: {
@@ -316,7 +311,7 @@
           this.descriptive_name = app.descriptive_name
           this.panels = app.panels
           this.schedule = app.schedule
-          document.title = this.pageTitle
+          window.document.title = `Settings: ${app.descriptive_name}`
         }
         catch(error){
           console.log('[InstanceSetings][loadApp] Error:', error)
