@@ -1,14 +1,6 @@
 <template>
   <div class="page-container">
 
-    <div class="breadcrumb">
-      <span class="history"><a href="/settings">Settings</a></span>
-      <span class="spacer">></span>
-      <span class="history">{{ organization.name }}</span>
-      <span class="spacer">></span>
-      <span class="active"><strong>Users And Roles</strong></span>
-    </div>
-
     <div class="page-inset">
       <h2>{{ organization.name }} | Users And Roles</h2>
 

@@ -48,7 +48,6 @@ const store = createStore({
       const path = (state.manifest.content.listen_at || {}).path
       return new URL(path, `https://${state.app.hostname}.${state.app.domain}`).href
     },
-
     hiddenByTour: (state) => (section) => {
       if (!state.tourMode) { return false }
       if (!state.tourSteps.includes(section)) { return true }

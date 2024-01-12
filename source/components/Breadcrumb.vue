@@ -1,7 +1,10 @@
 <template>
   <div class="Breadcrumb">
     <span v-for="(breadcrumb, i) in breadcrumbs"
-      >{{ `${i > 0 ? " > " : ""}` }} <a :href="breadcrumb.link">{{`${breadcrumb.display}` }}</a></span
+      >{{ `${i > 0 ? " > " : ""}` }}
+      <a v-if="i < breadcrumbs.length - 1" :href="breadcrumb.link">{{ `${breadcrumb.display}` }}</a>
+      <a v-else><strong class="lastBreadcrumb">{{ `${breadcrumb.display}` }}</strong></a>
+      </span
     >
   </div>
 </template>
@@ -23,9 +26,9 @@
   vertical-align: middle;
   border-top: 1px solid var(--super-bar-background-active);
 
-  // span {
-  //   padding: 0 0em;
-  // }
+  .lastBreadcrumb {
+    font-weight:700;
+  }
 
   a {
     color: var(--on-primary-darker);
