@@ -99,7 +99,7 @@
   .overview {
     position: absolute;
     width: 100%;
-    top: 80px; /* clear the SuperBar*/
+    top: 120px; /* clear the SuperBar*/
     padding: 0;
     margin: 0;
     height: calc(100% - 80px);
@@ -201,19 +201,19 @@
       }
     },
     created() {
-      if (!this.$route.query.panelType) {
+      if (!this.$route.query.paneltype) {
         this.panelTypeFilter = 'dashboard'
         this.$router.push({query: {panelType: this.panelTypeFilter}})
       } else {
-        this.panelTypeFilter = this.$route.query.panelType;
+        this.panelTypeFilter = this.$route.query.paneltype;
       }
     },
     mounted() {
-      if (!this.$route.query.panelType) {
+      if (!this.$route.query.paneltype) {
         this.panelTypeFilter = 'dashboard'
         this.$router.push({query: {panelType: this.panelTypeFilter}})
       } else {
-        this.panelTypeFilter = this.$route.query.panelType;
+        this.panelTypeFilter = this.$route.query.paneltype;
       }
       store.dispatch('setIsAuthenticated', {isAuthenticated: true});
       this.loadStats(this.chartType)
