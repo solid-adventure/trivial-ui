@@ -231,7 +231,7 @@ const store = createStore({
         await dispatch('loadProfile')
         await dispatch('loadApps')
         if (appId) {
-          commit('setApp', state.apps.find(a => appId === a.name))
+          await commit('setApp', state.apps.find(a => appId === a.name))
         }
         await dispatch('checkURLState')
       } catch (error) {
@@ -313,13 +313,6 @@ const store = createStore({
       const apps = await fetchJSON('/proxy/trivial?path=/apps')
       commit('setApps', apps)
     },
-
-    async loadApp({ commit }, { app_id }) {
-      console.log('[store][loadApp] loading app: ', app_id)
-      const app = await fetchJSON(`/proxy/trivial?path=/apps/${app_id}`)
-      commit('setApp', app)
-    },
-
     async setIsAuthenticated({state, commit}, {isAuthenticated}) {
       commit('setIsAuthenticated', isAuthenticated)
     },

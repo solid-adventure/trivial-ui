@@ -1,13 +1,21 @@
 <template>
   <div id="app">
     <!-- Navbar, sidebar, or other common components can be placed here -->
-    <header>
+    <header v-if="this.$store.state.isAuthenticated">
       <SuperBar />
+      <Breadcrumb v-if="breadcrumbs.length > 0" :breadcrumbs="breadcrumbs" />
     </header>
 
     <!-- Main content area where router views are rendered -->
     <main>
-      <router-view></router-view>
+      <router-view
+        :class="{
+          hasBreadcrumbs:
+            breadcrumbs.length > 0 && this.$store.state.isAuthenticated,
+        }"
+        v-if="!loadingWatcher"
+      ></router-view>
+      <p v-if="loadingWatcher">Loading...</p>
     </main>
 
     <!-- Common footer for the app -->
@@ -19,15 +27,22 @@
 
 <script>
 import SuperBar from "../components/SuperBar.vue";
+import router from "../router";
 import store from "../store";
+import Breadcrumb from "./Breadcrumb.vue";
 
 export default {
   name: "App",
   components: {
     SuperBar,
+    Breadcrumb,
   },
   data() {
-    return { lastVars: null };
+    return {
+      lastVars: null,
+      loadingWatcher: false,
+      breadcrumbs: [],
+    };
   },
   computed: {
     currentRouteName() {
@@ -38,8 +53,9 @@ export default {
     return { ...(this.lastVars ?? {}) };
   },
   watch: {
-    currentRouteName(newVal) {
+    async currentRouteName(newVal) {
       let vars = {};
+      this.loadingWatcher = true;
       if (this.$route.path.indexOf("/apps") == 0 && this?.$route?.params?.id) {
         vars.appId = this.$route.params.id;
       }
@@ -57,14 +73,47 @@ export default {
         vars.orgId !== this.lastVars?.orgId ||
         !this.lastVars
       ) {
-        store.dispatch("init", vars);
+        await store.dispatch("init", vars);
         this.lastVars = vars;
       }
+
+      var allBreaks = [];
+      let url = newVal;
+      if (url.indexOf("?") >= 0) {
+        url = url.slice(0, url.indexOf("?"));
+      }
+      for (let i = 0; i < url.length; i++) {
+        if (url[i] === "/") allBreaks.push(url.substring(0, i + 1));
+      }
+      if (allBreaks[allBreaks.length - 1] != url) {
+        allBreaks.push(url);
+      }
+
+      let resolvedRoutes = allBreaks.map((x) =>
+        this.$router.resolve({ path: x, params: this.$route.params })
+      );
+      // uncomment for debugging.... For some reason I will never understand
+      // the path: /apps/202ad25dd2f883/builder2 does not match with the route
+      //   { path: "/apps/:id/builder2", component: Builder, name: "Builder" },
+      // But it works flawlessly for actual navigation
+      // console.log(allBreaks);
+      // console.dir(this.$route);
+      // console.log(this.$route.params);
+      // console.log(resolvedRoutes);
+      this.breadcrumbs = resolvedRoutes
+        .filter((x) => x.matched && (x.matched.length ?? 0) > 0)
+        .map((x) => {
+          return { display: x.name, link: x.href };
+        });
+      this.loadingWatcher = false;
     },
   },
 };
 </script>
 
-<style>
+<style lang="scss" scoped>
+.hasBreadcrumbs {
+  margin-top: 80px;
+}
 /* global styles go here */
 </style>

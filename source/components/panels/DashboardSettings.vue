@@ -190,7 +190,7 @@ input, select {
 
 .dashboard-settings-container {
   position: fixed;
-  top: 80px;
+  // top: 80px;
   left: 0;
   background: var(--background);
   color: var(--on-background);

@@ -1,6 +1,6 @@
 @import "includes/reset";
 @import "includes/theme-defaults";
-@import "includes/brix";
+@import "includes/lato";
 @import "includes/modals";
 @import "includes/forms";
 @import "includes/transitions";
@@ -83,7 +83,6 @@ table.spaced {
 }
 
 div.page-container {
-  top: 80px;
   margin: 2em;
   position: relative;
 }

@@ -1,5 +1,5 @@
 <template>
-  <div class="SuperBar" v-if="this.$store.state.isAuthenticated">
+  <div class="SuperBar">
     <!-- NOTE The brand logo image is overwritten with var(--logo) -->
     <span class="brand"><a href="/"><img src="/assets/images/trivial-logo-light-warm.svg"/></a></span>
     <span class="superlink" :class="{active: isActive('dashboard')}"><a href="/?paneltype=dashboard">Dashboards</a></span>

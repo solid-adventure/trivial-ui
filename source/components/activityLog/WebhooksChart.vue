@@ -180,12 +180,12 @@ export default {
           },
           responsive: false,
           scales: {
-            xAxes: [{
+            x: {
               stacked: true
-            }],
-            yAxes: [{
+            },
+            y: {
               stacked: true
-            }]
+            }
           }
         }
       })

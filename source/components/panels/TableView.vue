@@ -799,7 +799,7 @@
 
     .summary-bar-backer {
       position: sticky;
-      top: 80;
+      // top: 80;
       background-color: var(--background);
     }
 

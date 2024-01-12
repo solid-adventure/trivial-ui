@@ -9,7 +9,7 @@
   .panels {
     position: absolute;
     width: 100%;
-    top: 80px; /* clear the SuperBar*/
+    // top: 80px; /* clear the SuperBar*/
     padding: 0;
     margin: 0;
     height: calc(100% - 80px);
