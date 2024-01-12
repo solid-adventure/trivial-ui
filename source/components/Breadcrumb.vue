@@ -3,7 +3,7 @@
     <span v-for="(breadcrumb, i) in breadcrumbs"
       >{{ `${i > 0 ? " > " : ""}` }}
       <a v-if="i < breadcrumbs.length - 1" :href="breadcrumb.link">{{ `${breadcrumb.display}` }}</a>
-      <a v-else><b class="lastBreadcrumb">{{ `${breadcrumb.display}` }}</b></a>
+      <a v-else><strong class="lastBreadcrumb">{{ `${breadcrumb.display}` }}</strong></a>
       </span
     >
   </div>
@@ -25,7 +25,7 @@
   z-index: 100;
   vertical-align: middle;
   border-top: 1px solid var(--super-bar-background-active);
-  
+
   .lastBreadcrumb {
     font-weight:700;
   }
