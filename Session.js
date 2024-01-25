@@ -27,10 +27,14 @@ module.exports = class Session {
 			destination = '/'
 		}
 
-		let no_redirect = ['/signin', '/recoverpassword', '/register', '/account-locked']
-  	if(!authorized && (no_redirect.indexOf(destination) == -1)){
-		  destination = '/signin'
+		let no_redirect = ['/signin', '/recoverpassword', '/resetpassword','/register', '/account-locked']
+   	if (!authorized && (no_redirect.indexOf(req.path) == -1)) {
+      destination = '/signin'
   	}
+
+    if (req.path === '/resetpassword') {
+      Session.validateForReset(req, res, next)
+    }
 
     // routed locked users to account locked page with reason for lock
     if (res.locals.current_user && res.locals.current_user.account_locked && no_redirect.indexOf(destination) == -1) {
