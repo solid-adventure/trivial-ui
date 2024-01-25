@@ -469,7 +469,7 @@
   background-position: left center;
   }
 
-.error {
+.panel .error {
   color: var(--error);
   background-image: var(--error-icon);
   background-repeat: no-repeat;
