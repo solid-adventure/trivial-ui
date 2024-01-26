@@ -164,6 +164,12 @@
     text-align: center;
     margin-top: 8em;
   }
+
+  th.period button {
+    background-color: var(--table-column-head-color);
+    color: var(--on-background);
+  }
+
 </style>
 
 <script>
