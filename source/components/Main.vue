@@ -87,7 +87,7 @@ export default {
       }
 
       let resolvedRoutes = allBreaks.map((x) =>
-        this.$router.resolve({ path: x, params: this.$route.params })
+        this.$router.resolve({ path: x })
       );
 
       this.breadcrumbs = resolvedRoutes
