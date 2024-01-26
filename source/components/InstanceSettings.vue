@@ -144,6 +144,7 @@
 </style>
 
 <script>
+  import { mapState } from 'vuex'
   import { memoize, fetchJSON } from 'trivial-core/lib/component-utils'
   import ActionButton from './controls/ActionButton.vue'
   import HideableSection from './controls/HideableSection.vue'
@@ -281,11 +282,24 @@
         }
       },
 
+      ...mapState([
+        'app',
+      ])
+
     },
 
     async created() {
       await this.loadManifest()
-      await this.loadApp()
+    },
+
+    watch: {
+      'app.id': function() {
+        this.descriptive_name = this.app.descriptive_name
+        this.panels = this.app.panels
+        this.schedule = this.app.schedule
+        window.document.title = `Settings: ${this.app.descriptive_name}`
+      }
+
     },
 
     methods: {
@@ -301,20 +315,6 @@
         } catch (error) {
           this.loading = false
           console.log('[InstanceSetings][loadManifest] Error:', error)
-          this.errorMessage = error.message
-        }
-      },
-
-      async loadApp(){
-        try{
-          let app = await fetchJSON(`/proxy/trivial?path=/apps/${this.appId}`)
-          this.descriptive_name = app.descriptive_name
-          this.panels = app.panels
-          this.schedule = app.schedule
-          window.document.title = `Settings: ${app.descriptive_name}`
-        }
-        catch(error){
-          console.log('[InstanceSetings][loadApp] Error:', error)
           this.errorMessage = error.message
         }
       },

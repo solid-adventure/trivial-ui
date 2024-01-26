@@ -236,10 +236,7 @@ const store = createStore({
     async init({ commit, dispatch, state }, { appId }) {
       try {
         await dispatch('loadProfile')
-        await dispatch('loadApps')
-        if (appId) {
-          await commit('setApp', state.apps.find(a => appId === a.name))
-        }
+        await dispatch('loadResources', { dispatch, router })
         await dispatch('checkURLState')
       } catch (error) {
         console.error('[store][init] Error: ', error)
@@ -316,10 +313,28 @@ const store = createStore({
       commit('setUser', user.user)
     },
 
+    async loadResources({ commit }, { dispatch, router }) {
+      const routeName = router.currentRoute.value.name
+      if ( routeName === 'PanelType') {
+        await dispatch('loadApps')
+      }
+
+      if ( ['Activity', 'Builder', 'Settings'].includes(routeName) ) {
+        await dispatch('loadApp', { appId: router.currentRoute.value.params.id })
+      }
+    },
+
     async loadApps({ commit }) {
       const apps = await fetchJSON('/proxy/trivial?path=/apps')
       await commit('setApps', apps)
     },
+
+    async loadApp({ commit }, { appId }) {
+      const app = await fetchJSON(`/proxy/trivial?path=/apps/${appId}`)
+      await commit('setApp', app)
+    },
+
+
     async setIsAuthenticated({state, commit}, {isAuthenticated}) {
       commit('setIsAuthenticated', isAuthenticated)
     },
