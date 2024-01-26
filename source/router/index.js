@@ -49,10 +49,9 @@ const routes = [
   { path: "/resetpassword", component: ResetPassword, name: "Reset Password" },
   { path: "/register", component: Register, name: "Register" },
   { path: "/settings", component: Settings, name: "Account Settings" },
-  // { path: '/playground', component: Playground },
   { path: "/apps/new", component: NewAppForm, name: "New App" },
   { path: "/account-locked", component: AccountLocked, name: "Account Locked" },
-  { path: "/apps/:id", component: Panels, name: "Apps" },
+  { path: "/apps/:id", component: Panels, name: "Show App" },
 
   // Below path not used and has crazy templating in there
   // { path: '/apps/:id/action/:perform/:actionIdentifier', component: AppAction },

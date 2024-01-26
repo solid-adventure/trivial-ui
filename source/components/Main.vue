@@ -95,7 +95,7 @@ export default {
         .map((x) => {
           let displayName = x.name;
           let linkPath = x.href;
-          if (displayName == "Apps" && store?.state?.app?.descriptive_name) {
+          if (displayName == "Show App" && store?.state?.app?.descriptive_name) {
             displayName = store.state.app.descriptive_name;
           }
           if (

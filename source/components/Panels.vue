@@ -1,6 +1,7 @@
 <template>
   <div class="panels">
-    <component :is="panelComponent" :app_id="appId" />
+    <component v-if="loaded" :is="panelComponent" :app_id="appId" />
+    <div v-if="!loaded" class="loading"><img src="/assets/images/trivial-loading.gif"></div>
   </div>
 </template>
 
@@ -14,7 +15,27 @@
     margin: 0;
     height: calc(100% - 80px);
     z-index: 10;
+
+    div.loading {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: -120px;
+      left: 0;
+      background: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      img {
+        max-width: 15%;
+      }
+
+    }
+
   }
+
+
 
 </style>
 
@@ -52,6 +73,11 @@
       }
     },
     computed: {
+
+      loaded() {
+        return typeof this.app.panels !== 'undefined'
+      },
+
       panelComponent() {
         try {
           return this.app.panels.component

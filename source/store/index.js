@@ -315,11 +315,11 @@ const store = createStore({
 
     async loadResources({ commit }, { dispatch, router }) {
       const routeName = router.currentRoute.value.name
-      if ( routeName === 'PanelType') {
+      if ( ['PanelType', 'Show App'].includes(routeName) ) {
         await dispatch('loadApps')
       }
 
-      if ( ['Activity', 'Builder', 'Settings'].includes(routeName) ) {
+      if ( ['Activity', 'Show App', 'Builder', 'Panels', 'Settings'].includes(routeName) ) {
         await dispatch('loadApp', { appId: router.currentRoute.value.params.id })
       }
     },
