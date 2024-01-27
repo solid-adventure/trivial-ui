@@ -127,6 +127,7 @@
         return this.activeTheme == 'Dark'
       },
       firstName() {
+        if (!this.user) { return 'Guest' }
         const match = /^\s*(\S+)/.exec(this.user.name || '')
         return match ? match[1] : (this.user.name || '')
       },
