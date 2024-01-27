@@ -114,12 +114,12 @@ const store = createStore({
 
     setAppAttribute(state, args) {
       // {app_id: 1234, attr: 'descriptive_name', val: "Great New Name" }
-      let app = state.apps.find(app => app.name == args.app_id)
+      let app = state.app
       app[args.attr] = args.val
     },
 
     setAppPanelOption(state, args) {
-      let app = state.apps.find(app => app.name == args.app_id)
+      let app = state.app
       let option = args.panelOption
       for (let key of Object.keys(args.panelOption)) {
         app.panels.options[key] = args.panelOption[key]
@@ -127,7 +127,7 @@ const store = createStore({
     },
 
     appendAppPanelOption(state, args) {
-      let app = state.apps.find(app => app.name == args.app_id)
+      let app = state.app
       let option = args.panelOption
       for (let key of Object.keys(args.panelOption)) {
         let existing = app.panels.options[key]
@@ -141,7 +141,7 @@ const store = createStore({
     },
 
     deleteAppPanelOption(state, args) {
-      let app = state.apps.find(app => app.name == args.app_id)
+      let app = state.app
       let option = args.panelOption
       for (let key of Object.keys(args.panelOption)) {
         let existing = app.panels.options[key]

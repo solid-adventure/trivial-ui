@@ -221,7 +221,7 @@ input, select {
 
   .advanced-settings {
     position: absolute;
-    bottom: 1em;
+    bottom: 4em;
   }
 
 }

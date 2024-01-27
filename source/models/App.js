@@ -43,7 +43,7 @@ class App {
   // There are few patterns in this file, but this is the best to follow.
   // We return a promise and deliberately do not catch here, so that errors can bubble to the caller.
   async save() {
-    let app = this.$store.state.apps.find(app => app.name == this.name)
+    let app = this.$store.state.app
     const appInstance = fetch('/proxy/trivial', {
     method: 'PUT',
     headers: {'content-type': 'application/json'},
