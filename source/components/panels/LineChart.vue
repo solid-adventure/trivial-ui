@@ -58,7 +58,7 @@
 
       chartConfig(){
         this.setColors()
-        if (this.chart) { this.chart.destroy() }
+        // if (this.chart) { this.chart.destroy() }
         let ctx = this.$refs[this.app_id]
         this.chart = new Chart(ctx, {
           type: 'line',

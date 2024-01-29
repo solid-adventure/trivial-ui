@@ -13,11 +13,10 @@
     </div>
 </template>
 <style lang="scss" scoped>
-  @import "../assets/stylesheets/includes/variables";
 
 .overlay{
     position: absolute;
-    top: 80px;
+    top: 120px;
     width: 100%;
     padding: 0;
 }
@@ -67,10 +66,10 @@
   import CopyButton from './controls/CopyButton.vue'
   import { mapMutations } from 'vuex'
   export default {
-    inject: ['webhookId'],
 
     data(){
         return {
+            webhookId: this.$route.params.id,
             webhook: null,
             loading: true,
             errorMessage: null,

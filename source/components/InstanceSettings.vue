@@ -1,5 +1,5 @@
 <template>
-  <super-bar></super-bar>
+  <!-- <super-bar></super-bar> -->
   <nav-tree selected-title="settings"></nav-tree>
   <div class="InstanceSettings">
     <div id="messages">{{errorMessage}}</div>
@@ -87,7 +87,7 @@
   	height: 100%;
   	margin: 2em;
     left: 23em;
-    top: 80px;
+    top: 120px;
     position: relative;
     width: calc(100% - 27em);
   }
@@ -144,19 +144,22 @@
 </style>
 
 <script>
+  import { mapState } from 'vuex'
   import { memoize, fetchJSON } from 'trivial-core/lib/component-utils'
   import ActionButton from './controls/ActionButton.vue'
   import HideableSection from './controls/HideableSection.vue'
   import ManifestMigrator from 'trivial-core/lib/ManifestMigrator'
   import { track } from '../../lib/TrackingService'
   import FeatureManager from 'trivial-core/lib/FeatureManager'
+  import NavTree from './builderv2/NavTree.vue'
 
   export default {
-    inject: ['appId'],
+    // inject: ['appId'],
 
     components: {
         ActionButton,
-        HideableSection
+        HideableSection,
+        'nav-tree': NavTree
     },
 
     provide: {
@@ -192,6 +195,8 @@
         copyMessage: null,
         panelMessage: null,
         scheduleMessage: null,
+        //assuming path remains as /apps/:id/settings2 or at least includes id param
+        appId: this.$route.params.id
       }
     },
 
@@ -214,11 +219,6 @@
         }
 
       },
-
-      pageTitle() {
-        return `Settings: ${this.descriptive_name}`
-      },
-
       downloadLink() {
         const base = `/download/${this.appId}`
         const params = FeatureManager.featureParams()
@@ -282,11 +282,24 @@
         }
       },
 
+      ...mapState([
+        'app',
+      ])
+
     },
 
-    created() {
-      this.loadManifest()
-      this.loadApp()
+    async created() {
+      await this.loadManifest()
+    },
+
+    watch: {
+      'app.id': function() {
+        this.descriptive_name = this.app.descriptive_name
+        this.panels = this.app.panels
+        this.schedule = this.app.schedule
+        window.document.title = `Settings: ${this.app.descriptive_name}`
+      }
+
     },
 
     methods: {
@@ -302,20 +315,6 @@
         } catch (error) {
           this.loading = false
           console.log('[InstanceSetings][loadManifest] Error:', error)
-          this.errorMessage = error.message
-        }
-      },
-
-      async loadApp(){
-        try{
-          let app = await fetchJSON(`/proxy/trivial?path=/apps/${this.appId}`)
-          this.descriptive_name = app.descriptive_name
-          this.panels = app.panels
-          this.schedule = app.schedule
-          document.title = this.pageTitle
-        }
-        catch(error){
-          console.log('[InstanceSetings][loadApp] Error:', error)
           this.errorMessage = error.message
         }
       },

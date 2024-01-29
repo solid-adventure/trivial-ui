@@ -1,0 +1,191 @@
+@use 'sass:string';
+@use 'sass:color';
+
+//
+// Utilities
+//
+@function tone-for($color, $background, $amount) {
+  @return color.mix($color, $background, $weight: $amount);
+}
+
+//
+// Colors
+//
+
+$background: #292524 !default;
+$background-80: tone-for($background, #000, 80%);
+$background-60: tone-for($background, #000, 60%);
+$background-40: tone-for($background, #000, 40%);
+$background-20: tone-for($background, #000, 20%);
+$background-high-contrast: #1a1616  !default;
+$surface: #1a1616 !default;
+$surface-secondary: #212022 !default;
+$primary: #4c46fe !default;
+$primary-darker:  #3430a4 !default;
+$secondary: #7874fa2b !default;
+$secondary-darker:  rgb(196 106 189) !default;
+$accent: #515683 !default;
+$accent-20: color.adjust($accent, $alpha: -0.8) !default;
+$error: #ff7a7a !default;
+$error-highlight: color.adjust($error, $lightness: 20%) !default;
+$success: #449344 !default;
+$success-highlight: color.adjust($success, $lightness: 20%) !default;
+
+$series-1: rgba(255,96,132, 0.75) !default; // 75% red
+$series-2: rgba(168,153,238,0.5) !default; // 50% purple
+$series-3: #f89467 !default; // orange
+$series-4: #a4d976 !default; // green
+
+
+$on-background: #c7c0b8 !default;
+$on-background-high-contrast: #ffffff !default;
+$on-background-80: tone-for($on-background, $background, 80%) !default;
+$on-background-60: tone-for($on-background, $background, 60%) !default;
+$on-background-40: tone-for($on-background, $background, 40%) !default;
+$on-background-20: tone-for($on-background, $background, 20%) !default;
+$on-surface: #b0b6ec !default;
+$on-surface-secondary: #c7c0b8 !default;
+$on-primary: #ffffff !default;
+$on-primary-darker: rgb(255, 255, 255) !default;
+$on-secondary: #b0b6ec !default;
+$on-secondary-darker: rgb(32 59 61) !default;
+$on-accent: #c7c0b8 !default;
+$on-accent-20: #908c8a !default;
+$on-error: rgb(255, 255, 255) !default;
+$on-success: rgb(255, 255, 255) !default;
+
+$link: $on-surface !default;
+
+$scrim-opacity: 0.32 !default;
+$scrim-color: color.change($on-surface, $alpha: $scrim-opacity) !default;
+$input-border-color: color.adjust($background, $lightness: -30%) !default;
+$table-column-head-color: $accent !default;
+$success-icon: url("/assets/images/check-circle-light.svg") !default;
+$error-icon: url("/assets/images/check-exclamation.svg") !default;
+$webhook-pre-color: #98a3ff !default;
+$auth-text-field-color: #e9ecff !default;
+$auth-button-font-color: $on-background-high-contrast !default;
+$logo-dark-on-light: url("/assets/images/trivial-logo-simplified-dark-on-light.svg") !default;
+$logo-light-on-dark: url("/assets/images/trivial-logo-simplified-light-on-dark.svg") !default;;
+$loading: url("/assets/images/trivial-loading.gif") !default;
+
+$auth-border-color: $accent !default;
+$auth-button-gradient: linear-gradient(45deg, #5147fe, #b61df6, #f46721) !default;
+
+$super-bar-background: #000 !default;
+$super-bar-background-active: $scrim-color !default;
+$toggle-background-light: #eee !default;
+$toggle-background-dark: #333 !default;
+
+//
+// Typography
+//
+
+$font-family: string.unquote("'Lato', sans-serif") !default;
+$code-font: monospace !default;
+
+
+//
+// Usage to color hierarchy mapping
+//
+
+$tab-color: $on-surface !default;
+$tab-background: $surface !default;
+$tab-selected-color: $on-background !default;
+$tab-selected-background: $background !default;
+$tab-selected-border: $on-background !default;
+
+$table-head-border: $on-background-40 !default;
+$table-striping: $surface !default;
+$table-row-hover-background: #6a6a6a !default;
+$on-table-row-hover-background: #e4e4e4 !default;
+
+$chart-inactive: $on-background-20 !default;
+$chart-success: $series-1 !default;
+$chart-error: $series-2 !default;
+
+$tool-tip-color: $on-background-high-contrast !default;
+$tool-tip-background: $background-high-contrast !default;
+
+//
+// Variables for CSS / runtime
+//
+:root {
+  --background: #{$background};
+  --background-80: #{$background-80};
+  --background-60: #{$background-60};
+  --background-40: #{$background-40};
+  --background-20: #{$background-20};
+  --background-high-contrast: #{$background-high-contrast};
+  --surface: #{$surface};
+  --surface-secondary: #{$surface-secondary};
+  --primary: #{$primary};
+  --primary-darker: #{$primary-darker};
+  --secondary: #{$secondary};
+  --secondary-darker: #{$secondary-darker};
+  --accent: #{$accent};
+  --accent-20: #{$accent-20};
+  --error: #{$error};
+  --error-highlight: #{$error-highlight};
+  --success: #{$success};
+  --success-highlight: #{$success-highlight};
+  --series-1: #{$series-1};
+  --series-2: #{$series-2};
+  --series-3: #{$series-3};
+  --series-4: #{$series-4};
+
+  --on-background: #{$on-background};
+  --on-background-high-contrast: #{$on-background-high-contrast};
+  --on-background-80: #{$on-background-80};
+  --on-background-60: #{$on-background-60};
+  --on-background-40: #{$on-background-40};
+  --on-background-20: #{$on-background-20};
+  --on-surface: #{$on-surface};
+  --on-surface-secondary: #{$on-surface-secondary};
+  --on-primary: #{$on-primary};
+  --on-primary-darker: #{$on-primary-darker};
+  --on-secondary: #{$on-secondary};
+  --on-secondary-darker: #{$on-secondary-darker};
+  --on-accent: #{$on-accent};
+  --on-accent-20: #{$on-accent-20};
+  --on-error: #{$on-error};
+  --on-success: #{$on-success};
+
+  --link: #{$link};
+
+  --scrim-opacity: #{$scrim-opacity};
+  --scrim-color: #{$scrim-color};
+  --input-border-color: #{$input-border-color};
+  --table-column-head-color: #{$table-column-head-color};
+  --table-row-hover-background: #{$table-row-hover-background};
+  --on-table-row-hover-background: #{$on-table-row-hover-background};
+
+  --success-icon: #{$success-icon};
+  --error-icon: #{$error-icon};
+  --webhook-pre-color: #{$webhook-pre-color};
+  --auth-text-field-color: #{$auth-text-field-color};
+  --auth-button-font-color: #{$auth-button-font-color};
+  --logo-login: #{$logo-dark-on-light};
+  --logo-superbar: #{$logo-light-on-dark};
+  --loading: #{$loading};
+  --auth-border-color: #{$auth-border-color};
+  --auth-button-gradient: #{$auth-button-gradient};
+
+  --font-family: #{$font-family};
+  --code-font: #{$code-font};
+
+  --table-head-border: #{$table-head-border};
+  --table-striping: #{$table-striping};
+
+  --chart-inactive: #{$chart-inactive};
+  --chart-success: #{$chart-success};
+  --chart-error: #{$chart-error};
+
+  --tool-tip-color: #{$tool-tip-color};
+  --tool-tip-background: #{$tool-tip-background};
+
+  --super-bar-background: #{$super-bar-background};
+  --super-bar-background-active: #{$super-bar-background-active};
+  --toggle-background-light: #{$toggle-background-light};
+  --toggle-background-dark: #{$toggle-background-dark};
+}

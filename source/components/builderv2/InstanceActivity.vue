@@ -1,11 +1,11 @@
 <script>
   import WebhooksTable from '../activityLog/WebhooksTable.vue'
+  import NavTree from './NavTree.vue'
 
   export default {
-    inject: ['appId'],
-
     components: {
-      WebhooksTable
+      WebhooksTable,
+      'nav-tree': NavTree
     }
   }
 
@@ -13,7 +13,7 @@
 
 <template>
   <div class="InstanceActivity">
-    <super-bar></super-bar>
+    <!-- <super-bar></super-bar> -->
     <nav-tree :selected-title="'activity'"></nav-tree>
     <WebhooksTable></WebhooksTable>
   </div>
@@ -23,7 +23,7 @@
   .InstanceActivity {
   	margin: 2em;
     left: 23em;
-    top: 80px;
+    top: 120px;
     position: relative;
     width: calc(100% - 27em);
   }

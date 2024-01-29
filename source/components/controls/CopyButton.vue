@@ -19,7 +19,6 @@
 </template>
 
 <style lang="scss" scoped>
-  @import "../../assets/stylesheets/includes/variables";
 
   .color-success {
     fill: green;
@@ -30,7 +29,7 @@
     cursor: pointer;
     background-color: transparent;
     .icon {
-      fill: var(--accent);
+      fill: var(--link);
     }
     .message {
       background: var(--tool-tip-background);

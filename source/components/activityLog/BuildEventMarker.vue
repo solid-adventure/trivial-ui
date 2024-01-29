@@ -49,7 +49,7 @@ import en from 'javascript-time-ago/locale/en'
 	    text-align: center;
 	    flex: none;
 	    margin: 0 1em;
-			font-family: 'Brix Sans';
+			font-family: 'Lato';
 	    color: var(--webhook-pre-color);
   	}
 

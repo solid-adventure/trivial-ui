@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard-container">
-    <super-bar></super-bar>
+    <!-- <super-bar></super-bar> -->
     <Notices :pinned="false"></Notices>
     <DashboardSettings v-if="this.settingsPanelOpen" @close="toggleSettings" :dateRangeNames="dateRangeNames" :appId="this.app_id"></DashboardSettings>
     <h1>{{this.app.descriptive_name}}</h1>
@@ -309,6 +309,7 @@
 
     h1 {
       display: inline;
+      margin-right: 10px;
     }
 
     h2 {
@@ -465,11 +466,15 @@
   background-size: 1.3em;
   padding-left: 2em;
   background-repeat: no-repeat;
-  background-position: left center;        }
+  background-position: left center;
+  }
 
-.error {
+.panel .error {
   color: var(--error);
   background-image: var(--error-icon);
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 30px;
 }
 
 

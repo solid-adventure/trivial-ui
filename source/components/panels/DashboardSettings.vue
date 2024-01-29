@@ -189,13 +189,13 @@ input, select {
 }
 
 .dashboard-settings-container {
-  position: absolute;
-  top: 0;
+  position: fixed;
+  top: 120px;
   left: 0;
   background: var(--background);
   color: var(--on-background);
   padding: 2em;
-  height: calc(100% - 80px);
+  height: calc(100% - 80px - 4em);
   z-index: 10;
   max-width: 24em;
   box-shadow: 6px 0px 5px 0px var(--on-background-20);
@@ -221,7 +221,7 @@ input, select {
 
   .advanced-settings {
     position: absolute;
-    bottom: 1em;
+    bottom: 4em;
   }
 
 }

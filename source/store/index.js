@@ -6,13 +6,17 @@ import ManifestMigrator from 'trivial-core/lib/ManifestMigrator'
 import FeatureManager from 'trivial-core/lib/FeatureManager'
 import ReconnectingWebSocket from 'reconnecting-websocket'
 import ActionPath from 'trivial-core/lib/actionsv2/ActionPath'
+import router from '../router'
 
 const store = createStore({
 
   state: {
+    currentPath: '/',
+    route: null,
     user: {},
     app: {},
-    appsLoaded: false,
+    isAuthenticated: true,
+    showSuperBar: false,
     apps: [],
     manifest: {
       id: null,
@@ -44,7 +48,6 @@ const store = createStore({
       const path = (state.manifest.content.listen_at || {}).path
       return new URL(path, `https://${state.app.hostname}.${state.app.domain}`).href
     },
-
     hiddenByTour: (state) => (section) => {
       if (!state.tourMode) { return false }
       if (!state.tourSteps.includes(section)) { return true }
@@ -64,12 +67,20 @@ const store = createStore({
   },
 
   mutations: {
-
+    setCurrentPath(state, currentPath) {
+      state.currentPath = currentPath
+    },
+    setRoute(state, route) {
+      state.route = route
+    },
     incrementTour(state) {
       state.tourStep++
       if (state.tourStep >= state.tourSteps.length) {
         state.tourMode = false
       }
+    },
+    setIsAuthenticated(state,isAuthenticated) {
+      state.isAuthenticated = isAuthenticated
     },
 
     setPlaygroundMode(state) {
@@ -103,12 +114,12 @@ const store = createStore({
 
     setAppAttribute(state, args) {
       // {app_id: 1234, attr: 'descriptive_name', val: "Great New Name" }
-      let app = state.apps.find(app => app.name == args.app_id)
+      let app = state.app
       app[args.attr] = args.val
     },
 
     setAppPanelOption(state, args) {
-      let app = state.apps.find(app => app.name == args.app_id)
+      let app = state.app
       let option = args.panelOption
       for (let key of Object.keys(args.panelOption)) {
         app.panels.options[key] = args.panelOption[key]
@@ -116,7 +127,7 @@ const store = createStore({
     },
 
     appendAppPanelOption(state, args) {
-      let app = state.apps.find(app => app.name == args.app_id)
+      let app = state.app
       let option = args.panelOption
       for (let key of Object.keys(args.panelOption)) {
         let existing = app.panels.options[key]
@@ -130,7 +141,7 @@ const store = createStore({
     },
 
     deleteAppPanelOption(state, args) {
-      let app = state.apps.find(app => app.name == args.app_id)
+      let app = state.app
       let option = args.panelOption
       for (let key of Object.keys(args.panelOption)) {
         let existing = app.panels.options[key]
@@ -225,10 +236,7 @@ const store = createStore({
     async init({ commit, dispatch, state }, { appId }) {
       try {
         await dispatch('loadProfile')
-        await dispatch('loadApps')
-        if (appId) {
-          commit('setApp', state.apps.find(a => appId === a.name))
-        }
+        await dispatch('loadResources', { dispatch, router })
         await dispatch('checkURLState')
       } catch (error) {
         console.error('[store][init] Error: ', error)
@@ -305,9 +313,35 @@ const store = createStore({
       commit('setUser', user.user)
     },
 
+    async loadResources({ commit }, { dispatch, router }) {
+      const routeName = router.currentRoute.value.name
+      if ( ['PanelType', 'Show App'].includes(routeName) ) {
+        await dispatch('loadApps')
+      }
+
+      if ( ['Activity', 'Show App', 'Builder', 'Panels', 'Settings'].includes(routeName) ) {
+        await dispatch('loadApp', { appId: router.currentRoute.value.params.id })
+      }
+    },
+
     async loadApps({ commit }) {
       const apps = await fetchJSON('/proxy/trivial?path=/apps')
-      commit('setApps', apps)
+      await commit('setApps', apps)
+    },
+
+    async loadApp({ commit }, { appId }) {
+      const app = await fetchJSON(`/proxy/trivial?path=/apps/${appId}`)
+      await commit('setApp', app)
+    },
+
+
+    async setIsAuthenticated({state, commit}, {isAuthenticated}) {
+      commit('setIsAuthenticated', isAuthenticated)
+    },
+    async setCurrentPath({state, commit}, {currentPath, route}) {
+      commit('setCurrentPath', currentPath)
+      commit('setRoute', route)
+
     },
 
     checkURLState({ state, commit }) {
@@ -334,7 +368,8 @@ const store = createStore({
     },
 
     async loadCredentials({ commit, state, dispatch }) {
-      const creds = await fetchJSON(`/proxy/trivial?path=/apps/${state.app.name}/credentials`)
+      let appId = state?.app?.name ?? state?.route?.params?.id
+      const creds = await fetchJSON(`/proxy/trivial?path=/apps/${appId}/credentials`)
       commit('setCredentials', creds.credentials)
       dispatch('notifyCredentialsLoaded')
       return creds.credentials
@@ -357,7 +392,8 @@ const store = createStore({
     },
 
     async loadManifest({ commit, state, dispatch }) {
-      const all = await fetchJSON(`/proxy/trivial?path=/manifests&app_id=${state.app.name}`)
+      const appId = state?.app?.name ?? state?.route?.params?.id
+      const all = await fetchJSON(`/proxy/trivial?path=/manifests&app_id=${appId}`)
       const manifest = all[0] || {content: '{}'}
       manifest.content = new ManifestMigrator(JSON.parse(manifest.content)).migrate()
       commit('setManifest', manifest)

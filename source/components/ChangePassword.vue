@@ -56,7 +56,7 @@
     position: absolute;
     float: left;
     left: 20%;
-    top: 80px;
+    top: 120px;
     font-size: 16px;
   	margin: 3.33em 2em 2em;
 }

@@ -9,8 +9,7 @@ module.exports = class Session {
 	// We are continuing to rely on the tokened URLs to provide some small level of privacy, combined with the Rails app, which
 	// does validate authorization
 	static async validate(req, res, next) {
-
-		let destination = req.route.path
+		let destination = req.originalUrl
 		let authorized = false
 
   	let token = req.signedCookies["trivial-access-token"]
@@ -28,10 +27,14 @@ module.exports = class Session {
 			destination = '/'
 		}
 
-		let no_redirect = ['/signin', '/recoverpassword', '/register', '/account-locked']
-  	if(!authorized && (no_redirect.indexOf(destination) == -1)){
-		  destination = '/signin'
+		let no_redirect = ['/signin', '/recoverpassword', '/resetpassword','/register', '/account-locked']
+   	if (!authorized && (no_redirect.indexOf(req.path) == -1)) {
+      destination = '/signin'
   	}
+
+    if (req.path === '/resetpassword') {
+      Session.validateForReset(req, res, next)
+    }
 
     // routed locked users to account locked page with reason for lock
     if (res.locals.current_user && res.locals.current_user.account_locked && no_redirect.indexOf(destination) == -1) {
@@ -39,7 +42,7 @@ module.exports = class Session {
     }
 
 	 	// Only redirect if we're not already there to prevent self-referential loop, e.g., on /login with no session
-		if (destination != req.route.path) {
+		if (destination != req.originalUrl) {
 			res.redirect(destination)
 		} else {
       next()

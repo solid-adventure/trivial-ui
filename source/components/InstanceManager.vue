@@ -25,7 +25,7 @@
   	position: absolute;
   	left: 20%; /* clear the AppManager */
   	width: 80%; /* what's left after AppManager */
-  	top: 80px; /* clear the SuperBar*/
+  	// top: 80px; /* clear the SuperBar*/
   	padding: 0;
   	margin: 0;
   	height: 100%;

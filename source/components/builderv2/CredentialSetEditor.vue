@@ -319,7 +319,7 @@
     input  {
       padding: 0.2em 0.5em;
       font-size: 1em;
-      font-family: 'Brix Sans';
+      font-family: 'Lato';
       font-weight: 100;
       font-size: 1em;
     }

@@ -1,6 +1,7 @@
 <template>
   <div class="panels">
-    <component :is="panelComponent" :app_id="appId" />
+    <component v-if="loaded" :is="panelComponent" :app_id="appId" />
+    <div v-if="!loaded" class="loading"><img src="/assets/images/trivial-loading.gif"></div>
   </div>
 </template>
 
@@ -9,19 +10,39 @@
   .panels {
     position: absolute;
     width: 100%;
-    top: 80px; /* clear the SuperBar*/
+    top: 120px; /* clear the SuperBar*/
     padding: 0;
     margin: 0;
     height: calc(100% - 80px);
     z-index: 10;
+
+    div.loading {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: -120px;
+      left: 0;
+      background: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      img {
+        max-width: 15%;
+      }
+
+    }
+
   }
+
+
 
 </style>
 
 <script>
   import { mapState } from 'vuex'
+  import Contract from './panels/Contract.vue'
   import Dashboard from './panels/Dashboard.vue'
-  import CSVUpload from './panels/CSVUpload.vue'
   import Headline from './panels/Headline.vue'
   import LineChart from './panels/LineChart.vue'
   import Spreadsheet from './panels/Spreadsheet.vue'
@@ -33,8 +54,8 @@
   export default {
 
     components: {
+      Contract,
       Dashboard,
-      CSVUpload,
       Headline,
       LineChart,
       Spreadsheet,
@@ -44,14 +65,17 @@
       Workbook
     },
 
-    mounted() {
-      document.title = this.pageTitle
+    watch: {
+      async app(newApp) {
+        if (newApp) {
+          window.document.title = newApp.descriptive_name;
+        }
+      }
     },
-
     computed: {
 
-      pageTitle() {
-        return this.app.descriptive_name
+      loaded() {
+        return typeof this.app.panels !== 'undefined'
       },
 
       panelComponent() {

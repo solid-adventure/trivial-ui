@@ -1,20 +1,7 @@
 <template>
-  <div class="OrganizationInviteUser">
+  <div class="page-container">
 
     <Notices></Notices>
-
-    <!-- TODO make this a component and pass the items as props -->
-    <!-- Once it's a component, spruce up the styling -->
-    <div class="breadcrumb">
-      <span class="history"><a :href="`/organizations/${this.orgId}/edit`">Users and Roles</a></span>
-      <span class="spacer">></span>
-
-<!--  TODO: add this back in when we have a way to get the organization name
-      <span class="history">{{ organization.name }}</span>
-      <span class="spacer">></span>
- -->
-      <span class="active"><strong>Add New User</strong></span>
-    </div>
 
     <div class="page-inset">
       <h2>Add New User</h2>
@@ -55,13 +42,13 @@ import Notifications from './notifications'
 import Notices from './Notices.vue'
 
 export default {
-  inject: ['orgId'],
 
   data(){
     return {
       newUserName: '',
       newUserEmail: '',
       newUserRole: '',
+      orgId: this.$route.params.id,
       errors: {
         newUserName: null,
         newUserEmail: null,
@@ -135,81 +122,70 @@ export default {
   }
 }
 </script>
-<style lang="scss">
- .OrganizationInviteUser {
-  height: 100%;
-  margin: 2em 10em;
-  width: calc(100% - 20em);
-  top: 80px;
-  position: relative;
- }
+<style lang="scss" scoped>
 
-div.page-inset {
-  background: var(--surface);
-  padding: 2em 6em;
-  border-radius: 1em;
-  border: 1px solid var(--background-80);
-  margin: 2em;
-  min-width: 18em;
-}
+  div.page-inset {
+    padding: 2em 6em;
+  }
 
-div.action-row {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
+  div.action-row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
 
-div.form-input {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 1em;
+  div.form-input {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1em;
 
-  label, div.label-with-error {
+    label, div.label-with-error {
+      margin-bottom: 0.5em;
+    }
+
+  }
+
+  .form-error {
+    color: var(--error);
+    margin-left: 0.5em;
+  }
+
+  .form-error::before {
+    content: '* ';
+  }
+
+  span.section {
     margin-bottom: 0.5em;
+    display: inline-block;
   }
 
-}
+  div.radio-group {
+    flex-direction: row;
+    align-content: flex-start;
+    flex-wrap: wrap;
+    max-width: 26em;
 
-.form-error {
-  color: var(--error);
-  margin-left: 0.5em;
-}
-
-.form-error::before {
-  content: '* ';
-}
-
-span.section {
-  margin-bottom: 0.5em;
-  display: inline-block;
-}
-
-div.radio-group {
-  flex-direction: row;
-  align-content: flex-start;
-  flex-wrap: wrap;
-
-  input {
-    margin-right: 1em;
-    border: 0px;
-    width: 1.25em;
-    height: 1.25em;
+    input {
+      margin-right: 1em;
+      border: 0px;
+      width: 1.25em;
+      height: 1.25em;
+    }
   }
-}
 
-div.radio-group > .help {
-  margin-block-end: 1em;
-  margin-left: 2.25em;
-  color: var(--on-surface-secondary);
-}
+  div.radio-group > .help {
+    margin-block-end: 1em;
+    margin-left: 2.25em;
+    color: var(--on-surface-secondary);
+  }
 
-.full-width {
-  width: 100%;
-}
+  .full-width {
+    width: 100%;
+  }
 
- table.organization-users {
-  width: 100%;
-  margin-block: 3em;
-}
+   table.organization-users {
+    width: 100%;
+    margin-block: 3em;
+  }
 
 </style>

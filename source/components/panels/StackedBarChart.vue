@@ -51,19 +51,19 @@
       chartConfig(){
         console.log(`chartConfig firing`)
         this.setColors()
-        for (let chart of this.charts) { chart.destroy() }
+        // for (let chart of this.charts) { chart.destroy() }
         let chart = new Chart(this.$refs[this.app_id], {
           type: 'bar',
           data: {labels: this.labels, datasets: this.datasets},
           options: {
             responsive: true,
             scales: {
-              xAxes: [{
+              x: {
                 stacked: true
-              }],
-              yAxes: [{
+              },
+              y: {
                 stacked: true
-              }]
+              }
             }
           }
         })

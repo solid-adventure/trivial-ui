@@ -1,6 +1,6 @@
 @import "includes/reset";
-@import "includes/variables";
-@import "includes/brix";
+@import "includes/theme-defaults";
+@import "includes/lato";
 @import "includes/modals";
 @import "includes/forms";
 @import "includes/transitions";
@@ -9,16 +9,16 @@ html, body {
   margin: 0;
   padding: 0;
   font-family: $font-family;
-  font-weight: 100;
+  font-weight: 400;
 }
 
 body {
   background: $background;
-	color: $on-background;
+  color: $on-background;
 }
 
 h1, h2, h3, h4 {
-  font-weight: 400;
+  font-weight: 700;
 }
 
 a {
@@ -52,7 +52,7 @@ table.spaced {
       background-color: var(--background);
 
       th {
-        font-weight: 400;
+        font-weight: 700;
         padding: 2rem 0.75rem;
         vertical-align: middle;
         text-align: left;
@@ -66,7 +66,7 @@ table.spaced {
       border-bottom: 1px solid $background-80;
 
       td {
-        font-weight: 100;
+        font-weight: 400;
         padding: 0.75rem;
         vertical-align: middle;
         text-align: left;
@@ -82,7 +82,24 @@ table.spaced {
 
 }
 
+div.page-container {
+  top: 80px;
+  margin: 2em;
+  position: relative;
+}
 
+div.page-inset {
+  background: var(--surface);
+  padding: 2em 3em;
+  border-radius: 1em;
+  border: 1px solid var(--background-80);
+  margin: 2em 2em 12em 2em;
+  min-width: 18em;
+}
+
+div.left-inset {
+  margin-left: 8em;
+}
 
 .main-btn {
   display: inline-block;
@@ -170,7 +187,7 @@ hr.accent {
 }
 
 .headroom-small {
-	margin-top: 1em;
+  margin-top: 1em;
 }
 
 .legroom {

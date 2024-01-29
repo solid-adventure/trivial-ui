@@ -1,11 +1,11 @@
 <template>
   <div class="SuperBar">
+    <!-- NOTE The brand logo image is overwritten with var(--logo) -->
     <span class="brand"><a href="/"><img src="/assets/images/trivial-logo-light-warm.svg"/></a></span>
-    <span class="superlink" :class="{active: isActive('dashboard')}"><a href="/?paneltype=dashboard">Dashboards</a></span>
+    <span class="superlink" :class="{active: isActive('dashboard')}"><a href="/dashboard">Dashboards</a></span>
+    <span class="superlink" :class="{active: isActive('contract')}"><a href="/contract">Contracts</a></span>
     <!-- TEMP DISABLE -->
     <!-- <span class="superlink" :class="{active: isActive('unset')}"><a href="/?paneltype=unset">Data Connectors</a></span> -->
-    <span class="superlink" :class="{active: isActive('playground')}"><a href="/playground">Playground</a></span>
-    <!-- <span><a href="/settings">Account</a></span> -->
     <span class="settings">
       <div class ="theme">
         <ToggleButton
@@ -33,10 +33,10 @@
     line-height: 80px;
     white-space: nowrap;
     z-index: 100;
+    vertical-align: middle;
 
     span {
       padding: 0 1em;
-      vertical-align: bottom;
     }
 
     span.superlink {
@@ -56,7 +56,7 @@
     }
 
     .active{
-      background-color: var(--scrim-color);
+      background-color: var(--super-bar-background-active);
       color: var(--on-background);
       border-bottom: 0;
       border-color: var(--accent);
@@ -65,18 +65,21 @@
   }
 
   .brand img {
-    height: 23px;
-    width: 115px;
-    margin-top: 8px;
+    height: calc(100% - 1em);
+    max-width: 4em;
+    vertical-align: middle;
+    margin-top: -0.5em;
+    content: var(--logo-superbar);
   }
 
-  .SuperBar .brand {
+  .brand {
   	font-weight: 100;
   	font-size: 1.5em;
     margin-left: 0.6em;
+    vertical-align: middle;
   }
 
-  .SuperBar .settings {
+  .settings {
     margin-right: 0.6em;
     float: right;
   }
@@ -99,7 +102,6 @@
   import { track } from '../../lib/TrackingService'
   import ToggleButton from './controls/ToggleButton.vue'
   import { Moon, Sun } from './icons'
-import { timeout } from 'd3-timer'
 
   export default {
     data(){
@@ -125,6 +127,7 @@ import { timeout } from 'd3-timer'
         return this.activeTheme == 'Dark'
       },
       firstName() {
+        if (!this.user) { return 'Guest' }
         const match = /^\s*(\S+)/.exec(this.user.name || '')
         return match ? match[1] : (this.user.name || '')
       },
@@ -171,7 +174,7 @@ import { timeout } from 'd3-timer'
             this.prevLink.after(this.newLink)
             break
         }
-        timeout(() => {
+        window.setTimeout(() => {
           this.prevLink.remove()
         }, 500)
         await this.themeUpdateCall()

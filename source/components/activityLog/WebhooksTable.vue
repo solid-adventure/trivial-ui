@@ -53,7 +53,6 @@
 </template>
 
 <style lang="scss" scoped>
-  @import "../../assets/stylesheets/includes/variables";
 
  .chart-area {
   margin: 4em 0;
@@ -167,7 +166,7 @@
     display: flex;
     flex-direction: row;
     border-bottom: 1px solid var(--on-background-40);
-    top: 80px;
+    top: 120px;
     position: sticky;
     background-color: var(--background);
     z-index: 2;
@@ -223,19 +222,16 @@ import { mapActions, mapState } from 'vuex'
     // delay gives a minimum display time to loading state
     setTimeout(this.fetchData, 500)
 
-    document.title = this.pageTitle
-
   },
-
+  watch: {
+    async app(newApp) {
+      window.document.title = `Activity: ${newApp.descriptive_name}`
+    }
+  },
   computed: {
     appId() {
-      return this.app.name
+      return this.$route.params.id;
     },
-
-    pageTitle() {
-      return `Activity: ${this.app.descriptive_name}`
-    },
-
     filteredWebhooks() {
       if (this.searchTerm == '') { return this.webhooks }
       let term = this.searchTerm.toLowerCase()

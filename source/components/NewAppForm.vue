@@ -1,7 +1,7 @@
 <template>
-    <super-bar></super-bar>
-    <div class="PageContainer">
-        <div class="Col1">
+    <!-- <super-bar></super-bar> -->
+    <div class="page-container">
+        <div class="page-inset">
             <Notices></Notices>
             <div v-if="buildStatus=='initial'" class="FormWrapper">
                 <h1>Create App</h1>
@@ -11,7 +11,7 @@
                         <input type="text" name="app_name" class='text-field' ref='app_name' v-model='appName' placeholder='App Name' @keydown.prevent.enter="_createApp"/>
                     </div>
                     <div class="column">
-                        <label for="panels" class="FormLabel">Display</label>
+                        <label for="panels" class="FormLabel">Type</label>
                         <select v-model='appPanelComponent' @keydown.prevent.enter="_createApp" >
                             <option v-for="appPanel of appPanelNames" :value="appPanel.name">{{appPanel.display_name}}</option>
                         </select>
@@ -21,9 +21,6 @@
                     <li class="SuggestionText">Need a suggestion? How about <a @click="fillSuggestedName">{{suggestedName}}</a>?</li>
                     <li><button class="refreshIcon" @click.prevent="refreshSuggestion" aria-label="refresh suggestion"></button></li>
                 </ul>
-
-
-
                 <div class="Submit">
                     <ActionButton class="button-medium" :class="{working: building}" :action="_createApp" :value="buttonText" working-value="Generating App..."></ActionButton>
                 </div>
@@ -33,12 +30,6 @@
                 <p v-for="message in messages">{{message}}</p>
                 <p v-if="buildStatus=='complete'">Ready!</p>
             </div>
-
-        </div>
-
-        <div class="Col2">
-            <!-- <span class="label">Preview</span> -->
-            <!-- <img :src="previewSrc" width="100%" height="auto" /> -->
         </div>
     </div>
 </template>
@@ -208,40 +199,9 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-.PageContainer{
-    position: fixed;
-    top: 80px;
-    height: calc(100% - 80px);
-    width: 100%;
-    padding-top: 0.5em;
-    display: flex;
-    align-items: start;
-}
 
-.Col1, .Col2 {
-    width: 100%;;
-    margin: 2em
-}
-
-.Col1{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-    margin-left:2em;
-}
-
-.Header{
-    width: calc(100% - 4em);
-
-    h1 {
-        margin-block-end: 0.1em;
-    }
-
-    em {
-        margin-bottom: 2em;
-        display: block;
-    }
+.page-inset {
+    padding-bottom: 6em;
 }
 
 .FormWrapper {
