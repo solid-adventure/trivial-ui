@@ -27,7 +27,7 @@ module.exports = class Session {
 			destination = '/'
 		}
 
-		let no_redirect = ['/signin', '/recoverpassword', '/resetpassword','/register', '/account-locked']
+		let no_redirect = ['/signin', '/acceptinvitation', '/recoverpassword', '/resetpassword','/register', '/account-locked']
    	if (!authorized && (no_redirect.indexOf(req.path) == -1)) {
       destination = '/signin'
   	}
