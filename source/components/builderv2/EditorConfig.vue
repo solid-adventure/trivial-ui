@@ -75,7 +75,7 @@
 
       credentialsEditable() {
         if (this.playgroundMode) { return true }
-        return this.$store.state.manifest.user_id == this.$store.state.user.id
+        return this.$store.state.manifest.owner_id == this.$store.state.user.id
       }
 
     }
