@@ -93,7 +93,7 @@ export default {
           body: JSON.stringify({
             path: "/auth/password",
             email,
-            redirect_url: "https://www.trivialapps.io/resetpassword",
+            redirect_url: `${window.location.origin}/resetpassword`,
           }),
         });
         this.message = `An email has been sent to ${email} with instructions on how to reset the password.`;
