@@ -36,6 +36,7 @@ const store = createStore({
     tourMode: false,
     tourStep: 0,
     tourSteps: ['action-info', 'credentials', 'transform-config'],
+    enableSaveCredentials: false
   },
 
   getters: {
@@ -417,6 +418,7 @@ const store = createStore({
     },
 
     async saveCredentials({ state, dispatch }) {
+      console.log(state.credentialSets, state.credentials)
       await fetchJSON('/proxy/trivial', {
         method: 'put',
         headers: {'content-type': 'application/json'},
@@ -443,9 +445,11 @@ const store = createStore({
       return manifest
     },
 
-    async save({ dispatch }) {
+    async save({state, dispatch }) {
       await dispatch('saveManifest')
-      await dispatch('saveCredentials')
+      if(state.enableSaveCredentials){
+        await dispatch('saveCredentials')
+      }
     },
 
     async build({ state }) {
@@ -576,6 +580,7 @@ const store = createStore({
     },
 
     async saveCredentialSet({ commit }, { credential_set, credentials }) {
+      console.log(credential_set,credentials)
       let newCreds = null
       if (credential_set.id) {
         newCreds = await fetchJSON('/proxy/trivial', {
