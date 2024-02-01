@@ -418,7 +418,6 @@ const store = createStore({
     },
 
     async saveCredentials({ state, dispatch }) {
-      console.log(state.credentialSets, state.credentials)
       await fetchJSON('/proxy/trivial', {
         method: 'put',
         headers: {'content-type': 'application/json'},
@@ -580,7 +579,6 @@ const store = createStore({
     },
 
     async saveCredentialSet({ commit }, { credential_set, credentials }) {
-      console.log(credential_set,credentials)
       let newCreds = null
       if (credential_set.id) {
         newCreds = await fetchJSON('/proxy/trivial', {
