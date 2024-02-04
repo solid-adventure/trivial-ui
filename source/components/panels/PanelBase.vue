@@ -226,13 +226,18 @@
               ),
             headers: {'content-type': 'application/json'}
           })
-          // TODO: Pre-process the response to wrap in the {statusCode: xxx, body: xxx} format
+          .then(response => this.preProcessResponse(response, 200))
           .then(response => this.handleResponse(response))
         } catch (error) {
           this.errors = error
+          this.preProcessResponse(error, 500)
           console.error('[fetchDataTrivialApi] Error:', error)
         }
         this.loading = false
+      },
+
+      preProcessResponse(response, status) {
+        return {statusCode: status, body: response}
       },
 
       fetchDataTrivialApp() {

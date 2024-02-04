@@ -4,10 +4,19 @@
       <PanelPopover :app_id="app_id" :parent_app_id="parent_app_id" />
       <h2 v-if="cascadingTitle">{{cascadingTitle}}</h2>
       <p v-if="cascadingDescription">{{cascadingDescription}}</p>
-      <h1>
-        {{formattedCount}}
-      </h1>
-        <p>{{errors}}</p>
+
+      <table v-if="Object.entries(formattedCounts).length > 0">
+        <tr v-for="(value, key) in formattedCounts">
+          <td>{{ key }}</td>
+          <td>{{ value }}</td>
+        </tr>
+      </table>
+      <table v-else>
+        <tr>
+          <td>No results</td>
+        </tr>
+      </table>
+      <p>{{errors}}</p>
     </div>
   </div>
 </template>
@@ -21,16 +30,23 @@
     mixins: [PanelBase],
 
     computed: {
-      formattedCount() {
+
+      formattedCounts() {
+        if (typeof(this.count) !== 'object') { return {} }
+        let out = {}
         try {
           let options = this.app.panels.options.countFormat || {}
-          // countFormat: {type: "money", args: {places: 0}}
-          let args = [this.count, Object.values(options.args)].flat()
-          return Format[options.type](...args)
-        } catch(e) {
+          for (const [k, v] of Object.entries(this.count)) {
+            let args = [v, Object.values(options.args)].flat()
+            out[k] = `${Format[options.type](...args)}`
+          }
+          return out
+        }
+        catch (e) {
           return this.count
         }
-      }
+      },
+
     },
 
     methods: {
@@ -45,7 +61,7 @@
             this.title = r.title
           } catch (error) {
             this.errors = error
-          }          
+          }
         }
       }
     }

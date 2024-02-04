@@ -87,7 +87,8 @@
 
       timezone(newVal) {
         this.saveOptionAttribute("timezone", newVal)
-      }
+      },
+
     },
 
     computed: {
