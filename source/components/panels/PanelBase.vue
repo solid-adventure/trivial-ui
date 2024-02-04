@@ -207,7 +207,7 @@
       //       "type": "trivial-api",
       //       "args": {
       //         "path": "reports/item_count",
-      //         "register_id": 1
+      //         "register_ids": 1
       //       }
       //     }
       //   },
