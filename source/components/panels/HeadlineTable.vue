@@ -8,8 +8,14 @@
       <table v-if="Object.entries(formattedCounts).length > 0">
         <tr v-for="(value, key) in formattedCounts">
           <td>{{ key }}</td>
-          <td>{{ value }}</td>
+          <td class="value">{{ value }}</td>
         </tr>
+        <tr v-if="displayTotal">
+          <td class="total total_label">Total</td>
+          <td class="total value">{{ formattedTotal }}</td>
+        </tr>
+
+
       </table>
       <table v-else>
         <tr>
@@ -30,6 +36,35 @@
     mixins: [PanelBase],
 
     computed: {
+
+      displayTotal() {
+        try {
+          return this.app.panels.options.display_total || false
+        } catch (error) {
+          return false
+        }
+      },
+
+      total() {
+        if (!this.count) { return 0 }
+        try {
+          return Object.values(this.count).reduce((acc, curr) => acc + Number(curr), 0);
+        } catch (error) {
+          return 0
+        }
+      },
+
+      formattedTotal() {
+        if (typeof(this.count) !== 'object') { return {} }
+        try {
+          let options = this.app.panels.options.countFormat || {}
+          let args = [this.total, Object.values(options.args)].flat()
+          return `${Format[options.type](...args)}`
+        }
+        catch (e) {
+          return this.total
+        }
+      },
 
       formattedCounts() {
         if (typeof(this.count) !== 'object') { return {} }
@@ -79,5 +114,19 @@
     flex-direction: column;
     justify-content: center;
   }
+
+  td.value {
+    text-align: right;
+  }
+
+  td.total {
+    border-top: 1px solid var(--input-border-color);
+  }
+
+  td.total_label {
+    padding-right: 1em;
+    text-align: right;
+  }
+
 
 </style>
