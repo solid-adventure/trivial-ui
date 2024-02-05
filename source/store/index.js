@@ -234,6 +234,7 @@ const store = createStore({
 
   actions: {
     async init({ commit, dispatch, state }, { appId }) {
+      console.log(VUE_APP_SAMPLE)
       try {
         await dispatch('loadProfile')
         await dispatch('loadResources', { dispatch, router })

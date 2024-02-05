@@ -54,6 +54,7 @@ module.exports = {
     new MiniCssExtractPlugin(),
     new webpack.DefinePlugin(
     {
+      VUE_APP_SAMPLE: JSON.stringify(process.env.VUE_APP_SAMPLE),
       __VUE_OPTIONS_API__: true,
       __VUE_PROD_DEVTOOLS__: !isDevelopment,
     }),
