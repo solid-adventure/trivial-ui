@@ -46,6 +46,7 @@
 
   // Panels
   import Headline from './Headline.vue'
+  import HeadlineTable from './HeadlineTable.vue'
   import LineChart from './LineChart.vue'
   import notifications from '../notifications'
   import Section from './Section.vue'
@@ -63,6 +64,7 @@
       // Panels
       DatePicker,
       Headline,
+      HeadlineTable,
       LineChart,
       Section,
       Spreadsheet,

@@ -83,6 +83,33 @@
         return new URL(path, `https://${this.app.hostname}.${this.app.domain}`).href
       },
 
+      data_source() {
+        if (!this.app) { return }
+        try {
+          if (this.app.panels.options.data_source.type === 'trivial-api')  {
+            return 'trivial-api'
+          } else {
+            return 'trivial-app'
+          }
+        } catch (e) {
+          return 'trivial-app'
+        }
+      },
+
+      reportPath() {
+        if (!this.app) { return }
+        return this.app.panels.options.data_source.args.path
+      },
+
+      data_sourceArgs() {
+        if (!this.app) { return }
+        try {
+          return this.app.panels.options.data_source.args
+        } catch (e) {
+          return {}
+        }
+      },
+
       customerToken() {
         return this.$store.state.user.current_customer_token
       },
@@ -134,9 +161,11 @@
 
       },
 
-      // As a computed property, this misses changes to the Mixin children
+      // This is a method because, as a computed property, it misses changes to the Mixin children
       mergedOptions() {
-        return Object.assign({customer_token: this.customerToken}, this.options)
+        let out = Object.assign({customer_token: this.customerToken}, this.options)
+        out = Object.assign(out, this.data_sourceArgs)
+        return out
       },
 
       intialData() {
@@ -163,12 +192,60 @@
 
       async fetchData() {
         if (!this.app) { return }
+        if (this.data_source === 'trivial-api') {
+          this.fetchDataTrivialApi()
+        } else {
+          this.fetchDataTrivialApp()
+        }
+      },
+
+      // Expected format:
+      // {
+      //   "options": {
+      //     "full_width": false,
+      //     "data_source": {
+      //       "type": "trivial-api",
+      //       "args": {
+      //         "path": "reports/item_count",
+      //         "register_ids": 1
+      //       }
+      //     }
+      //   },
+      //   "component": "Headline"
+      // }
+      async fetchDataTrivialApi(displayLoading=true) {
+        if (displayLoading) { this.loading = true }
+        try {
+          await fetchJSON(`/proxy/trivial`, {
+            method: 'post',
+            body: JSON.stringify(
+              Object.assign(
+                this.mergedOptions(),
+                {path: this.reportPath}
+                )
+              ),
+            headers: {'content-type': 'application/json'}
+          })
+          .then(response => this.preProcessResponse(response, 200))
+          .then(response => this.handleResponse(response))
+        } catch (error) {
+          this.errors = error
+          this.preProcessResponse(error, 500)
+          console.error('[fetchDataTrivialApi] Error:', error)
+        }
+        this.loading = false
+      },
+
+      preProcessResponse(response, status) {
+        return {statusCode: status, body: response}
+      },
+
+      fetchDataTrivialApp() {
         if (this.shouldFetchCached) {
           this.fetchDataCached()
         } else {
           this.fetchDataLive()
         }
-
       },
 
       async fetchDataLive(displayLoading=true) {

@@ -7,9 +7,7 @@
       <h1>
         {{formattedCount}}
       </h1>
-      <div v-if="errors.length > 0">
         <p>{{errors}}</p>
-      </div>
     </div>
   </div>
 </template>
