@@ -9,6 +9,7 @@ const webpack = require('webpack');
 const mode =
   process.env["NODE_ENV"] === "production" ? "production" : "development";
 const isDevelopment = mode == "development";
+const enableSaveCredentials = process.env.VUE_APP_ENABLE_SAVE_CREDENTIALS;
 
 module.exports = {
   devtool: "inline-source-map",
@@ -54,6 +55,7 @@ module.exports = {
     new MiniCssExtractPlugin(),
     new webpack.DefinePlugin(
     {
+      VUE_APP_ENABLE_SAVE_CREDENTIALS: (enableSaveCredentials?enableSaveCredentials:false),
       __VUE_OPTIONS_API__: true,
       __VUE_PROD_DEVTOOLS__: !isDevelopment,
     }),

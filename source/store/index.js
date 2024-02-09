@@ -36,6 +36,7 @@ const store = createStore({
     tourMode: false,
     tourStep: 0,
     tourSteps: ['action-info', 'credentials', 'transform-config'],
+    enableSaveCredentials: VUE_APP_ENABLE_SAVE_CREDENTIALS
   },
 
   getters: {
@@ -445,7 +446,9 @@ const store = createStore({
 
     async save({ dispatch }) {
       await dispatch('saveManifest')
-      await dispatch('saveCredentials')
+      if(this.state.enableSaveCredentials){
+        await dispatch('saveCredentials')
+      }
     },
 
     async build({ state }) {
