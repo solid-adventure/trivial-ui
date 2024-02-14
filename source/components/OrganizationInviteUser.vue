@@ -96,6 +96,7 @@ export default {
         path: `/auth/invitation`,
         email: this.newUserEmail,
         name: this.newUserName,
+        trivial_ui_url: window.location.origin,
         invitation_metadata: {
           org_id: this.orgId,
           role: this.newUserRole
