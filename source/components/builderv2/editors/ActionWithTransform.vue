@@ -108,7 +108,8 @@
 
       ...mapState([
         'tourMode',
-        'tourStep'
+        'tourStep',
+        'enableSaveCredentials'
       ])
     },
 
@@ -136,7 +137,7 @@
         :credentials="credentials"
         :nextIdentifier="nextIdentifier"
         @edit="edit"></EditorDefinition>
-      <HideableSection v-if="displayCredentials && !hiddenByTour('credentials')" :initially-hidden="false" display-name="Credentials">
+      <HideableSection v-if="displayCredentials && !hiddenByTour('credentials') && enableSaveCredentials" :initially-hidden="false" display-name="Credentials">
         <EditorConfig :value="action" :credentials="credentials"></EditorConfig>
       </HideableSection>
         <div class="transform-fields">
