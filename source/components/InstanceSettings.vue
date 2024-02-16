@@ -73,6 +73,11 @@
       <textarea id="manifest_content" class="code-entry" cols="60" rows="30" spellcheck="false" v-model="formattedManifest"></textarea>
       <br /><input type="button" id="manifest_content_save" class="button-small" :class="{working: rebuilding}" @click.prevent="save" :value="rebuilding ? 'Rebuilding Lambda...' : 'Rebuild Lambda' ">
       </HideableSection>
+
+      <hr class="headroom accent" />
+      <h2 class="headroom section-title">Transfer Apps</h2>
+      <AppTransferManager :appType = "app.panels.component"/>
+
       <hr class="headroom accent" />
       <h2 class="headroom section-title">Delete</h2>
       <p class="section-help-text"><em>Danger zone! Deleting this app is permanent and cannot be undone.</em></p>
@@ -152,6 +157,7 @@
   import { track } from '../../lib/TrackingService'
   import FeatureManager from 'trivial-core/lib/FeatureManager'
   import NavTree from './builderv2/NavTree.vue'
+  import AppTransferManager from './builderv2/AppTransferManager.vue'
 
   export default {
     // inject: ['appId'],
@@ -159,6 +165,7 @@
     components: {
         ActionButton,
         HideableSection,
+        AppTransferManager,
         'nav-tree': NavTree
     },
 
