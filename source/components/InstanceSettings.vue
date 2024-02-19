@@ -76,7 +76,13 @@
 
       <hr class="headroom accent" />
       <h2 class="headroom section-title">Transfer Apps</h2>
-      <AppTransferManager :appType = "app.panels.component"/>
+
+      {{ app.owner_type + " " + app.owner_id }} 
+      <AppTransferManager
+      v-bind = "setPropIfOrg" 
+      :app_id = "app.id"
+      :app_type = "app.panels.component"
+      />
 
       <hr class="headroom accent" />
       <h2 class="headroom section-title">Delete</h2>
@@ -286,6 +292,16 @@
           } catch (error) {
             console.log('[InstanceSettings][set formattedSchedule] Error: ', error)
           }
+        }
+      },
+
+      setPropIfOrg() {
+        if (this.app.owner_type === 'Organization') {
+          return {
+            owner_id: this.app.owner_id
+          };
+        } else {
+        return {};
         }
       },
 

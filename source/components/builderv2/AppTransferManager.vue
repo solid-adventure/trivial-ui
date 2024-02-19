@@ -7,48 +7,48 @@ export default {
     SearchField,
   },
   props: {
-    appType: String,
-    // app_id
+    app_type: String,
+    app_id: Number,
+    owner_id: Number,
   },
   data() {
     return {
-      organizations: []
+      organizations: [],
     };
   },
-  created(){
-    this.loadOrganizations()
+  created() {
+    this.loadOrganizations();
   },
   methods: {
     async loadOrganizations() {
       try {
-        let response = await fetchJSON(
-          `/proxy/trivial?path=/organizations`
-        );
+        let response = await fetchJSON(`/proxy/trivial?path=/organizations`);
         this.organizations = response;
       } catch (error) {
-        console.log("[OrganizationSettings][loadOrganization] Error:", error);
+        console.log("[AppTransferManager][loadOrganization] Error:", error);
       }
     },
-    async transferApp(id){
-      // console.log(app_id)
+    async transferApp(org_id) {
       try {
-        let response = await fetchJSON(
-          `/proxy/trivial?path=/apps/${app_id}/transfer/organizations/${id}`,{
-            method: 'PUT'
+        let response = await fetchJSON(`/proxy/trivial`, {
+          method: "PUT",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            path: `/apps/${this.app_id}/transfer/organizations/${org_id}`,
+          }),
         });
-        console.log(response)
+        console.log(response);
       } catch (error) {
-        console.log("[OrganizationSettings][loadOrganization] Error:", error);
+        console.log("[AppTransferManager][transferApp] Error:", error);
       }
-    }
+    },
   },
-
 };
 </script>
 
 <template>
   <div class="page-inset">
-    <h2>{{ appType }} | Organizations </h2>
+    <h2>{{ app_type }} | Organizations</h2>
     <div class="title-row">
       <!-- <div class="search-container">
         <SearchField
@@ -57,29 +57,31 @@ export default {
           v-on:update="searchTerm = $event"
         ></SearchField>
       </div> -->
-
       <table class="spaced user-organizations">
         <thead>
           <tr>
-            <th class = "organization">Organization</th>
-            <th class = "billing-email">Billing Email</th>
-            <th class = "action">Action</th>
+            <th class="organization">Organization</th>
+            <th class="billing-email">Billing Email</th>
+            <th class="action">Action</th>
           </tr>
         </thead>
- 
+
         <tbody>
-          <tr v-for="org in organizations" :key="org.id">
-            <td>{{org.name}}</td>
-            <td>{{org.billing_email}}</td>
-            <td>
-              <div class="new-button-container">
-                <a
-                  class="button-medium headroom-small"
-                  >Transfer</a
-                >
-              </div>
-            </td>
-          </tr>
+          <template v-for="org in organizations" :key="org.id">
+            <tr v-if = "owner_id != org.id">
+              <td>{{ org.name }}</td>
+              <td>{{ org.billing_email }}</td>
+              <td>
+                <div class="new-button-container">
+                  <a
+                    class="button-medium headroom-small"
+                    @click="transferApp(org.id)"
+                    >Transfer</a
+                  >
+                </div>
+              </td>
+            </tr>
+          </template>
         </tbody>
         <!-- <tbody v-else>
           <tr>
@@ -87,7 +89,6 @@ export default {
           </tr>
         </tbody> -->
       </table>
-
     </div>
   </div>
 </template>
@@ -106,7 +107,7 @@ div.action-buttons {
   }
 }
 table.user-organizations {
-    width: 100%;
-    margin-block: 3em;
-  }
+  width: 100%;
+  margin-block: 3em;
+}
 </style>
