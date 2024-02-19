@@ -77,9 +77,10 @@
       <hr class="headroom accent" />
       <h2 class="headroom section-title">Transfer Apps</h2>
 
-      {{ app.owner_type + " " + app.owner_id }} 
+      {{ "Current Owner: " + app.owner_type + " " + app.owner_id }} 
       <AppTransferManager
-      v-bind = "setPropIfOrg" 
+      v-bind = "setPropIfOrg"
+      :app_name = "descriptive_name"
       :app_id = "app.id"
       :app_type = "app.panels.component"
       />

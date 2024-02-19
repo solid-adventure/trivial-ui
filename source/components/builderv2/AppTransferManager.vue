@@ -10,6 +10,7 @@ export default {
     app_type: String,
     app_id: Number,
     owner_id: Number,
+    app_name: String
   },
   data() {
     return {
@@ -28,18 +29,25 @@ export default {
         console.log("[AppTransferManager][loadOrganization] Error:", error);
       }
     },
-    async transferApp(org_id) {
-      try {
-        let response = await fetchJSON(`/proxy/trivial`, {
-          method: "PUT",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({
-            path: `/apps/${this.app_id}/transfer/organizations/${org_id}`,
-          }),
-        });
-        console.log(response);
-      } catch (error) {
-        console.log("[AppTransferManager][transferApp] Error:", error);
+    async transferApp(org_name, org_id) {
+      if (
+        confirm(
+          `Are you sure you want to transfer the App: "${this.app_name}"" to the Organization: "${org_name}"?`
+        )
+      ) {
+        try {
+          let response = await fetchJSON(`/proxy/trivial`, {
+            method: "PUT",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({
+              path: `/apps/${this.app_id}/transfer/organizations/${org_id}`,
+            }),
+          });
+          console.log(response);
+          window.location = `/dashboard`
+        } catch (error) {
+          console.log("[AppTransferManager][transferApp] Error:", error);
+        }
       }
     },
   },
@@ -68,14 +76,14 @@ export default {
 
         <tbody>
           <template v-for="org in organizations" :key="org.id">
-            <tr v-if = "owner_id != org.id">
+            <tr v-if="owner_id != org.id">
               <td>{{ org.name }}</td>
               <td>{{ org.billing_email }}</td>
               <td>
                 <div class="new-button-container">
                   <a
                     class="button-medium headroom-small"
-                    @click="transferApp(org.id)"
+                    @click="transferApp(org.name, org.id)"
                     >Transfer</a
                   >
                 </div>
