@@ -5,14 +5,25 @@
       <h2 v-if="cascadingTitle">{{cascadingTitle}}</h2>
       <p v-if="cascadingDescription">{{cascadingDescription}}</p>
 
-      <table v-if="Object.entries(formattedCounts).length > 0">
-        <tr v-for="(value, key) in formattedCounts">
-          <td>{{ key }}</td>
-          <td class="value">{{ value }}</td>
+      <table v-if="hasResults">
+
+        <thead>
+          <tr>
+            <th></th> <!-- group -->
+            <th v-for="period of group_by_period_keys"><span class="total">{{ period }}</span></th>
+            <th><span class="total">Total</span></th>
+          </tr>
+        </thead>
+
+        <tr v-for="group of group_keys">
+          <td>{{ group }}</td>
+          <td v-for="period of group_by_period_keys" class="value">{{ formattedValue(valueForCell(period, group)) }}</td>
+          <td class="value">{{ formattedValue(totalForGroup(group)) }}</td>
         </tr>
         <tr v-if="displayTotal">
           <td class="total total_label">Total</td>
-          <td class="total value">{{ formattedTotal }}</td>
+          <td v-for="period of group_by_period_keys" class="total value"> {{ formattedValue(totalForPeriod(period)) }}</td>
+          <td class="total value">{{ formattedValue(totalForAll()) }}</td>
         </tr>
 
 
@@ -37,6 +48,16 @@
 
     computed: {
 
+      group_by_period_keys() {
+        const uniq = new Set(this.count.filter((row) => row.period !== "All").map((row) => row.period));
+        return [...uniq];
+      },
+
+      group_keys() {
+        const uniq = new Set(this.count.map((row) => row.group));
+        return [...uniq];
+      },
+
       displayTotal() {
         try {
           return this.app.panels.options.display_total || false
@@ -45,41 +66,9 @@
         }
       },
 
-      total() {
-        if (!this.count) { return 0 }
-        try {
-          return Object.values(this.count).reduce((acc, curr) => acc + Number(curr), 0);
-        } catch (error) {
-          return 0
-        }
-      },
-
-      formattedTotal() {
-        if (typeof(this.count) !== 'object') { return {} }
-        try {
-          let options = this.app.panels.options.countFormat || {}
-          let args = [this.total, Object.values(options.args)].flat()
-          return `${Format[options.type](...args)}`
-        }
-        catch (e) {
-          return this.total
-        }
-      },
-
-      formattedCounts() {
-        if (typeof(this.count) !== 'object') { return {} }
-        let out = {}
-        try {
-          let options = this.app.panels.options.countFormat || {}
-          for (const [k, v] of Object.entries(this.count)) {
-            let args = [v, Object.values(options.args)].flat()
-            out[k] = `${Format[options.type](...args)}`
-          }
-          return out
-        }
-        catch (e) {
-          return this.count
-        }
+      hasResults() {
+        if (typeof(this.count) !== 'object') { return }
+        return this.count && this.count.length > 0
       },
 
     },
@@ -98,7 +87,35 @@
             this.errors = error
           }
         }
+      },
+
+      rowByPeriodAndGroup(period, group) {
+        return this.count.find( row => row.group === group && row.period === period )
+      },
+
+      totalForPeriod(period) {
+        return this.count.filter( row => row.period === period ).reduce((acc, row) => acc + Number(row.value), 0)
+      },
+
+      totalForGroup(group) {
+        return this.count.filter( row => row.group === group ).reduce((acc, row) => acc + Number(row.value), 0)
+      },
+
+      totalForAll() {
+        return this.count.reduce((acc, row) => acc + Number(row.value), 0)
+      },
+
+      valueForCell(period, group) {
+        let row = this.rowByPeriodAndGroup(period, group)
+        return row ? row.value : '-'
+      },
+
+      formattedValue(value) {
+        let options = this.app.panels.options.countFormat || {}
+        let args = [value, Object.values(options.args)].flat()
+        return `${Format[options.type](...args)}`
       }
+
     }
   }
 </script>
@@ -113,6 +130,12 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
+    width: unset;
+    overflow-x: scroll;
+  }
+
+  th {
+    text-align: right;
   }
 
   td.value {
@@ -124,8 +147,7 @@
   }
 
   td.total_label {
-    padding-right: 1em;
-    text-align: right;
+    font-weight: bold;
   }
 
 
