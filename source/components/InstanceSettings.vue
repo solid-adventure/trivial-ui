@@ -30,7 +30,19 @@
             <div v-if="copyMessage" v-html="copyMessage" class="message"></div>
         </transition>
       </div>
+      
+      <hr class="headroom accent" />
+      <h2 class="headroom section-title">App Ownership</h2>
+      <p class="section-help-text"><em>Transfer app ownership to organizations you are apart of!</em></p>
+      <p class="section-help-text"><em><b>Note:</b> <br> Transferring a dashboard app doesn't include its children apps. <br> Before transferring the dashboard, be sure to transfer each child app individually to the preferred organization.</em></p>
 
+      <AppTransferManager
+      v-bind = "setPropIfOrg"
+      :app_descriptive_name = "descriptive_name"
+      :app_id = "app.id"
+      :app_type = "app.panels.component"
+      :app_name = "app.name"
+      />
 
       <hr class="headroom accent" />
       <h2 class="headroom section-title">Download Source</h2>
@@ -73,17 +85,6 @@
       <textarea id="manifest_content" class="code-entry" cols="60" rows="30" spellcheck="false" v-model="formattedManifest"></textarea>
       <br /><input type="button" id="manifest_content_save" class="button-small" :class="{working: rebuilding}" @click.prevent="save" :value="rebuilding ? 'Rebuilding Lambda...' : 'Rebuild Lambda' ">
       </HideableSection>
-
-      <hr class="headroom accent" />
-      <h2 class="headroom section-title">Transfer Apps</h2>
-
-      {{ "Current Owner: " + app.owner_type + " " + app.owner_id }} 
-      <AppTransferManager
-      v-bind = "setPropIfOrg"
-      :app_name = "descriptive_name"
-      :app_id = "app.id"
-      :app_type = "app.panels.component"
-      />
 
       <hr class="headroom accent" />
       <h2 class="headroom section-title">Delete</h2>
@@ -308,6 +309,7 @@
 
       ...mapState([
         'app',
+        'user.id'
       ])
 
     },
