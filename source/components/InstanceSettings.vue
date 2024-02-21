@@ -36,13 +36,7 @@
       <p class="section-help-text"><em>Transfer app ownership to organizations you are apart of!</em></p>
       <p class="section-help-text"><em><b>Note:</b> <br> Transferring a dashboard app doesn't include its children apps. <br> Before transferring the dashboard, be sure to transfer each child app individually to the preferred organization.</em></p>
 
-      <AppTransferManager
-      v-bind = "setPropIfOrg"
-      :app_descriptive_name = "descriptive_name"
-      :app_id = "app.id"
-      :app_type = "app.panels.component"
-      :app_name = "app.name"
-      />
+      <AppTransferManager/>
 
       <hr class="headroom accent" />
       <h2 class="headroom section-title">Download Source</h2>
@@ -297,19 +291,9 @@
         }
       },
 
-      setPropIfOrg() {
-        if (this.app.owner_type === 'Organization') {
-          return {
-            owner_id: this.app.owner_id
-          };
-        } else {
-        return {};
-        }
-      },
 
       ...mapState([
-        'app',
-        'user.id'
+        'app'
       ])
 
     },
