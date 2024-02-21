@@ -1,18 +1,23 @@
 <script>
 import { fetchJSON } from "trivial-core/lib/component-utils";
 import { mapState } from 'vuex'
+import { mapMutations } from 'vuex'
 
 export default {
   computed: {
-    ...mapState([
-        'app'
-      ])
+    ...mapState({
+      descriptive_name: state => state.app.descriptive_name,
+      owner_id: state => state.app.owner_id,
+      owner_type: state => state.app.owner_type,
+      id: state => state.app.id,
+      name: state => state.app.name,
+    }),
   },
   data() {
     return {
       organizations: [],
       transferInProgress: false,
-      transferComplete: false,
+      errorMsg: null
     };
   },
 
@@ -21,38 +26,46 @@ export default {
   },
 
   methods: {
+    ...mapMutations([
+      'updateAppOwner'
+    ]),
+
     async loadOrganizations() {
       try {
         let response = await fetchJSON(`/proxy/trivial?path=/organizations`);
         this.organizations = response;
       } catch (error) {
-        console.log("[AppTransferManager][loadOrganization] Error:", error);
+        this.errorMsg = error
       }
     },
 
     async transferApp(org_name, org_id) {
       if (
         confirm(
-          `Are you sure you want to transfer the App: "${this.app.descriptive_name}"" to the Organization: "${org_name}"?`
+          `Are you sure you want to transfer "${this.descriptive_name}"" to the organization: "${org_name}"?`
         )
       ) {
         try {
-          this.transferInProgress = true;
+          this.errorMsg = null
+          this.transferInProgress = true
           let response = await fetchJSON(`/proxy/trivial`, {
             method: "PUT",
             headers: { "content-type": "application/json" },
             body: JSON.stringify({
-              path: `/apps/${this.app.id}/transfer/organizations/${org_id}`,
+              path: `/apps/${this.id}/transfer/organizations/${org_id}`,
             }),
           });
-          console.log(response);
           await new Promise((resolve) => {
             this.delayTransferIndicator(resolve);
           });
-          window.location.reload();
+          this.updateAppOwner({
+            owner_type: 'Organization',
+            owner_id: org_id
+          })
         } catch (error) {
           this.delayTransferIndicator();
-          console.log("[AppTransferManager][transferApp] Error:", error);
+          this.errorMsg = error
+          console.log(this.errorMsg)
         }
       }
     },
@@ -60,19 +73,20 @@ export default {
     delayTransferIndicator(resolve) {
       setTimeout(() => {
         this.transferInProgress = false;
-        this.transferComplete = true;
         resolve();
       }, 1000);
     },
+
   },
 };
 </script>
 
 <template>
+  <span v-if="owner_type === 'User'"> This app is visible to you. Transferring this app will make it visible to all members of organization.</span>
   <div class="title-row">
-    <div class="transfer-status">
+    <div class="status-messages">
       <span v-if="transferInProgress"> Transfer In Progress... </span>
-      <span v-if="transferComplete"> Transfer Complete! </span>
+      <span v-if="errorMsg">{{ errorMsg }}</span>
     </div>
 
     <table class="spaced user-organizations">
@@ -89,14 +103,12 @@ export default {
             <td>{{ org.name }}</td>
             <td>{{ org.billing_email }}</td>
             <td>
-              <div v-if="app.owner_id === org.id && app.owner_type === 'Organization'"  class="new-button-container">
-                <a class="button-medium headroom-small disable-button"
-                  >Current Owner</a
-                >
+              <div v-if="owner_id === org.id && owner_type === 'Organization'">
+                <span>Current Owner</span>
               </div>
               <div v-else class="new-button-container">
                 <a
-                  class="button-medium headroom-small"
+                  class="button-small"
                   @click="transferApp(org.name, org.id)"
                   >Transfer</a
                 >
@@ -116,11 +128,9 @@ export default {
 table.user-organizations {
   width: 70%;
 }
-.disable-button {
-  pointer-events: none;
-}
-.transfer-status {
+
+.status-messages {
   display: block;
-  height: 2em;
+  height: 3em;
 }
 </style>
