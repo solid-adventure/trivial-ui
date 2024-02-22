@@ -18,7 +18,7 @@ export default {
       organizations: [],
       transferInProgress: false,
       errorMsg: null,
-      loadOrgsError: false,
+      loadOrgsError: true,
       transferError: false,
     };
   },
@@ -83,45 +83,44 @@ export default {
 </script>
 
 <template>
-  <span v-if="owner_type === 'User'">
-    This app is visible to you. Transferring this app will make it visible to
-    all members of organization.</span
-  >
-  <div class="title-row">
-    <div class="status-messages">
-      <span v-if="transferInProgress"> Transfer In Progress... </span>
-      <span v-if="transferError"> Transfer Failed. </span>
-    </div>
 
-    <table class="spaced user-organizations" v-if="!loadOrgsError">
-      <thead>
-        <tr class="active">
-          <th class="organization">Organization</th>
-          <th class="billing-email">Billing Email</th>
-          <th class="action">Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        <template v-for="org in organizations" :key="org.id">
-          <tr>
-            <td>{{ org.name }}</td>
-            <td>{{ org.billing_email }}</td>
-            <td>
-              <div v-if="owner_id === org.id && owner_type === 'Organization'">
-                <span>Current Owner</span>
-              </div>
-              <div v-else class="new-button-container">
-                <a class="button-small" @click="transferApp(org.name, org.id)"
-                  >Transfer</a
-                >
-              </div>
-            </td>
-          </tr>
-        </template>
-      </tbody>
-    </table>
-    <p v-else>Failed to load user's organizations</p>
+  <div id="app-notices">
+    <span v-if="transferInProgress"> Transfer In Progress... </span>
+    <span v-if="transferError"> Transfer Failed. </span>
+    <span v-if="owner_type === 'User' && !transferInProgress">
+      This app is visible to you. Transferring this app will make it visible to
+      all members of organization.
+    </span>
   </div>
+
+  <table class="spaced user-organizations" v-if="!loadOrgsError">
+    <thead>
+      <tr class="active">
+        <th class="organization">Organization</th>
+        <th class="billing-email">Billing Email</th>
+        <th class="action">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <template v-for="org in organizations" :key="org.id">
+        <tr>
+          <td>{{ org.name }}</td>
+          <td>{{ org.billing_email }}</td>
+          <td>
+            <div v-if="owner_id === org.id && owner_type === 'Organization'">
+              <span>Current Owner</span>
+            </div>
+            <div v-else class="new-button-container">
+              <a class="button-small" @click="transferApp(org.name, org.id)"
+                >Transfer</a
+              >
+            </div>
+          </td>
+        </tr>
+      </template>
+    </tbody>
+  </table>
+  <span v-else>Failed to load user's organizations</span>
 </template>
 
 <style lang="scss" scoped>
@@ -132,8 +131,10 @@ table.user-organizations {
   width: 70%;
 }
 
-.status-messages {
+#app-notices {
   display: block;
+  margin-top: 15px;
   height: 2em;
 }
+
 </style>
