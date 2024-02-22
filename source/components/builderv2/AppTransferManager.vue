@@ -9,17 +9,18 @@ export default {
       descriptive_name: (state) => state.app.descriptive_name,
       owner_id: (state) => state.app.owner_id,
       owner_type: (state) => state.app.owner_type,
-      id: (state) => state.app.id,
-      name: (state) => state.app.name,
+      current_app_id: (state) => state.app.id,
+      user_id: (state) => state.user.id
     }),
   },
   data() {
     return {
       organizations: [],
-      transferInProgress: false,
-      errorMsg: null,
-      loadOrgsError: false,
-      transferError: false,
+      transfer_in_progress: false,
+      load_org_error: false,
+      transfer_error: false,
+      new_owner_type_path: null,
+      confirm_msg: null,
     };
   },
 
@@ -30,51 +31,58 @@ export default {
   methods: {
     ...mapMutations(["updateAppOwner"]),
 
+    setUserType(user_type, org_name) {
+      if (user_type === "Organization") {
+        this.new_owner_type_path = "organizations";
+        this.confirm_msg = `Transfer "${this.descriptive_name}" to the organization| "${org_name}"?`;
+      } else if (user_type === "User") {
+        this.new_owner_type_path = "users";
+        this.confirm_msg = `Transfer "${this.descriptive_name}" to yourself?`;
+      } else {
+        throw new Error("user_type is not set appropriately.");
+      }
+    },
     async loadOrganizations() {
       try {
         let response = await fetchJSON(`/proxy/trivial?path=/organizations`);
         this.organizations = response;
       } catch (error) {
-        this.loadOrgsError = true;
+        this.load_org_error = true;
       }
     },
 
-    async transferApp(org_name, org_id) {
-      if (
-        confirm(
-          `Transfer "${this.descriptive_name}" to the organization| "${org_name}"?`
-        )
-      ) {
+    async transferApp(new_owner_type, new_owner_id, org_name) {
+      this.setUserType(new_owner_type, org_name);
+      if (confirm(this.confirm_msg)) {
         try {
-          this.errorMsg = null;
-          this.transferInProgress = true;
-          this.transferError = false;
+          this.transfer_in_progress = true;
+          this.transfer_error = false;
           let response = await fetchJSON(`/proxy/trivial`, {
             method: "PUT",
             headers: { "content-type": "application/json" },
             body: JSON.stringify({
-              path: `/apps/${this.id}/transfer/organizations/${org_id}`,
+              path: `/apps/${this.current_app_id}/transfer/${this.new_owner_type_path}/${new_owner_id}`,
             }),
           });
           await new Promise((resolve) => {
             this.delayTransferIndicator(resolve);
           });
           this.updateAppOwner({
-            owner_type: "Organization",
-            owner_id: org_id,
+            owner_type: new_owner_type,
+            owner_id: new_owner_id,
           });
         } catch (error) {
           await new Promise((resolve) => {
             this.delayTransferIndicator(resolve);
           });
-          this.transferError = true;
+          this.transfer_error = true;
         }
       }
     },
 
     delayTransferIndicator(resolve) {
       setTimeout(() => {
-        this.transferInProgress = false;
+        this.transfer_in_progress = false;
         resolve();
       }, 1000);
     },
@@ -83,17 +91,16 @@ export default {
 </script>
 
 <template>
-
   <div id="app-notices">
-    <span v-if="transferInProgress"> Transfer In Progress... </span>
-    <span v-if="transferError"> Transfer Failed. </span>
-    <span v-if="owner_type === 'User' && !transferInProgress">
-      This app is visible to you. Transferring this app will make it visible to
-      all members of organization.
-    </span>
+    <p v-if="transfer_in_progress">Transfer In Progress...</p>
+    <p v-if="transfer_error">Transfer Failed.</p>
+    <p v-if="owner_type === 'User' && !transfer_in_progress">
+      <em><strong>This app is only visible to you.</strong></em> Transferring this app
+      will make it visible to all members of the organization.
+    </p>
   </div>
 
-  <table class="spaced user-organizations" v-if="!loadOrgsError">
+  <table class="spaced user-organizations" v-if="!load_org_error">
     <thead>
       <tr class="active">
         <th class="organization">Organization</th>
@@ -107,11 +114,16 @@ export default {
           <td>{{ org.name }}</td>
           <td>{{ org.billing_email }}</td>
           <td>
-            <div v-if="owner_id === org.id && owner_type === 'Organization'">
+            <div
+              v-if="owner_id === org.id && owner_type === 'Organization'"
+              class="new-button-container"
+            >
               <span>Current Owner</span>
             </div>
             <div v-else class="new-button-container">
-              <a class="button-small" @click="transferApp(org.name, org.id)"
+              <a
+                class="button-small"
+                @click="transferApp('Organization', org.id, org.name)"
                 >Transfer</a
               >
             </div>
@@ -121,6 +133,12 @@ export default {
     </tbody>
   </table>
   <span v-else>Failed to load user's organizations</span>
+  <p>Make the app viewable only to you.</p>
+  <div class="new-button-container">
+    <a class="button-small" @click="transferApp('User', user_id)"
+      >Make Private</a
+    >
+  </div>
 </template>
 
 <style lang="scss" scoped>
@@ -136,5 +154,7 @@ table.user-organizations {
   margin-top: 15px;
   height: 2em;
 }
-
+#app-notices p {
+  margin: 0;
+}
 </style>

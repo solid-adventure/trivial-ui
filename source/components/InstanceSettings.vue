@@ -33,7 +33,7 @@
       
       <hr class="headroom accent" />
       <h2 class="headroom section-title">App Ownership</h2>
-      <p class="section-help-text"><em>Transfer app ownership to organizations you are a member of!</em></p>
+      <p class="section-help-text"><em>Transfer app ownership to organizations you are a member of.</em></p>
       <p id="transfer-note">
         <em><strong>Note:</strong></em> <br />
           Transferring a dashboard app doesn't include its children apps. Before
@@ -153,7 +153,7 @@
   .section-end {
     padding-bottom: 4em;
   }
-  
+
   #transfer-note {
     margin: 0;
   }
