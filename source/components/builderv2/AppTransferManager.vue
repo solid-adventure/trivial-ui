@@ -1,23 +1,25 @@
 <script>
 import { fetchJSON } from "trivial-core/lib/component-utils";
-import { mapState } from 'vuex'
-import { mapMutations } from 'vuex'
+import { mapState } from "vuex";
+import { mapMutations } from "vuex";
 
 export default {
   computed: {
     ...mapState({
-      descriptive_name: state => state.app.descriptive_name,
-      owner_id: state => state.app.owner_id,
-      owner_type: state => state.app.owner_type,
-      id: state => state.app.id,
-      name: state => state.app.name,
+      descriptive_name: (state) => state.app.descriptive_name,
+      owner_id: (state) => state.app.owner_id,
+      owner_type: (state) => state.app.owner_type,
+      id: (state) => state.app.id,
+      name: (state) => state.app.name,
     }),
   },
   data() {
     return {
       organizations: [],
       transferInProgress: false,
-      errorMsg: null
+      errorMsg: null,
+      loadOrgsError: false,
+      transferError: false,
     };
   },
 
@@ -26,28 +28,27 @@ export default {
   },
 
   methods: {
-    ...mapMutations([
-      'updateAppOwner'
-    ]),
+    ...mapMutations(["updateAppOwner"]),
 
     async loadOrganizations() {
       try {
         let response = await fetchJSON(`/proxy/trivial?path=/organizations`);
         this.organizations = response;
       } catch (error) {
-        this.errorMsg = error
+        this.loadOrgsError = true;
       }
     },
 
     async transferApp(org_name, org_id) {
       if (
         confirm(
-          `Are you sure you want to transfer "${this.descriptive_name}"" to the organization: "${org_name}"?`
+          `Are you sure you want to transfer "${this.descriptive_name}" to the organization: "${org_name}"?`
         )
       ) {
         try {
-          this.errorMsg = null
-          this.transferInProgress = true
+          this.errorMsg = null;
+          this.transferInProgress = true;
+          this.transferError = false;
           let response = await fetchJSON(`/proxy/trivial`, {
             method: "PUT",
             headers: { "content-type": "application/json" },
@@ -59,13 +60,14 @@ export default {
             this.delayTransferIndicator(resolve);
           });
           this.updateAppOwner({
-            owner_type: 'Organization',
-            owner_id: org_id
-          })
+            owner_type: "Organization",
+            owner_id: org_id,
+          });
         } catch (error) {
-          this.delayTransferIndicator();
-          this.errorMsg = error
-          console.log(this.errorMsg)
+          await new Promise((resolve) => {
+            this.delayTransferIndicator(resolve);
+          });
+          this.transferError = true;
         }
       }
     },
@@ -76,20 +78,22 @@ export default {
         resolve();
       }, 1000);
     },
-
   },
 };
 </script>
 
 <template>
-  <span v-if="owner_type === 'User'"> This app is visible to you. Transferring this app will make it visible to all members of organization.</span>
+  <span v-if="owner_type === 'User'">
+    This app is visible to you. Transferring this app will make it visible to
+    all members of organization.</span
+  >
   <div class="title-row">
     <div class="status-messages">
       <span v-if="transferInProgress"> Transfer In Progress... </span>
-      <span v-if="errorMsg">{{ errorMsg }}</span>
+      <span v-if="transferError"> Transfer Failed. </span>
     </div>
 
-    <table class="spaced user-organizations">
+    <table class="spaced user-organizations" v-if="!loadOrgsError">
       <thead>
         <tr class="active">
           <th class="organization">Organization</th>
@@ -107,9 +111,7 @@ export default {
                 <span>Current Owner</span>
               </div>
               <div v-else class="new-button-container">
-                <a
-                  class="button-small"
-                  @click="transferApp(org.name, org.id)"
+                <a class="button-small" @click="transferApp(org.name, org.id)"
                   >Transfer</a
                 >
               </div>
@@ -118,6 +120,7 @@ export default {
         </template>
       </tbody>
     </table>
+    <p v-else>Failed to load user's organizations</p>
   </div>
 </template>
 
@@ -131,6 +134,6 @@ table.user-organizations {
 
 .status-messages {
   display: block;
-  height: 3em;
+  height: 2em;
 }
 </style>
