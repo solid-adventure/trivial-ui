@@ -18,7 +18,7 @@ export default {
       organizations: [],
       transferInProgress: false,
       errorMsg: null,
-      loadOrgsError: true,
+      loadOrgsError: false,
       transferError: false,
     };
   },
