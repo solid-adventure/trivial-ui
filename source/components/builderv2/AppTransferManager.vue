@@ -42,7 +42,7 @@ export default {
     async transferApp(org_name, org_id) {
       if (
         confirm(
-          `Are you sure you want to transfer "${this.descriptive_name}" to the organization: "${org_name}"?`
+          `Transfer "${this.descriptive_name}" to the organization| "${org_name}"?`
         )
       ) {
         try {
