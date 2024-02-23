@@ -7,7 +7,7 @@ export default {
   computed: {
     ...mapState({
       descriptive_name: (state) => state.app.descriptive_name,
-      owner_id: (state) => state.app.owner_id,
+      current_owner_id: (state) => state.app.owner_id,
       owner_type: (state) => state.app.owner_type,
       current_app_id: (state) => state.app.id,
       user_id: (state) => state.user.id
@@ -21,6 +21,7 @@ export default {
       transfer_error: false,
       new_owner_type_path: null,
       confirm_msg: null,
+      organization_name: null
     };
   },
 
@@ -31,6 +32,15 @@ export default {
   methods: {
     ...mapMutations(["updateAppOwner"]),
 
+    isOwner(org_id, org_name) {
+      // console.log(this.current_owner_id, org_id, owner_type)
+      if(this.current_owner_id === org_id && this.owner_type === 'Organization'){
+        this.organization_name = org_name
+        return true
+      } else {
+        return false;
+      }
+    },
     setUserType(user_type, org_name) {
       if (user_type === "Organization") {
         this.new_owner_type_path = "organizations";
@@ -99,8 +109,8 @@ export default {
       <strong>This app is visible only to you.</strong><br>Transferring this app
       will make it visible to all members of the organization.
     </span>
-    <div v-if = "owner_type !== 'User' && !transfer_in_progress && !transfer_error">
-      <p>Make the app visible only to you:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+    <div id = "private-notice" v-if = "owner_type !== 'User' && !transfer_in_progress && !transfer_error">
+      <p><strong>This app is visible to all members of {{ organization_name }}.</strong><br>Make the app visible only to you:</p>
       <a class="button-small" @click="transferApp('User', user_id)"
         >Make Private</a
       >
@@ -122,7 +132,7 @@ export default {
           <td>{{ org.billing_email }}</td>
           <td>
             <div
-              v-if="owner_id === org.id && owner_type === 'Organization'"
+              v-if="isOwner(org.id, org.name)"
               class="new-button-container"
             >
               <span>Current Owner</span>
@@ -156,12 +166,17 @@ export default {
 table.user-organizations {
   width: 100%;
 }
+tr {
+  height: 4em;
+  th {
+    width: 33%;
+  }
+}
 
 #app-notices {
   display: flex;
-  margin-top: 5px;
-  height: 4em;
-  margin-bottom: 30px;
+  height: 8em;
+  padding-bottom: 10px;
   align-items: center;
 }
 .no-orgs {

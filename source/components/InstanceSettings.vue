@@ -174,8 +174,7 @@
     }
 
     p {
-      padding: 0 8em 0 0;
-      margin-top: 0;
+      margin: 0;
     }
 
   }
