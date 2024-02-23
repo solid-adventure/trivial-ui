@@ -91,6 +91,7 @@ export default {
 </script>
 
 <template>
+  <div id = "transfer-app-container">
   <div id="app-notices">
     <span v-if="transfer_in_progress">Transfer In Progress...</span>
     <span v-if="transfer_error">Transfer Failed.</span>
@@ -139,14 +140,21 @@ export default {
     </tbody>
   </table>
   <span v-else>Failed to load user's organizations</span>
+  <p v-if="!load_org_error && !organizations.length" class="no-orgs">
+    <em>You do not have any organziations. Navigate to settings to create a new organization.</em>
+  </p>
+</div>
 </template>
-
 <style lang="scss" scoped>
+
+#transfer-app-container {
+  width: 70%;
+}
 .active {
   background-color: var(--table-column-head-color);
 }
 table.user-organizations {
-  width: 70%;
+  width: 100%;
 }
 
 #app-notices {
@@ -156,4 +164,10 @@ table.user-organizations {
   margin-bottom: 30px;
   align-items: center;
 }
+.no-orgs {
+  text-align: center;
+  margin-top: 4em;
+}
+
+  
 </style>
