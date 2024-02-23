@@ -35,7 +35,7 @@
       <h2 class="headroom section-title">App Ownership</h2>
       <p class="section-help-text"><em>Transfer app ownership to organizations you are a member of.</em></p>
       <p id="transfer-note">
-        <em><strong>Note:</strong></em> <br />
+        <strong>Note:</strong> <br />
           Transferring a dashboard app doesn't include its children apps. Before
           transferring the dashboard, <br />
           be sure to transfer each child app individually to the preferred
