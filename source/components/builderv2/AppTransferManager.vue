@@ -99,7 +99,7 @@ export default {
       <strong>This app is visible only to you.</strong><br>Transferring this app
       will make it visible to all members of the organization.
     </span>
-    <div v-if = "owner_type !== 'User' && !transfer_in_progress">
+    <div v-if = "owner_type !== 'User' && !transfer_in_progress && !transfer_error">
       <p>Make the app visible only to you:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
       <a class="button-small" @click="transferApp('User', user_id)"
         >Make Private</a
