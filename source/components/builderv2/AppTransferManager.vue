@@ -95,9 +95,15 @@ export default {
     <span v-if="transfer_in_progress">Transfer In Progress...</span>
     <span v-if="transfer_error">Transfer Failed.</span>
     <span v-if="owner_type === 'User' && !transfer_in_progress">
-      <strong>This app is visible only to you.</strong> Transferring this app
+      <strong>This app is visible only to you.</strong><br>Transferring this app
       will make it visible to all members of the organization.
     </span>
+    <div v-if = "owner_type !== 'User' && !transfer_in_progress">
+      <p>Make the app visible only to you:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+      <a class="button-small" @click="transferApp('User', user_id)"
+        >Make Private</a
+      >
+    </div>
   </div>
 
   <table class="spaced user-organizations" v-if="!load_org_error">
@@ -133,13 +139,6 @@ export default {
     </tbody>
   </table>
   <span v-else>Failed to load user's organizations</span>
-
-  <p>Make the app viewable only to you.</p>
-  <div class="new-button-container">
-    <a class="button-small" @click="transferApp('User', user_id)"
-      >Make Private</a
-    >
-  </div>
 </template>
 
 <style lang="scss" scoped>
@@ -151,10 +150,10 @@ table.user-organizations {
 }
 
 #app-notices {
-  display: block;
-  margin-top: 10px;
-  height: 1em;
-  margin-bottom: 20px;
+  display: flex;
+  margin-top: 5px;
+  height: 4em;
+  margin-bottom: 30px;
+  align-items: center;
 }
-
 </style>

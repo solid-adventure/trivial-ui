@@ -34,13 +34,16 @@
       <hr class="headroom accent" />
       <h2 class="headroom section-title">App Ownership</h2>
       <p class="section-help-text"><em>Transfer app ownership to organizations you are a member of.</em></p>
-      <p id="transfer-note">
-        <strong>Note:</strong> <br />
-          Transferring a dashboard app doesn't include its children apps. Before
+      <div class = "row">
+        <span class = "pro-tip">Pro Tip</span>
+        <p>
+          Transferring a dashboard doesn't include its children apps. Before
           transferring the dashboard, <br />
-          be sure to transfer each child app individually to the preferred
-          organization.
-      </p>
+          be sure to transfer each child app individually.
+        </p>
+      </div>
+
+
       <AppTransferManager/>
 
       <hr class="headroom accent" />
@@ -154,8 +157,27 @@
     padding-bottom: 4em;
   }
 
-  #transfer-note {
-    margin: 0;
+  .row {
+    display: flex;
+    align-content: flex-start;
+    padding-top: 1em;
+
+    .pro-tip {
+      background-color: var(--background-high-contrast);
+      color: var(--success-highlight);
+      padding: 10px 8px;
+      margin-right: 8px;
+      border-radius: 6px;
+      border: 1px solid var(--success-highlight);
+      flex-shrink: 0;
+      height: fit-content;
+    }
+
+    p {
+      padding: 0 8em 0 0;
+      margin-top: 0;
+    }
+
   }
 </style>
 
