@@ -5,7 +5,7 @@
       <h2 v-if="cascadingTitle">{{cascadingTitle}}</h2>
       <p v-if="cascadingDescription">{{cascadingDescription}}</p>
 
-      <table v-if="hasResults">
+      <table v-if="hasResults" class="headroom">
 
         <thead>
           <tr>
@@ -131,11 +131,20 @@
     flex-direction: column;
     justify-content: center;
     width: unset;
-    overflow-x: scroll;
+    overflow-x: auto;
   }
 
   th {
     text-align: right;
+    white-space: nowrap;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+  }
+
+  td {
+    white-space: nowrap;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
   }
 
   td.value {
