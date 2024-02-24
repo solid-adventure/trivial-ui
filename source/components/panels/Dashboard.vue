@@ -33,13 +33,13 @@
 
     <div class="panels-container">
       <div class="row" v-for="childApp in partialWidthPanels">
-        <component v-if="start_at && end_at" :is="childApp.component" :key="childApp.id" :app_id="childApp.id" :parent_app_id="app.name" :options="{start_at, end_at, group_by_period}" @set-selected-panel-values="setSelectedPanelValues"/>
+        <component v-if="start_at && end_at" :is="childApp.component" :key="childApp.id" :app_id="childApp.id" :parent_app_id="app.name" :options="{start_at, end_at, group_by_period, timezone}" @set-selected-panel-values="setSelectedPanelValues"/>
       </div>
     </div>
 
     <div class="full-width-panels-container">
       <div v-for="childApp in fullWidthPanels" class="full-width-panel-container">
-        <component v-if="start_at && end_at" :is="childApp.component" :key="childApp.id" :app_id="childApp.id" :parent_app_id="app.name" :options="{start_at, end_at, group_by_period}" @set-selected-panel-values="setSelectedPanelValues"/>
+        <component v-if="start_at && end_at" :is="childApp.component" :key="childApp.id" :app_id="childApp.id" :parent_app_id="app.name" :options="{start_at, end_at, group_by_period, timezone}" @set-selected-panel-values="setSelectedPanelValues"/>
       </div>
     </div>
   </div>
@@ -134,11 +134,12 @@
         }
       },
 
-      defaultTimezone() {
+      timezone() {
+        let local = Intl.DateTimeFormat().resolvedOptions().timeZone
         try {
-          return this.app.panels.options.timezone
+          return this.app.panels.options.timezone || local
         } catch(e) {
-          return
+          return local
         }
       },
 
@@ -214,7 +215,7 @@
         let d = this.dateFromRangeTypeAndPosition(0)
         if (!d) { return }
         // drop time to get midnight in TZ
-        d = new Date(d.toLocaleDateString('en-US', { timeZone: this.defaultTimezone, timeZoneName: 'short' }))
+        d = new Date(d.toLocaleDateString('en-US', { timeZone: this.timezone, timeZoneName: 'short' }))
         return d
       },
 
@@ -222,7 +223,7 @@
         let d = this.dateFromRangeTypeAndPosition(1)
         if (!d) { return }
         // drop time to get midnight in TZ, go forward 1 whole day, then back 1 millisecond to get the end of the day
-        d = new Date(d.toLocaleDateString('en-US', { timeZone: this.defaultTimezone, timeZoneName: 'short' }))
+        d = new Date(d.toLocaleDateString('en-US', { timeZone: this.timezone, timeZoneName: 'short' }))
         d.setDate(d.getDate() + 1)
         d.setTime(d.getTime() -1)
         return d
