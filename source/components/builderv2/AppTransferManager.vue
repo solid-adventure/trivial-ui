@@ -6,9 +6,9 @@ import { mapMutations } from "vuex";
 export default {
   computed: {
     ...mapState({
-      descriptive_name: (state) => state.app.descriptive_name,
+      current_descriptive_name: (state) => state.app.descriptive_name,
       current_owner_id: (state) => state.app.owner_id,
-      owner_type: (state) => state.app.owner_type,
+      current_owner_type: (state) => state.app.owner_type,
       current_app_id: (state) => state.app.id,
       user_id: (state) => state.user.id
     }),
@@ -33,7 +33,7 @@ export default {
     ...mapMutations(["updateAppOwner"]),
 
     isOwner(org_id, org_name) {
-      if(this.current_owner_id === org_id && this.owner_type === 'Organization'){
+      if(this.current_owner_id === org_id && this.current_owner_type === 'Organization'){
         this.organization_name = org_name
         return true
       } else {
@@ -43,10 +43,10 @@ export default {
     setUserType(user_type, org_name) {
       if (user_type === "Organization") {
         this.new_owner_type_path = "organizations";
-        this.confirm_msg = `Transfer "${this.descriptive_name}" to the organization| "${org_name}"?`;
+        this.confirm_msg = `Transfer "${this.current_descriptive_name}" to the organization| "${org_name}"?`;
       } else if (user_type === "User") {
         this.new_owner_type_path = "users";
-        this.confirm_msg = `Transfer "${this.descriptive_name}" to yourself?`;
+        this.confirm_msg = `Transfer "${this.current_descriptive_name}" to yourself?`;
       } else {
         throw new Error("user_type is not set appropriately.");
       }
@@ -104,11 +104,11 @@ export default {
   <div id="app-notices">
     <span v-if="transfer_in_progress">Transfer In Progress...</span>
     <span v-if="transfer_error">Transfer Failed.</span>
-    <span v-if="owner_type === 'User' && !transfer_in_progress">
+    <span v-if="current_owner_type === 'User' && !transfer_in_progress">
       <strong>This app is visible only to you.</strong><br>Transferring this app
       will make it visible to all members of the organization.
     </span>
-    <div id = "private-notice" v-if = "owner_type !== 'User' && !transfer_in_progress && !transfer_error">
+    <div id = "private-notice" v-if = "current_owner_type !== 'User' && !transfer_in_progress && !transfer_error">
       <p><strong>This app is visible to all members of {{ organization_name }}.</strong><br>Make the app visible only to you:</p>
       <a class="button-small" @click="transferApp('User', user_id)"
         >Make Private</a
