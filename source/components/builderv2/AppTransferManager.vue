@@ -21,7 +21,7 @@ export default {
       transfer_error: false,
       new_owner_type_path: null,
       confirm_msg: null,
-      organization_name: null
+      app_owner_org_name: null
     };
   },
 
@@ -32,15 +32,18 @@ export default {
   methods: {
     ...mapMutations(["updateAppOwner"]),
 
-    isOwner(org_id, org_name) {
-      if(this.current_owner_id === org_id && this.current_owner_type === 'Organization'){
-        this.organization_name = org_name
+    isOwner(org_id) {
+      return this.current_owner_id === org_id && this.current_owner_type === 'Organization'
+    },
+    checkAndSetOrgOwner(org_id, org_name){
+      if(this.isOwner(org_id)) {
+        this.app_owner_org_name = org_name
         return true
-      } else {
-        return false;
+      } else{
+        return false
       }
     },
-    setUserType(user_type, org_name) {
+    setOwnerType(user_type, org_name) {
       if (user_type === "Organization") {
         this.new_owner_type_path = "organizations";
         this.confirm_msg = `Transfer "${this.current_descriptive_name}" to the organization| "${org_name}"?`;
@@ -51,6 +54,7 @@ export default {
         throw new Error("user_type is not set appropriately.");
       }
     },
+
     async loadOrganizations() {
       try {
         let response = await fetchJSON(`/proxy/trivial?path=/organizations`);
@@ -61,7 +65,7 @@ export default {
     },
 
     async transferApp(new_owner_type, new_owner_id, org_name) {
-      this.setUserType(new_owner_type, org_name);
+      this.setOwnerType(new_owner_type, org_name);
       if (confirm(this.confirm_msg)) {
         try {
           this.transfer_in_progress = true;
@@ -109,7 +113,7 @@ export default {
       will make it visible to all members of the organization.
     </span>
     <div id = "private-notice" v-if = "current_owner_type !== 'User' && !transfer_in_progress && !transfer_error">
-      <p><strong>This app is visible to all members of {{ organization_name }}.</strong><br>Make the app visible only to you:</p>
+      <p><strong>This app is visible to all members of {{ app_owner_org_name }}.</strong><br>Make the app visible only to you:</p>
       <a class="button-small" @click="transferApp('User', user_id)"
         >Make Private</a
       >
@@ -131,7 +135,7 @@ export default {
           <td>{{ org.billing_email }}</td>
           <td>
             <div
-              v-if="isOwner(org.id, org.name)"
+              v-if="checkAndSetOrgOwner(org.id, org.name)"
               class="new-button-container"
             >
               <span>Current Owner</span>
