@@ -33,7 +33,6 @@ export default {
     ...mapMutations(["updateAppOwner"]),
 
     isOwner(org_id, org_name) {
-      // console.log(this.current_owner_id, org_id, owner_type)
       if(this.current_owner_id === org_id && this.owner_type === 'Organization'){
         this.organization_name = org_name
         return true
