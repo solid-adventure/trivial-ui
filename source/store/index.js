@@ -113,6 +113,11 @@ const store = createStore({
       if (beforePos > -1) { state.apps.splice(beforePos, 1)}
     },
 
+    updateAppOwner(state, {owner_type, owner_id}){
+      state.app.owner_type = owner_type
+      state.app.owner_id = owner_id
+    },
+    
     setAppAttribute(state, args) {
       // {app_id: 1234, attr: 'descriptive_name', val: "Great New Name" }
       let app = state.app

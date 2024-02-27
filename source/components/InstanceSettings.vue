@@ -30,7 +30,21 @@
             <div v-if="copyMessage" v-html="copyMessage" class="message"></div>
         </transition>
       </div>
+      
+      <hr class="headroom accent" />
+      <h2 class="headroom section-title">App Ownership</h2>
+      <p class="section-help-text"><em>Transfer app ownership to organizations you are a member of.</em></p>
+      <div class = "row">
+        <span class = "pro-tip">Pro Tip</span>
+        <p>
+          Transferring a dashboard doesn't include its children apps. Before
+          transferring the dashboard, <br />
+          be sure to transfer each child app individually.
+        </p>
+      </div>
 
+
+      <AppTransferManager/>
 
       <hr class="headroom accent" />
       <h2 class="headroom section-title">Download Source</h2>
@@ -73,6 +87,7 @@
       <textarea id="manifest_content" class="code-entry" cols="60" rows="30" spellcheck="false" v-model="formattedManifest"></textarea>
       <br /><input type="button" id="manifest_content_save" class="button-small" :class="{working: rebuilding}" @click.prevent="save" :value="rebuilding ? 'Rebuilding Lambda...' : 'Rebuild Lambda' ">
       </HideableSection>
+
       <hr class="headroom accent" />
       <h2 class="headroom section-title">Delete</h2>
       <p class="section-help-text"><em>Danger zone! Deleting this app is permanent and cannot be undone.</em></p>
@@ -141,6 +156,28 @@
   .section-end {
     padding-bottom: 4em;
   }
+
+  .row {
+    display: flex;
+    align-content: flex-start;
+    padding-top: 1em;
+
+    .pro-tip {
+      background-color: var(--background-high-contrast);
+      color: var(--success-highlight);
+      padding: 10px 8px;
+      margin-right: 8px;
+      border-radius: 6px;
+      border: 1px solid var(--success-highlight);
+      flex-shrink: 0;
+      height: fit-content;
+    }
+
+    p {
+      margin: 0;
+    }
+
+  }
 </style>
 
 <script>
@@ -152,6 +189,7 @@
   import { track } from '../../lib/TrackingService'
   import FeatureManager from 'trivial-core/lib/FeatureManager'
   import NavTree from './builderv2/NavTree.vue'
+  import AppTransferManager from './builderv2/AppTransferManager.vue'
 
   export default {
     // inject: ['appId'],
@@ -159,6 +197,7 @@
     components: {
         ActionButton,
         HideableSection,
+        AppTransferManager,
         'nav-tree': NavTree
     },
 
@@ -282,8 +321,9 @@
         }
       },
 
+
       ...mapState([
-        'app',
+        'app'
       ])
 
     },
