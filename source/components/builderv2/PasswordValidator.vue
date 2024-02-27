@@ -53,9 +53,13 @@ export default {
   text-align: left;
 }
 .error {
-  color: var(--error);
+  color: gray;
+}
+.success::marker {
+  color: var(--primary);
 }
 .success {
-  color: var(--success);
+  color: black;
 }
+
 </style>
