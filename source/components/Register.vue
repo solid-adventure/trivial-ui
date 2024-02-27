@@ -32,7 +32,10 @@
               required
             />
           </div>
-          <div>
+          <div class = "password-info">
+            <PasswordValidator :password = "password" @passwordValidity = "updatePasswordValidity"/>
+          </div>
+          <div id = "tos-container">
             <input
               type="checkbox"
               class="terms-checkbox"
@@ -64,6 +67,7 @@
               type="submit"
               class="button"
               value="Create Account"
+              :disabled="!isPasswordValid"
             />
             <input
               v-else
@@ -128,6 +132,9 @@
   width: unset;
 }
 
+.password-info {
+  width: unset;
+}
 .container p {
   text-align: left;
   margin-bottom: 20px;
@@ -136,9 +143,10 @@
 .text-field {
   margin-bottom: 30px;
 }
-
+#tos-container {
+  padding-bottom: 20px;
+}
 .submit {
-  margin: 30px 0 30px 266px;
 }
 
 .signIn {
@@ -159,94 +167,96 @@
 import store from "../store";
 import TrackingService from "../../lib/TrackingService";
 import FeatureManager from "trivial-core/lib/FeatureManager";
+import PasswordValidator from "./builderv2/PasswordValidator.vue";
+
 TrackingService.identifyLandingReferer();
 export default {
-  created() {
-    store.dispatch("setIsAuthenticated", { isAuthenticated: false });
-  },
-  data() {
-    return {
-      errorMessage: null,
-      register_clicked: false,
-      name: "",
-      email: "",
-      password: "",
-      termsAccepted: false,
-      waitlistText: "",
-      join_waitlist_clicked: false,
-    };
-  },
-
-  computed: {
-    registrationEnabled: () => {
-      return FeatureManager.isEnabled("registration");
+    created() {
+        store.dispatch("setIsAuthenticated", { isAuthenticated: false });
     },
-  },
-
-  methods: {
-    handleSubmit(e) {
-      e.preventDefault();
-      this.register_clicked = true;
-
-      let name = this.name;
-      let email = this.email;
-      let password = this.password;
-
-      let register = fetch(`/proxy/trivial`, {
-        method: "post",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          path: "/auth",
-          name: name,
-          role: "member",
-          email: email,
-          password: password,
-        }),
-      })
-        .then((response) => response.json())
-        .then((data) => this.handleResponse(data))
-        .catch((error) => this.handleRegisterError(error));
-    },
-
-    handleResponse(data) {
-      if (!data.data.id) {
-        this.handleSignUpError(data);
-      } else {
-        this.register_clicked = false;
-        let user = {
-          Name: data.data.name,
-          Email: data.data.email,
-          ID: data.data.id,
+    data() {
+        return {
+            errorMessage: null,
+            register_clicked: false,
+            name: "",
+            email: "",
+            isPasswordValid: false,
+            password: "",
+            termsAccepted: false,
+            waitlistText: "",
+            join_waitlist_clicked: false,
         };
-        TrackingService.identify(user);
-        TrackingService.track("User Signup", user);
-        window.location = "/";
-      }
     },
-
-    handleRegisterError(e) {
-      this.password = "";
-      this.register_clicked = false;
-      if (e && e.errors) {
-        this.errorMessage = e.errors;
-        console.log(`[SignUp] Error: ${e.errors}`);
-      } else {
-        this.errorMessage = "Unable to create account, please try again.";
-        console.log(`[SignUp] Error: ${e}`);
-      }
+    computed: {
+        registrationEnabled: () => {
+            return FeatureManager.isEnabled("registration");
+        },
     },
-
-    handleJoinWaitlist(e) {
-      e.preventDefault();
-      this.join_waitlist_clicked = true;
-      TrackingService.track("User Joined Waitlist", {
-        email: this.email,
-        type: "waitlist",
-      });
-      this.waitlistText = "Successfully added email to waitlist";
-      this.email = "";
-      this.join_waitlist_clicked = false;
+    methods: {
+        handleSubmit(e) {
+            e.preventDefault();
+            this.register_clicked = true;
+            let name = this.name;
+            let email = this.email;
+            let password = this.password;
+            let register = fetch(`/proxy/trivial`, {
+                method: "post",
+                headers: { "content-type": "application/json" },
+                body: JSON.stringify({
+                    path: "/auth",
+                    name: name,
+                    role: "member",
+                    email: email,
+                    password: password,
+                }),
+            })
+                .then((response) => response.json())
+                .then((data) => this.handleResponse(data))
+                .catch((error) => this.handleRegisterError(error));
+        },
+        handleResponse(data) {
+            if (!data.data.id) {
+                this.handleSignUpError(data);
+            }
+            else {
+                this.register_clicked = false;
+                let user = {
+                    Name: data.data.name,
+                    Email: data.data.email,
+                    ID: data.data.id,
+                };
+                TrackingService.identify(user);
+                TrackingService.track("User Signup", user);
+                window.location = "/";
+            }
+        },
+        handleRegisterError(e) {
+            this.password = "";
+            this.register_clicked = false;
+            if (e && e.errors) {
+                this.errorMessage = e.errors;
+                console.log(`[SignUp] Error: ${e.errors}`);
+            }
+            else {
+                this.errorMessage = "Unable to create account, please try again.";
+                console.log(`[SignUp] Error: ${e}`);
+            }
+        },
+        handleJoinWaitlist(e) {
+            e.preventDefault();
+            this.join_waitlist_clicked = true;
+            TrackingService.track("User Joined Waitlist", {
+                email: this.email,
+                type: "waitlist",
+            });
+            this.waitlistText = "Successfully added email to waitlist";
+            this.email = "";
+            this.join_waitlist_clicked = false;
+        },
+        updatePasswordValidity(value){
+          this.isPasswordValid = value
+        }
     },
-  },
+    components: { PasswordValidator }
 };
 </script>
