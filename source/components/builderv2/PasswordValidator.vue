@@ -33,8 +33,6 @@ export default {
 };
 </script>
 <template>
-      <p>{{ password }}</p>
-
   <div id="password-verify-container">
     <p>Password Must Contain:</p>
     <ul>
