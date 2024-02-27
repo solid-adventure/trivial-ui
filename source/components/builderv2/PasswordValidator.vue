@@ -21,20 +21,22 @@ export default {
       return this.password.length >= 12
     },
     isPasswordValid(){
-      return this.hasUpperCase && this.hasLowerCase && this.hasSymbolhasSymbol && this.hasDigit & this.hasLength
+      let result = this.hasUpperCase && this.hasLowerCase && this.hasSymbol && this.hasDigit && this.hasLength
+      return result
     }
     },
     watch: {
-      'password': function(){
+      'isPasswordValid': function(){
         this.$emit('passwordValidity', this.isPasswordValid)
       }
   }
 };
 </script>
 <template>
+      <p>{{ password }}</p>
+
   <div id="password-verify-container">
     <p>Password Must Contain:</p>
-    <p>{{ password }}</p>
     <ul>
       <li :class="!hasSymbol ? 'error' : 'success'">
         1 Symbol or Special Character
