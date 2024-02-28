@@ -1,7 +1,8 @@
 <template>
     <div class="overlay">
         <div class="container">
-            <h2>Change Password</h2>
+            <span class="brand"><img /></span>
+            <p id = "reset-password-title">Change password:</p>
             <form id='resetPasswordForm'>
                 <div>
                     <input type='password' class='text-field' placeholder ='New Password' v-model='new_password'/>
@@ -9,6 +10,7 @@
                 <div>
                     <input type='password' class='text-field' placeholder ='Confirm Password' v-model='confirm_password'/>
                 </div>
+                <PasswordValidator :password = "new_password" @passwordValidity = "updatePasswordValidity"/>
                 <transition name="fade">
                     <p v-if="errorMessage"><em>{{errorMessage}}</em></p>
                 </transition>
@@ -47,22 +49,28 @@
 
 .overlay{
     height: calc(100% - 80px);
-    width: 80%;
+    width: 100%;
     float: right;
+}
+#reset-password-title {
+    text-align: left;
 }
 </style>
 
 <script>
-  import { fetchJSON } from 'trivial-core/lib/component-utils'
+import { fetchJSON } from 'trivial-core/lib/component-utils'
+import PasswordValidator from './builderv2/PasswordValidator.vue'
 
 export default {
+    components: { PasswordValidator },
     data(){
         return {
             errorMessage: null,
             message: null,
             submit_clicked: false,
             new_password: '',
-            confirm_password:''
+            confirm_password:'',
+            isPasswordValid: false
         }        
     },
 
@@ -93,6 +101,9 @@ export default {
             this.new_password = ''
             this.confirm_password = ''
 
+        },
+        updatePasswordValidity(value){
+          this.isPasswordValid = value
         }
     }
 }

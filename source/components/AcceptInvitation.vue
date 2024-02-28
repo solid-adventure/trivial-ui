@@ -32,7 +32,7 @@
                       <div>
                           <input type='password' class='text-field' placeholder ='Confirm Password' v-model='confirm_password'/>
                       </div>
-
+                      <PasswordValidator :password = "confirm_password" @passwordValidity = "updatePasswordValidity"/>
                     </span>
                     <transition name="fade">
                         <p v-if="errorMessage"><em>{{errorMessage}}</em></p>
@@ -84,10 +84,11 @@
 <script>
   import ActionButton from './controls/ActionButton.vue'
   import { fetchJSON } from 'trivial-core/lib/component-utils'
-
+  import PasswordValidator from './builderv2/PasswordValidator.vue'
 export default {
     components: { 
-        ActionButton 
+        ActionButton, 
+        PasswordValidator
     },
     
     data(){
@@ -98,7 +99,8 @@ export default {
           message: null,
           current_password: '',
           new_password: '',
-          confirm_password:''
+          confirm_password:'',
+          isPasswordValid: false
         }        
     },
 
@@ -180,6 +182,9 @@ export default {
             this.current_password = ''
             this.new_password = ''
             this.confirm_password = ''
+        },
+        updatePasswordValidity(value){
+          this.isPasswordValid = value
         }
     }
 }

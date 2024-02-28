@@ -146,8 +146,6 @@
 #tos-container {
   padding-bottom: 20px;
 }
-.submit {
-}
 
 .signIn {
   margin: 20px 0;

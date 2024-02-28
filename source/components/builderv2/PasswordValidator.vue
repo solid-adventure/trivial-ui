@@ -66,6 +66,7 @@ li {
   background-size: 13px;
   background-position: left center;
   padding-left: 25px;
+  font-weight: lighter;
 
 }
 ul {
