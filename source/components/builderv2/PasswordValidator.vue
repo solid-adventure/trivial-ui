@@ -34,7 +34,7 @@ export default {
 </script>
 <template>
   <div id="password-verify-container">
-    <p>Password Must Contain:</p>
+    <p id = "password-note">Password Must Contain:</p>
     <ul>
       <li :class="!hasSymbol ? 'error' : 'success'">
         1 Symbol or Special Character
@@ -52,14 +52,31 @@ export default {
 #password-verify-container {
   text-align: left;
 }
-.error {
-  color: gray;
+li.error{
+  background-image: var(--x-symbol-icon);
+  color: var(--error);
 }
-.success::marker {
-  color: var(--primary);
+li.success {
+  background-image: var(--checkmark-icon);
+  color: var(--success);
 }
-.success {
-  color: black;
+li {
+  margin-bottom: 3px;
+  background-repeat: no-repeat;
+  background-size: 13px;
+  background-position: left center;
+  padding-left: 25px;
+
+}
+ul {
+  margin-top: 0;
+  margin-bottom: 20px;
+  padding-left: 0;
+  list-style-type: none;
+}
+#password-note {
+  margin-bottom: 10px;
+  margin-top: 0px;
 }
 
 </style>
