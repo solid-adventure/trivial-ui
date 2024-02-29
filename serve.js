@@ -25,8 +25,6 @@ const {
 const pino = require('pino')
 const pinoHttp = require('pino-http')
 const WebSocketServer = require('websocket').server
-const { parse } = require("csv-parse");
-const multer = require("multer")
 // const ActionCreator = require('./lib/ActionCreator')
 const { encoding_for_model } = require("@dqbd/tiktoken");
 const { Configuration, OpenAIApi } = require("openai");
@@ -168,21 +166,6 @@ const callProtocol = async (req, res) => {
     req.log.error({err}, `[callProtocol] Failed to invoke protocol`)
     res.sendStatus(500)
   }
-}
-
-const convertCsvToJson = async (req, res) => {
-  let columns = req.body.first_row_as_column_headers || true
-  if (columns == "true") { columns = true}
-  if (columns == "false") { columns = false}
-  let parser = parse({columns: columns}, (err, records) => {
-    fs.unlink(req.file.path, () => {})
-    if (err) {
-      res.status(500).json({error: `${err}`})
-    } else {
-      res.status(200).json({'uploaded': req.file.originalname, rows: records})
-    }
-  })
-  fs.createReadStream(req.file.path).pipe(parser)
 }
 
 const performAction = async (req, res) => {
@@ -408,11 +391,6 @@ serve.post('/apps/call', (req, res) => {
         res.status(response.statusCode).send(response)
       }
     })
-})
-
-const upload = multer({ dest: './tmp/' })
-serve.post('/csv-to-json', upload.single('file'), (req, res) => {
-  convertCsvToJson(req, res)
 })
 
 // const actionCreatorPaths = function() {
