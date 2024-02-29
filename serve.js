@@ -24,7 +24,6 @@ const {
 } = require('trivial-core')
 const pino = require('pino')
 const pinoHttp = require('pino-http')
-const WebSocketServer = require('websocket').server
 // const ActionCreator = require('./lib/ActionCreator')
 
 const port = process.env.PORT || 3000;
@@ -344,6 +343,3 @@ const httpServer = serve.listen(port, () => {
   logger.info(`Server running at http://localhost:${port}/`);
 });
 
-// Web Socket
-const wsServer = new WebSocketServer({httpServer, autoAcceptConnections: false})
-wsServer.on('request', request => UpdateManager.handleRequest(request, expressLogger.logger))

@@ -75,7 +75,6 @@ export default {
       this.displayVault = true;
     }
 
-    this.subscribeWebhookEvents(this.webhookListener);
     await this.loadCredentialSets();
     this.loaded = true;
   },
@@ -214,7 +213,6 @@ export default {
           View: () => (window.location = `/apps/${this.app.name}/activity`),
         },
       });
-      this.unsubscribeWebhookEvents(this.webhookListener); // only notify once
     },
 
     containsFunctionChanges(newVal) {
@@ -244,8 +242,6 @@ export default {
       "loadCredentialsOrDraft",
       "loadManifestOrDraft",
       "notifyManifestLoaded",
-      "subscribeWebhookEvents",
-      "unsubscribeWebhookEvents",
     ]),
 
     ...mapMutations(["setManifestContent", "setManifestDefinitions"]),
