@@ -11,7 +11,6 @@ const Session = require(`${__dirname}/Session.js`)
 const createError = require('http-errors')
 
 const {
-  // ActionCreator,
   ActionInput,
   AppBuilder,
   AppManager,
@@ -24,7 +23,6 @@ const {
 } = require('trivial-core')
 const pino = require('pino')
 const pinoHttp = require('pino-http')
-// const ActionCreator = require('./lib/ActionCreator')
 
 const port = process.env.PORT || 3000;
 const logger = pino({
@@ -200,33 +198,6 @@ serve.post('/apps/call', (req, res) => {
     })
 })
 
-// const actionCreatorPaths = function() {
-//   serve.get('/actions', Session.validate, (req,res) => {
-//     res.render('actions.html')
-//   })
-
-//   serve.post('/actions', Session.validate, (req, res) => {
-
-//     let actionCreator = new ActionCreator(req.body.service, req.body.action, req.body.template)
-//     actionCreator.build()
-//     .then(response => { handleResponse(response) })
-//     .catch(error => { handleResponse(error) })
-
-//     function handleResponse(out) {
-//       if (out.error) {
-//         res.send({status: 500, body: out.error})
-//       } else if (out.success) {
-//         res.send({status: 200, body: out.success})
-//       }
-//     }
-
-//   })
-// }
-
-// if ('development' === process.env.NODE_ENV) {
-//   actionCreatorPaths()
-// }
-
 serve.post('/build', (req, res) => {
 	build(req, res)
 })
@@ -239,31 +210,6 @@ serve.post('/writeLocally', (req, res) => {
 serve.delete('/build/:id', (req, res) => {
   teardown(req, res)
 })
-
-// Get request redirects to POST via client side JS to prevent eager-loading triggering downloads
-serve.get("/downloadFile/", (req, res) => {
-  res.render('downloadFile.html', {url: req.query.u})
-})
-
-// /downloadFile?u=https://www.file-to-download.com/path/file.txt
-serve.post("/downloadFile/", (req, res) => {
-  console.log`[POST] downloadFile`
-  let url = req.query.u
-
-  request({
-    url: new URL(url)},
-    (error, response, body) => {
-      let path = `./tmp/downloads`
-      let file = `trivial_${Date.now()}.zpl`
-      fs.promises.mkdir(path, {recursive: true})
-      .then(x => fs.promises.writeFile(`${path}/${file}`, body))
-      .then(x => res.download(`${path}/${file}`))    
-      .catch(console.error)
-    }
-  )
-
-
-});
 
 serve.get('/download/:id', download)
 
