@@ -16,7 +16,6 @@
     <div v-if="hasResolvedValue && !playgroundMode" class="resolved-display">
       <pre>{{resolvedValue}}</pre>
     </div>
-    <Component v-if="previewHelperType" :is="previewHelperType" :query="resolvedValue" />
     <CodeErrorDetail
       v-if="displayError && hasError && expandErrors"
       class="error-detail"
@@ -175,10 +174,6 @@
     },
 
     computed: {
-
-      previewHelperType() {
-        return this.options.previewHelper
-      },
 
       valueWithoutBackticks() {
         let out = this.modelValue.trim()

@@ -159,30 +159,6 @@ const callProtocol = async (req, res) => {
   }
 }
 
-const performAction = async (req, res) => {
-
-  let Action
-  try {
-    Action = require(`trivial-core/lib/actionsv2/actions/${req.params.service}/${req.params.action}/Action`)
-  } catch (err) {
-    req.log.error({err}, `[performAction] Require Failed ${err}`)
-  }
-
-  try {
-    let input = new ActionInput({config: req.body.config, values: {payload: req.body.payload}})
-    let action = new Action(input)
-    await action.perform()
-    res.send({body: action.output._values.payload, status: action.output._values.payload.status})
-  } catch (err) {
-    req.log.error({err}, `[performAction] Failed ${err}`)
-    res.sendStatus(500)
-  }
-}
-
-serve.post('/actions/:service/:action/perform', Session.validate, (req, res) => {
-  performAction(req, res)
-})
-
 serve.post('/apps/call', (req, res) => {
   request({
     url: new URL(req.query.url),
