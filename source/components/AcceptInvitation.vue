@@ -142,7 +142,6 @@ export default {
               invitation_token: this.invitationToken
             }
           } else {
-            console.log(this.invitationToken)
             return {
               path: '/auth/invitation',
               password: this.new_password,
