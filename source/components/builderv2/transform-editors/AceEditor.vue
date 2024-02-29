@@ -1,9 +1,7 @@
 <template>
   <div class="autocomplete-input" :class="{expanded: showList}">
     <div class="autocomplete-container">
-      <Component v-if="suggestionHelperType" :is="suggestionHelperType" @handleSuggestion="handleSuggestion" @handleRunQuery="syntheticRunQueryClick" />
       <FunctionEditor :modelValue="valueWithoutBackticks" @input="handleInput" :options="options" />
-      <ActionButton v-if="previewHelperType" ref="runQueryButton" value='Preview<span class="shortcut"> ⌘ + return</span>' :action="runQuery" class="button button-small preview-button" workingValue="Running..." />
       <ul ref="list" class="completions" v-if="showList">
         <li v-for="(str, idx) in matchingCompletions"
             @mousedown="complete(str)"
@@ -125,8 +123,6 @@
   import CodeErrorDetail from '../../controls/CodeErrorDetail.vue'
   import FunctionEditor from '../../controls/FunctionEditor.vue'
   import ToolTip from '../../controls/ToolTip.vue'
-  import QueryHelper from '../preview-helpers/QueryHelper.vue'
-  import QuerySuggestionManager from '../suggestion-managers/QuerySuggestionManager.vue'
   import { mapMutations, mapState } from 'vuex'
 
   export default {
@@ -135,8 +131,6 @@
       CodeErrorDetail,
       FunctionEditor,
       ToolTip,
-      QueryHelper,
-      QuerySuggestionManager
     },
 
     props: {
@@ -184,10 +178,6 @@
 
       previewHelperType() {
         return this.options.previewHelper
-      },
-
-      suggestionHelperType() {
-        return this.options.suggestionManager
       },
 
       valueWithoutBackticks() {
@@ -276,13 +266,6 @@
 
     mounted() {
       this.toolTipSize = this.$refs.input
-
-      this.$store.state.keyboardControl.register(
-        'command-Enter',
-        'Preview',
-        this.syntheticRunQueryClick.bind(this),
-        {}
-      )
     },
 
     watch: {
@@ -297,23 +280,11 @@
 
     methods: {
 
-      syntheticRunQueryClick() {
-        this.$refs.runQueryButton.click()
-      },
-
-      async runQuery() {
-        await this.$root.$refs.QueryHelper.runQuery()
-      },
-
       handleInput(event) {
         let val = event.target.value
         if (this.backticksRemoved) { val = `\`${val}\``}
         this.$emit('update:modelValue', val)
         this.open = true
-      },
-
-      handleSuggestion(val) {
-        this.$emit('update:modelValue', val)
       },
 
       complete(str) {
