@@ -1,7 +1,12 @@
 <template>
-  <div :class="{working: working}" @click.prevent="click" :disabled="disabled" v-html="content"></div>
+  <div :class="{working: working, disabledButton: disabled}" @click.prevent="click" v-html="content"></div>
 </template>
 
+<style lang="scss" scoped>
+.disabledButton {
+  pointer-events: none;
+}
+</style>
 <script>
   import notifications from '../notifications'
 

@@ -30,9 +30,9 @@
                           <input type='password' class='text-field' placeholder ='New Password' v-model='new_password'/>
                       </div>
                       <div>
-                          <input type='password' class='text-field' placeholder ='Confirm Password' v-model='confirm_password'/>
+                          <input id = "confirm-password-input" @click.once = "displayPasswordMatchErr = true" type='password' class='text-field' placeholder ='Confirm Password' v-model='confirm_password'/>
                       </div>
-                      <PasswordValidator :password = "confirm_password" @passwordValidity = "updatePasswordValidity"/>
+                      <PasswordValidator :password = "new_password" :confirm_password = "confirm_password" :enable_confirm_password = "true" :displayPasswordMatchErr = "displayPasswordMatchErr"  @passwordValidity = "updatePasswordValidity"/>
                     </span>
                     <transition name="fade">
                         <p v-if="errorMessage"><em>{{errorMessage}}</em></p>
@@ -40,7 +40,7 @@
                     <transition name="fade">
                         <div v-if="message" class="message">{{message}}</div>
                     </transition>
-                    <ActionButton class = "button-small submit" :action="handleSubmit" value ="Submit" working-value="Updating..."></ActionButton>
+                    <ActionButton class = "button-small submit" :action="handleSubmit" value ="Submit" working-value="Updating..." :disabled="!isPasswordValid"></ActionButton>
                     <p v-if="existingUser">
                       Need to create an account? <a href="/" @click.prevent="handleNewUserClick" >Sign up</a>
                     </p>
@@ -78,6 +78,9 @@
     margin: 30px 0 45px 266px;
 }
 
+#confirm-password-input {
+  margin-bottom: 0;
+}
 
 </style>
 
@@ -100,15 +103,12 @@ export default {
           current_password: '',
           new_password: '',
           confirm_password:'',
-          isPasswordValid: false
+          isPasswordValid: false,
+          displayPasswordMatchErr: false
         }        
     },
 
     computed: {
-        // TODO leverage
-        passwordMatch(){
-          return this.new_password === this.confirm_password
-        },
 
         invitationToken(){
           let params = new URLSearchParams(window.location.search);
@@ -142,6 +142,7 @@ export default {
               invitation_token: this.invitationToken
             }
           } else {
+            console.log(this.invitationToken)
             return {
               path: '/auth/invitation',
               password: this.new_password,
@@ -174,7 +175,9 @@ export default {
                 headers: {'content-type': 'application/json'},
                 body: JSON.stringify(this.acceptInvitationPayload)
               })
-              this.completed = true
+              if(update.status === 201){
+                this.completed = true
+              }
             } catch (err) {
                 console.log('[ChangePassword][handleSubmit] Error: ', err)
                 this.errorMessage = err.message

@@ -1,40 +1,68 @@
 <script>
-
 export default {
   props: {
     password: String,
+    confirm_password: String,
+    enable_confirm_password: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    displayPasswordMatchErr: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   computed: {
-    hasUpperCase(){
-      return /[A-Z]/.test(this.password)
+    hasUpperCase() {
+      return /[A-Z]/.test(this.password);
     },
-    hasLowerCase(){
-      return /[a-z]/.test(this.password)
+    hasLowerCase() {
+      return /[a-z]/.test(this.password);
     },
-    hasSymbol(){
-      return /[^A-Za-z0-9]/.test(this.password)
+    hasSymbol() {
+      return /[!@#$%^&*()_+{}\[\]:;<>,.?~\\\-]/.test(this.password);
     },
-    hasDigit(){
-      return/[1-9]/.test(this.password)
+    hasDigit() {
+      return /[1-9]/.test(this.password);
     },
-    hasLength(){
-      return this.password.length >= 12
+    hasLength() {
+      return this.password.length >= 12;
     },
-    isPasswordValid(){
-      let result = this.hasUpperCase && this.hasLowerCase && this.hasSymbol && this.hasDigit && this.hasLength
-      return result
-    }
+    passwordMatch() {
+      return this.password === this.confirm_password;
     },
-    watch: {
-      'isPasswordValid': function(){
-        this.$emit('passwordValidity', this.isPasswordValid)
-      }
-  }
+    isPasswordValid() {
+      let result =
+        this.hasUpperCase &&
+        this.hasLowerCase &&
+        this.hasSymbol &&
+        this.hasDigit &&
+        this.hasLength;
+      let confirm_password_result = this.enable_confirm_password
+        ? result && this.passwordMatch
+        : result;
+      console.log(confirm_password_result);
+      return confirm_password_result;
+    },
+  },
+  watch: {
+    isPasswordValid: function () {
+      this.$emit("passwordValidity", this.isPasswordValid);
+    },
+  },
 };
 </script>
 <template>
   <div id="password-verify-container">
-    <p id = "password-note">Password Must Contain:</p>
+    <div v-if="enable_confirm_password" id="password-match-container">
+      <!-- Password match should only be displayed after user has clicked on confirm_password input -->
+      <span class="error-icon" v-if="displayPasswordMatchErr && !passwordMatch">
+        <span class="message">Passwords Must Match</span>
+      </span>
+    </div>
+    <p id="password-note">Password Must Contain:</p>
     <ul>
       <li :class="!hasSymbol ? 'error' : 'success'">
         1 Symbol or Special Character
@@ -52,7 +80,7 @@ export default {
 #password-verify-container {
   text-align: left;
 }
-li.error{
+li.error {
   background-image: var(--x-symbol-icon);
   color: var(--error);
 }
@@ -67,7 +95,6 @@ li {
   background-position: left center;
   padding-left: 25px;
   font-weight: lighter;
-
 }
 ul {
   margin-top: 0;
@@ -79,5 +106,18 @@ ul {
   margin-bottom: 10px;
   margin-top: 0px;
 }
+span.error-icon {
+  background-image: var(--error-icon);
+  background-repeat: no-repeat;
+  background-position: left center;
 
+  span.message {
+    margin-left: 1.5em;
+    line-height: 3em;
+  }
+}
+#password-match-container {
+  height: 3em;
+  margin-top: 5px;
+}
 </style>
