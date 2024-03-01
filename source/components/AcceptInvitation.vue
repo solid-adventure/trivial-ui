@@ -35,7 +35,11 @@
                       <PasswordValidator :password = "new_password" :confirm_password = "confirm_password" :enable_confirm_password = "true" :displayPasswordMatchErr = "displayPasswordMatchErr"  @passwordValidity = "updatePasswordValidity"/>
                     </span>
                     <transition name="fade">
-                        <p v-if="errorMessage"><em>{{errorMessage}}</em></p>
+                        <div id = "error-msg-container">
+                          <span v-if="errorMessage">
+                            <em>{{errorMessage}}</em>
+                          </span>
+                        </div>
                     </transition>
                     <transition name="fade">
                         <div v-if="message" class="message">{{message}}</div>
@@ -75,13 +79,16 @@
 }
 
 .submit{
-    margin: 30px 0 45px 266px;
+    margin: 0 0 45px 266px;
 }
 
 #confirm-password-input {
   margin-bottom: 0;
 }
 
+#error-msg-container {
+  height: 1.5em;
+}
 </style>
 
 <script>
@@ -174,8 +181,14 @@ export default {
                 headers: {'content-type': 'application/json'},
                 body: JSON.stringify(this.acceptInvitationPayload)
               })
-              if(update.status === 201){
+              if(update.status === 202){
                 this.completed = true
+              } else if (update.status === 406){
+                this.errorMessage = "Invalid Invitation Token"
+              } else if (update.status === 422){
+                this.errorMessage = "Invalid Password"
+              } else {
+                this.errorMessage = "Server is unable to process the invitation request"
               }
             } catch (err) {
                 console.log('[ChangePassword][handleSubmit] Error: ', err)
