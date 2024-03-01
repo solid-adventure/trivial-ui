@@ -249,65 +249,6 @@ const store = createStore({
       }
     },
 
-    // This works, but was a bit hacky and too slow
-    // async setCredentialOnRunnerApp( { state, commit, dispatch }, {config, name, forAction}) {
-    //   let runnerApp
-    //   try {
-    //     runnerApp = state.app.panels.options.queryRunnerApp
-    //   } catch (e) {
-    //     return
-    //     console.log(e)
-    //   }
-    //   if (!runnerApp) { return }
-    //   let manifest = await dispatch('getManifestByAppName', runnerApp.hostname)
-    //   let manifestContent = JSON.parse(manifest.content)
-
-    //   // Hack alert! We're counting on a specific manifest template to write this config into the correct location
-    //   // TODO Crawl the manifest to replace the config by it's action type, not location
-    //   if ( manifestContent.program.definition.actions[0].definition.actions[1].config[name].$cred != config[name].$cred ) {
-    //     commit('setQueryRunnerAppReady', false)
-    //     let updatedManifestContent = await dispatch('writeCredentialIntoManifestContent', { manifestContent, config })
-    //     await dispatch('saveManifestContentById', { id: manifest.id, manifestContent: updatedManifestContent })
-    //     await dispatch('buildByManifestContent', {manifestContent: updatedManifestContent})
-    //   }
-    //   commit('setQueryRunnerApp', runnerApp)
-    //   commit('setQueryRunnerAppReady', true)
-    // },
-
-    // async writeCredentialIntoManifestContent({}, {manifestContent, config}) {
-    //   try {
-    //     manifestContent.program.definition.actions[0].definition.actions[1].config = config
-    //     return manifestContent
-    //   } catch (e) {
-    //     console.log(e)
-    //   }
-    // },
-
-    // async saveManifestContentById({}, {id, manifestContent}) {
-    //   const manifest = await fetchJSON(`/proxy/trivial`, {
-    //     method: 'put',
-    //     headers: {'content-type': 'application/json'},
-    //     body: JSON.stringify({
-    //       path: `/manifests/${id}`,
-    //       content: JSON.stringify(manifestContent)
-    //     })
-    //   })
-    // },
-
-    // async getManifestByAppName({}, name) {
-    //   const all = await fetchJSON(`/proxy/trivial?path=/manifests&app_id=${name}`)
-    //   return all[0]
-    // },
-
-    // async buildByManifestContent({}, { manifestContent }) {
-    //   const params = FeatureManager.featureParams()
-    //   await fetchJSON(`/build?${params}`, {
-    //     method: 'post',
-    //     headers: {'content-type': 'application/json'},
-    //     body: JSON.stringify(manifestContent)
-    //   })
-    // },
-
     async loadProfile({ commit }) {
       let user
       try {
