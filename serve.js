@@ -229,7 +229,7 @@ serve.all('/proxy/:service', (req, res) => {
 })
 // End Proxy Section
 
-serve.get('*', Session.validate, (req, res) => {
+serve.get('*', (req, res) => {
   res.render('main.html', {
     analytics_id: process.env.ANALYTICS_ID,
     app_id: 'TrivialBuilder'

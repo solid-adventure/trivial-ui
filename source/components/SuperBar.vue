@@ -10,7 +10,7 @@
       <div class ="theme">
         <ToggleButton
           @update:modelValue="updateToggleButtonState"
-          :modelValue="active"
+          :modelValue="themeToggleActive"
           off-icon="sun"
           on-icon="moon"
           theme-override="dark"></ToggleButton>
@@ -106,15 +106,15 @@
   export default {
     data(){
       return {
-        activeTheme: '',
+        activeTheme: 'Light',
         themeUpdating: false,
         prevLink: undefined,
         newLink: undefined
       }
     },
 
-    created() {
-      this.loadTheme()
+    mounted() {
+      this.setActiveTheme()
     },
 
     components: {
@@ -123,9 +123,10 @@
     },
 
     computed: {
-      active(){
+      themeToggleActive(){
         return this.activeTheme == 'Dark'
       },
+
       firstName() {
         if (!this.user) { return 'Guest' }
         const match = /^\s*(\S+)/.exec(this.user.name || '')
@@ -134,10 +135,17 @@
 
       ...mapState([
         'user'
-      ])
+      ]),
+
     },
 
     methods: {
+
+      setActiveTheme() {
+        if (!this.user || !this.user.color_theme) { return }
+        this.activeTheme = this.user.color_theme
+      },
+
       isActive(tab) {
         if (window.location.pathname != '/') { return false }
         let params =  new URLSearchParams(window.location.search)
@@ -147,15 +155,6 @@
         }
         return tab == panelTypeFromLocation
 
-      },
-      async loadTheme(){
-        try {
-          let response = await fetchJSON('/proxy/trivial?path=/profile')
-          response.user.color_theme == null ? this.activeTheme = "Light" : this.activeTheme = response.user.color_theme
-        }
-        catch(error){
-          console.log('[Settings][loadTheme] Error: ', error)
-        }
       },
       async updateToggleButtonState(event){
         this.themeUpdating = true
@@ -184,19 +183,9 @@
         this.themeUpdating = false
       },
 
-      async themeUpdateCall(){
-        try {
-          let update = await fetchJSON('/proxy/trivial', {
-            method: 'put',
-            headers: {'content-type': 'application/json'},
-            body: JSON.stringify({
-              path: '/profile',
-              color_theme: this.activeTheme
-            })
-          })
-        } catch (err) {
-            console.log('[Settings][themeUpdateCall] Error: ', err)
-        }
+      async themeUpdateCall() {
+        this.$store.state.Session.updateProfile({color_theme: this.activeTheme})
+        .catch(err => console.error('[Settings][themeUpdateCall] Error: ', err))
       }
     }
   }

@@ -20,6 +20,7 @@ import OrganizationInviteUser from "../components/OrganizationInviteUser.vue";
 import WebhookDisplay from "../components/WebhookDisplay.vue";
 import Actions from "../components/Actions.vue";
 import FunctionWriter from "../components/FunctionWriter.vue";
+import Session from "../models/Session.js";
 
 const routes = [
   { path: "/", component: AppsOverview, name: "Home" },
@@ -52,9 +53,6 @@ const routes = [
   { path: "/apps/new", component: NewAppForm, name: "New App" },
   { path: "/account-locked", component: AccountLocked, name: "Account Locked" },
   { path: "/apps/:id", component: Panels, name: "Show App" },
-
-  // Below path not used and has crazy templating in there
-  // { path: '/apps/:id/action/:perform/:actionIdentifier', component: AppAction },
   {
     path: "/apps/:id/settings2",
     component: InstanceSettings,
@@ -77,18 +75,31 @@ const routes = [
     component: OrganizationInviteUser,
     name: "Invite User",
   },
-  // Another one where we might need to render the appManager above
-  // the actual webhook display component
-  // Open to discussing if we should just add the app-manager to the
-  // componment, create a new component or render a custom component
-
-  //Dead component, API post is commented out?
-  // { path: "/actions", component: Actions, name: "Actions" },
 ];
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
+});
+
+router.beforeEach(async (to, from, next) => {
+  let valid = await Session.validate(to, from, next);
+  console.log("to", to);
+  console.log("from", from);
+  console.log("valid", valid);
+  // Valid session, redirect away from signin
+  // if (to.path === '/signin' && valid) {
+  //   next({
+  //     path: "/",
+  //     // params: { nextUrl: to.fullPath },
+  //   });
+  // }
+  if (!valid) {
+    next({
+      path: "/signin"
+    });
+  }
+  next();
 });
 
 export default router;

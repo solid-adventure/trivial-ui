@@ -173,7 +173,7 @@ export default {
 
       async fetchSuggestedName(){
           try {
-            const name = await fetchJSON('/proxy/trivial?path=/apps/name_suggestion')
+            const name = await fetchJSON(`${this.$store.state.trivialApiUrl}/apps/name_suggestion`)
             return name.suggestion
         }
         catch(error){

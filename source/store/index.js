@@ -6,6 +6,7 @@ import ManifestMigrator from 'trivial-core/lib/ManifestMigrator'
 import FeatureManager from 'trivial-core/lib/FeatureManager'
 import ActionPath from 'trivial-core/lib/actionsv2/ActionPath'
 import router from '../router'
+import Session from '../models/Session'
 
 const store = createStore({
 
@@ -14,7 +15,7 @@ const store = createStore({
     route: null,
     user: {},
     app: {},
-    isAuthenticated: true,
+    isAuthenticated: false,
     showSuperBar: false,
     apps: [],
     manifest: {
@@ -35,7 +36,9 @@ const store = createStore({
     tourMode: false,
     tourStep: 0,
     tourSteps: ['action-info', 'credentials', 'transform-config'],
-    enableSaveCredentials: VUE_APP_ENABLE_SAVE_CREDENTIALS
+    enableSaveCredentials: VUE_APP_ENABLE_SAVE_CREDENTIALS,
+    trivialApiUrl: VUE_APP_TRIVIAL_API_URL,
+    Session: Session,
   },
 
   getters: {
@@ -230,6 +233,7 @@ const store = createStore({
 
   actions: {
     async init({ commit, dispatch, state }, { appId }) {
+      if (!state.isAuthenticated) { return }
       try {
         await dispatch('loadProfile')
         await dispatch('loadResources', { dispatch, router })
@@ -240,14 +244,26 @@ const store = createStore({
       }
     },
 
-    async loadProfile({ commit }) {
+    async signIn({ commit, state }, { accessToken, client, expiry, uid, user }) {
+      await Session.create(accessToken, client, expiry, uid)
+      commit('setIsAuthenticated', true)
+      commit('setUser', user)
+    },
+
+    async signOut({ commit, state }) {
+      await Session.destroy()
+      commit('setIsAuthenticated', false)
+    },
+
+    async loadProfile({ commit, state }) {
       let user
       try {
-        user = await fetchJSON('/proxy/trivial?path=/profile')
+        user = await Session.getProfile()
       } catch (e) {
+        console.error('Failed to load profile', e)
         user = {name: 'guest'}
       }
-      commit('setUser', user.user)
+      commit('setUser', user)
     },
 
     async loadResources({ commit }, { dispatch, router }) {
@@ -262,12 +278,12 @@ const store = createStore({
     },
 
     async loadApps({ commit }) {
-      const apps = await fetchJSON('/proxy/trivial?path=/apps')
+      const apps = await Session.apiCall('/apps')
       await commit('setApps', apps)
     },
 
     async loadApp({ commit }, { appId }) {
-      const app = await fetchJSON(`/proxy/trivial?path=/apps/${appId}`)
+      const app = await Session.apiCall(`/apps/${appId}`)
       await commit('setApp', app)
     },
 
@@ -306,16 +322,14 @@ const store = createStore({
 
     async loadCredentials({ commit, state, dispatch }) {
       let appId = state?.app?.name ?? state?.route?.params?.id
-      const creds = await fetchJSON(`/proxy/trivial?path=/apps/${appId}/credentials`)
+      const creds = await Session.apiCall(`/apps/${appId}/credentials`)
       commit('setCredentials', creds.credentials)
       dispatch('notifyCredentialsLoaded')
       return creds.credentials
     },
 
     async loadCredentialsDraft({ commit, dispatch }, { token }) {
-      const creds = await fetchJSON(
-        `/proxy/trivial?path=/manifests/-/drafts/${token}/credentials`
-      )
+      const creds = await Session.apiCall(`/manifests/-/drafts/${token}/credentials`)
       commit('setCredentials', creds.credentials)
       return creds.credentials
     },
@@ -330,7 +344,7 @@ const store = createStore({
 
     async loadManifest({ commit, state, dispatch }) {
       const appId = state?.app?.name ?? state?.route?.params?.id
-      const all = await fetchJSON(`/proxy/trivial?path=/manifests&app_id=${appId}`)
+      const all = await Session.apiCall(`/manifests&app_id=${appId}`)
       const manifest = all[0] || {content: '{}'}
       manifest.content = new ManifestMigrator(JSON.parse(manifest.content)).migrate()
       commit('setManifest', manifest)
@@ -339,7 +353,7 @@ const store = createStore({
     },
 
     async loadManifestDraft({ commit, dispatch }, { token }) {
-      const manifest = await fetchJSON(`/proxy/trivial?path=/manifests/-/drafts/${token}`)
+      const manifest = await Session.apiCall(`/manifests/-/drafts/${token}`)
       manifest.content = new ManifestMigrator(manifest.content).migrate()
       commit('setManifest', {id: manifest.manifest_id, content: manifest.content, user_id: manifest.user_id})
       return manifest

@@ -41,6 +41,7 @@
 <script>
 import TrackingService from '../../lib/TrackingService';
 import store from '../store'
+
 TrackingService.identifyLandingReferer();
 export default {
     created() {
@@ -56,31 +57,37 @@ export default {
         }
     },
     methods: {
-        handleSubmit(e){
+        async handleSubmit(e){
             e.preventDefault()
             this.sign_in_clicked = true
 
             let email = this.email
 		    let password = this.password
 
-		    let login = fetch(`/proxy/trivial`, {
+		    let response = await fetch(`${this.$store.state.trivialApiUrl}/auth/sign_in`, {
 		    	method: 'post',
+                mode: 'cors',
 		    	headers: {'content-type': 'application/json'},
 		    	body: JSON.stringify({
-		    		path: '/auth/sign_in',
 		    		email: email,
 		    		password: password
 		    	})
 		    })
-		    .then(response => response.json())
-		    .then(data => this.handleResponse(data))
+            this.handleResponse(response, await response.json())
 		    .catch(error => this.handleSignInError(error))
         },
 
-        handleResponse(data){
+        async handleResponse(response, data){
             if (!data.data.id) {
 		    	this.handleSignInError(data)
 		    } else {
+                store.dispatch('signIn', {
+                    accessToken: response.headers.get('access-token'),
+                    client: response.headers.get('client'),
+                    expiry: response.headers.get('expiry'),
+                    uid: response.headers.get('uid'),
+                    user: data.data
+                })
                 this.sign_in_clicked = false
                 let user = {
                     'Name': data.data.name,
