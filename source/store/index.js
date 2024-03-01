@@ -55,15 +55,6 @@ const store = createStore({
       return false
     },
 
-    // works but unused
-    // hasCredentialSetForActionType: (state) => (actionCredentialType) => {
-    //   let credentialSets = state.credentialSets
-    //   let reqs = Object.keys(actionCredentialType).map(k => actionCredentialType[k].type)
-    //   let cs_types = credentialSets.map(cs => cs.credential_type)
-    //   let unmet_reqs = reqs.filter(req => !cs_types.includes(req))
-    //   return unmet_reqs.length == 0
-    // },
-
   },
 
   mutations: {
