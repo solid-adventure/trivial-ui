@@ -68,22 +68,6 @@ const download = async (req, res) => {
   }
 }
 
-// Writes an app directly to the filesystem for local development
-const writeLocally = async (req, res) => {
-  try {
-    let builder = new AppBuilder(req.body.app_id, {
-      template: req.body.template,
-      version: req.body.version,
-      req: req
-    })
-    await builder.writeLocally(req.body)
-    res.sendStatus(200)
-  } catch (err) {
-    req.log.error({err}, `[writeLocally] Could not build app '${req.body.app_id}'`)
-    res.sendStatus(500)
-  }
-}
-
 // Writes an app to an AWS Lambda
 const build = async (req, res) => {
   try {
@@ -173,11 +157,6 @@ serve.post('/apps/call', (req, res) => {
 
 serve.post('/build', (req, res) => {
 	build(req, res)
-})
-
-
-serve.post('/writeLocally', (req, res) => {
-  writeLocally(req, res)
 })
 
 serve.delete('/build/:id', (req, res) => {

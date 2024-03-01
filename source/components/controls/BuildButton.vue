@@ -53,10 +53,6 @@
         return this.dirty ? 'Save <span class="shortcut">⌘ + S</span>' : 'Saved'
       },
 
-      local() {
-        return false // TODO Dynamic
-      }
-
     },
 
     methods: {
@@ -69,11 +65,7 @@
       async save() {
         try {
           this.$emit('update:buildInProgress', true)
-          if (this.local) {
-            await this.saveAndWriteLocally()
-          } else {
-            await this.saveAndBuild()
-          }
+          await this.saveAndBuild()
           notifications.success('Application built!')
           this.$emit('update:dirty', false)
           this.$emit('update:buildInProgress', false)
@@ -123,7 +115,6 @@
 
       ...mapActions([
         'saveAndBuild',
-        'saveAndWriteLocally',
         'onManifestLoaded',
         'onCredentialsLoaded'
       ])

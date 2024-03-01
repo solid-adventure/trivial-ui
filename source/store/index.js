@@ -464,20 +464,6 @@ const store = createStore({
       })
     },
 
-    async writeLocally({ state }) {
-      const params = FeatureManager.featureParams()
-      await fetchJSON(`/writeLocally?${params}`, {
-        method: 'post',
-        headers: {'content-type': 'application/json'},
-        body: JSON.stringify(state.manifest.content)
-      })
-    },
-
-    async saveAndWriteLocally( { dispatch }) {
-      await dispatch('save')
-      await dispatch('writeLocally')
-    },
-
     async saveAndBuild({ dispatch }) {
       await dispatch('save')
       await dispatch('build')
