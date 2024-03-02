@@ -368,26 +368,12 @@ const store = createStore({
     },
 
     async saveCredentials({ state, dispatch }) {
-      await fetchJSON('/proxy/trivial', {
-        method: 'put',
-        headers: {'content-type': 'application/json'},
-        body: JSON.stringify({
-          path: `/apps/${state.app.name}/credentials`,
-          credentials: state.credentials
-        })
-      })
+      await Session.apiCall(`/apps/${state.app.name}/credentials`, 'PUT', {credentials: state.credentials})
       dispatch('notifyCredentialsLoaded')
     },
 
     async saveManifest({ commit, state, dispatch }) {
-      const manifest = await fetchJSON(`/proxy/trivial`, {
-        method: 'put',
-        headers: {'content-type': 'application/json'},
-        body: JSON.stringify({
-          path: `/manifests/${state.manifest.id}`,
-          content: JSON.stringify(state.manifest.content)
-        })
-      })
+      const manifest = await Session.apiCall(`/manifests/${state.manifest.id}`, 'PUT', {content: JSON.stringify(state.manifest.content)})
       manifest.content = new ManifestMigrator(JSON.parse(manifest.content)).migrate()
       commit('setManifest', manifest)
       dispatch('notifyManifestLoaded')
@@ -472,32 +458,16 @@ const store = createStore({
     async saveCredentialSet({ commit }, { credential_set, credentials }) {
       let newCreds = null
       if (credential_set.id) {
-        newCreds = await fetchJSON('/proxy/trivial', {
-          headers: {'content-type': 'application/json'},
-          method: 'put',
-          body: JSON.stringify({
-            path: `/credential_sets/${credential_set.id}`,
-            credential_set,
-            credentials
-          })
-        })
+        newCreds = await Session.apiCall(`/credential_sets/${credential_set.id}`, 'PUT', {credential_set, credentials})
       } else {
-        newCreds = await fetchJSON('/proxy/trivial', {
-          headers: {'content-type': 'application/json'},
-          method: 'post',
-          body: JSON.stringify({
-            path: `/credential_sets`,
-            credential_set,
-            credentials
-          })
-        })
+        newCreds = await Session.apiCall(`/credential_sets`, 'POST', {credential_set, credentials})
       }
       commit('updateCredentialSet', newCreds.credential_set)
       return newCreds.credential_set
     },
 
     async destroyCredentialSet({ commit }, { id }) {
-      await fetchJSON(`/proxy/trivial?path=/credential_sets/${id}`, {method: 'delete'})
+      await Session.apiCall(`/credential_sets/${id}`, 'DELETE')
       commit('removeCredentialSet', { id })
     }
   }

@@ -323,15 +323,15 @@
       },
 
       async loadHourlyStats() {
-        this.setStats(await fetchJSON('/proxy/trivial?path=/apps/stats/hourly'))
+        this.setStats(await this.$store.state.Session.apiCall('apps/stats/hourly'))
       },
 
       async loadDailyStats() {
-        this.setStats(await fetchJSON('/proxy/trivial?path=/apps/stats/daily'))
+        this.setStats(await this.$store.state.Session.apiCall('apps/stats/daily'))
       },
 
       async loadWeeklyStats() {
-        this.setStats(await fetchJSON('/proxy/trivial?path=/apps/stats/weekly'))
+        this.setStats(await this.$store.state.Session.apiCall('apps/stats/weekly'))
       },
 
       setStats(data) {

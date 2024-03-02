@@ -182,7 +182,7 @@
 
 <script>
   import { mapState } from 'vuex'
-  import { memoize, fetchJSON } from 'trivial-core/lib/component-utils'
+  import { fetchJSON } from 'trivial-core/lib/component-utils'
   import ActionButton from './controls/ActionButton.vue'
   import HideableSection from './controls/HideableSection.vue'
   import ManifestMigrator from 'trivial-core/lib/ManifestMigrator'
@@ -199,21 +199,6 @@
         HideableSection,
         AppTransferManager,
         'nav-tree': NavTree
-    },
-
-    provide: {
-      loadDataSamples: memoize(async function () {
-        try {
-          let response = await fetch(`/proxy/trivial?path=/webhooks&app_id=${this.appId}`)
-          let data = await response.json()
-          data = Array.isArray(data) ? data : [] // empty result looks like {webhooks: []}
-          return data.map(item => {
-            return {topic: item.topic, payload: item.payload}
-          })
-        } catch (error) {
-          console.log('[InstanceSettings][loadDataSamples] Error:', error)
-        }
-      })
     },
 
     data() {
