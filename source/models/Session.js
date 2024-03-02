@@ -20,10 +20,13 @@ export default class Session {
   ///////// User End //////////
 
 
+  static apiUrl(path) {
+    return new URL(path, store.state.trivialApiUrl)
+  }
+
   static async apiCall(path, method='GET', data) {
     const session = await Session.current()
     if (!session.accessToken) { return }
-    const url = new URL(path, store.state.trivialApiUrl)
 
     const options = {
       method: method,
@@ -38,9 +41,10 @@ export default class Session {
     if (data) {
       options.body = JSON.stringify(data)
     }
-    return fetch(url, options)
+    return fetch(this.apiUrl(path), options)
     .then(response => Session.handleResponse(response))
   }
+
   static async handleResponse(response) {
     let out = undefined
     // Catch an empty body, such as No Content after a delete
@@ -58,7 +62,30 @@ export default class Session {
     }
   }
 
-  static async create(token, client, expiry, uid) {
+  static async create(email, password) {
+    let response = await fetch(this.apiUrl('/auth/sign_in'), {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({email, password})
+    })
+    let data = await response.json()
+    let user = data.data
+
+    await Session.setCookies(
+      response.headers.get('access-token'),
+      response.headers.get('client'),
+      response.headers.get('expiry'),
+      response.headers.get('uid')
+    )
+    store.commit('setIsAuthenticated', true)
+    store.commit('setUser', user)
+    return user
+  }
+
+
+  static async setCookies(token, client, expiry, uid) {
     await window.cookieStore.set("trivial-access-token", token)
     await window.cookieStore.set("trivial-client", client)
     await window.cookieStore.set("trivial-expiry", expiry)

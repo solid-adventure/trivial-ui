@@ -244,17 +244,6 @@ const store = createStore({
       }
     },
 
-    async signIn({ commit, state }, { accessToken, client, expiry, uid, user }) {
-      await Session.create(accessToken, client, expiry, uid)
-      commit('setIsAuthenticated', true)
-      commit('setUser', user)
-    },
-
-    async signOut({ commit, state }) {
-      await Session.destroy()
-      commit('setIsAuthenticated', false)
-    },
-
     async loadProfile({ commit, state }) {
       let user
       try {

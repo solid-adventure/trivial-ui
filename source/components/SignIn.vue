@@ -60,44 +60,21 @@ export default {
         async handleSubmit(e){
             e.preventDefault()
             this.sign_in_clicked = true
-
-            let email = this.email
-		    let password = this.password
-
-		    let response = await fetch(`${this.$store.state.trivialApiUrl}/auth/sign_in`, {
-		    	method: 'post',
-                mode: 'cors',
-		    	headers: {'content-type': 'application/json'},
-		    	body: JSON.stringify({
-		    		email: email,
-		    		password: password
-		    	})
-		    })
-            this.handleResponse(response, await response.json())
-		    .catch(error => this.handleSignInError(error))
-        },
-
-        async handleResponse(response, data){
-            if (!data.data.id) {
-		    	this.handleSignInError(data)
-		    } else {
-                store.dispatch('signIn', {
-                    accessToken: response.headers.get('access-token'),
-                    client: response.headers.get('client'),
-                    expiry: response.headers.get('expiry'),
-                    uid: response.headers.get('uid'),
-                    user: data.data
-                })
+            try {
+                let user = await this.$store.state.Session.create(this.email, this.password)
                 this.sign_in_clicked = false
-                let user = {
-                    'Name': data.data.name,
-                    'Email': data.data.email,
-                    'ID': data.data.id
+                this.password = ''
+                let identity = {
+                    'Name': user.name,
+                    'Email': user.email,
+                    'ID': user.id
                 }
-                TrackingService.identify(user)
-                TrackingService.track('User Signin', user)
-                window.location = '/'
-		    }
+                TrackingService.identify(identity)
+                TrackingService.track('User Signin', identity)
+                this.$router.push('/')
+            } catch(e) {
+                this.handleSignInError(e)
+            }
         },
 
         handleSignInError(e) {
