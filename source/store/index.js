@@ -344,7 +344,7 @@ const store = createStore({
 
     async loadManifest({ commit, state, dispatch }) {
       const appId = state?.app?.name ?? state?.route?.params?.id
-      const all = await Session.apiCall(`/manifests&app_id=${appId}`)
+      const all = await Session.apiCall(`/manifests?app_id=${appId}`)
       const manifest = all[0] || {content: '{}'}
       manifest.content = new ManifestMigrator(JSON.parse(manifest.content)).migrate()
       commit('setManifest', manifest)
@@ -418,7 +418,7 @@ const store = createStore({
     async requireDataSample({ state, commit }) {
       if (!state.dataSample) {
         try {
-          const data = await fetchJSON(`/proxy/trivial?path=/webhooks&app_id=${state.app.name}&limit=1`)
+          const data = await Session.apiCall(`/webhooks?app_id=${state.app.name}&limit=1`)
           if (Array.isArray(data) && data.length > 0) {
             commit('setDataSample', data[0])
           } else {
@@ -458,13 +458,13 @@ const store = createStore({
     },
 
     async loadCredentialSets({ commit }) {
-      const creds = await fetchJSON(`/proxy/trivial?path=/credential_sets`)
+      const creds = await Session.apiCall(`/credential_sets`)
       commit('setCredentialSets', creds.credential_sets)
       return creds.credential_sets
     },
 
     async loadCredentialSetAndSecret({ commit }, { id }) {
-      const data = await fetchJSON(`/proxy/trivial?path=/credential_sets/${id}`)
+      const data = await Session.apiCall(`/credential_sets/${id}`)
       commit('updateCredentialSet', data.credential_set)
       return data
     },

@@ -262,7 +262,7 @@ import { mapState } from 'vuex'
 
     async fetchData() {
       try {
-        await fetchJSON(`/proxy/trivial?path=/activity_entries&app_id=${this.appId}`)
+        await this.$store.state.Session.apiCall(`/activity_entries?app_id=${this.appId}`)
         .then(webhooks => this.webhooks = webhooks)
         .then(webhooks => this.selectFirst(webhooks))
       } catch (error) {
