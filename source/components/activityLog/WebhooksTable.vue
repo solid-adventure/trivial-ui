@@ -1,12 +1,5 @@
 <template>
   <div>
-<!--     <Notices></Notices>
-    <h1 class='headroom title'>Activity Log</h1>
-    <p>Review the data passed into your app and how it was processed.</p>
-    <div class="chart-area">
-      <WebhooksChart></WebhooksChart>
-    </div>
- -->
     <p v-if="loading">Loading...</p>
     <div v-if="!loading">
       <p v-if="!webhooks.length"><em>No events to display, run your app to create a history</em></p>
@@ -194,7 +187,6 @@ import BuildEventMarker from './BuildEventMarker.vue'
 import notifications from '../../components/notifications'
 import SearchField from '../../components/controls/SearchField.vue'
 import JsonViewer from './JsonViewer.vue'
-import WebhooksChart from './WebhooksChart.vue'
 import Notices from '../Notices.vue'
 import { mapState } from 'vuex'
 
@@ -205,7 +197,6 @@ import { mapState } from 'vuex'
     JsonViewer,
     Notices,
     SearchField,
-    WebhooksChart
   },
 
   data() {

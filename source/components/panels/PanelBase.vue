@@ -216,16 +216,7 @@
       async fetchDataTrivialApi(displayLoading=true) {
         if (displayLoading) { this.loading = true }
         try {
-          await fetchJSON(`/proxy/trivial`, {
-            method: 'post',
-            body: JSON.stringify(
-              Object.assign(
-                this.mergedOptions(),
-                {path: this.reportPath}
-                )
-              ),
-            headers: {'content-type': 'application/json'}
-          })
+          await this.$store.state.Session.apiCall(this.reportPath, 'POST', this.mergedOptions())
           .then(response => this.preProcessResponse(response, 200))
           .then(response => this.handleResponse(response))
         } catch (error) {
@@ -267,14 +258,7 @@
       async fetchDataCached() {
         this.loading = true
         try {
-          await fetchJSON(`/proxy/trivial`, {
-            method: 'POST',
-            body: JSON.stringify({
-              path: `/apps/${this.app_id}/last_request`,
-              payload: this.mergedOptions()
-            }),
-            headers: {'content-type': 'application/json'}
-          })
+          await this.$store.state.Session.apiCall(`/apps/${this.app_id}/last_request`, 'POST', {payload: this.mergedOptions()})
           .then(response => this.digContentFromDiagnostics(response))
           .then(response => this.handleResponse(response))
         } catch (error) {

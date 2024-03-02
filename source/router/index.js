@@ -16,7 +16,6 @@ import InstanceActivity from "../components/builderv2/InstanceActivity.vue";
 import Builder from "../components/builderv2/Builder.vue";
 import OrganizationSettings from "../components/OrganizationSettings.vue";
 import OrganizationInviteUser from "../components/OrganizationInviteUser.vue";
-// import WebhookDisplay from "../components/WebhookDisplay.vue";
 import Actions from "../components/Actions.vue";
 import FunctionWriter from "../components/FunctionWriter.vue";
 import Session from "../models/Session.js";

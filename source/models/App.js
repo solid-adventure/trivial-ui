@@ -23,64 +23,43 @@ class App {
   }
 
   async create({ name, panelOptions }) {
-    const appInstance = await fetchJSON('/proxy/trivial', {
-        method: 'POST',
-        headers: {'content-type': 'application/json'},
-        body: JSON.stringify({
-            path: '/apps',
-            descriptive_name: name,
-            panels: panelOptions})
+    const appInstance = await this.$store.state.Session.apiCall('/apps', 'POST', {
+      descriptive_name: name,
+      panels: panelOptions
     })
     this.name = appInstance.name
     this.panelOptions = panelOptions
     this.$store.commit('addApp', appInstance)
     await this.instantiateManifest(appInstance)
     Object.assign(this, appInstance)
-    // this.instance = appInstance
     return appInstance
   }
 
-  // There are few patterns in this file, but this is the best to follow.
-  // We return a promise and deliberately do not catch here, so that errors can bubble to the caller.
   async save() {
     let app = this.$store.state.app
-    const appInstance = fetch('/proxy/trivial', {
-    method: 'PUT',
-    headers: {'content-type': 'application/json'},
-    body: JSON.stringify({
-        path: `/apps/${this.name}`,
-        descriptive_name: app.descriptive_name,
-        panels: {
-            options: app.panels.options,
-            component: app.panels.component
-            }
-        })
+    const appInstance = await this.$store.state.Session.apiCall(`/apps/${this.name}`, 'PUT', {
+      descriptive_name: app.descriptive_name,
+      panels: {
+        options: app.panels.options,
+        component: app.panels.component
+      }
     })
-    .then(response => response.json())
-    return await appInstance
+    return appInstance
   }
 
 
   async destroy() {
-    await fetchJSON(`/build/${this.name}`, {
-      method: 'delete'
-    })
+    // RELEASE BLOCKER
+    // await fetchJSON(`/build/${this.name}`, {
+    //   method: 'delete'
+    // })
     await this.removeCredentials()
-    await fetchJSON(`/proxy/trivial?path=/apps/${this.name}`, {
-      method: 'delete'
-    })
+    this.$store.state.Session.apiCall(`/apps/${this.name}`, 'DELETE')
     this.$store.commit('removeApp', {name: this.name})
   }
 
   async removeCredentials() {
-    await fetchJSON('/proxy/trivial', {
-      method: 'put',
-      headers: {'content-type': 'application/json'},
-      body: JSON.stringify({
-        path: `/apps/${this.name}/credentials`,
-        credentials: {}
-      })
-    })
+    await this.$store.state.Session.apiCall(`/apps/${this.name}/credentials`, 'PUT', {credentials: {}})
   }
 
   async instantiateManifest(appInstance) {
@@ -97,14 +76,9 @@ class App {
   }
 
   async createManifest(manifest) {
-    const response = await fetchJSON('/proxy/trivial', {
-      method: 'POST',
-      headers: {'content-type': 'application/json'},
-      body: JSON.stringify({
-        path: '/manifests',
-        app_id: manifest.app_id,
-        content: JSON.stringify(manifest)
-      })
+    const response = await this.$store.state.Session.apiCall('/manifests', 'POST', {
+      app_id: manifest.app_id,
+      content: JSON.stringify(manifest)
     })
     this.$store.commit('setManifest', manifest)
     return response

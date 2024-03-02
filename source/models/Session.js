@@ -38,16 +38,24 @@ export default class Session {
     if (data) {
       options.body = JSON.stringify(data)
     }
-    let response = await fetch(url, options)
-
-    if (!response.ok) {
-      throw new Error(response.statusText)
-    }
-
+    return fetch(url, options)
+    .then(response => Session.handleResponse(response))
+  }
+  static async handleResponse(response) {
+    let out = undefined
     // Catch an empty body, such as No Content after a delete
     const clonedResponse = response.clone()
     const text = await clonedResponse.text()
-    if (text.replaceAll(' ','').length > 0) { return response.json() }
+
+    if (text.replaceAll(' ','').length > 0) {
+     out = await response.json()
+    }
+
+    if (response.ok) {
+      return out
+    } else {
+      throw new Error(out.error)
+    }
   }
 
   static async create(token, client, expiry, uid) {
