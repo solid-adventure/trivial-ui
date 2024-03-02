@@ -13,11 +13,10 @@ import Settings from "../components/Settings.vue";
 import AccountLocked from "../components/AccountLocked.vue";
 import InstanceSettings from "../components/InstanceSettings.vue";
 import InstanceActivity from "../components/builderv2/InstanceActivity.vue";
-import InstanceExport from "../components/InstanceExport.vue";
 import Builder from "../components/builderv2/Builder.vue";
 import OrganizationSettings from "../components/OrganizationSettings.vue";
 import OrganizationInviteUser from "../components/OrganizationInviteUser.vue";
-import WebhookDisplay from "../components/WebhookDisplay.vue";
+// import WebhookDisplay from "../components/WebhookDisplay.vue";
 import Actions from "../components/Actions.vue";
 import FunctionWriter from "../components/FunctionWriter.vue";
 import Session from "../models/Session.js";
@@ -59,8 +58,6 @@ const routes = [
     name: "Settings",
   },
   { path: "/apps/:id/activity", component: InstanceActivity, name: "Activity" },
-  // revisit Export crazy template
-  // { path: '/apps/:id/export', component: InstanceExport },
   { path: "/apps/:id/builder2", component: Builder, name: "Builder" },
   // Route below seems to be a duplicate of /apps/:id which defaults to Panels component
   { path: "/apps/:id/panels", component: Panels, name: "Panels" },

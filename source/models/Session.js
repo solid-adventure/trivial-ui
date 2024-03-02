@@ -39,13 +39,12 @@ export default class Session {
       options.body = JSON.stringify(data)
     }
     let response = await fetch(url, options)
-    .catch(error => Promise.reject(error))
 
     if (!response.ok) {
-      Promise.reject(response)
+      throw new Error(response.statusText)
     }
 
-    // Catch an empty body, such as No content after a delete
+    // Catch an empty body, such as No Content after a delete
     const clonedResponse = response.clone()
     const text = await clonedResponse.text()
     if (text.replaceAll(' ','').length > 0) { return response.json() }

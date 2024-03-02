@@ -264,7 +264,7 @@
       // We get the basics from the prop, but load the full object here
       async fetchEntry() {
         try {
-         let entry = await fetchJSON(`/proxy/trivial?path=/activity_entries/${this.webhook.id}`)
+          let entry = await this.$store.state.Session.apiCall(`/activity_entries/${this.webhook.id}`)
          this.diagnostics = entry.diagnostics
         } catch (e) {
           console.error('[WebhooksTable][fetchData] Error:', e)
@@ -300,23 +300,8 @@
 
       async resendPayload() {
         try {
-      		let response = await fetch('/proxy/trivial', {
-            method: 'POST',
-            headers: {'content-type': 'application/json'},
-            body: JSON.stringify({
-              path: `/webhooks/${this.webhook.id}/resend`
-            })
-          })
-          let result = await response.json()
-
-          if (result.status < 300) {
-            track('Re-Sent Webhook', {
-              'Status': result.status
-            })
-            this.resendStatus('Sent!')
-          } else {
-            this.resendFailed(result.message || result.error)
-          }
+          await this.$store.state.Session.apiCall(`/webhooks/${this.webhook.id}/resend`, 'POST')
+          this.resendStatus('Sent!')
         } catch (error) {
           this.resendFailed(error)
         }
