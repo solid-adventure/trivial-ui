@@ -3,14 +3,6 @@
 
     <div class="page-inset">
       <h2>{{ organization.name }} | Users And Roles</h2>
-
-  <!--
-      <form id="editOrgForm">
-        <label >Name<input type="text" :placeholder="organization.name" v-model="updatedName"></label>
-        <label>Billing Email<input type="text" :placeholder="organization.billing_email" v-model="updatedBillingEmail"></label>
-        <button class="button-medium" @click="editOrganization">Update Organization</button>
-      </form> -->
-
       <div class="action-row">
         <a :href="newInvitationPath" class="button-medium">Add New User</a>
       </div>
@@ -44,7 +36,7 @@
   </div>
 </template>
 <script>
-import { fetchJSON } from 'trivial-core/lib/component-utils'
+
 import Icon from './Icon.vue'
 
 export default {
@@ -78,7 +70,7 @@ export default {
     },
 
     orgDeletable() {
-      return this.users.length == 0
+      return this.users.length === 1
     },
 
   },
@@ -91,66 +83,34 @@ export default {
 
     async loadOrganization(){
       try{
-        let response = await fetchJSON(`/proxy/trivial?path=/organizations/${this.orgId}`)
-        this.organization = response
+        this.organization = await this.$store.state.Session.apiCall(`/organizations/${this.orgId}`)
         this.users.push(...this.organization.users)
-        console.log(JSON.stringify(this.organization, null, 2))
-
       } catch(error){
-          console.log('[OrganizationSettings][loadOrganization] Error:', error)
+        // TODO these should all print to the UI, not the console
+        console.error('[OrganizationSettings][loadOrganization] Error:', error)
       }
-    },
-
-    async editOrganization(e){
-      e.preventDefault()
-      let updatedParams = {}
-      if(this.updatedBillingEmail !== this.organization.billing_email) updatedParams.billing_email = this.updatedBillingEmail
-      if(this.updatedName !== this.organization.name) updatedParams.name = this.updatedName
-      if(!updatedParams.name && !updatedParams.billing_email) return // no updates provided
-      try{
-        let response = await fetchJSON('/proxy/trivial', {  
-          method: 'PUT',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({
-            ...updatedParams,
-            path: `/organizations/${this.orgId}`
-          })
-        })
-      } catch(error){
-        console.log('[OrganizationSettings][editOrganization] Error:', error)
-      }
-      this.updatedBillingEmail = this.updatedName = ''
     },
 
     async deleteOrganization() {
       if(confirm(`Are you sure you want to delete the ${this.organization.name} Organization?`))
       try {
-          let response = await fetch(`/proxy/trivial?path=/organizations/${this.orgId}`, {
-              method: 'DELETE',
-              headers: { 'content-type': 'application/json' }
-          });
-          if(response.status!== 204) throw new Error(response.status)
-          window.location.href = `http://localhost:3000/settings`
+        await this.$store.state.Session.apiCall(`/organizations/${this.orgId}`, 'DELETE')
+        this.$router.push({ path: '/settings' })
       }
       catch (error) {
-          console.log('[OrganizationsManager][deleteOrganization]', error);
+        // TODO these should all print to the UI, not the console
+        console.error('[OrganizationsManager][deleteOrganization]', error);
       }
     },
 
     async removeUser(user){
       if(confirm(`Are you sure you want to delete ${user.name} from the ${this.organization.name} Organization?`))
       try{
-        let response = await fetch(`/proxy/trivial?path=/organizations/${this.orgId}/delete_org_role&user_id=${user.user_id}`, {
-          method: 'DELETE',
-        });
-        if (response.ok) {
-          this.users = this.users.filter(u => u.user_id != user.user_id)
-        }
-
-
-        // if(remove.status!== 204) throw new Error(remove.status)
+        await this.$store.state.Session.apiCall(`/organizations/${this.orgId}/delete_org_role?user_id=${user.user_id}`, 'DELETE')
+        this.users = this.users.filter(u => u.user_id != user.user_id)
       } catch(error){
-        console.log('[OrganizationsManager][deleteUser]', error);
+        // TODO these should all print to the UI, not the console
+        console.error('[OrganizationsManager][deleteUser]', error);
       }
     }
   },

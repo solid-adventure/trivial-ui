@@ -38,9 +38,17 @@ export default class Session {
     if (data) {
       options.body = JSON.stringify(data)
     }
-    return fetch(url, options)
-    .then(response => response.json())
-    .catch(error => console.error('Error:', error))
+    let response = await fetch(url, options)
+    .catch(error => Promise.reject(error))
+
+    if (!response.ok) {
+      Promise.reject(response)
+    }
+
+    // Catch an empty body, such as No content after a delete
+    const clonedResponse = response.clone()
+    const text = await clonedResponse.text()
+    if (text.replaceAll(' ','').length > 0) { return response.json() }
   }
 
   static async create(token, client, expiry, uid) {

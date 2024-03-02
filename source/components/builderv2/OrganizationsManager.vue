@@ -21,15 +21,11 @@ export default {
                 return
             }
             try {
-                await fetch('/proxy/trivial', {
-                    method: 'POST',
-                    headers: { 'content-type': 'application/json' },
-                    body: JSON.stringify({
-                        path: `/organizations`,
-                        name: this.newOrgName,
-                        billing_email: this.$store.state.user.email
-                    })
+                await this.$store.state.Session.apiCall(`/organizations`, 'POST', {
+                    name: this.newOrgName,
+                    billing_email: this.$store.state.user.email
                 });
+
             }
             catch (error) {
                 console.log('[OrganizationsManager][newOrganization] Error: ', error);
@@ -40,8 +36,7 @@ export default {
         },
         async fetchOrganizations() {
             try {
-                let orgs = await fetchJSON(`/proxy/trivial?path=/organizations`);
-                return orgs;
+                return await this.$store.state.Session.apiCall(`/organizations`);
             }
             catch (error) {
                 console.log('[OrganizationsManager][loadOrganizations] Error: ', error);
@@ -51,7 +46,7 @@ export default {
         async injectOrganizationUsers(orgs) {
             let promises = [];
             for (let org of orgs) {
-                let response = fetchJSON(`/proxy/trivial?path=/organizations/${org.id}`);
+                let response = this.$store.state.Session.apiCall(`/organizations/${org.id}`);
                 promises.push(response);
             }
             const responses = await Promise.all(promises);
