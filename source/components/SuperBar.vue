@@ -184,7 +184,7 @@
       },
 
       async themeUpdateCall() {
-        this.$store.state.Session.updateProfile({color_theme: this.activeTheme})
+        this.$store.state.Session.apiCall('/profile', 'PUT', {color_theme: this.activeTheme})
         .catch(err => console.error('[Settings][themeUpdateCall] Error: ', err))
       }
     }

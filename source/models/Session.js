@@ -6,20 +6,6 @@ export default class Session {
   constructor() {
   }
 
-
-  ///////// User Start //////////
-  static async getProfile() {
-    return Session.apiCall('/profile')
-    .then(data => data.user)
-  }
-
-  static async updateProfile(user) {
-    return Session.apiCall('/profile', 'PUT', user)
-    .then(data => data.user)
-  }
-  ///////// User End //////////
-
-
   static apiUrl(path) {
     return new URL(path, store.state.trivialApiUrl)
   }

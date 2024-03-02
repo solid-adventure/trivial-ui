@@ -245,14 +245,13 @@ const store = createStore({
     },
 
     async loadProfile({ commit, state }) {
-      let user
       try {
-        user = await Session.getProfile()
+        let data = await Session.apiCall('/profile')
+        commit('setUser', data.user)
       } catch (e) {
         console.error('Failed to load profile', e)
-        user = {name: 'guest'}
+        commit('setUser', {name: 'guest'})
       }
-      commit('setUser', user)
     },
 
     async loadResources({ commit }, { dispatch, router }) {
