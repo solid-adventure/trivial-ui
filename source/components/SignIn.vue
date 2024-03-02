@@ -71,7 +71,7 @@ export default {
                 }
                 TrackingService.identify(identity)
                 TrackingService.track('User Signin', identity)
-                this.$router.push('/')
+                window.location.href = '/' // Full reload to re-init state w/user present
             } catch(e) {
                 this.handleSignInError(e)
             }
