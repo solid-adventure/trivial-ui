@@ -110,14 +110,7 @@
       async sendCustom() {
         try {
           const appId = this.app.name
-          await fetchJSON('/proxy/trivial', {
-            method: 'post',
-            headers: {'content-type': 'application/json'},
-            body: JSON.stringify({
-              path: `/webhooks/${appId}/send`,
-              payload: JSON.parse(this.customPayload)
-            })
-          })
+          await this.$store.state.Session.apiCall(`/webhooks/${appId}/send`, 'POST', JSON.parse(this.customPayload))
           Notifications.success('Data sent')
         } catch (err) {
           console.error('Failed to send custom data', err)
