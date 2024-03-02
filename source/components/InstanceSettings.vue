@@ -346,8 +346,7 @@
 
       async loadManifest() {
         try {
-          let response = await fetch(`/proxy/trivial?path=/manifests&app_id=${this.appId}`)
-          let manifests = await response.json()
+          let manifests = await this.$store.state.Session.apiCall(`/manifests?app_id=${this.appId}`)
           this.manifest = manifests[0]
           this.manifestContent =
             new ManifestMigrator(JSON.parse(this.manifest.content)).migrate()
@@ -367,22 +366,14 @@
         this.rebuilding = true
         try {
           this.errorMessage = null
-    		  let response = await fetch(`/proxy/trivial`, {
-    			  method: 'put',
-    			  headers: {'content-type': 'application/json'},
-      			body: JSON.stringify({
-      				path: `/manifests/${this.manifest.id}`,
-      				content: JSON.stringify(this.manifestContent)
-      			})
-    		  })
-          let data = await response.json()
-          if (!response.ok)
-            throw new Error(data.errors.join('\n'))
-
-          this.manifest = data
+          this.manifest = await this.$store.state.Session.apiCall(`/manifests/${this.manifest.id}`,
+             'PUT',
+             {content: JSON.stringify(this.manifestContent)}
+          )
           this.manifestContent = JSON.parse(this.manifest.content)
-          await this.teardown(false)
-          await this.build()
+          // RELEASE BLOCKER --- SKIP FOR NOW
+          // await this.teardown(false)
+          // await this.build()
           this.rebuilding = false
           track('Saved Manifest Manually',{
               'ManifestId': this.manifest.id,
@@ -426,9 +417,11 @@
       async teardown(deleteFromBackend=true) {
         try {
           this.errorMessage = null
-          await fetchJSON(`/build/${this.appId}`, {
-            method: 'delete'
-          })
+
+          // RELEASE BLOCKER
+          // await fetchJSON(`/build/${this.appId}`, {
+          //   method: 'delete'
+          // })
           await this.removeCredentials()
           if (deleteFromBackend) {
             await this.destroy()
@@ -441,36 +434,26 @@
 
       // TODO: Deleting an app should remove its credentials automatically
       async removeCredentials() {
-        await fetchJSON('/proxy/trivial', {
-          method: 'put',
-          headers: {'content-type': 'application/json'},
-          body: JSON.stringify({
-            path: `/apps/${this.appId}/credentials`,
-            credentials: {}
-          })
-        })
+        await this.$store.state.Session.apiCall(`/apps/${this.appId}/credentials`, 'PUT',
+          {credentials: {}}
+        )
       },
 
       async destroy() {
-        let response = await fetchJSON(`/proxy/trivial?path=/apps/${this.appId}`, {
-          method: 'delete'
-        })
+        await this.$store.state.Session.apiCall(`/apps/${this.appId}`, 'DELETE')
       },
 
       async copyApp(){
         try{
-          this.errorMessage = null
-          let response = await fetchJSON('/proxy/trivial', {
-            method: 'post',
-            headers: {'content-type':'application/json'},
-            body: JSON.stringify({
-              path: `/apps/${this.appId}/copy`,
-              new_app_descriptive_name: this.new_app_descriptive_name
-            })
+          this.copyMessage = null
+          let new_app = await this.$store.state.Session.apiCall(`/apps/${this.appId}/copy`, 'POST', {
+            new_app_descriptive_name: this.new_app_descriptive_name
           })
-  
-          let new_app = await response
-          this.copyMessage = `<a href="/apps/${new_app.name}/builder2">${new_app.descriptive_name} Created!</a>`
+          if (new_app.errors) {
+            this.copyMessage = new_app.errors.join(',')
+          } else {
+            this.copyMessage = `<a href="/apps/${new_app.name}/builder2">${new_app.descriptive_name} Created!</a>`
+          }
         }
         catch(error){
           this.copyMessage = error.message
@@ -480,14 +463,7 @@
       async updateDescriptiveName(){
         try{
           this.errorMessage = null
-          let response = await fetchJSON('/proxy/trivial', {
-            method: 'put',
-            headers: {'content-type':'application/json'},
-            body: JSON.stringify({
-              path: `/apps/${this.appId}`,
-              descriptive_name: this.descriptive_name
-            })
-          })
+          let response = await this.$store.state.Session.apiCall(`/apps/${this.appId}`, 'PUT', {descriptive_name: this.descriptive_name})
           this.message = 'App name successfully updated!'
           setTimeout(() => {
             this.message = null
@@ -507,14 +483,7 @@
         try{
           this.errorMessage = null
           this.updatingPanels = true
-          let response = await fetchJSON('/proxy/trivial', {
-            method: 'put',
-            headers: {'content-type':'application/json'},
-            body: JSON.stringify({
-              path: `/apps/${this.appId}`,
-              panels: this.panels
-            })
-          })
+          await this.$store.state.Session.apiCall(`/apps/${this.appId}`, 'PUT', {panels: this.panels})
           this.panelMessage = 'Panel options successfully updated!'
         } catch(error){
           console.log('[InstanceSetings][updatePanels] Error:', error)
@@ -527,14 +496,7 @@
         try{
           this.errorMessage = null
           this.updatingSchedule = true
-          let response = await fetchJSON('/proxy/trivial', {
-            method: 'put',
-            headers: {'content-type':'application/json'},
-            body: JSON.stringify({
-              path: `/apps/${this.appId}`,
-              schedule: this.schedule
-            })
-          })
+          await this.$store.state.Session.apiCall(`/apps/${this.appId}`, 'PUT', {schedule: this.schedule})
           this.scheduleMessage = 'Schedule successfully updated!'
         } catch(error){
           console.log('[InstanceSetings][updateSchedule] Error:', error)

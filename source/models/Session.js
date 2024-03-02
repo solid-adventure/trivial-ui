@@ -25,13 +25,6 @@ export default class Session {
     if (!session.accessToken) { return }
     const url = new URL(path, store.state.trivialApiUrl)
 
-console.log('url', url)
-
-// Given a path like: /manifests&app_id=${appId}`
-
-// URL is building as:
-// http://localhost:3001/manifests&app_id=e1e7af2e9f4b91e3
-
     const options = {
       method: method,
       headers: {

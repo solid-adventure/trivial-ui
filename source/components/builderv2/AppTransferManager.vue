@@ -57,8 +57,9 @@ export default {
 
     async loadOrganizations() {
       try {
-        let response = await fetchJSON(`/proxy/trivial?path=/organizations`);
-        this.organizations = response;
+        // let response = await fetchJSON(`/proxy/trivial?path=/organizations`);
+        this.organizations = await this.$store.state.Session.apiCall('/organizations');
+        // this.organizations = response;
       } catch (error) {
         this.load_org_error = true;
       }
