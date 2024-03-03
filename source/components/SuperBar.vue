@@ -4,8 +4,6 @@
     <span class="brand"><a href="/"><img src="/assets/images/trivial-logo-light-warm.svg"/></a></span>
     <span class="superlink" :class="{active: isActive('dashboard')}"><a href="/dashboard">Dashboards</a></span>
     <span class="superlink" :class="{active: isActive('contract')}"><a href="/contract">Contracts</a></span>
-    <!-- TEMP DISABLE -->
-    <!-- <span class="superlink" :class="{active: isActive('unset')}"><a href="/?paneltype=unset">Data Connectors</a></span> -->
     <span class="settings">
       <div class ="theme">
         <ToggleButton
@@ -113,8 +111,8 @@
       }
     },
 
-    mounted() {
-      this.setActiveTheme()
+    watch: {
+      'theme': 'setActiveThemeAndApply',
     },
 
     components: {
@@ -123,6 +121,7 @@
     },
 
     computed: {
+
       themeToggleActive(){
         return this.activeTheme == 'Dark'
       },
@@ -133,17 +132,22 @@
         return match ? match[1] : (this.user.name || '')
       },
 
+      styleSheetLink() {
+        return this.theme === 'Dark' ? '/assets/stylesheets/app.css' : '/assets/stylesheets/app-light.css'
+      },
+
       ...mapState([
-        'user'
+        'user',
+        'theme'
       ]),
 
     },
 
     methods: {
 
-      setActiveTheme() {
-        if (!this.user || !this.user.color_theme) { return }
-        this.activeTheme = this.user.color_theme
+      setActiveThemeAndApply() {
+        this.activeTheme = this.theme
+        this.setStylesheet()
       },
 
       isActive(tab) {
@@ -156,26 +160,26 @@
         return tab == panelTypeFromLocation
 
       },
-      async updateToggleButtonState(event){
-        this.themeUpdating = true
+
+      setStylesheet() {
         this.prevLink = document.querySelector('link[rel=stylesheet]')
         this.newLink = document.createElement('link')
         this.newLink.rel = 'stylesheet'
+        this.newLink.href = this.styleSheetLink
+        this.prevLink.after(this.newLink)
+        this.prevLink.remove()
+      },
+
+      async updateToggleButtonState(event){
+        this.themeUpdating = true
         switch(event){
           case true:
             this.activeTheme = 'Dark'
-            this.newLink.href = '/assets/stylesheets/app.css'
-            this.prevLink.after(this.newLink)
             break
           case false:
             this.activeTheme = 'Light'
-            this.newLink.href = '/assets/stylesheets/app-light.css'
-            this.prevLink.after(this.newLink)
             break
         }
-        window.setTimeout(() => {
-          this.prevLink.remove()
-        }, 500)
         await this.themeUpdateCall()
         track('Changed Theme', {
           'New Active Theme': this.activeTheme
@@ -184,8 +188,9 @@
       },
 
       async themeUpdateCall() {
-        this.$store.state.Session.apiCall('/profile', 'PUT', {color_theme: this.activeTheme})
+        let data = await this.$store.state.Session.apiCall('/profile', 'PUT', {color_theme: this.activeTheme})
         .catch(err => console.error('[Settings][themeUpdateCall] Error: ', err))
+        this.$store.commit('setTheme', data.user.color_theme)
       }
     }
   }

@@ -14,6 +14,7 @@ const store = createStore({
     currentPath: '/',
     route: null,
     user: {},
+    theme: 'Light',
     app: {},
     isAuthenticated: false,
     showSuperBar: false,
@@ -188,12 +189,12 @@ const store = createStore({
       state.user = user
     },
 
-    setDataSample(state, dataSample) {
-      state.dataSample = dataSample
+    setTheme(state, theme) {
+      state.theme = theme
     },
 
-    setWebhookSocket(state, socket) {
-      state.webhookSocket = socket
+    setDataSample(state, dataSample) {
+      state.dataSample = dataSample
     },
 
     addListener(state, {event, listener}) {
@@ -247,6 +248,7 @@ const store = createStore({
     async loadProfile({ commit, state }) {
       try {
         let data = await Session.apiCall('/profile')
+        commit('setTheme', data.user.color_theme)
         commit('setUser', data.user)
       } catch (e) {
         console.error('Failed to load profile', e)
