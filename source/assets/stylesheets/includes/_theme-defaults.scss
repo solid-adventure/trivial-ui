@@ -62,6 +62,8 @@ $input-border-color: color.adjust($background, $lightness: -30%) !default;
 $table-column-head-color: $accent !default;
 $success-icon: url("/assets/images/check-circle-light.svg") !default;
 $error-icon: url("/assets/images/check-exclamation.svg") !default;
+$checkmark-icon: url("/assets/images/checkmark.svg") !default;
+$x-symbol-icon: url("/assets/images/x-symbol.svg") !default;
 $webhook-pre-color: #98a3ff !default;
 $auth-text-field-color: #e9ecff !default;
 $auth-button-font-color: $on-background-high-contrast !default;
@@ -162,6 +164,8 @@ $tool-tip-background: $background-high-contrast !default;
 
   --success-icon: #{$success-icon};
   --error-icon: #{$error-icon};
+  --checkmark-icon: #{$checkmark-icon};
+  --x-symbol-icon: #{$x-symbol-icon};
   --webhook-pre-color: #{$webhook-pre-color};
   --auth-text-field-color: #{$auth-text-field-color};
   --auth-button-font-color: #{$auth-button-font-color};

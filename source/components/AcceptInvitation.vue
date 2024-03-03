@@ -30,17 +30,21 @@
                           <input type='password' class='text-field' placeholder ='New Password' v-model='new_password'/>
                       </div>
                       <div>
-                          <input type='password' class='text-field' placeholder ='Confirm Password' v-model='confirm_password'/>
+                          <input id = "confirm-password-input" @click.once = "displayPasswordMatchErr = true" type='password' class='text-field' placeholder ='Confirm Password' v-model='confirm_password'/>
                       </div>
-
+                      <PasswordValidator :password = "new_password" :confirm_password = "confirm_password" :enable_confirm_password = "true" :displayPasswordMatchErr = "displayPasswordMatchErr"  @passwordValidity = "updatePasswordValidity"/>
                     </span>
                     <transition name="fade">
-                        <p v-if="errorMessage"><em>{{errorMessage}}</em></p>
+                        <div id = "error-msg-container">
+                          <span v-if="errorMessage">
+                            <em>{{errorMessage}}</em>
+                          </span>
+                        </div>
                     </transition>
                     <transition name="fade">
                         <div v-if="message" class="message">{{message}}</div>
                     </transition>
-                    <ActionButton class = "button-small submit" :action="handleSubmit" value ="Submit" working-value="Updating..."></ActionButton>
+                    <ActionButton class = "button-small submit" :action="handleSubmit" value ="Submit" working-value="Updating..." :disabled="!isPasswordValid"></ActionButton>
                     <p v-if="existingUser">
                       Need to create an account? <a href="/" @click.prevent="handleNewUserClick" >Sign up</a>
                     </p>
@@ -75,19 +79,26 @@
 }
 
 .submit{
-    margin: 30px 0 45px 266px;
+    margin: 0 0 45px 266px;
 }
 
+#confirm-password-input {
+  margin-bottom: 0;
+}
 
+#error-msg-container {
+  height: 1.5em;
+}
 </style>
 
 <script>
   import ActionButton from './controls/ActionButton.vue'
   import { fetchJSON } from 'trivial-core/lib/component-utils'
-
+  import PasswordValidator from './builderv2/PasswordValidator.vue'
 export default {
     components: { 
-        ActionButton 
+        ActionButton, 
+        PasswordValidator
     },
     
     data(){
@@ -98,15 +109,13 @@ export default {
           message: null,
           current_password: '',
           new_password: '',
-          confirm_password:''
+          confirm_password:'',
+          isPasswordValid: false,
+          displayPasswordMatchErr: false
         }        
     },
 
     computed: {
-        // TODO leverage
-        passwordMatch(){
-          return this.new_password === this.confirm_password
-        },
 
         invitationToken(){
           let params = new URLSearchParams(window.location.search);
@@ -172,7 +181,15 @@ export default {
                 headers: {'content-type': 'application/json'},
                 body: JSON.stringify(this.acceptInvitationPayload)
               })
-              this.completed = true
+              if(update.status === 202){
+                this.completed = true
+              } else if (update.status === 406){
+                this.errorMessage = "Invalid Invitation Token"
+              } else if (update.status === 422){
+                this.errorMessage = "Invalid Password"
+              } else {
+                this.errorMessage = "Server is unable to process the invitation request"
+              }
             } catch (err) {
                 console.log('[ChangePassword][handleSubmit] Error: ', err)
                 this.errorMessage = err.message
@@ -180,6 +197,9 @@ export default {
             this.current_password = ''
             this.new_password = ''
             this.confirm_password = ''
+        },
+        updatePasswordValidity(value){
+          this.isPasswordValid = value
         }
     }
 }

@@ -1,14 +1,16 @@
 <template>
     <div class="overlay">
         <div class="container">
-            <h2>Change Password</h2>
+            <span class="brand"><img /></span>
+            <h3 id = "reset-password-title">Change password:</h3>
             <form id='resetPasswordForm'>
                 <div>
                     <input type='password' class='text-field' placeholder ='New Password' v-model='new_password'/>
                 </div>
                 <div>
-                    <input type='password' class='text-field' placeholder ='Confirm Password' v-model='confirm_password'/>
+                    <input id = "confirm-password-input" type='password' @click.once = "displayPasswordMatchErr = true" class='text-field' placeholder ='Confirm Password' v-model='confirm_password'/>
                 </div>
+                <PasswordValidator :password = "new_password" :confirm_password = "confirm_password" :enable_confirm_password = "true" :displayPasswordMatchErr = "displayPasswordMatchErr"  @passwordValidity = "updatePasswordValidity"/>
                 <transition name="fade">
                     <p v-if="errorMessage"><em>{{errorMessage}}</em></p>
                 </transition>
@@ -16,7 +18,7 @@
                     <div v-if="message" class="message">{{message}}</div>
                 </transition>
                 <div class="submit">
-        	        <input v-if="!submit_clicked" type='submit' class='button' @click="handleSubmit" value ='Submit' />
+        	        <input v-if="!submit_clicked" type='submit' class='button' @click="handleSubmit" value ='Submit' :disabled="!isPasswordValid"/>
         	        <input v-else type='submit' class='button clicked' value ='Updating...' />
                 </div>
 	        </form>
@@ -47,22 +49,33 @@
 
 .overlay{
     height: calc(100% - 80px);
-    width: 80%;
+    width: 100%;
     float: right;
+}
+#reset-password-title {
+    text-align: left;
+    margin-left: 0;
+}
+#confirm-password-input {
+  margin-bottom: 0;
 }
 </style>
 
 <script>
-  import { fetchJSON } from 'trivial-core/lib/component-utils'
+import { fetchJSON } from 'trivial-core/lib/component-utils'
+import PasswordValidator from './builderv2/PasswordValidator.vue'
 
 export default {
+    components: { PasswordValidator },
     data(){
         return {
             errorMessage: null,
             message: null,
             submit_clicked: false,
             new_password: '',
-            confirm_password:''
+            confirm_password:'',
+            isPasswordValid: false,
+            displayPasswordMatchErr: false
         }        
     },
 
@@ -93,6 +106,9 @@ export default {
             this.new_password = ''
             this.confirm_password = ''
 
+        },
+        updatePasswordValidity(value){
+          this.isPasswordValid = value
         }
     }
 }

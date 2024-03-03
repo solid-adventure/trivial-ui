@@ -5,7 +5,6 @@
 
       <h2>Account Settings</h2>
 
-      <a href="/changepassword">Change password</a><br />
       <a href="/signout">Sign out</a><br>
       <div class="section">
         <OrganizationsManager></OrganizationsManager>
