@@ -21,15 +21,23 @@ import FunctionWriter from "../components/FunctionWriter.vue";
 import Session from "../models/Session.js";
 
 const routes = [
-  { path: "/", component: AppsOverview, name: "Home" },
-  { path: "/:paneltype", component: AppsOverview, name: "PanelType" },
+  { path: "/",
+    component: AppsOverview,
+    name: "Home"
+  },
+  { path: "/:paneltype",
+    component: AppsOverview,
+    name: "PanelType"
+  },
   {
     path: "/signin",
     component: SignIn,
     props: { hideSuperBar: true },
     name: "Sign In",
   },
-  { path: "/signout", component: SignOut, name: "Sign Out" },
+  { path: "/signout",
+    component: SignOut, name: "Sign Out",
+  },
   {
     path: "/changepassword",
     component: ChangePassword,
@@ -39,28 +47,56 @@ const routes = [
     path: "/acceptinvitation",
     component: AcceptInvitation,
     name: "Accept Invitation",
+    meta: { requiresAuth: false }
   },
   {
     path: "/recoverpassword",
     component: RecoverPassword,
     name: "Recover Password",
+    meta: { requiresAuth: false }
   },
-  { path: "/resetpassword", component: ResetPassword, name: "Reset Password" },
-  { path: "/register", component: Register, name: "Register" },
-  { path: "/settings", component: Settings, name: "Account Settings" },
-  { path: "/apps/new", component: NewAppForm, name: "New App" },
-  { path: "/account-locked", component: AccountLocked, name: "Account Locked" },
-  { path: "/apps/:id", component: Panels, name: "Show App" },
+  { path: "/resetpassword",
+    component: ResetPassword,
+    name: "Reset Password",
+    meta: { requiresAuth: false }
+  },
+  { path: "/register",
+    component: Register,
+    name: "Register",
+    meta: { requiresAuth: false }
+  },
+  { path: "/settings",
+    component: Settings,
+    name: "Account Settings"
+  },
+  { path: "/apps/new",
+    component: NewAppForm,
+    name: "New App"
+  },
+  { path: "/account-locked",
+    component: AccountLocked,
+    name: "Account Locked"
+  },
+  { path: "/apps/:id",
+    component: Panels,
+    name: "Show App"
+  },
   {
     path: "/apps/:id/settings2",
     component: InstanceSettings,
     name: "Settings",
   },
-  { path: "/apps/:id/activity", component: InstanceActivity, name: "Activity" },
-  { path: "/apps/:id/builder2", component: Builder, name: "Builder" },
-  // Route below seems to be a duplicate of /apps/:id which defaults to Panels component
-  { path: "/apps/:id/panels", component: Panels, name: "Panels" },
-  { path: "/apps/:id/builder2/*", component: Builder, name: "Actions" }, //change this path
+  { path: "/apps/:id/activity",
+    component: InstanceActivity,
+    name: "Activity"
+  },
+  { path: "/apps/:id/builder2",
+    component: Builder,
+    name: "Builder"
+  },
+  { path: "/apps/:id/builder2/*",
+    component: Builder,
+    name: "Actions" }, //change this path
   {
     path: "/organizations/:id/edit",
     component: OrganizationSettings,
@@ -78,24 +114,29 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach(async (to, from, next) => {
-  let valid = await Session.validate(to, from, next);
-  console.log("to", to);
-  console.log("from", from);
-  console.log("valid", valid);
-  // Valid session, redirect away from signin
-  // if (to.path === '/signin' && valid) {
-  //   next({
-  //     path: "/",
-  //     // params: { nextUrl: to.fullPath },
-  //   });
-  // }
-  if (!valid) {
-    next({
+const redirectToSignIn = (to, loggedIn) => {
+  if (loggedIn && to.path === "/signin") { return false }
+  if (!loggedIn && to.path === "/signin") { return false }
+  if (to.meta.requiresAuth === false) { return false }
+  if (!loggedIn) { return true }
+  if (loggedIn) { return false }
+  // // Not expected to fire, but default to protected
+  return true
+}
+
+router.beforeEach(async (to, from) => {
+  let loggedIn = await Session.validate();
+  if (redirectToSignIn(to, loggedIn)) {
+    return {
       path: "/signin"
-    });
+    }
   }
-  next();
-});
+  if (loggedIn && to.path === "/signin") {
+    return {
+      path: "/"
+    }
+  }
+})
+
 
 export default router;
