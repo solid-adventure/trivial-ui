@@ -196,7 +196,7 @@ import SearchField from '../../components/controls/SearchField.vue'
 import JsonViewer from './JsonViewer.vue'
 import WebhooksChart from './WebhooksChart.vue'
 import Notices from '../Notices.vue'
-import { mapActions, mapState } from 'vuex'
+import { mapState } from 'vuex'
 
   export default {
 
@@ -270,7 +270,6 @@ import { mapActions, mapState } from 'vuex'
         notifications.error(`Could not load webhooks: ${error.message}`)
       }
       this.loading = false
-      this.subscribeWebhookEvents(this.webhookListener)
     },
 
     selectFirst(webhooks) {
@@ -284,7 +283,6 @@ import { mapActions, mapState } from 'vuex'
       track('Received New App Data', {
         'App ID': this.appId
       })
-      this.unsubscribeWebhookEvents(this.webhookListener) // pause until reloaded
     },
 
     async reload() {
@@ -317,11 +315,6 @@ import { mapActions, mapState } from 'vuex'
       if (status >= 200 && status < 400) { return 'success' }
       if (status >= 400) { return 'error' }
     },
-
-    ...mapActions([
-      'subscribeWebhookEvents',
-      'unsubscribeWebhookEvents'
-    ])
   }
 }
 </script>

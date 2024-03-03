@@ -1,7 +1,5 @@
-const http = require('http');
 const express = require('express')
 const serve = express()
-const fs = require('fs');
 const enforce = require('express-sslify')
 const cookieParser = require('cookie-parser')
 const request = require('request');
@@ -11,8 +9,6 @@ const Session = require(`${__dirname}/Session.js`)
 const createError = require('http-errors')
 
 const {
-  // ActionCreator,
-  ActionInput,
   AppBuilder,
   AppManager,
   AppTemplate,
@@ -24,16 +20,6 @@ const {
 } = require('trivial-core')
 const pino = require('pino')
 const pinoHttp = require('pino-http')
-const WebSocketServer = require('websocket').server
-const { parse } = require("csv-parse");
-const multer = require("multer")
-// const ActionCreator = require('./lib/ActionCreator')
-const { encoding_for_model } = require("@dqbd/tiktoken");
-const { Configuration, OpenAIApi } = require("openai");
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-const openai = new OpenAIApi(configuration);
 
 const port = process.env.PORT || 3000;
 const logger = pino({
@@ -78,22 +64,6 @@ const download = async (req, res) => {
     res.send(archiveData)
   } catch (err) {
     req.log.error({err}, `[download] Could not build app '${req.body.app_id}'`)
-    res.sendStatus(500)
-  }
-}
-
-// Writes an app directly to the filesystem for local development
-const writeLocally = async (req, res) => {
-  try {
-    let builder = new AppBuilder(req.body.app_id, {
-      template: req.body.template,
-      version: req.body.version,
-      req: req
-    })
-    await builder.writeLocally(req.body)
-    res.sendStatus(200)
-  } catch (err) {
-    req.log.error({err}, `[writeLocally] Could not build app '${req.body.app_id}'`)
     res.sendStatus(500)
   }
 }
@@ -170,231 +140,6 @@ const callProtocol = async (req, res) => {
   }
 }
 
-const convertCsvToJson = async (req, res) => {
-  let columns = req.body.first_row_as_column_headers || true
-  if (columns == "true") { columns = true}
-  if (columns == "false") { columns = false}
-  let parser = parse({columns: columns}, (err, records) => {
-    fs.unlink(req.file.path, () => {})
-    if (err) {
-      res.status(500).json({error: `${err}`})
-    } else {
-      res.status(200).json({'uploaded': req.file.originalname, rows: records})
-    }
-  })
-  fs.createReadStream(req.file.path).pipe(parser)
-}
-
-const performAction = async (req, res) => {
-
-  let Action
-  try {
-    Action = require(`trivial-core/lib/actionsv2/actions/${req.params.service}/${req.params.action}/Action`)
-  } catch (err) {
-    req.log.error({err}, `[performAction] Require Failed ${err}`)
-  }
-
-  try {
-    let input = new ActionInput({config: req.body.config, values: {payload: req.body.payload}})
-    let action = new Action(input)
-    await action.perform()
-    res.send({body: action.output._values.payload, status: action.output._values.payload.status})
-  } catch (err) {
-    req.log.error({err}, `[performAction] Failed ${err}`)
-    res.sendStatus(500)
-  }
-}
-
-serve.post('/actions/:service/:action/perform', Session.validate, (req, res) => {
-  performAction(req, res)
-})
-
-serve.post('/suggestionTokens', Session.validate, (req, res) => {
-  const enc = encoding_for_model(req.body.model)
-  const tokens = enc.encode(req.body.prompt).length
-  res.status(200).json({tokens: tokens})
-})
-
-serve.post("/suggestionStream", Session.validate, (req, res) => {
-  res.setHeader("Cache-Control", "no-cache");
-  res.setHeader("Content-Type", "text/event-stream");
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Connection", "keep-alive");
-  res.flushHeaders(); // flush the headers to establish SSE with client
-  if (req.body.model === 'gpt-3.5-turbo') {
-    return suggestionChat(req, res)
-  }
-  return suggestion(req, res)
-});
-
-serve.post("/suggestionChatStream", Session.validate, (req, res) => {
-  res.setHeader("Cache-Control", "no-cache");
-  res.setHeader("Content-Type", "text/event-stream");
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Connection", "keep-alive");
-  res.flushHeaders(); // flush the headers to establish SSE with client
-  return suggestionChat(req, res)
-});
-
-const suggestion = (req, res) => {
-  try {
-    const response = openai.createCompletion(req.body, { responseType: 'stream' });
-    response.then((resp) => {
-        resp.data.on("data", (data) => {
-          // console.log(`[DATA] ${data.toString()}`); // TEMP DEBUG
-          const lines = data
-            .toString()
-            .split("\n")
-            .filter((line) => line.trim() !== "");
-          for (const line of lines) {
-            const message = line.replace(/^data: /, "");
-            if (message === "[DONE]") {
-              res.end();
-              return;
-            }
-            const parsed = JSON.parse(message);
-            res.write(JSON.stringify(parsed.choices[0])+'\n');
-          }
-        });
-        resp.data.on("end", (end) => {
-          console.log(end);
-        });
-      })
-      .catch((e) => {
-        res.end(
-          JSON.stringify({ 
-            error: e.response.statusText,
-            code: e.response.status,
-          })
-        );
-      });
-  } catch (e) {
-    console.log('[suggestionStream Failed]}', e);
-    res.end(JSON.stringify({ error: e.message, code: 500 }));
-  }
-}
-
-const suggestionChat = (req, res) => {
-  try {
-    const response = openai.createChatCompletion({
-      messages: [{role: 'user', content: req.body.prompt}],
-      model: req.body.model,
-      max_tokens: req.body.max_tokens,
-      temperature: req.body.temperature,
-      top_p: req.body.top_p,
-      presence_penalty: req.body.presence_penalty,
-      frequency_penalty: req.body.frequency_penalty,
-      stop: req.body.stop,
-      stream: true
-    }, { responseType: 'stream' });
-    response.then((resp) => {
-        // Send space char to format response correctly
-        res.write('{"text": " "}\n\n') 
-        resp.data.on("data", (data) => {
-          try {
-          // console.log(`[DATA] ${data.toString()}`); // TEMP DEBUG
-            const lines = data
-              .toString()
-              .split("\n")
-              .filter((line) => line.trim() !== "");
-            for (const line of lines) {
-              const message = line.replace(/^data: /, "");
-              if (message === "[DONE]") {
-                res.end();
-                return;
-              }
-              const parsed = JSON.parse(message);
-              if (!parsed.choices[0].delta.content) continue
-              const chunk = {
-                text: parsed.choices[0].delta.content,
-              }
-              res.write(JSON.stringify(chunk)+'\n\n');
-            }
-          } catch (e) {
-            console.log('[suggestionStream Parsing Error]', e)
-          }
-        });
-        resp.data.on("end", (end) => {
-          console.log(end);
-        });
-      })
-      .catch((e) => {
-        res.end(
-          JSON.stringify({ 
-            error: e.response.statusText,
-            code: e.response.status,
-          })
-        );
-      });
-  } catch (e) {
-    console.log('[suggestionStream Failed]}', e);
-    res.end(JSON.stringify({ error: e.message, code: 500 }));
-  }
-}
-
-serve.post('/suggestion', Session.validate, (req, res) => {
-  request({
-    headers: {
-      'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
-    },
-    url: new URL("https://api.openai.com/v1/completions"),
-    method: 'post',
-    json: req.body
-  },
-    (error, response, body) => {
-      if (error) {
-        res.status(500).json({error: error})
-      } else {
-        res.status(response.statusCode).send(response)
-      }
-    })
-})
-
-serve.post('/suggestionChat', Session.validate, (req, res) => {
-  request({
-    headers: {
-      'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
-    },
-    url: new URL("https://api.openai.com/v1/chat/completions"),
-    method: 'post',
-    json: req.body
-  },
-    (error, response, body) => {
-      if (error) {
-        res.status(500).json({error: error})
-      } else {
-        res.status(response.statusCode).send(response)
-      }
-    })
-})
-
-serve.post('/correction-log', Session.validate, (req, res) => {
-  let state = req.body.state
-  let query = req.body.query
-  let path = `./tmp/correction-log`
-  fs.promises.mkdir(path, {recursive: true})
-  .then(x => fs.promises.writeFile(`${path}/${state}.sql`, query))
-  .catch(e => console.log(`[correction-log] ${e}`))
-})
-
-serve.post('/correction', Session.validate, (req, res) => {
-  request({
-    headers: {
-      'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
-    },
-    url: new URL("https://api.openai.com/v1/edits"),
-    method: 'post',
-    json: req.body
-  },
-    (error, response, body) => {
-      if (error) {
-        res.status(500).json({error: error})
-      } else {
-        res.status(response.statusCode).send(response)
-      }
-    })
-})
-
 serve.post('/apps/call', (req, res) => {
   request({
     url: new URL(req.query.url),
@@ -410,75 +155,13 @@ serve.post('/apps/call', (req, res) => {
     })
 })
 
-const upload = multer({ dest: './tmp/' })
-serve.post('/csv-to-json', upload.single('file'), (req, res) => {
-  convertCsvToJson(req, res)
-})
-
-// const actionCreatorPaths = function() {
-//   serve.get('/actions', Session.validate, (req,res) => {
-//     res.render('actions.html')
-//   })
-
-//   serve.post('/actions', Session.validate, (req, res) => {
-
-//     let actionCreator = new ActionCreator(req.body.service, req.body.action, req.body.template)
-//     actionCreator.build()
-//     .then(response => { handleResponse(response) })
-//     .catch(error => { handleResponse(error) })
-
-//     function handleResponse(out) {
-//       if (out.error) {
-//         res.send({status: 500, body: out.error})
-//       } else if (out.success) {
-//         res.send({status: 200, body: out.success})
-//       }
-//     }
-
-//   })
-// }
-
-// if ('development' === process.env.NODE_ENV) {
-//   actionCreatorPaths()
-// }
-
 serve.post('/build', (req, res) => {
 	build(req, res)
-})
-
-
-serve.post('/writeLocally', (req, res) => {
-  writeLocally(req, res)
 })
 
 serve.delete('/build/:id', (req, res) => {
   teardown(req, res)
 })
-
-// Get request redirects to POST via client side JS to prevent eager-loading triggering downloads
-serve.get("/downloadFile/", (req, res) => {
-  res.render('downloadFile.html', {url: req.query.u})
-})
-
-// /downloadFile?u=https://www.file-to-download.com/path/file.txt
-serve.post("/downloadFile/", (req, res) => {
-  console.log`[POST] downloadFile`
-  let url = req.query.u
-
-  request({
-    url: new URL(url)},
-    (error, response, body) => {
-      let path = `./tmp/downloads`
-      let file = `trivial_${Date.now()}.zpl`
-      fs.promises.mkdir(path, {recursive: true})
-      .then(x => fs.promises.writeFile(`${path}/${file}`, body))
-      .then(x => res.download(`${path}/${file}`))    
-      .catch(console.error)
-    }
-  )
-
-
-});
 
 serve.get('/download/:id', download)
 
@@ -558,6 +241,3 @@ const httpServer = serve.listen(port, () => {
   logger.info(`Server running at http://localhost:${port}/`);
 });
 
-// Web Socket
-const wsServer = new WebSocketServer({httpServer, autoAcceptConnections: false})
-wsServer.on('request', request => UpdateManager.handleRequest(request, expressLogger.logger))

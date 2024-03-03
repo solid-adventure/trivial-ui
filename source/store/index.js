@@ -4,7 +4,6 @@ import KeyboardControl from '../lib/KeyboardControl'
 import notifications from '../components/notifications'
 import ManifestMigrator from 'trivial-core/lib/ManifestMigrator'
 import FeatureManager from 'trivial-core/lib/FeatureManager'
-import ReconnectingWebSocket from 'reconnecting-websocket'
 import ActionPath from 'trivial-core/lib/actionsv2/ActionPath'
 import router from '../router'
 
@@ -55,15 +54,6 @@ const store = createStore({
       if (state.tourStep != state.tourSteps.indexOf(section)) { return true }
       return false
     },
-
-    // works but unused
-    // hasCredentialSetForActionType: (state) => (actionCredentialType) => {
-    //   let credentialSets = state.credentialSets
-    //   let reqs = Object.keys(actionCredentialType).map(k => actionCredentialType[k].type)
-    //   let cs_types = credentialSets.map(cs => cs.credential_type)
-    //   let unmet_reqs = reqs.filter(req => !cs_types.includes(req))
-    //   return unmet_reqs.length == 0
-    // },
 
   },
 
@@ -250,65 +240,6 @@ const store = createStore({
       }
     },
 
-    // This works, but was a bit hacky and too slow
-    // async setCredentialOnRunnerApp( { state, commit, dispatch }, {config, name, forAction}) {
-    //   let runnerApp
-    //   try {
-    //     runnerApp = state.app.panels.options.queryRunnerApp
-    //   } catch (e) {
-    //     return
-    //     console.log(e)
-    //   }
-    //   if (!runnerApp) { return }
-    //   let manifest = await dispatch('getManifestByAppName', runnerApp.hostname)
-    //   let manifestContent = JSON.parse(manifest.content)
-
-    //   // Hack alert! We're counting on a specific manifest template to write this config into the correct location
-    //   // TODO Crawl the manifest to replace the config by it's action type, not location
-    //   if ( manifestContent.program.definition.actions[0].definition.actions[1].config[name].$cred != config[name].$cred ) {
-    //     commit('setQueryRunnerAppReady', false)
-    //     let updatedManifestContent = await dispatch('writeCredentialIntoManifestContent', { manifestContent, config })
-    //     await dispatch('saveManifestContentById', { id: manifest.id, manifestContent: updatedManifestContent })
-    //     await dispatch('buildByManifestContent', {manifestContent: updatedManifestContent})
-    //   }
-    //   commit('setQueryRunnerApp', runnerApp)
-    //   commit('setQueryRunnerAppReady', true)
-    // },
-
-    // async writeCredentialIntoManifestContent({}, {manifestContent, config}) {
-    //   try {
-    //     manifestContent.program.definition.actions[0].definition.actions[1].config = config
-    //     return manifestContent
-    //   } catch (e) {
-    //     console.log(e)
-    //   }
-    // },
-
-    // async saveManifestContentById({}, {id, manifestContent}) {
-    //   const manifest = await fetchJSON(`/proxy/trivial`, {
-    //     method: 'put',
-    //     headers: {'content-type': 'application/json'},
-    //     body: JSON.stringify({
-    //       path: `/manifests/${id}`,
-    //       content: JSON.stringify(manifestContent)
-    //     })
-    //   })
-    // },
-
-    // async getManifestByAppName({}, name) {
-    //   const all = await fetchJSON(`/proxy/trivial?path=/manifests&app_id=${name}`)
-    //   return all[0]
-    // },
-
-    // async buildByManifestContent({}, { manifestContent }) {
-    //   const params = FeatureManager.featureParams()
-    //   await fetchJSON(`/build?${params}`, {
-    //     method: 'post',
-    //     headers: {'content-type': 'application/json'},
-    //     body: JSON.stringify(manifestContent)
-    //   })
-    // },
-
     async loadProfile({ commit }) {
       let user
       try {
@@ -465,20 +396,6 @@ const store = createStore({
       })
     },
 
-    async writeLocally({ state }) {
-      const params = FeatureManager.featureParams()
-      await fetchJSON(`/writeLocally?${params}`, {
-        method: 'post',
-        headers: {'content-type': 'application/json'},
-        body: JSON.stringify(state.manifest.content)
-      })
-    },
-
-    async saveAndWriteLocally( { dispatch }) {
-      await dispatch('save')
-      await dispatch('writeLocally')
-    },
-
     async saveAndBuild({ dispatch }) {
       await dispatch('save')
       await dispatch('build')
@@ -508,51 +425,6 @@ const store = createStore({
           console.error({err, event, payload}, 'Error in event listener')
         }
       })
-    },
-
-    connectWebhookSocket({ state, commit, dispatch }) {
-      if (! state.webhookSocket) {
-        const proto = /^https/i.test(window.location.protocol) ? 'wss' : 'ws'
-        const socket = new ReconnectingWebSocket(
-          `${proto}://${window.location.host}/webhooks/${state.app.name}`
-        )
-
-        socket.addEventListener('message', data => {
-          try {
-            const msg = JSON.parse(data.data)
-            switch (msg.type) {
-            case 'new':
-              dispatch('emitEvent', {event: 'newWebhook', payload: {id: msg.id}})
-              break
-            }
-          } catch (err) {
-            console.error({err}, 'Error receiving message from web socket')
-          }
-        })
-
-        commit('setWebhookSocket', socket)
-      }
-    },
-
-    disconnectWebhookSocket({ state, commit }) {
-      if (state.webhookSocket) {
-        state.webhookSocket.close()
-        commit('setWebhookSocket', null)
-      }
-    },
-
-    subscribeWebhookEvents({ state, commit, dispatch }, listener) {
-      commit('addListener', {event: 'newWebhook', listener})
-      if (! state.webhookSocket) {
-        dispatch('connectWebhookSocket')
-      }
-    },
-
-    unsubscribeWebhookEvents({ state, commit, dispatch }, listener) {
-      commit('removeListener', {event: 'newWebhook', listener})
-      if ((state.listeners.newWebhook || []).length === 0) {
-        dispatch('disconnectWebhookSocket')
-      }
     },
 
     notifyManifestLoaded({ dispatch }) {
