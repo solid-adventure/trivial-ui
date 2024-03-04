@@ -143,14 +143,12 @@ export default {
 
           if (this.existingUser) {
             return {
-              path: '/auth/invitation',
               password: this.current_password,
               password_confirmation: this.current_password,
               invitation_token: this.invitationToken
             }
           } else {
             return {
-              path: '/auth/invitation',
               password: this.new_password,
               password_confirmation: this.confirm_password,
               invitation_token: this.invitationToken
@@ -176,23 +174,10 @@ export default {
         async handleSubmit(e){
             e.preventDefault()
             try {
-              let update = await fetch('/proxy/trivial', {
-                method: 'PUT',
-                headers: {'content-type': 'application/json'},
-                body: JSON.stringify(this.acceptInvitationPayload)
-              })
-              if(update.status === 202){
-                this.completed = true
-              } else if (update.status === 406){
-                this.errorMessage = "Invalid Invitation Token"
-              } else if (update.status === 422){
-                this.errorMessage = "Invalid Password"
-              } else {
-                this.errorMessage = "Server is unable to process the invitation request"
-              }
+              await this.$store.state.Session.apiCall('/auth/invitation', 'PUT', this.acceptInvitationPayload)
+              this.completed = true
             } catch (err) {
-                console.log('[AcceptInvitation][handleSubmit] Error: ', err)
-                this.errorMessage = err.message
+              this.errorMessage = err.message
             }
             this.current_password = ''
             this.new_password = ''

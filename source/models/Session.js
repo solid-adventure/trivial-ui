@@ -34,15 +34,20 @@ export default class Session {
     // Catch an empty body, such as No Content after a delete
     const clonedResponse = response.clone()
     const text = await clonedResponse.text()
-
     if (text.replaceAll(' ','').length > 0) {
      out = await response.json()
     }
 
     if (response.ok) {
       return out
-    } else {
+    } else if (out.error) {
       throw new Error(out.error)
+    } else if (out.errors) {
+      throw new Error(out.errors.join(', '))
+    } else if (response.statusText) {
+      throw new Error(response.statusText)
+    } else {
+      throw new Error("Request failed")
     }
   }
 
