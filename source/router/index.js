@@ -3,7 +3,6 @@ import AppsOverview from "../components/AppsOverview.vue";
 import SignIn from "../components/SignIn.vue";
 import SignOut from "../components/SignOut.vue";
 import NewAppForm from "../components/NewAppForm.vue";
-import ChangePassword from "../components/ChangePassword.vue";
 import Panels from "../components/Panels.vue";
 import AcceptInvitation from "../components/AcceptInvitation.vue";
 import RecoverPassword from "../components/RecoverPassword.vue";
@@ -37,11 +36,6 @@ const routes = [
   },
   { path: "/signout",
     component: SignOut, name: "Sign Out",
-  },
-  {
-    path: "/changepassword",
-    component: ChangePassword,
-    name: "Change Password",
   },
   {
     path: "/acceptinvitation",
