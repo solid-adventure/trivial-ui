@@ -62,7 +62,6 @@
 </style>
 
 <script>
-import { fetchJSON } from 'trivial-core/lib/component-utils'
 import PasswordValidator from './builderv2/PasswordValidator.vue'
 
 export default {
@@ -85,20 +84,21 @@ export default {
             e.preventDefault()
             this.submit_clicked = true
             try {
-              let update = await fetchJSON('/proxy/trivial', {
-                method: 'put',
-                headers: {'content-type': 'application/json'},
-                body: JSON.stringify({
-                  path: '/auth/password',
-                  password: this.new_password,
-                  password_confirmation: this.confirm_password,
-                })
-              })
+              let reset_token = new URL(location.href).searchParams.get('token')
+              let client = new URL(location.href).searchParams.get('client')
+              let uid = new URL(location.href).searchParams.get('uid')
+              await this.$store.state.Session.resetPassword(
+                this.new_password,
+                this.confirm_password,
+                reset_token,
+                client,
+                uid
+              )
               this.message = 'Password successfully updated!'
               setTimeout(() => { this.message = null}, 2500)
               window.location = '/'
             } catch (err) {
-                console.log('[ChangePassword][handleSubmit] Error: ', err)
+                console.log('[ResetPassword][handleSubmit] Error: ', err)
                 this.errorMessage = err
                 setTimeout(() => { this.errorMessage = null}, 2500)
             }

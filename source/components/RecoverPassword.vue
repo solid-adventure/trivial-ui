@@ -60,9 +60,7 @@
 </style>
 
 <script>
-import { fetchJSON } from "trivial-core/lib/component-utils";
 import ActionButton from "./controls/ActionButton.vue";
-import store from "../store";
 
 export default {
   components: {
@@ -85,21 +83,16 @@ export default {
       e.preventDefault();
       this.submit_clicked = true;
       try {
-        let fetch = await fetchJSON("/proxy/trivial", {
-          method: "post",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({
-            path: "/auth/password",
-            email,
-            redirect_url: `${window.location.origin}/resetpassword`,
-          }),
+        await this.$store.state.Session.apiCall('/auth/password', 'POST', {
+          email,
+          redirect_url: `${window.location.origin}/resetpassword`,
         });
         this.message = `An email has been sent to ${email} with instructions on how to reset the password.`;
         setTimeout(() => {
           this.message = null;
         }, 4000);
       } catch (err) {
-        console.log("[ChangePassword][handleSubmit] Error: ", err);
+        console.log("[RecoverPassword][handleSubmit] Error: ", err);
         this.errorMessage = err.message;
         setTimeout(() => {
           this.errorMessage = null;

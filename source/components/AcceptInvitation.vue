@@ -191,7 +191,7 @@ export default {
                 this.errorMessage = "Server is unable to process the invitation request"
               }
             } catch (err) {
-                console.log('[ChangePassword][handleSubmit] Error: ', err)
+                console.log('[AcceptInvitation][handleSubmit] Error: ', err)
                 this.errorMessage = err.message
             }
             this.current_password = ''

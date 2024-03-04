@@ -11,7 +11,6 @@ export default class Session {
 
   static async apiCall(path, method='GET', data) {
     const session = await Session.current()
-    if (!session.accessToken) { return }
 
     const options = {
       method: method,
@@ -81,6 +80,28 @@ export default class Session {
     return user
   }
 
+  static async resetPassword(password, confirm_password, resetToken, client, uid) {
+    const options = {
+      method: 'PUT',
+      headers: {
+        "Content-Type": "application/json",
+        "access-token": resetToken,
+        client: client,
+        uid: uid,
+      },
+      body: JSON.stringify({
+        password,
+        password_confirmation: confirm_password,
+      })
+    }
+    let response = await fetch(this.apiUrl('/auth/password'), options)
+    if (response.ok) {
+      return await response.json()
+    } else {
+      throw new Error(response.statusText)
+    }
+  }
+
   static async setCookies(response) {
     await window.cookieStore.set("trivial-access-token", response.headers.get('access-token'))
     await window.cookieStore.set("trivial-client", response.headers.get('client'))
@@ -94,7 +115,6 @@ export default class Session {
     await window.cookieStore.delete("trivial-client")
     await window.cookieStore.delete("trivial-expiry")
     await window.cookieStore.delete("trivial-uid")
-    await window.cookieStore.delete("trivial-reset")
   }
 
   static async current() {
@@ -112,52 +132,14 @@ export default class Session {
 
   static async validate() {
     let session = await Session.current()
-
     if (store.user && store.user.account_locked) {
       return false
     }
-
     if (session.accessToken && session.expiry && Session.validExpiry(session.expiry)) {
       store.commit('setIsAuthenticated', true)
       return true
     }
-
-    // if (req.path === '/resetpassword') {
-    //   Session.validateForReset(req, res, next)
-    // }
-
     return false
-
-  }
-
-  // Checks for valid session parameters in a redirect URL or trivial-reset
-  // header. If the values are found in a the request URL, it sets a
-  // trivial-reset header.
-  //
-  // This does not represent a true session, only permission to reset the
-  // password.
-  //
-  // If parameteters are found, they are returned as an object. Otherwise,
-  // a redirect to signin is sent and undefined is returned.
-  static validateForReset(req, res, next) {
-    const requiredParams = ['access-token', 'client', 'expiry', 'uid']
-
-    if ( requiredParams.every(p => req.query.hasOwnProperty(p)) &&
-        Session.validExpiry(req.query.expiry) ) {
-      const headers = {}
-      requiredParams.forEach(p => headers[p] = req.query[p])
-      res.cookie('trivial-reset', JSON.stringify(headers), {signed: true})
-      return next()
-    }
-
-    if (cookies['trivial-reset']) {
-      const headers = JSON.parse(cookies['trivial-reset'])
-      if (Session.validExpiry(headers.expiry)) {
-        return next()
-      }
-    }
-
-    res.redirect('/signin')
   }
 
   static validExpiry(expiry) {
