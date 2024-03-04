@@ -68,9 +68,7 @@ export default {
   components: {
     ActionButton,
   },
-  created() {
-    store.dispatch("setIsAuthenticated", { isAuthenticated: false });
-  },
+
   data() {
     return {
       errorMessage: null,

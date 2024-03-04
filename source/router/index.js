@@ -115,13 +115,9 @@ const router = createRouter({
 });
 
 const redirectToSignIn = (to, loggedIn) => {
-  if (loggedIn && to.path === "/signin") { return false }
-  if (!loggedIn && to.path === "/signin") { return false }
+  if (to.path === "/signin") { return false }
   if (to.meta.requiresAuth === false) { return false }
-  if (!loggedIn) { return true }
-  if (loggedIn) { return false }
-  // // Not expected to fire, but default to protected
-  return true
+  return !loggedIn
 }
 
 router.beforeEach(async (to, from) => {

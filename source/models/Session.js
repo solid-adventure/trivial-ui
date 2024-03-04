@@ -57,24 +57,35 @@ export default class Session {
     })
     let data = await response.json()
     let user = data.data
-
-    await Session.setCookies(
-      response.headers.get('access-token'),
-      response.headers.get('client'),
-      response.headers.get('expiry'),
-      response.headers.get('uid')
-    )
-    store.commit('setIsAuthenticated', true)
-    store.commit('setUser', user)
+    if (response.ok) {
+      await this.setCookies(response)
+      store.commit('setUser', user)
+    }
     return user
   }
 
+  static async register(name, email, password, role='member') {
+    let response = await fetch(this.apiUrl('/auth'), {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({name, email, password, role})
+    })
+    let data = await response.json()
+    let user = data.data
+    if (response.ok) {
+      await this.setCookies(response)
+      store.commit('setUser', user)
+    }
+    return user
+  }
 
-  static async setCookies(token, client, expiry, uid) {
-    await window.cookieStore.set("trivial-access-token", token)
-    await window.cookieStore.set("trivial-client", client)
-    await window.cookieStore.set("trivial-expiry", expiry)
-    await window.cookieStore.set("trivial-uid", uid)
+  static async setCookies(response) {
+    await window.cookieStore.set("trivial-access-token", response.headers.get('access-token'))
+    await window.cookieStore.set("trivial-client", response.headers.get('client'))
+    await window.cookieStore.set("trivial-expiry", response.headers.get('expiry'))
+    await window.cookieStore.set("trivial-uid", response.headers.get('uid'))
   }
 
   static async destroy() {
@@ -100,9 +111,7 @@ export default class Session {
   }
 
   static async validate() {
-
     let session = await Session.current()
-    console.log('session', session)
 
     if (store.user && store.user.account_locked) {
       return false

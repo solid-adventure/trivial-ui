@@ -221,7 +221,6 @@
       } else {
         this.panelTypeFilter = this.$route.params.paneltype;
       }
-      store.dispatch('setIsAuthenticated', {isAuthenticated: true});
       this.loadStats(this.chartType)
     },
 

@@ -277,10 +277,6 @@ const store = createStore({
       await commit('setApp', app)
     },
 
-
-    async setIsAuthenticated({state, commit}, {isAuthenticated}) {
-      commit('setIsAuthenticated', isAuthenticated)
-    },
     async setCurrentPath({state, commit}, {currentPath, route}) {
       commit('setCurrentPath', currentPath)
       commit('setRoute', route)

@@ -5,7 +5,6 @@ const cookieParser = require('cookie-parser')
 const request = require('request');
 let dotEnvConfig = require('dotenv').config();
 const dotEnv = dotEnvConfig["parsed"]
-const Session = require(`${__dirname}/Session.js`)
 const createError = require('http-errors')
 
 const {
