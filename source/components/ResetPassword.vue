@@ -8,15 +8,30 @@
                     <input type='password' class='text-field' placeholder ='New Password' v-model='new_password'/>
                 </div>
                 <div>
-                    <input id = "confirm-password-input" type='password' @click.once = "displayPasswordMatchErr = true" class='text-field' placeholder ='Confirm Password' v-model='confirm_password'/>
+                    <input
+                        id = "confirm-password-input"
+                        @focus = "hasClickedConfirmPassword = true"
+                        type='password' :class="isPasswordMatching? 'text-field-error' : 'text-field'"
+                        placeholder ='Confirm Password'
+                        v-model='confirm_password'
+                    />
                 </div>
-                <PasswordValidator :password = "new_password" :confirm_password = "confirm_password" :enable_confirm_password = "true" :displayPasswordMatchErr = "displayPasswordMatchErr"  @passwordValidity = "updatePasswordValidity"/>
-                <transition name="fade">
-                    <p v-if="errorMessage"><em>{{errorMessage}}</em></p>
-                </transition>
-                <transition name="fade">
-                    <div v-if="message" class="message">{{message}}</div>
-                </transition>
+                <PasswordValidator
+                :password="new_password"
+                :confirm_password="confirm_password"
+                :enable_confirm_password="true"
+                :hasClickedConfirmPassword="hasClickedConfirmPassword"
+                @passwordValidity="updatePasswordValidity"
+                @passwordMatch="updatePasswordMatch"
+                />
+                <div class = "message-container">
+                    <transition name="fade">
+                        <span v-if="errorMessage"><em>{{errorMessage}}</em></span>
+                    </transition>
+                    <transition name="fade">
+                        <div v-if="message" class="message">{{message}}</div>
+                    </transition>
+                </div>
                 <div class="submit">
         	        <input v-if="!submit_clicked" type='submit' class='button' @click="handleSubmit" value ='Submit' :disabled="!isPasswordValid"/>
         	        <input v-else type='submit' class='button clicked' value ='Updating...' />
@@ -35,7 +50,7 @@
 }
 
 .text-field {
-    margin-bottom: 20px;
+    margin-bottom: 30px;
 }
 
 .submit{
@@ -59,6 +74,10 @@
 #confirm-password-input {
   margin-bottom: 0;
 }
+span.brand{
+    display: block;
+    margin-top: 100px;
+}
 </style>
 
 <script>
@@ -75,7 +94,8 @@ export default {
             new_password: '',
             confirm_password:'',
             isPasswordValid: false,
-            displayPasswordMatchErr: false
+            hasClickedConfirmPassword: false,
+            isPasswordMatching: false
         }        
     },
 
@@ -109,6 +129,9 @@ export default {
         },
         updatePasswordValidity(value){
           this.isPasswordValid = value
+        },
+        updatePasswordMatch(value){
+          this.isPasswordMatching = value
         }
     }
 }

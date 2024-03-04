@@ -3,7 +3,7 @@
     <div class="container">
       <span class="brand"><img /></span>
       <div v-if="registrationEnabled">
-        <p>Create a new account:</p>
+        <h3>Create a new account:</h3>
         <form id="registerForm" @submit="handleSubmit">
           <div>
             <input
@@ -58,9 +58,12 @@
               >Privacy Policy</a
             >
           </div>
-          <p v-if="errorMessage">
+          <div class="message-container">
+            <p v-if="errorMessage">
             <em>{{ errorMessage }}</em>
           </p>
+          </div>
+
           <div class="submit">
             <input
               v-if="!register_clicked"
@@ -125,6 +128,10 @@
   justify-content: center;
   align-items: center;
   align-content: space-between;
+
+}
+.overlay.clearSuperBar {
+  margin-top: 20px;
 }
 
 .container {
@@ -135,7 +142,7 @@
 .password-info {
   width: unset;
 }
-.container p {
+.container h3 {
   text-align: left;
   margin-bottom: 20px;
 }
@@ -143,8 +150,13 @@
 .text-field {
   margin-bottom: 30px;
 }
+
 #tos-container {
   padding-bottom: 20px;
+}
+
+.submit {
+  margin: 0 0 0 266px;
 }
 
 .signIn {
