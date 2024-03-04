@@ -229,12 +229,8 @@ serve.all('/proxy/:service', (req, res) => {
 // End Proxy Section
 
 serve.get('*', (req, res) => {
-  res.render('main.html', {
-    analytics_id: process.env.ANALYTICS_ID,
-    app_id: 'TrivialBuilder'
-  })
+  res.render('main.html')
 });
-
 
 const httpServer = serve.listen(port, () => {
   logger.info(`Server running at http://localhost:${port}/`);
