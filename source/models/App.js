@@ -49,11 +49,12 @@ class App {
 
 
   async destroy() {
-    // RELEASE BLOCKER
-    // await fetchJSON(`/build/${this.name}`, {
-    //   method: 'delete'
-    // })
-    await this.removeCredentials()
+    if (this.$store.state.enableBuildApps) {
+      await fetchJSON(`/build/${this.name}`, {
+        method: 'delete'
+      })
+      await this.removeCredentials()
+    }
     this.$store.state.Session.apiCall(`/apps/${this.name}`, 'DELETE')
     this.$store.commit('removeApp', {name: this.name})
   }

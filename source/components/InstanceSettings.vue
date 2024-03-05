@@ -83,10 +83,10 @@
       <hr class="headroom accent" />
       <h2 class="headroom section-title">Manifest.json</h2>
       <p class="section-help-text"><em>Danger zone! Editing the manifest directly will allow you to break the build.</em></p>
-      <p class="section-help-text"><em>This will delete the lambda and recreate it.</em></p>
+      <p class="section-help-text"><em>If there is a Lambda managed by this app, it will delete the lambda and recreate it.</em></p>
       <HideableSection :initially-hidden="true" display-name='Manifest' class="settings">
       <textarea id="manifest_content" class="code-entry" cols="60" rows="30" spellcheck="false" v-model="formattedManifest"></textarea>
-      <br /><input type="button" id="manifest_content_save" class="button-small" :class="{working: rebuilding}" @click.prevent="save" :value="rebuilding ? 'Rebuilding Lambda...' : 'Rebuild Lambda' ">
+      <br /><input type="button" id="manifest_content_save" class="button-small" :class="{working: rebuilding}" @click.prevent="save" :value="rebuilding ? 'Updating manifest...' : 'Update Manifest' ">
       </HideableSection>
 
       <hr class="headroom accent" />
@@ -358,9 +358,8 @@
              {content: JSON.stringify(this.manifestContent)}
           )
           this.manifestContent = JSON.parse(this.manifest.content)
-          // RELEASE BLOCKER --- SKIP FOR NOW
-          // await this.teardown(false)
-          // await this.build()
+          await this.teardown(false)
+          await this.build()
           this.rebuilding = false
           track('Saved Manifest Manually',{
               'ManifestId': this.manifest.id,
@@ -373,6 +372,7 @@
       },
 
       async build() {
+        if (!this.$store.state.enableBuildApps)  { return }
         try {
           const params = FeatureManager.featureParams()
       		await fetch(`/build?${params}`, {
@@ -404,12 +404,14 @@
       async teardown(deleteFromBackend=true) {
         try {
           this.errorMessage = null
-
-          // RELEASE BLOCKER
-          // await fetchJSON(`/build/${this.appId}`, {
-          //   method: 'delete'
-          // })
-          await this.removeCredentials()
+          // Only teardown Lambda if build apps is enabled
+          if (this.$store.state.enableBuildApps) {
+            await fetchJSON(`/build/${this.appId}`, {
+              method: 'delete'
+            })
+            await this.removeCredentials()
+          }
+          // Always delete from the backend if the flag is set
           if (deleteFromBackend) {
             await this.destroy()
           }

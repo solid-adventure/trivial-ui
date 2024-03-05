@@ -38,6 +38,7 @@ const store = createStore({
     tourStep: 0,
     tourSteps: ['action-info', 'credentials', 'transform-config'],
     enableSaveCredentials: VUE_APP_ENABLE_SAVE_CREDENTIALS,
+    enableBuildApps: VUE_APP_ENABLE_BUILD_APPS,
     trivialApiUrl: VUE_APP_TRIVIAL_API_URL,
     Session: Session,
   },
@@ -374,6 +375,7 @@ const store = createStore({
     },
 
     async build({ state }) {
+      if (!state.enableBuildApps) { return }
       const params = FeatureManager.featureParams()
       await fetchJSON(`/build?${params}`, {
         method: 'post',
