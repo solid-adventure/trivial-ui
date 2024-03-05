@@ -45,7 +45,6 @@ serve.use(express.json({limit: '5mb'}));
 serve.use(express.static('public'))
 serve.set('views', __dirname + '/public/views/');
 serve.engine('html', require('ejs').renderFile);
-// serve.use(cookieParser(process.env.COOKIE_SIGNATURE))
 serve.use(cookieParser())
 serve.use((req, res, next) => {
   res.locals.featureSettings = FeatureManager.envSettings()
