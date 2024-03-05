@@ -10,7 +10,7 @@ export default class Session {
   }
 
   static async apiCall(path, method='GET', data) {
-    const session = await Session.current()
+    const session = Session.current
 
     const options = {
       method: method,
@@ -62,7 +62,7 @@ export default class Session {
     let data = await response.json()
     let user = data.data
     if (response.ok) {
-      await this.setCookies(response)
+      await this.setLocalStorage(response)
       store.commit('setUser', user)
     }
     return user
@@ -79,7 +79,7 @@ export default class Session {
     let data = await response.json()
     let user = data.data
     if (response.ok) {
-      await this.setCookies(response)
+      await this.setLocalStorage(response)
       store.commit('setUser', user)
     }
     return user
@@ -107,36 +107,29 @@ export default class Session {
     }
   }
 
-  static async setCookies(response) {
-    await window.cookieStore.set("trivial-access-token", response.headers.get('access-token'))
-    await window.cookieStore.set("trivial-client", response.headers.get('client'))
-    await window.cookieStore.set("trivial-expiry", response.headers.get('expiry'))
-    await window.cookieStore.set("trivial-uid", response.headers.get('uid'))
+  static async setLocalStorage(response) {
+    localStorage.setItem("trivial-access-token", response.headers.get('access-token'))
+    localStorage.setItem("trivial-client", response.headers.get('client'))
+    localStorage.setItem("trivial-expiry", response.headers.get('expiry'))
+    localStorage.setItem("trivial-uid", response.headers.get('uid'))
   }
 
   static async destroy() {
-    await window.cookieStore.delete("trivial-access-token")
-    await window.cookieStore.delete("trivial-client")
-    await window.cookieStore.delete("trivial-expiry")
-    await window.cookieStore.delete("trivial-uid")
+    localStorage.clear()
     await Session.apiCall('/auth/sign_out', 'DELETE')
   }
 
-  static async current() {
-    let accessToken = await window.cookieStore.get("trivial-access-token")
-    let client = await window.cookieStore.get("trivial-client")
-    let expiry = await window.cookieStore.get("trivial-expiry")
-    let uid = await window.cookieStore.get("trivial-uid")
+  static get current() {
     return {
-      accessToken: accessToken?.value,
-      client: client?.value,
-      expiry: expiry?.value,
-      uid: uid?.value
+      accessToken: localStorage.getItem("trivial-access-token"),
+      client: localStorage.getItem("trivial-client"),
+      expiry: localStorage.getItem("trivial-expiry"),
+      uid: localStorage.getItem("trivial-uid")
     }
   }
 
   static async validate() {
-    let session = await Session.current()
+    let session = Session.current
     if (store.user && store.user.account_locked) {
       return false
     }
