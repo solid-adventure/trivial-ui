@@ -30,12 +30,25 @@
                           <input type='password' class='text-field' placeholder ='New Password' v-model='new_password'/>
                       </div>
                       <div>
-                          <input id = "confirm-password-input" @click.once = "displayPasswordMatchErr = true" type='password' class='text-field' placeholder ='Confirm Password' v-model='confirm_password'/>
+                          <input
+                            id = "confirm-password-input"
+                            @focus = "hasClickedConfirmPassword = true"
+                            type='password' :class="isPasswordMatching? 'text-field-error' : 'text-field'"
+                            placeholder ='Confirm Password'
+                            v-model='confirm_password'
+                          />
                       </div>
-                      <PasswordValidator :password = "new_password" :confirm_password = "confirm_password" :enable_confirm_password = "true" :displayPasswordMatchErr = "displayPasswordMatchErr"  @passwordValidity = "updatePasswordValidity"/>
+                      <PasswordValidator
+                        :password="new_password"
+                        :confirm_password="confirm_password"
+                        :enable_confirm_password="true"
+                        :hasClickedConfirmPassword="hasClickedConfirmPassword"
+                        @passwordValidity="updatePasswordValidity"
+                        @passwordMatch="updatePasswordMatch"
+                      />
                     </span>
                     <transition name="fade">
-                        <div id = "error-msg-container">
+                        <div class = "message-container">
                           <span v-if="errorMessage">
                             <em>{{errorMessage}}</em>
                           </span>
@@ -44,16 +57,21 @@
                     <transition name="fade">
                         <div v-if="message" class="message">{{message}}</div>
                     </transition>
-                    <ActionButton class = "button-small submit" :action="handleSubmit" value ="Submit" working-value="Updating..." :disabled="!isPasswordValid"></ActionButton>
-                    <p v-if="existingUser">
-                      Need to create an account? <a href="/" @click.prevent="handleNewUserClick" >Sign up</a>
-                    </p>
-                    <p v-else>
-                      Already have an account? <a href="/" @click.prevent="handleExistingUserClick" >Sign in</a>
-                    </p>
-                    <p>
-                      Forgot Password? <a href="/recoverpassword">Reset Password</a>
-                    </p>
+                    <div v-if="existingUser">
+                      <ActionButton class = "button-small submit" :action="handleSubmit" value ="Submit" working-value="Updating..."></ActionButton>
+                      <p>
+                        Need to create an account? <a href="/" @click.prevent="handleNewUserClick" >Sign up</a>
+                      </p>
+                      <p>
+                        Forgot Password? <a href="/recoverpassword">Reset Password</a>
+                      </p>
+                    </div>
+                    <div v-else>
+                      <ActionButton class = "button-small submit" :action="handleSubmit" value ="Submit" working-value="Updating..." :disabled="!isPasswordValid"></ActionButton>
+                      <span>
+                        Already have an account? <a href="/" @click.prevent="handleExistingUserClick" >Sign in</a>
+                      </span>
+                    </div>
     	        </form>
             </span>
           </div>
@@ -79,15 +97,11 @@
 }
 
 .submit{
-    margin: 0 0 45px 266px;
+    margin: 0 0 15px 266px;
 }
 
 #confirm-password-input {
   margin-bottom: 0;
-}
-
-#error-msg-container {
-  height: 1.5em;
 }
 </style>
 
@@ -111,7 +125,9 @@ export default {
           new_password: '',
           confirm_password:'',
           isPasswordValid: false,
-          displayPasswordMatchErr: false
+          hasClickedConfirmPassword: false,
+          isPasswordMatching: false
+
         }        
     },
 
@@ -155,8 +171,6 @@ export default {
             }
           }
         }
-
-
     },
 
     methods: {
@@ -185,6 +199,9 @@ export default {
         },
         updatePasswordValidity(value){
           this.isPasswordValid = value
+        },
+        updatePasswordMatch(value){
+          this.isPasswordMatching = value
         }
     }
 }

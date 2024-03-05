@@ -8,7 +8,7 @@ export default {
       required: false,
       default: false,
     },
-    displayPasswordMatchErr: {
+    hasClickedConfirmPassword: {
       type: Boolean,
       required: false,
       default: false,
@@ -43,34 +43,40 @@ export default {
       let confirm_password_result = this.enable_confirm_password
         ? result && this.passwordMatch
         : result;
-      console.log(confirm_password_result);
       return confirm_password_result;
     },
+    displayPasswordMatchErr(){
+      return this.hasClickedConfirmPassword && !(this.passwordMatch)
+    }
   },
   watch: {
-    isPasswordValid: function () {
+    isPasswordValid: function(){
       this.$emit("passwordValidity", this.isPasswordValid);
     },
+    displayPasswordMatchErr: function(){
+      this.$emit("passwordMatch", this.displayPasswordMatchErr)
+    }
+
   },
 };
 </script>
 <template>
   <div id="password-verify-container">
-    <div v-if="enable_confirm_password" id="password-match-container">
+    <div v-if="enable_confirm_password" class="message-container">
       <!-- Password match should only be displayed after user has clicked on confirm_password input -->
-      <span class="error-icon" v-if="displayPasswordMatchErr && !passwordMatch">
-        <span class="message">Passwords Must Match</span>
+      <span v-if="displayPasswordMatchErr">
+        <span class="message">Passwords do not match</span>
       </span>
     </div>
     <p id="password-note">Password Must Contain:</p>
     <ul>
-      <li :class="!hasSymbol ? 'error' : 'success'">
+      <li :class="hasSymbol ? 'success' : 'error'">
         1 Symbol or Special Character
       </li>
-      <li :class="!hasUpperCase ? 'error' : 'success'">1 Uppercase</li>
-      <li :class="!hasLowerCase ? 'error' : 'success'">1 Lowercase</li>
-      <li :class="!hasDigit ? 'error' : 'success'">1 Digit</li>
-      <li :class="!hasLength ? 'error' : 'success'">
+      <li :class="hasUpperCase ? 'success' : 'error'">1 Uppercase</li>
+      <li :class="hasLowerCase ? 'success' : 'error'">1 Lowercase</li>
+      <li :class="hasDigit ? 'success' : 'error'">1 Digit</li>
+      <li :class="hasLength ? 'success' : 'error'">
         Minimum Length of 12 Characters
       </li>
     </ul>
@@ -106,18 +112,8 @@ ul {
   margin-bottom: 10px;
   margin-top: 0px;
 }
-span.error-icon {
-  background-image: var(--error-icon);
-  background-repeat: no-repeat;
-  background-position: left center;
-
-  span.message {
-    margin-left: 1.5em;
-    line-height: 3em;
-  }
-}
-#password-match-container {
-  height: 3em;
-  margin-top: 5px;
+.message{
+  color: var(--error);
+  font-size: small;
 }
 </style>
