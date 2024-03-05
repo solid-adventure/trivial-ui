@@ -2,7 +2,7 @@
   <div class="viewer-container">
       <div class="heading-row">
         <h2>Errors</h2>
-         <a v-if="this.webhook.activity_type == 'request'" href="#" class="button-medium headroom-mini" @click.prevent="resendPayload">{{resendText}}</a>
+         <a v-if="displayResendButton" href="#" class="button-medium headroom-mini" @click.prevent="resendPayload">{{resendText}}</a>
       </div>
       <ul v-if="errors.length > 0" class="history">
         <li v-for="error in errors" class="error">{{error.message}}</li>
@@ -219,6 +219,11 @@
     },
 
     computed: {
+
+      displayResendButton() {
+        return this.webhook.activity_type == 'request' && this.$store.state.enableWebhookAppTrigger
+      },
+
       payloadDisplay() {
         return formatJSON(this.webhook.payload) || 'Empty payload'
       },

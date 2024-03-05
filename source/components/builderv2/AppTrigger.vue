@@ -77,7 +77,8 @@
       },
 
       ...mapState([
-        'app'
+        'app',
+        'enableWebhookAppTrigger'
       ]),
 
       ...mapGetters([
@@ -147,7 +148,7 @@
     <select v-model="mode">
       <option :value="SELECT_MODE">Select</option>
       <option :value="CUSTOM_MODE">Manual</option>
-      <option :value="RECEIVE_MODE">Receive Webhook</option>
+      <option v-if="enableWebhookAppTrigger" :value="RECEIVE_MODE">Receive Webhook</option>
     </select>
     <div v-if="inReceiveMode">
       <button ref="copy" class="secondary-button" @click="copyUrl">{{copyButtonText}}</button>
@@ -155,6 +156,7 @@
     <div v-if="inCustomMode">
       <div class="secondary-button" @click="configureData">Edit Payload</div>
       <ActionButton
+        v-if="enableWebhookAppTrigger"
         ref="sendCustomButton"
         class="button-medium"
         value="Run"

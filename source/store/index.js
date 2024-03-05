@@ -40,6 +40,7 @@ const store = createStore({
     enableSaveCredentials: VUE_APP_ENABLE_SAVE_CREDENTIALS,
     enableBuildApps: VUE_APP_ENABLE_BUILD_APPS,
     trivialApiUrl: VUE_APP_TRIVIAL_API_URL,
+    enableWebhookAppTrigger: VUE_APP_ENABLE_WEBHOOK_APP_TRIGGER,
     Session: Session,
   },
 
