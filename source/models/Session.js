@@ -115,11 +115,11 @@ export default class Session {
   }
 
   static async destroy() {
-    await Session.apiCall('/auth/sign_out', 'DELETE')
     await window.cookieStore.delete("trivial-access-token")
     await window.cookieStore.delete("trivial-client")
     await window.cookieStore.delete("trivial-expiry")
     await window.cookieStore.delete("trivial-uid")
+    await Session.apiCall('/auth/sign_out', 'DELETE')
   }
 
   static async current() {

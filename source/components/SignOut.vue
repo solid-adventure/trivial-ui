@@ -12,6 +12,9 @@ export default {
       // this.$router.push("/signin"); // ideal, once the above is fixed
     } catch(e) {
       console.error(e);
+      if (e.message == 'User was not found or was not logged in.') {
+        window.location = '/signin';
+      }
     }
   }
 }
