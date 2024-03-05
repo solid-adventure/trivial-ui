@@ -62,7 +62,7 @@ export default class Session {
     let data = await response.json()
     let user = data.data
     if (response.ok) {
-      await this.setLocalStorage(response)
+      await this.setCookies(response)
       store.commit('setUser', user)
     }
     return user
@@ -79,7 +79,7 @@ export default class Session {
     let data = await response.json()
     let user = data.data
     if (response.ok) {
-      await this.setLocalStorage(response)
+      await this.setCookies(response)
       store.commit('setUser', user)
     }
     return user
@@ -107,24 +107,33 @@ export default class Session {
     }
   }
 
-  static async setLocalStorage(response) {
-    localStorage.setItem("trivial-access-token", response.headers.get('access-token'))
-    localStorage.setItem("trivial-client", response.headers.get('client'))
-    localStorage.setItem("trivial-expiry", response.headers.get('expiry'))
-    localStorage.setItem("trivial-uid", response.headers.get('uid'))
+  static async setCookies(response) {
+    document.cookie = `trivial-access-token=${response.headers.get('access-token')}`
+    document.cookie = `trivial-client=${response.headers.get('client')}`
+    document.cookie = `trivial-expiry=${response.headers.get('expiry')}`
+    document.cookie = `trivial-uid=${response.headers.get('uid')}`
+  }
+
+  static getCookie(name) {
+    return document.cookie
+      .split("; ")
+      .find((row) => row.startsWith(`${name}=`))
+      ?.split("=")[1];
   }
 
   static async destroy() {
-    localStorage.clear()
+    for (let cookie of ['trivial-access-token', 'trivial-client', 'trivial-expiry', 'trivial-uid']) {
+      document.cookie = `${cookie}=; expires=Thu, 01 Jan 1970 00:00:00 UTC;;`
+    }
     await Session.apiCall('/auth/sign_out', 'DELETE')
   }
 
   static get current() {
     return {
-      accessToken: localStorage.getItem("trivial-access-token"),
-      client: localStorage.getItem("trivial-client"),
-      expiry: localStorage.getItem("trivial-expiry"),
-      uid: localStorage.getItem("trivial-uid")
+      accessToken: this.getCookie('trivial-access-token'),
+      client: this.getCookie('trivial-client'),
+      expiry: this.getCookie('trivial-expiry'),
+      uid: this.getCookie('trivial-uid')
     }
   }
 

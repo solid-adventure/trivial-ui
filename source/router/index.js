@@ -121,16 +121,11 @@ router.beforeEach(async (to, from) => {
       path: "/signin"
     }
   }
-  // if (to.path === "resetpassword") {
-  //   let valid = await Session.validateForResetPassword();
-  // }
-
   if (loggedIn && to.path === "/signin") {
     return {
       path: "/"
     }
   }
 })
-
 
 export default router;
