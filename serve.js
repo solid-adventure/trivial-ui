@@ -229,7 +229,7 @@ serve.all('/proxy/:service', (req, res) => {
 // End Proxy Section
 
 serve.get('*', (req, res) => {
-  res.render('main.html')
+  res.render('index.html')
 });
 
 const httpServer = serve.listen(port, () => {
