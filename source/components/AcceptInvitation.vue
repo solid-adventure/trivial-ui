@@ -8,7 +8,8 @@
             <div v-else>
               <span v-if="loggedIn && !loggedInAsInvited">You are logged in as <strong>{{currentUser.email}}</strong>, but this invitation is for <strong>{{ invitedEmail }}</strong>. Please <a href="/signout">sign out</a> before accepting this invitation.</span>
               <span v-else>
-              <h2>Accept Invitation</h2>
+              <div v-if = "tokenIsInvalid">
+                <h2>Accept Invitation</h2>
                 <form>
                   <!-- User email is always locked -->
                     <div>
@@ -72,7 +73,12 @@
                         Already have an account? <a href="/" @click.prevent="handleExistingUserClick" >Sign in</a>
                       </span>
                     </div>
-    	        </form>
+    	          </form>
+              </div>
+              <div v-else>
+                <p v-if = "errorMessage != null && tokenIsInvalid">{{ errorMessage }}</p>
+                <p v-else>Invalid or expired invitation token. <br> Please contact the organization administrator for assistance.</p>
+              </div>
             </span>
           </div>
 
@@ -97,9 +103,11 @@
 }
 
 .submit{
-    margin: 0 0 15px 266px;
+    margin: 0 0 20px 266px;
 }
-
+.clearSuperBar{
+  margin-top: 50px !important;
+}
 #confirm-password-input {
   margin-bottom: 0;
 }
@@ -114,7 +122,7 @@ export default {
         ActionButton, 
         PasswordValidator
     },
-    
+
     data(){
         return {
           completed: false,
@@ -126,9 +134,25 @@ export default {
           confirm_password:'',
           isPasswordValid: false,
           hasClickedConfirmPassword: false,
-          isPasswordMatching: false
+          isPasswordMatching: false,
+          tokenIsInvalid: false
 
         }        
+    },
+    async created(){
+        try {
+          await this.$store.state.Session.apiCall('/auth/invitation', 'PUT', {
+            password: '',
+            password_confirmation: '',
+            invitation_token: this.invitationToken
+          })
+        } catch (err) {
+          this.errorMessage = err.message
+          if(this.errorMessage !== 'Invalid token.'){
+            this.tokenIsInvalid = true
+            this.errorMessage = null
+          }
+        }
     },
 
     computed: {
