@@ -35,12 +35,12 @@ $input-border-color: color.adjust($background, $lightness: -30%);
 $table-column-head-color: #eef3f7;
 $table-row-hover-background: #e5e5e5;
 $on-table-row-hover-background: #000;
-$success-icon: url("/assets/images/check-circle.svg");
+$success-icon: url("/src/assets/images/check-circle.svg");
 $webhook-pre-color: #8d99b1;
 $auth-text-field-color: $primary;
 $auth-button-font-color: $background-high-contrast;
-$logo-dark-on-light: url("/assets/images/trivial-logo-simplified-dark-on-light.svg");
-$logo-light-on-dark: url("/assets/images/trivial-logo-simplified-light-on-dark.svg");
+$logo-dark-on-light: url("/src/assets/images/trivial-logo-simplified-dark-on-light.svg");
+$logo-light-on-dark: url("/src/assets/images/trivial-logo-simplified-light-on-dark.svg");
 $auth-border-color: $primary;
 $auth-button-gradient: linear-gradient(45deg, #45c400, #00bdef, #2567ff);
 

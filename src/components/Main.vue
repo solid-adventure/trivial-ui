@@ -24,6 +24,8 @@ import router from "../router";
 import store from "../store";
 import Breadcrumb from "./Breadcrumb.vue";
 
+// import "/src/assets/stylesheets/app-light.scss";
+
 export default {
   name: "App",
   components: {

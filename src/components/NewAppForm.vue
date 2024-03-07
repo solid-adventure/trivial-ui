@@ -273,7 +273,7 @@ export default {
 .refreshIcon{
     height: 1em;
     width: 1em;
-    background-image: url("/source/assets/images/sync-solid.svg");
+    background-image: url("/src/assets/images/sync-solid.svg");
     color: var(--on-surface);
     background-color: transparent;
     cursor: pointer;

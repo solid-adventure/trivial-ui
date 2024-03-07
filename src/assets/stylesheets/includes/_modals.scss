@@ -31,7 +31,7 @@
     &.modal-large {
       width: 80%;
 
-      @media only screen and(max-width: 1024px) {
+      @media only screen and (max-width: 1024px) {
         width: 100%;
       }
     }
@@ -52,6 +52,6 @@
     position: absolute;
     top: .5em;
     right: .5em;
-    background-image: url('/assets/images/times-circle-solid-light.svg')
+    background-image: url('/src/assets/images/times-circle-solid-light.svg')
   }
 }
