@@ -8,7 +8,6 @@
   import { mapState, mapGetters } from 'vuex'
 
   const RECEIVE_MODE = 0
-  const RESEND_MODE = 1
   const CUSTOM_MODE = 2
   const SELECT_MODE = 3
 
@@ -47,7 +46,6 @@
       this.$store.state.keyboardControl.register('shift-?', "", this.openKeyboardControls.bind(this))
 
       this.$store.state.keyboardControl.register('command-shift-r', "Run w/Manual Payload", this.syntheticsendCustomWithConfirmationClick.bind(this))
-      this.$store.state.keyboardControl.register('command-l', "Run w/Last Payload", this.syntheticResendLastClick.bind(this))
       this.$store.state.keyboardControl.register('command-p', "Edit Payload", this.configureData.bind(this))
 
 
@@ -56,10 +54,6 @@
     computed: {
       RECEIVE_MODE() {
         return RECEIVE_MODE
-      },
-
-      RESEND_MODE() {
-        return RESEND_MODE
       },
 
       CUSTOM_MODE() {
@@ -74,10 +68,6 @@
         return RECEIVE_MODE === this.mode
       },
 
-      inResendMode() {
-        return RESEND_MODE === this.mode
-      },
-
       inCustomMode() {
         return CUSTOM_MODE === this.mode
       },
@@ -87,7 +77,8 @@
       },
 
       ...mapState([
-        'app'
+        'app',
+        'enableWebhookAppTrigger'
       ]),
 
       ...mapGetters([
@@ -113,37 +104,6 @@
         setTimeout(() => this.copyButtonText = 'Copy Webhook URL', 750)
       },
 
-      syntheticResendLastClick() {
-        this.$refs.resendLastButton.click()
-      },
-
-      async resendLast() {
-        try {
-          const appId = this.app.name
-          const webhooks = await fetchJSON(`/proxy/trivial?path=/webhooks&app_id=${appId}&limit=1`)
-          if (webhooks[0]) {
-            await fetchJSON('/proxy/trivial', {
-              method: 'post',
-              headers: {'content-type': 'application/json'},
-              body: JSON.stringify({path: `/webhooks/${webhooks[0].id}/resend`})
-            })
-          } else {
-            await fetchJSON('/proxy/trivial', {
-              method: 'post',
-              headers: {'content-type': 'application/json'},
-              body: JSON.stringify({
-                path: `/webhooks/${appId}/send`,
-                payload: {}
-              })
-            })
-          }
-          Notifications.success('Data sent')
-        } catch (err) {
-          console.error('Failed to resend last webhook', err)
-          Notifications.error(`Could not resend last payload: ${err.message}`)
-        }
-      },
-
       configureData() {
         this.$emit('edit:payload')
       },
@@ -151,14 +111,7 @@
       async sendCustom() {
         try {
           const appId = this.app.name
-          await fetchJSON('/proxy/trivial', {
-            method: 'post',
-            headers: {'content-type': 'application/json'},
-            body: JSON.stringify({
-              path: `/webhooks/${appId}/send`,
-              payload: JSON.parse(this.customPayload)
-            })
-          })
+          await this.$store.state.Session.apiCall(`/webhooks/${appId}/send`, 'POST', JSON.parse(this.customPayload))
           Notifications.success('Data sent')
         } catch (err) {
           console.error('Failed to send custom data', err)
@@ -195,23 +148,15 @@
     <select v-model="mode">
       <option :value="SELECT_MODE">Select</option>
       <option :value="CUSTOM_MODE">Manual</option>
-      <option :value="RECEIVE_MODE">Receive Webhook</option>
-      <option :value="RESEND_MODE">Re-send Last Payload</option>
+      <option v-if="enableWebhookAppTrigger" :value="RECEIVE_MODE">Receive Webhook</option>
     </select>
     <div v-if="inReceiveMode">
       <button ref="copy" class="secondary-button" @click="copyUrl">{{copyButtonText}}</button>
     </div>
-    <div v-if="inResendMode">
-      <ActionButton
-        ref="resendLastButton"
-        class="button-medium"
-        value="Run <span class='shortcut'>⌘ + L</span>"
-        workingValue="Sending..."
-        :action="resendLast"></ActionButton>
-    </div>
     <div v-if="inCustomMode">
       <div class="secondary-button" @click="configureData">Edit Payload</div>
       <ActionButton
+        v-if="enableWebhookAppTrigger"
         ref="sendCustomButton"
         class="button-medium"
         value="Run"

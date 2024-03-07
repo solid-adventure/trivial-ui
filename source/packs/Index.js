@@ -1,14 +1,9 @@
-import SuperBar from '../components/SuperBar.vue'
-import AppsOverview from '../components/AppsOverview.vue'
-import store from '../store'
-import {createApp} from 'vue/dist/vue.runtime.esm-bundler'
+import { createApp } from 'vue';
+import Main from '../components/Main.vue';
+import router from '../router';
+import store from '../store';
 
-
-console.log('[Index] initializing')
-store.dispatch('init', {})
-
-let index = createApp(AppsOverview);
-index.component("super-bar", SuperBar);
-index.use(store);
-index.mount("#index");
-
+const app = createApp(Main);
+app.use(router);
+app.use(store);
+app.mount('#app');

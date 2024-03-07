@@ -6,6 +6,7 @@ import ManifestMigrator from 'trivial-core/lib/ManifestMigrator'
 import FeatureManager from 'trivial-core/lib/FeatureManager'
 import ActionPath from 'trivial-core/lib/actionsv2/ActionPath'
 import router from '../router'
+import Session from '../models/Session'
 
 const store = createStore({
 
@@ -13,8 +14,9 @@ const store = createStore({
     currentPath: '/',
     route: null,
     user: {},
+    theme: 'Light',
     app: {},
-    isAuthenticated: true,
+    isAuthenticated: false,
     showSuperBar: false,
     apps: [],
     manifest: {
@@ -35,7 +37,11 @@ const store = createStore({
     tourMode: false,
     tourStep: 0,
     tourSteps: ['action-info', 'credentials', 'transform-config'],
-    enableSaveCredentials: VUE_APP_ENABLE_SAVE_CREDENTIALS
+    enableSaveCredentials: VUE_APP_ENABLE_SAVE_CREDENTIALS,
+    enableBuildApps: VUE_APP_ENABLE_BUILD_APPS,
+    trivialApiUrl: VUE_APP_TRIVIAL_API_URL,
+    enableWebhookAppTrigger: VUE_APP_ENABLE_WEBHOOK_APP_TRIGGER,
+    Session: Session,
   },
 
   getters: {
@@ -185,12 +191,12 @@ const store = createStore({
       state.user = user
     },
 
-    setDataSample(state, dataSample) {
-      state.dataSample = dataSample
+    setTheme(state, theme) {
+      state.theme = theme
     },
 
-    setWebhookSocket(state, socket) {
-      state.webhookSocket = socket
+    setDataSample(state, dataSample) {
+      state.dataSample = dataSample
     },
 
     addListener(state, {event, listener}) {
@@ -230,6 +236,7 @@ const store = createStore({
 
   actions: {
     async init({ commit, dispatch, state }, { appId }) {
+      if (!state.isAuthenticated) { return }
       try {
         await dispatch('loadProfile')
         await dispatch('loadResources', { dispatch, router })
@@ -240,14 +247,15 @@ const store = createStore({
       }
     },
 
-    async loadProfile({ commit }) {
-      let user
+    async loadProfile({ commit, state }) {
       try {
-        user = await fetchJSON('/proxy/trivial?path=/profile')
+        let data = await Session.apiCall('/profile')
+        commit('setTheme', data.user.color_theme)
+        commit('setUser', data.user)
       } catch (e) {
-        user = {name: 'guest'}
+        console.error('Failed to load profile', e)
+        commit('setUser', {name: 'guest'})
       }
-      commit('setUser', user.user)
     },
 
     async loadResources({ commit }, { dispatch, router }) {
@@ -262,19 +270,15 @@ const store = createStore({
     },
 
     async loadApps({ commit }) {
-      const apps = await fetchJSON('/proxy/trivial?path=/apps')
+      const apps = await Session.apiCall('/apps')
       await commit('setApps', apps)
     },
 
     async loadApp({ commit }, { appId }) {
-      const app = await fetchJSON(`/proxy/trivial?path=/apps/${appId}`)
+      const app = await Session.apiCall(`/apps/${appId}`)
       await commit('setApp', app)
     },
 
-
-    async setIsAuthenticated({state, commit}, {isAuthenticated}) {
-      commit('setIsAuthenticated', isAuthenticated)
-    },
     async setCurrentPath({state, commit}, {currentPath, route}) {
       commit('setCurrentPath', currentPath)
       commit('setRoute', route)
@@ -306,16 +310,14 @@ const store = createStore({
 
     async loadCredentials({ commit, state, dispatch }) {
       let appId = state?.app?.name ?? state?.route?.params?.id
-      const creds = await fetchJSON(`/proxy/trivial?path=/apps/${appId}/credentials`)
+      const creds = await Session.apiCall(`/apps/${appId}/credentials`)
       commit('setCredentials', creds.credentials)
       dispatch('notifyCredentialsLoaded')
       return creds.credentials
     },
 
     async loadCredentialsDraft({ commit, dispatch }, { token }) {
-      const creds = await fetchJSON(
-        `/proxy/trivial?path=/manifests/-/drafts/${token}/credentials`
-      )
+      const creds = await Session.apiCall(`/manifests/-/drafts/${token}/credentials`)
       commit('setCredentials', creds.credentials)
       return creds.credentials
     },
@@ -330,7 +332,7 @@ const store = createStore({
 
     async loadManifest({ commit, state, dispatch }) {
       const appId = state?.app?.name ?? state?.route?.params?.id
-      const all = await fetchJSON(`/proxy/trivial?path=/manifests&app_id=${appId}`)
+      const all = await Session.apiCall(`/manifests?app_id=${appId}`)
       const manifest = all[0] || {content: '{}'}
       manifest.content = new ManifestMigrator(JSON.parse(manifest.content)).migrate()
       commit('setManifest', manifest)
@@ -339,7 +341,7 @@ const store = createStore({
     },
 
     async loadManifestDraft({ commit, dispatch }, { token }) {
-      const manifest = await fetchJSON(`/proxy/trivial?path=/manifests/-/drafts/${token}`)
+      const manifest = await Session.apiCall(`/manifests/-/drafts/${token}`)
       manifest.content = new ManifestMigrator(manifest.content).migrate()
       commit('setManifest', {id: manifest.manifest_id, content: manifest.content, user_id: manifest.user_id})
       return manifest
@@ -354,26 +356,12 @@ const store = createStore({
     },
 
     async saveCredentials({ state, dispatch }) {
-      await fetchJSON('/proxy/trivial', {
-        method: 'put',
-        headers: {'content-type': 'application/json'},
-        body: JSON.stringify({
-          path: `/apps/${state.app.name}/credentials`,
-          credentials: state.credentials
-        })
-      })
+      await Session.apiCall(`/apps/${state.app.name}/credentials`, 'PUT', {credentials: state.credentials})
       dispatch('notifyCredentialsLoaded')
     },
 
     async saveManifest({ commit, state, dispatch }) {
-      const manifest = await fetchJSON(`/proxy/trivial`, {
-        method: 'put',
-        headers: {'content-type': 'application/json'},
-        body: JSON.stringify({
-          path: `/manifests/${state.manifest.id}`,
-          content: JSON.stringify(state.manifest.content)
-        })
-      })
+      const manifest = await Session.apiCall(`/manifests/${state.manifest.id}`, 'PUT', {content: JSON.stringify(state.manifest.content)})
       manifest.content = new ManifestMigrator(JSON.parse(manifest.content)).migrate()
       commit('setManifest', manifest)
       dispatch('notifyManifestLoaded')
@@ -388,6 +376,7 @@ const store = createStore({
     },
 
     async build({ state }) {
+      if (!state.enableBuildApps) { return }
       const params = FeatureManager.featureParams()
       await fetchJSON(`/build?${params}`, {
         method: 'post',
@@ -404,7 +393,7 @@ const store = createStore({
     async requireDataSample({ state, commit }) {
       if (!state.dataSample) {
         try {
-          const data = await fetchJSON(`/proxy/trivial?path=/webhooks&app_id=${state.app.name}&limit=1`)
+          const data = await Session.apiCall(`/webhooks?app_id=${state.app.name}&limit=1`)
           if (Array.isArray(data) && data.length > 0) {
             commit('setDataSample', data[0])
           } else {
@@ -444,13 +433,13 @@ const store = createStore({
     },
 
     async loadCredentialSets({ commit }) {
-      const creds = await fetchJSON(`/proxy/trivial?path=/credential_sets`)
+      const creds = await Session.apiCall(`/credential_sets`)
       commit('setCredentialSets', creds.credential_sets)
       return creds.credential_sets
     },
 
     async loadCredentialSetAndSecret({ commit }, { id }) {
-      const data = await fetchJSON(`/proxy/trivial?path=/credential_sets/${id}`)
+      const data = await Session.apiCall(`/credential_sets/${id}`)
       commit('updateCredentialSet', data.credential_set)
       return data
     },
@@ -458,32 +447,16 @@ const store = createStore({
     async saveCredentialSet({ commit }, { credential_set, credentials }) {
       let newCreds = null
       if (credential_set.id) {
-        newCreds = await fetchJSON('/proxy/trivial', {
-          headers: {'content-type': 'application/json'},
-          method: 'put',
-          body: JSON.stringify({
-            path: `/credential_sets/${credential_set.id}`,
-            credential_set,
-            credentials
-          })
-        })
+        newCreds = await Session.apiCall(`/credential_sets/${credential_set.id}`, 'PUT', {credential_set, credentials})
       } else {
-        newCreds = await fetchJSON('/proxy/trivial', {
-          headers: {'content-type': 'application/json'},
-          method: 'post',
-          body: JSON.stringify({
-            path: `/credential_sets`,
-            credential_set,
-            credentials
-          })
-        })
+        newCreds = await Session.apiCall(`/credential_sets`, 'POST', {credential_set, credentials})
       }
       commit('updateCredentialSet', newCreds.credential_set)
       return newCreds.credential_set
     },
 
     async destroyCredentialSet({ commit }, { id }) {
-      await fetchJSON(`/proxy/trivial?path=/credential_sets/${id}`, {method: 'delete'})
+      await Session.apiCall(`/credential_sets/${id}`, 'DELETE')
       commit('removeCredentialSet', { id })
     }
   }

@@ -45,12 +45,6 @@ export default {
         EditFunction
     },
 
-    created() {
-        // This seems to be wrong sadly we can just rename setIsAuthenticated
-        // To 'ShowSuperBar'
-      store.dispatch('setIsAuthenticated', {isAuthenticated: false});
-    },
-
     data(){
         return {
         newFunction: {

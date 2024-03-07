@@ -1,11 +1,15 @@
 <html>
 <head>
-	<title>Trivial Dashboard</title>
-  <%- include('_head.html') -%>
+  <link rel="shortcut icon" href="/assets/images/favicon.png" type="image/png" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  	<title>Trivial Dashboard</title>
+    <link rel="stylesheet" href="/assets/stylesheets/app-light.css">
 </head>
 
 <body>
-  <div id="index">
+  <div id="app">
+    <router-view></router-view>
   </div>
 </body>
 

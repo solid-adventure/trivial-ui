@@ -24,9 +24,6 @@
 <script>
   import store from '../store'
 export default {
-  created() {
-    store.dispatch('setIsAuthenticated', {isAuthenticated: false});
-  },
   computed: {
     currentUserMessage() {
       return this.$store?.state?.user?.account_locked_reason;

@@ -303,6 +303,10 @@ hr.accent {
   }
 }
 
+.message-container{
+  display: block;
+  height: 1.5em;
+}
 
 // datepicker
 $namespace: 'xmx'; // change the 'mx' to 'xmx'. then <date-picker prefix-class="xmx" />

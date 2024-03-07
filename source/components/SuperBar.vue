@@ -4,13 +4,11 @@
     <span class="brand"><a href="/"><img src="/assets/images/trivial-logo-light-warm.svg"/></a></span>
     <span class="superlink" :class="{active: isActive('dashboard')}"><a href="/dashboard">Dashboards</a></span>
     <span class="superlink" :class="{active: isActive('contract')}"><a href="/contract">Contracts</a></span>
-    <!-- TEMP DISABLE -->
-    <!-- <span class="superlink" :class="{active: isActive('unset')}"><a href="/?paneltype=unset">Data Connectors</a></span> -->
     <span class="settings">
       <div class ="theme">
         <ToggleButton
           @update:modelValue="updateToggleButtonState"
-          :modelValue="active"
+          :modelValue="themeToggleActive"
           off-icon="sun"
           on-icon="moon"
           theme-override="dark"></ToggleButton>
@@ -106,15 +104,15 @@
   export default {
     data(){
       return {
-        activeTheme: '',
+        activeTheme: 'Light',
         themeUpdating: false,
         prevLink: undefined,
         newLink: undefined
       }
     },
 
-    created() {
-      this.loadTheme()
+    watch: {
+      'theme': 'setActiveThemeAndApply',
     },
 
     components: {
@@ -123,21 +121,35 @@
     },
 
     computed: {
-      active(){
+
+      themeToggleActive(){
         return this.activeTheme == 'Dark'
       },
+
       firstName() {
         if (!this.user) { return 'Guest' }
         const match = /^\s*(\S+)/.exec(this.user.name || '')
         return match ? match[1] : (this.user.name || '')
       },
 
+      styleSheetLink() {
+        return this.theme === 'Dark' ? '/assets/stylesheets/app.css' : '/assets/stylesheets/app-light.css'
+      },
+
       ...mapState([
-        'user'
-      ])
+        'user',
+        'theme'
+      ]),
+
     },
 
     methods: {
+
+      setActiveThemeAndApply() {
+        this.activeTheme = this.theme
+        this.setStylesheet()
+      },
+
       isActive(tab) {
         if (window.location.pathname != '/') { return false }
         let params =  new URLSearchParams(window.location.search)
@@ -148,35 +160,26 @@
         return tab == panelTypeFromLocation
 
       },
-      async loadTheme(){
-        try {
-          let response = await fetchJSON('/proxy/trivial?path=/profile')
-          response.user.color_theme == null ? this.activeTheme = "Light" : this.activeTheme = response.user.color_theme
-        }
-        catch(error){
-          console.log('[Settings][loadTheme] Error: ', error)
-        }
-      },
-      async updateToggleButtonState(event){
-        this.themeUpdating = true
+
+      setStylesheet() {
         this.prevLink = document.querySelector('link[rel=stylesheet]')
         this.newLink = document.createElement('link')
         this.newLink.rel = 'stylesheet'
+        this.newLink.href = this.styleSheetLink
+        this.prevLink.after(this.newLink)
+        this.prevLink.remove()
+      },
+
+      async updateToggleButtonState(event){
+        this.themeUpdating = true
         switch(event){
           case true:
             this.activeTheme = 'Dark'
-            this.newLink.href = '/assets/stylesheets/app.css'
-            this.prevLink.after(this.newLink)
             break
           case false:
             this.activeTheme = 'Light'
-            this.newLink.href = '/assets/stylesheets/app-light.css'
-            this.prevLink.after(this.newLink)
             break
         }
-        window.setTimeout(() => {
-          this.prevLink.remove()
-        }, 500)
         await this.themeUpdateCall()
         track('Changed Theme', {
           'New Active Theme': this.activeTheme
@@ -184,19 +187,10 @@
         this.themeUpdating = false
       },
 
-      async themeUpdateCall(){
-        try {
-          let update = await fetchJSON('/proxy/trivial', {
-            method: 'put',
-            headers: {'content-type': 'application/json'},
-            body: JSON.stringify({
-              path: '/profile',
-              color_theme: this.activeTheme
-            })
-          })
-        } catch (err) {
-            console.log('[Settings][themeUpdateCall] Error: ', err)
-        }
+      async themeUpdateCall() {
+        let data = await this.$store.state.Session.apiCall('/profile', 'PUT', {color_theme: this.activeTheme})
+        .catch(err => console.error('[Settings][themeUpdateCall] Error: ', err))
+        this.$store.commit('setTheme', data.user.color_theme)
       }
     }
   }

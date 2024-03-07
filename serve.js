@@ -5,7 +5,6 @@ const cookieParser = require('cookie-parser')
 const request = require('request');
 let dotEnvConfig = require('dotenv').config();
 const dotEnv = dotEnvConfig["parsed"]
-const Session = require(`${__dirname}/Session.js`)
 const createError = require('http-errors')
 
 const {
@@ -46,7 +45,7 @@ serve.use(express.json({limit: '5mb'}));
 serve.use(express.static('public'))
 serve.set('views', __dirname + '/public/views/');
 serve.engine('html', require('ejs').renderFile);
-serve.use(cookieParser(process.env.COOKIE_SIGNATURE))
+serve.use(cookieParser())
 serve.use((req, res, next) => {
   res.locals.featureSettings = FeatureManager.envSettings()
   next()
@@ -229,13 +228,9 @@ serve.all('/proxy/:service', (req, res) => {
 })
 // End Proxy Section
 
-serve.get('*', Session.validate, (req, res) => {
-  res.render('main.html', {
-    analytics_id: process.env.ANALYTICS_ID,
-    app_id: 'TrivialBuilder'
-  })
+serve.get('*', (req, res) => {
+  res.render('index.html')
 });
-
 
 const httpServer = serve.listen(port, () => {
   logger.info(`Server running at http://localhost:${port}/`);

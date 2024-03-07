@@ -3,7 +3,7 @@
     <div class="container">
       <span class="brand"><img /></span>
       <div v-if="registrationEnabled">
-        <p>Create a new account:</p>
+        <h3>Create a new account:</h3>
         <form id="registerForm" @submit="handleSubmit">
           <div>
             <input
@@ -58,9 +58,12 @@
               >Privacy Policy</a
             >
           </div>
-          <p v-if="errorMessage">
+          <div class="message-container">
+            <p v-if="errorMessage">
             <em>{{ errorMessage }}</em>
           </p>
+          </div>
+
           <div class="submit">
             <input
               v-if="!register_clicked"
@@ -125,6 +128,10 @@
   justify-content: center;
   align-items: center;
   align-content: space-between;
+
+}
+.overlay.clearSuperBar {
+  margin-top: 20px;
 }
 
 .container {
@@ -135,7 +142,7 @@
 .password-info {
   width: unset;
 }
-.container p {
+.container h3 {
   text-align: left;
   margin-bottom: 20px;
 }
@@ -143,8 +150,13 @@
 .text-field {
   margin-bottom: 30px;
 }
+
 #tos-container {
   padding-bottom: 20px;
+}
+
+.submit {
+  margin: 0 0 0 266px;
 }
 
 .signIn {
@@ -169,9 +181,6 @@ import PasswordValidator from "./builderv2/PasswordValidator.vue";
 
 TrackingService.identifyLandingReferer();
 export default {
-    created() {
-        store.dispatch("setIsAuthenticated", { isAuthenticated: false });
-    },
     data() {
         return {
             errorMessage: null,
@@ -194,37 +203,23 @@ export default {
         handleSubmit(e) {
             e.preventDefault();
             this.register_clicked = true;
-            let name = this.name;
-            let email = this.email;
-            let password = this.password;
-            let register = fetch(`/proxy/trivial`, {
-                method: "post",
-                headers: { "content-type": "application/json" },
-                body: JSON.stringify({
-                    path: "/auth",
-                    name: name,
-                    role: "member",
-                    email: email,
-                    password: password,
-                }),
-            })
-                .then((response) => response.json())
-                .then((data) => this.handleResponse(data))
-                .catch((error) => this.handleRegisterError(error));
+            this.$store.state.Session.register(this.name, this.email, this.password)
+            .then(user => this.handleResponse(user))
+            .catch((error) => this.handleRegisterError(error));
         },
-        handleResponse(data) {
-            if (!data.data.id) {
-                this.handleSignUpError(data);
+        handleResponse(user) {
+            if (!user.id) {
+                this.handleSignUpError(user);
             }
             else {
                 this.register_clicked = false;
-                let user = {
-                    Name: data.data.name,
-                    Email: data.data.email,
-                    ID: data.data.id,
+                let identity = {
+                    Name: user.name,
+                    Email: user.email,
+                    ID: user.id,
                 };
-                TrackingService.identify(user);
-                TrackingService.track("User Signup", user);
+                TrackingService.identify(identity);
+                TrackingService.track("User Signup", identity);
                 window.location = "/";
             }
         },

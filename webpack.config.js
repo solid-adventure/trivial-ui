@@ -10,6 +10,10 @@ const mode =
   process.env["NODE_ENV"] === "production" ? "production" : "development";
 const isDevelopment = mode == "development";
 const enableSaveCredentials = process.env["VUE_APP_ENABLE_SAVE_CREDENTIALS"] === "true";
+const enableBuildApps = process.env["VUE_APP_ENABLE_BUILD_APPS"] === "true";
+const enableWebhookAppTrigger = process.env["VUE_APP_ENABLE_WEBHOOK_APP_TRIGGER"] === "true";
+
+const trivialApiUrl = JSON.stringify(process.env["TRIVIAL_URL"]);
 
 module.exports = {
   devtool: "inline-source-map",
@@ -56,6 +60,9 @@ module.exports = {
     new webpack.DefinePlugin(
     {
       VUE_APP_ENABLE_SAVE_CREDENTIALS: enableSaveCredentials,
+      VUE_APP_ENABLE_BUILD_APPS: enableBuildApps,
+      VUE_APP_ENABLE_WEBHOOK_APP_TRIGGER: enableWebhookAppTrigger,
+      VUE_APP_TRIVIAL_API_URL: trivialApiUrl,
       __VUE_OPTIONS_API__: true,
       __VUE_PROD_DEVTOOLS__: !isDevelopment,
     }),

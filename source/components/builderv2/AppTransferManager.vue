@@ -57,8 +57,7 @@ export default {
 
     async loadOrganizations() {
       try {
-        let response = await fetchJSON(`/proxy/trivial?path=/organizations`);
-        this.organizations = response;
+        this.organizations = await this.$store.state.Session.apiCall('/organizations');
       } catch (error) {
         this.load_org_error = true;
       }
@@ -70,13 +69,7 @@ export default {
         try {
           this.transfer_in_progress = true;
           this.transfer_error = false;
-          let response = await fetchJSON(`/proxy/trivial`, {
-            method: "PUT",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify({
-              path: `/apps/${this.current_app_id}/transfer/${this.new_owner_type_path}/${new_owner_id}`,
-            }),
-          });
+          await this.$store.state.Session.apiCall(`/apps/${this.current_app_id}/transfer/${this.new_owner_type_path}/${new_owner_id}`, 'PUT');
           await new Promise((resolve) => {
             this.delayTransferIndicator(resolve);
           });

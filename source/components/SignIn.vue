@@ -41,11 +41,9 @@
 <script>
 import TrackingService from '../../lib/TrackingService';
 import store from '../store'
+
 TrackingService.identifyLandingReferer();
 export default {
-    created() {
-        store.dispatch('setIsAuthenticated', {isAuthenticated: false});
-    },
     data(){
         return {
             state: null,
@@ -56,41 +54,24 @@ export default {
         }
     },
     methods: {
-        handleSubmit(e){
+        async handleSubmit(e){
             e.preventDefault()
             this.sign_in_clicked = true
-
-            let email = this.email
-		    let password = this.password
-
-		    let login = fetch(`/proxy/trivial`, {
-		    	method: 'post',
-		    	headers: {'content-type': 'application/json'},
-		    	body: JSON.stringify({
-		    		path: '/auth/sign_in',
-		    		email: email,
-		    		password: password
-		    	})
-		    })
-		    .then(response => response.json())
-		    .then(data => this.handleResponse(data))
-		    .catch(error => this.handleSignInError(error))
-        },
-
-        handleResponse(data){
-            if (!data.data.id) {
-		    	this.handleSignInError(data)
-		    } else {
+            try {
+                let user = await this.$store.state.Session.create(this.email, this.password)
                 this.sign_in_clicked = false
-                let user = {
-                    'Name': data.data.name,
-                    'Email': data.data.email,
-                    'ID': data.data.id
+                this.password = ''
+                let identity = {
+                    'Name': user.name,
+                    'Email': user.email,
+                    'ID': user.id
                 }
-                TrackingService.identify(user)
-                TrackingService.track('User Signin', user)
-                window.location = '/'
-		    }
+                TrackingService.identify(identity)
+                TrackingService.track('User Signin', identity)
+                window.location.href = '/' // Full reload to re-init state w/user present
+            } catch(e) {
+                this.handleSignInError(e)
+            }
         },
 
         handleSignInError(e) {

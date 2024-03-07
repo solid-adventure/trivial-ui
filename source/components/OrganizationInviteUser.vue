@@ -93,7 +93,6 @@ export default {
       e.preventDefault()
       if (!this.validateForm()) { return false }
       let data = {
-        path: `/auth/invitation`,
         email: this.newUserEmail,
         name: this.newUserName,
         trivial_ui_url: window.location.origin,
@@ -102,12 +101,8 @@ export default {
           role: this.newUserRole
         }
       }
-      try{
-        await fetchJSON(`/proxy/trivial`, {
-          method: 'POST',
-          headers: {'content-type': 'application/json'},
-          body: JSON.stringify(data)
-        })
+      try {
+        await this.$store.state.Session.apiCall('/auth/invitation', 'POST', data)
         Notifications.success('Invitation sent')
         window.setTimeout(() => {
           window.location = `/organizations/${this.orgId}/edit`
