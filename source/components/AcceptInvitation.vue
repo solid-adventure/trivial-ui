@@ -102,7 +102,7 @@
 }
 
 .submit{
-    margin: 0 0 20px 266px;
+    margin: 0 0 50px 266px;
 }
 .clearSuperBar{
   margin-top: 50px !important;
