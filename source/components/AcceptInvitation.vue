@@ -8,7 +8,7 @@
             <div v-else>
               <span v-if="loggedIn && !loggedInAsInvited">You are logged in as <strong>{{currentUser.email}}</strong>, but this invitation is for <strong>{{ invitedEmail }}</strong>. Please <a href="/signout">sign out</a> before accepting this invitation.</span>
               <span v-else>
-              <div v-if = "tokenIsInvalid">
+              <div v-if = "tokenIsValid">
                 <h2>Accept Invitation</h2>
                 <form>
                   <!-- User email is always locked -->
@@ -76,7 +76,7 @@
     	          </form>
               </div>
               <div v-else>
-                <p v-if = "errorMessage != null && tokenIsInvalid">{{ errorMessage }}</p>
+                <p v-if = "errorMessage != null && !tokenIsValid">{{ errorMessage }}</p>
                 <p v-else>Invalid or expired invitation token. <br> Please contact the organization administrator for assistance.</p>
               </div>
             </span>
@@ -135,21 +135,27 @@ export default {
           isPasswordValid: false,
           hasClickedConfirmPassword: false,
           isPasswordMatching: false,
-          tokenIsInvalid: false
+          tokenIsValid: false
 
         }        
     },
     async created(){
         try {
-          await this.$store.state.Session.apiCall('/auth/invitation', 'PUT', {
+          let result = await this.$store.state.Session.apiCall('/auth/invitation', 'PUT', {
             password: '',
             password_confirmation: '',
             invitation_token: this.invitationToken
           })
         } catch (err) {
           this.errorMessage = err.message
-          if(this.errorMessage !== 'Invalid token.'){
-            this.tokenIsInvalid = true
+          if(!err.code){
+            this.errorMessage = "An unexpected error occurred. Please try again later."
+            return
+          }
+          // 422 refers to incorrect password, this implies that the invitaiton token exists
+          if(err.code === 422) {
+            this.tokenIsValid = true
+            // To prevent errorMessage to populate when users inputs password
             this.errorMessage = null
           }
         }
