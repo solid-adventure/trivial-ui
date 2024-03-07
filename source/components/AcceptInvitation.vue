@@ -76,8 +76,7 @@
     	          </form>
               </div>
               <div v-else>
-                <p v-if = "errorMessage != null && !tokenIsValid">{{ errorMessage }}</p>
-                <p v-else>Invalid or expired invitation token. <br> Please contact the organization administrator for assistance.</p>
+                <p>{{ errorMessage }}</p>
               </div>
             </span>
           </div>
