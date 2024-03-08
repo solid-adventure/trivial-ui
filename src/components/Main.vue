@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" v-if="!loading">
     <!-- Navbar, sidebar, or other common components can be placed here -->
     <header v-if="this.$store.state.isAuthenticated">
       <SuperBar />
@@ -24,8 +24,6 @@ import router from "../router";
 import store from "../store";
 import Breadcrumb from "./Breadcrumb.vue";
 
-// import "/src/assets/stylesheets/app-light.scss";
-
 export default {
   name: "App",
   components: {
@@ -36,8 +34,19 @@ export default {
     return {
       lastVars: null,
       breadcrumbs: [],
-      loading: false,
+      loading: true,
     };
+  },
+  created() {
+    if (store.state.theme === "Dark") {
+      import('/src/assets/stylesheets/app.scss');
+    } else {
+      import('/src/assets/stylesheets/app-light.scss');
+    }
+    // Don't love this, but it's a quick fix for now and prevents FOUC
+    window.setTimeout(() => {
+      this.loading = false;
+    }, 300);
   },
   computed: {
     currentRouteName() {
@@ -54,7 +63,6 @@ export default {
         route: this.$route,
       });
       let vars = {};
-      this.loading = true;
       if (this.$route.path.indexOf("/apps") == 0 && this?.$route?.params?.id) {
         vars.appId = this.$route.params.id;
       }
@@ -123,7 +131,6 @@ export default {
       if (!this.breadcrumbs.length) {
         this.breadcrumbs = [{ display: "Home", link: "/" }];
       }
-      this.loading = false;
     },
   },
 };

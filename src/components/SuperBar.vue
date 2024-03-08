@@ -96,27 +96,21 @@
 <script>
   import { mapState } from 'vuex'
   import Icon from './Icon.vue'
-  import { fetchJSON } from 'trivial-core/lib/component-utils'
   import TrackingService from '../../lib/TrackingService'
   import ToggleButton from './controls/ToggleButton.vue'
-  // import { Moon, Sun } from './icons'
   import Sun from './icons/sun.vue'
   import Moon from './icons/moon.vue'
-
-
 
   export default {
     data(){
       return {
-        activeTheme: 'Light',
+        activeTheme: '',
         themeUpdating: false,
-        prevLink: undefined,
-        newLink: undefined
       }
     },
 
     watch: {
-      'theme': 'setActiveThemeAndApply',
+      'theme': 'applyTheme',
     },
 
     components: {
@@ -124,10 +118,14 @@
       ToggleButton
     },
 
+    created(){
+      this.applyTheme()
+    },
+
     computed: {
 
       themeToggleActive(){
-        return this.activeTheme == 'Dark'
+        return this.theme === 'Dark'
       },
 
       firstName() {
@@ -136,22 +134,21 @@
         return match ? match[1] : (this.user.name || '')
       },
 
-      styleSheetLink() {
-        return this.theme === 'Dark' ? '/src/assets/stylesheets/app.css' : '/src/assets/stylesheets/app-light.css'
-      },
-
       ...mapState([
         'user',
-        'theme'
+        'theme',
       ]),
 
     },
 
     methods: {
 
-      setActiveThemeAndApply() {
-        this.activeTheme = this.theme
-        this.setStylesheet()
+      applyTheme() {
+        if (this.theme === "Dark") {
+          import('/src/assets/stylesheets/app.scss');
+        } else {
+          import('/src/assets/stylesheets/app-light.scss');
+        }
       },
 
       isActive(tab) {
@@ -163,15 +160,6 @@
         }
         return tab == panelTypeFromLocation
 
-      },
-
-      setStylesheet() {
-        this.prevLink = document.querySelector('link[rel=stylesheet]')
-        this.newLink = document.createElement('link')
-        this.newLink.rel = 'stylesheet'
-        this.newLink.href = this.styleSheetLink
-        this.prevLink.after(this.newLink)
-        this.prevLink.remove()
       },
 
       async updateToggleButtonState(event){
@@ -192,10 +180,11 @@
       },
 
       async themeUpdateCall() {
+        this.$store.commit('setTheme',this.activeTheme)
         let data = await this.$store.state.Session.apiCall('/profile', 'PUT', {color_theme: this.activeTheme})
         .catch(err => console.error('[Settings][themeUpdateCall] Error: ', err))
-        this.$store.commit('setTheme', data.user.color_theme)
-      }
+      },
+
     }
   }
 </script>

@@ -14,7 +14,8 @@ const store = createStore({
     currentPath: '/',
     route: null,
     user: {},
-    theme: 'Light',
+    theme: localStorage.getItem('theme')?.toLowerCase() === 'dark' ? 'Dark' : 'Light',
+    themeLoaded: false,
     app: {},
     isAuthenticated: false,
     showSuperBar: false,
@@ -69,6 +70,9 @@ const store = createStore({
     },
     setRoute(state, route) {
       state.route = route
+    },
+    themeLoaded(state, loaded) {
+      state.themeLoaded = loaded
     },
     incrementTour(state) {
       state.tourStep++
@@ -193,6 +197,7 @@ const store = createStore({
 
     setTheme(state, theme) {
       state.theme = theme
+      localStorage.setItem('theme', theme)
     },
 
     setDataSample(state, dataSample) {
