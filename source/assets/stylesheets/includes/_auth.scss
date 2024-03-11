@@ -1,5 +1,5 @@
 .overlay {
-    height: 100%;
+    height: calc(100% - 80px);
     display: flex;
     flex-direction: column;
     justify-content: center;

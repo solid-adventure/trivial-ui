@@ -130,12 +130,7 @@
   align-content: space-between;
 
 }
-.overlay.clearSuperBar {
-  margin-top: 20px;
-}
-
 .container {
-  padding: 2em;
   width: unset;
 }
 
