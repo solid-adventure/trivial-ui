@@ -21,6 +21,13 @@
       <option v-for="range of dateRangeNames">{{ range }}</option>
     </select>
 
+    <p><label for="date_range">Period</label></p>
+    <em>The default period selected when the dashboard loads.</em>
+    <select id="group_by_period" v-model="group_by_period">
+      <option v-for="period of ['Day', 'Week', 'Month', 'Year', 'Quarter', 'Total Only']">{{ period }}</option>
+    </select>
+
+
     <p><label for="timezone">Time Zone</label></p>
     <em>The timezone reports will be generated in. If no option is selected, the user's timezone will be used.</em>
     <select id="timezone" v-model="timezone">
@@ -66,6 +73,7 @@
         savingError: false,
         name: '',
         date_range: '',
+        group_by_period: 'total',
         timezone: '',
         saveTimer: null
       }
@@ -89,6 +97,10 @@
         this.saveOptionAttribute("timezone", newVal)
       },
 
+      group_by_period(newVal) {
+        this.saveOptionAttribute("group_by_period", newVal)
+      },
+
     },
 
     computed: {
@@ -110,6 +122,7 @@
         this.name = this.app.descriptive_name
         this.date_range = this.app.panels.options.date_range
         this.timezone = this.app.panels.options.timezone
+        this.group_by_period = this.app.panels.options.group_by_period
       },
 
       close() {

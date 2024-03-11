@@ -163,9 +163,8 @@
 
       // This is a method because, as a computed property, it misses changes to the Mixin children
       mergedOptions() {
-        let out = Object.assign({customer_token: this.customerToken}, this.options)
-        out = Object.assign(out, this.data_sourceArgs)
-        return out
+        // Pass this.options last to let dashboard settings override saved settings
+        return Object.assign({}, this.data_sourceArgs, this.options)
       },
 
       intialData() {

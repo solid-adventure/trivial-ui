@@ -18,19 +18,30 @@
         <option name="Custom">Custom</option>
       </select>
       <date-picker prefix-class="xmx" v-model:value="namedDateRange" :range="true"></date-picker>
-     </div>
-      <div class="panels-container">
-        <div class="row" v-for="childApp in partialWidthPanels">
-          <component v-if="start_at && end_at" :is="childApp.component" :key="childApp.id" :app_id="childApp.id" :parent_app_id="app.name" :options="{start_at: start_at, end_at: end_at}" @set-selected-panel-values="setSelectedPanelValues"/>
-        </div>
+    </div>
+    <div class="group-by-period-container">
+      <div class="selector-container">
+          <a href="#"
+            v-for="period in ['Day', 'Week', 'Month', 'Year', 'Quarter', 'Total Only']"
+            v-on:click.prevent="group_by_period=period">
+            <span class="period-selector" :class="{active: group_by_period == period }" >
+              {{ periodAbbreviation(period) }}
+            </span>
+          </a>
       </div>
+    </div>
 
-      <div class="full-width-panels-container">
-        <div v-for="childApp in fullWidthPanels" class="full-width-panel-container">
-          <component v-if="start_at && end_at" :is="childApp.component" :key="childApp.id" :app_id="childApp.id" :parent_app_id="app.name" :options="{start_at: start_at, end_at: end_at}" @set-selected-panel-values="setSelectedPanelValues"/>
-        </div>
+    <div class="panels-container">
+      <div class="row" v-for="childApp in partialWidthPanels">
+        <component v-if="start_at && end_at" :is="childApp.component" :key="childApp.id" :app_id="childApp.id" :parent_app_id="app.name" :options="{start_at, end_at, group_by_period, timezone}" @set-selected-panel-values="setSelectedPanelValues"/>
       </div>
- 
+    </div>
+
+    <div class="full-width-panels-container">
+      <div v-for="childApp in fullWidthPanels" class="full-width-panel-container">
+        <component v-if="start_at && end_at" :is="childApp.component" :key="childApp.id" :app_id="childApp.id" :parent_app_id="app.name" :options="{start_at, end_at, group_by_period, timezone}" @set-selected-panel-values="setSelectedPanelValues"/>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -84,6 +95,7 @@
         createPanelOpen: false,
         dateRangeName: '',
         customDateRange: [],
+        group_by_period: 'total',
         settingsPanelOpen: false,
         selectedPanelValues: null
       }
@@ -92,6 +104,7 @@
     mounted() {
       this.setCustomDateRange()
       this.setDefaultDateRangeName()
+      this.setDefaultGroupByPeriod()
       this.$store.state.keyboardControl.register('command-c', "Copy", this.handleCopy.bind(this))
     },
 
@@ -121,11 +134,12 @@
         }
       },
 
-      defaultTimezone() {
+      timezone() {
+        let local = Intl.DateTimeFormat().resolvedOptions().timeZone
         try {
-          return this.app.panels.options.timezone
+          return this.app.panels.options.timezone || local
         } catch(e) {
-          return
+          return local
         }
       },
 
@@ -201,7 +215,7 @@
         let d = this.dateFromRangeTypeAndPosition(0)
         if (!d) { return }
         // drop time to get midnight in TZ
-        d = new Date(d.toLocaleDateString('en-US', { timeZone: this.defaultTimezone, timeZoneName: 'short' }))
+        d = new Date(d.toLocaleDateString('en-US', { timeZone: this.timezone, timeZoneName: 'short' }))
         return d
       },
 
@@ -209,7 +223,7 @@
         let d = this.dateFromRangeTypeAndPosition(1)
         if (!d) { return }
         // drop time to get midnight in TZ, go forward 1 whole day, then back 1 millisecond to get the end of the day
-        d = new Date(d.toLocaleDateString('en-US', { timeZone: this.defaultTimezone, timeZoneName: 'short' }))
+        d = new Date(d.toLocaleDateString('en-US', { timeZone: this.timezone, timeZoneName: 'short' }))
         d.setDate(d.getDate() + 1)
         d.setTime(d.getTime() -1)
         return d
@@ -253,6 +267,11 @@
         return false
       },
 
+      periodAbbreviation(period) {
+        if (period === 'Total Only') { return period }
+        return period[0]
+      },
+
       toggleSettings() {
         this.settingsPanelOpen = !this.settingsPanelOpen
       },
@@ -266,6 +285,14 @@
           this.dateRangeName = this.app.panels.options.date_range
         } catch(e) {
           this.dateRangeName = 'Last Week'
+        }
+      },
+
+      setDefaultGroupByPeriod() {
+        try {
+          this.group_by_period = this.app.panels.options.group_by_period
+        } catch(e) {
+          this.group_by_period = 'total'
         }
       },
 
@@ -331,6 +358,39 @@
       position: absolute;
       top: 1em;
       right: 3em;
+
+    }
+
+    div.group-by-period-container {
+
+      display: flex;
+      justify-content: flex-end;
+
+      div.selector-container {
+
+        padding: 0.5em;
+        background: var(--surface);
+        border: 1px solid var(--input-border-color);
+        font-size: 0.9em;
+
+        span.period-selector {
+          margin-left: 0.75em;
+          margin-right: 0.75em;
+
+          a:link, a:visited {
+            color: var(--on-surface);
+            text-decoration: none;
+          }
+
+        }
+
+        span.active {
+          font-weight: bold;
+          border-bottom: 2px solid var(--on-background-60);
+        }
+
+      }
+
 
     }
 
