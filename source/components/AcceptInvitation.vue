@@ -68,9 +68,9 @@
                     </div>
                     <div v-else>
                       <ActionButton class = "button-small submit" :action="handleSubmit" value ="Submit" working-value="Updating..." :disabled="!isPasswordValid"></ActionButton>
-                      <span>
+                      <p>
                         Already have an account? <a href="/" @click.prevent="handleExistingUserClick" >Sign in</a>
-                      </span>
+                      </p>
                     </div>
     	        </form>
             </span>
