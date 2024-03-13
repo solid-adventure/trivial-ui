@@ -1,4 +1,9 @@
 import vue from '@vitejs/plugin-vue'
+import TrivialCore from 'trivial-core'
+
+const actionRegistry = new TrivialCore.ActionRegistry()
+actionRegistry.build()
+
 
 export default {
   plugins: [vue()],
