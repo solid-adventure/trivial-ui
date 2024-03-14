@@ -1,24 +1,28 @@
-const express = require('express')
+import express from 'express'
 const serve = express()
-const enforce = require('express-sslify')
-const cookieParser = require('cookie-parser')
-const request = require('request');
-let dotEnvConfig = require('dotenv').config();
+import enforce from 'express-sslify'
+import cookieParser from 'cookie-parser'
+import request from 'request'
+import dotenv from 'dotenv'
+const dotEnvConfig = dotenv.config()
 const dotEnv = dotEnvConfig["parsed"]
-const createError = require('http-errors')
+import createError from 'http-errors'
+import ejs from 'ejs'
+import path from 'path';
+const __dirname = path.resolve();
 
-const {
-  AppBuilder,
-  AppManager,
-  AppTemplate,
-  APISpec,
-  FeatureManager,
-  UpdateManager,
-  OAuth2Manager,
-  Redactions
-} = require('trivial-core')
-const pino = require('pino')
-const pinoHttp = require('pino-http')
+import TrivialCore from 'trivial-core'
+const AppBuilder = TrivialCore.AppBuilder
+const AppManager = TrivialCore.AppManager
+const AppTemplate = TrivialCore.AppTemplate
+const APISpec = TrivialCore.APISpec
+const FeatureManager = TrivialCore.FeatureManager
+const UpdateManager = TrivialCore.UpdateManager
+const OAuth2Manager = TrivialCore.OAuth2Manager
+const Redactions = TrivialCore.Redactions
+
+import pino from 'pino'
+import pinoHttp from 'pino-http'
 
 const port = process.env.PORT || 3000;
 const logger = pino({
@@ -42,9 +46,9 @@ if ('production' === process.env.NODE_ENV) {
 
 serve.use(express.json({limit: '5mb'}));
 
-serve.use(express.static('public'))
-serve.set('views', __dirname + '/public/views/');
-serve.engine('html', require('ejs').renderFile);
+serve.use(express.static('dist'))
+serve.set('views', __dirname + '/dist');
+serve.engine('html', ejs.renderFile);
 serve.use(cookieParser())
 serve.use((req, res, next) => {
   res.locals.featureSettings = FeatureManager.envSettings()

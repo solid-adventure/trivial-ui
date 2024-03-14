@@ -2,4 +2,4 @@
 .env
 /tmp/*
 README.html
-public/*
+/dist/*
