@@ -37,7 +37,7 @@
 import AppPanel from './panels/AppPanel'
 import { fetchJSON } from 'trivial-core/lib/component-utils'
 import ActionButton from './controls/ActionButton.vue'
-import { track } from '../../lib/TrackingService'
+import TrackingService from '../../lib/TrackingService'
 import Notices from './Notices.vue'
 import notifications from './notifications'
 import { mapMutations } from 'vuex'
@@ -126,7 +126,7 @@ export default {
           let app = new App(this.$store)
           this.appPanel = new AppPanel(this.appPanelComponent)
           const appInstance = await app.create({name: this.appName, panelOptions: this.appPanel.defaultOptions})
-          track('App Creation Started', {})
+          TrackingService.track('App Creation Started', {})
           this.buildStatus = 'started'
           // this.incrementTutorial()
           this.startMessages()
@@ -134,7 +134,7 @@ export default {
           this.build(appInstance, this.$store.state.manifest.content)
         } catch (error) {
           console.log('[AppManager][createApp] Error: ', error)
-          track('App Creation Failed', {})
+          TrackingService.track('App Creation Failed', {})
           notifications.error(`Failed to create app: ${error.message}`)
         }
       },
@@ -166,7 +166,7 @@ export default {
 
       async refreshSuggestion(){
           this.suggestedName = await this.fetchSuggestedName()
-          track('Refreshed Name Suggestion',{
+          TrackingService.track('Refreshed Name Suggestion',{
               'New Suggested Name': this.suggestedName
           })
       },
@@ -184,7 +184,7 @@ export default {
 
       fillSuggestedName(){
           this.appName = this.suggestedName
-          track('Suggested App Name Click', {
+          TrackingService.track('Suggested App Name Click', {
               'Suggested Name': this.suggestedName
           })
         },

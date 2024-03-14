@@ -1,7 +1,7 @@
 <template>
   <div class="panels">
     <component v-if="loaded" :is="panelComponent" :app_id="appId" />
-    <div v-if="!loaded" class="loading"><img src="/assets/images/trivial-loading.gif"></div>
+    <div v-if="!loaded" class="loading"><img src="/src/assets/images/trivial-loading.gif"></div>
   </div>
 </template>
 

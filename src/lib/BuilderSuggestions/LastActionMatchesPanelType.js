@@ -1,7 +1,9 @@
-const ActionDescriptors = require ('trivial-core/lib/actionsv2/catalog/ActionDescriptors')
-const BuilderSuggestionBase = require ('./BuilderSuggestionBase')
+// const ActionDescriptors = require ('trivial-core/lib/actionsv2/catalog/ActionDescriptors')
+// const BuilderSuggestionBase = require ('./BuilderSuggestionBase')
+import ActionDescriptors from 'trivial-core/lib/actionsv2/catalog/ActionDescriptors'
+import BuilderSuggestionBase from './BuilderSuggestionBase'
 
-class LastActionMatchesPanelType extends BuilderSuggestionBase {
+export default class LastActionMatchesPanelType extends BuilderSuggestionBase {
 
 	get suggestion () {
 		return {
@@ -46,5 +48,3 @@ class LastActionMatchesPanelType extends BuilderSuggestionBase {
   }
 
 }
-
-module.exports = LastActionMatchesPanelType

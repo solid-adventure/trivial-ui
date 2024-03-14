@@ -6,7 +6,7 @@
   import Notifications from '../notifications'
   import { mapState, mapActions } from 'vuex'
   import parse from '../../lib/pg-connection-string'
-  import { track } from '../../../lib/TrackingService'
+  import TrackingService from '../../../lib/TrackingService'
   import {nextTick} from 'vue'
 
   export default {
@@ -142,7 +142,7 @@
           })
           if (this.isNew) {
             this.$emit('added', data)
-            track('Added Credentials', {})
+            TrackingService.track('Added Credentials', {})
           }
           Notifications.success('Credentials saved')
           this.close()

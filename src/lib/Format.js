@@ -1,4 +1,4 @@
-class Format {
+export default class Format {
   constructor() {
   }
 
@@ -47,5 +47,3 @@ class Format {
   }
 
 }
-
-module.exports = Format

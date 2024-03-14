@@ -193,7 +193,6 @@
 </style>
 
 <script>
-  import { track } from '../../../lib/TrackingService'
   import { formatJSON, fetchJSON } from 'trivial-core/lib/component-utils'
   import CopyButton from '../../components/controls/CopyButton.vue'
   import notifications from '../../components/notifications'

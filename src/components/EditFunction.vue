@@ -154,7 +154,7 @@
   import CopyButton from './controls/CopyButton.vue'
   import CodeErrorDetail from './controls/CodeErrorDetail.vue'
   import Modal from './Modal.vue'
-  import { track } from '../../lib/TrackingService'
+  import TrackingService from '../../lib/TrackingService'
 
   export default {
 
@@ -238,7 +238,7 @@
 
         if (this.isNew){
           this.$emit('addfunction', this.value)
-          track('Created Custom Function', {})
+          TrackingService.track('Created Custom Function', {})
         }
         else
           this.$emit('updatefunction', this.value)

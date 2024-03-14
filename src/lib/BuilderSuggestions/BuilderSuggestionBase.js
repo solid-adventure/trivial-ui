@@ -1,4 +1,4 @@
-class BuilderSuggestionBase {
+export default class BuilderSuggestionBase {
 	constructor(app, actions, nextIdentifier) {
 		this.app = app || {}
 		this.actions = actions || []
@@ -26,5 +26,3 @@ class BuilderSuggestionBase {
   }
 
 }
-
-module.exports = BuilderSuggestionBase

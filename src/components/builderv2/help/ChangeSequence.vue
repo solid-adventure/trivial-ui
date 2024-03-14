@@ -15,7 +15,7 @@
       <span @click="close" class="close-icon"></span>
       <div class="help-message">
         <p><span class='pro-tip'>Pro Tip</span>Move <em>SendResponse</em> to the end to get feedback from previous actions.</p>
-        <img src="/assets/images/help/changeSequence.gif" />
+        <img src="/src/assets/images/help/changeSequence.gif" />
       </div>
       <div class="button-row headroom">
         <input type="button" class="button-medium save" @click="close" value="OK">

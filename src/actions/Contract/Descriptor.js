@@ -1,6 +1,6 @@
 const ActionDescriptorBase = require('../../base/ActionDescriptorBase')
 
-class Contract extends ActionDescriptorBase {
+export default class Contract extends ActionDescriptorBase {
   // get iconUrl() {
   //   return '/assets/images/action-icons/webhook-relay.svg'
   // }
@@ -35,5 +35,3 @@ class Contract extends ActionDescriptorBase {
   }
 
 }
-
-module.exports = Contract

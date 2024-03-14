@@ -1,4 +1,4 @@
-class SelectionBounds {
+export default class SelectionBounds {
   constructor(bounds) {
     // [top, right, bottom, left] to describe outer perimeter
     this.bounds = bounds || []
@@ -55,5 +55,3 @@ class SelectionBounds {
   } 
 
 }
-
-module.exports = SelectionBounds

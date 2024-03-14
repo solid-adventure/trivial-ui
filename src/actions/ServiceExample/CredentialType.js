@@ -1,6 +1,6 @@
 const CredentialTypeBase = require('../../base/CredentialTypeBase')
 
-class ServiceExampleCredentials extends CredentialTypeBase {
+export default class ServiceExampleCredentials extends CredentialTypeBase {
     getConfigFields() {
         return {
           api_key:{type: String, required: true, secret: true},
@@ -8,4 +8,3 @@ class ServiceExampleCredentials extends CredentialTypeBase {
         }
     }
 }
-module.exports = ServiceExampleCredentials

@@ -234,7 +234,7 @@
         @dragleave="dragLeaveItem"
         @drop="dropItem($event, newIndex)">
 
-        <div class="grab"><img src='/assets/images/grabby-dots-01.svg' class='grabby-dots'/></div>
+        <div class="grab"><img src='/src/assets/images/grabby-dots-01.svg' class='grabby-dots'/></div>
         <div class="icon" :style="{'background-image': iconUrl(action.def)}"></div>
         <div class="description">
           <h2 class='title'>{{definitionName(action.def)}}</h2>

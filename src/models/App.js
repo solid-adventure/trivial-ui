@@ -1,6 +1,7 @@
-const { fetchJSON } = require('trivial-core/lib/component-utils')
+// const { fetchJSON } = require('trivial-core/lib/component-utils')
+import { fetchJSON } from 'trivial-core/lib/component-utils'
 
-class App {
+export default class App {
 
   // Creating an app:
   // Create an App instance, passing in the Vuex store object
@@ -114,5 +115,3 @@ class App {
   }
 
 }
-
-module.exports = App

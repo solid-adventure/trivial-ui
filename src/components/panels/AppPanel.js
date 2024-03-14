@@ -1,8 +1,9 @@
-const App = require('../../models/App')
+import App from '../../models/App'
+// const App = require('../../models/App')
 // const fetch = require('node-fetch')
 
 
-class AppPanel {
+export default class AppPanel {
 
   constructor(name, options) {
     this.name = name
@@ -81,5 +82,3 @@ class AppPanel {
   }
 
 }
-
-module.exports = AppPanel

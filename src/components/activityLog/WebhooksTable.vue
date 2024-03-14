@@ -181,7 +181,7 @@
 </style>
 
 <script>
-import { track } from '../../../lib/TrackingService'
+import TrackingService from '../../../lib/TrackingService'
 import { formatJSON, fetchJSON } from 'trivial-core/lib/component-utils'
 import BuildEventMarker from './BuildEventMarker.vue'
 import notifications from '../../components/notifications'
@@ -271,7 +271,7 @@ import { mapState } from 'vuex'
 
     receivedWebhook(event) {
       notifications.info('New data available', {actions: {Reload: () => this.reload()}})
-      track('Received New App Data', {
+      TrackingService.track('Received New App Data', {
         'App ID': this.appId
       })
     },

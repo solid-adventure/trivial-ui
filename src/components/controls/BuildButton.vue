@@ -18,7 +18,7 @@
 <script>
   import ActionButton from './ActionButton.vue'
   import notifications from '../notifications'
-  import { track } from '../../../lib/TrackingService'
+  import TrackingService from '../../../lib/TrackingService'
   import { mapActions } from 'vuex'
 
   export default {
@@ -69,7 +69,7 @@
           notifications.success('Application built!')
           this.$emit('update:dirty', false)
           this.$emit('update:buildInProgress', false)
-          track('Saved App', {
+          TrackingService.track('Saved App', {
             'ManifestId': this.$store.state.manifest.id
           })
         } catch (error) {

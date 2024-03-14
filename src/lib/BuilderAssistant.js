@@ -1,7 +1,10 @@
-const LastActionMatchesPanelType = require ('./BuilderSuggestions/LastActionMatchesPanelType')
-const FormatForTableView = require ('./BuilderSuggestions/FormatForTableView')
+// const LastActionMatchesPanelType = require ('./BuilderSuggestions/LastActionMatchesPanelType')
+// const FormatForTableView = require ('./BuilderSuggestions/FormatForTableView')
 
-class BuilderAssistant {
+import LastActionMatchesPanelType from './BuilderSuggestions/LastActionMatchesPanelType'
+import FormatForTableView from './BuilderSuggestions/FormatForTableView'
+
+export default class BuilderAssistant {
 	constructor(app, actions, nextIdentifier) {
 		this.suggestions = []
 		this.assistants = [
@@ -28,5 +31,3 @@ class BuilderAssistant {
 
 
 }
-
-module.exports = BuilderAssistant

@@ -15,7 +15,7 @@
 
 // Note: key modifiers must be in alphabetical order, e.g, command-shift-n. shift-command-n will not work
 
-class KeyboardControl {
+export default class KeyboardControl {
   constructor(documentRef) {
 
     this.init()
@@ -122,4 +122,3 @@ class KeyboardControl {
 
 }
 
-module.exports = KeyboardControl

@@ -1,6 +1,6 @@
 'use strict'
 
-var url = require('url')
+import url from 'url'
 
 // Copied from pg-connection-string with fs removed to load in browser
 // https://github.com/brianc/node-postgres/tree/master/packages/pg-connection-string
@@ -91,6 +91,6 @@ function parse(str) {
   return config
 }
 
-module.exports = parse
+export default parse
 
 parse.parse = parse

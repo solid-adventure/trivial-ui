@@ -1,9 +1,11 @@
-const ActionDescriptors = require ('trivial-core/lib/actionsv2/catalog/ActionDescriptors')
-const BuilderSuggestionBase = require ('./BuilderSuggestionBase')
-const ActionIterator = require ('trivial-core/lib/actionsv2/catalog/ActionIterator')
+// const ActionDescriptors = require ('trivial-core/lib/actionsv2/catalog/ActionDescriptors')
+// const BuilderSuggestionBase = require ('./BuilderSuggestionBase')
+// const ActionIterator = require ('trivial-core/lib/actionsv2/catalog/ActionIterator')
+import ActionDescriptors from 'trivial-core/lib/actionsv2/catalog/ActionDescriptors'
+import BuilderSuggestionBase from './BuilderSuggestionBase'
+import ActionIterator from 'trivial-core/lib/actionsv2/catalog/ActionIterator'
 
-
-class FormatForTableView extends BuilderSuggestionBase {
+export default class FormatForTableView extends BuilderSuggestionBase {
 
 	get suggestion () {
 		return {
@@ -70,5 +72,3 @@ class FormatForTableView extends BuilderSuggestionBase {
 
 
 }
-
-module.exports = FormatForTableView

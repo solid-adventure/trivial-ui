@@ -84,7 +84,7 @@
 
 <style lang="scss" scoped>
 
-  @import '~handsontable/dist/handsontable.full.css';
+  // @import '~handsontable/dist/handsontable.full.css';
 
   .container {
     width: 100%;

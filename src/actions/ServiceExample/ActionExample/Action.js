@@ -1,6 +1,6 @@
 const ActionBase = require('../../../base/ActionBase')
 
-class ActionExample extends ActionBase {
+export default class ActionExample extends ActionBase {
   async perform() {
 
     // let api_key = this.config.ServiceExample.api_key
@@ -26,5 +26,3 @@ class ActionExample extends ActionBase {
   }
 
 }
-
-module.exports = ActionExample

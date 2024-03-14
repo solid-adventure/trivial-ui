@@ -188,7 +188,7 @@
   import ActionButton from './controls/ActionButton.vue'
   import HideableSection from './controls/HideableSection.vue'
   import ManifestMigrator from 'trivial-core/lib/ManifestMigrator'
-  import { track } from '../../lib/TrackingService'
+  import TrackingService from '../../lib/TrackingService'
   import FeatureManager from 'trivial-core/lib/FeatureManager'
   import NavTree from './builderv2/NavTree.vue'
   import AppTransferManager from './builderv2/AppTransferManager.vue'
@@ -361,7 +361,7 @@
           await this.teardown(false)
           await this.build()
           this.rebuilding = false
-          track('Saved Manifest Manually',{
+          TrackingService.track('Saved Manifest Manually',{
               'ManifestId': this.manifest.id,
             })
         } catch (error) {
@@ -393,7 +393,7 @@
           await this.teardown()
           this.deleting = false
           if (null === this.errorMessage)
-            track('Deleted App', {
+            TrackingService.track('Deleted App', {
               'App ID': this.appId
             })
             window.location = '/'
@@ -456,7 +456,7 @@
           this.message = 'App name successfully updated!'
           setTimeout(() => {
             this.message = null
-            track('Renamed App',{
+            TrackingService.track('Renamed App',{
               'New App Name': this.descriptive_name
             })
             window.location = window.location

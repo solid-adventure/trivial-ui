@@ -1,7 +1,7 @@
 <template>
   <div class="SuperBar">
     <!-- NOTE The brand logo image is overwritten with var(--logo) -->
-    <span class="brand"><a href="/"><img src="/assets/images/trivial-logo-light-warm.svg"/></a></span>
+    <span class="brand"><a href="/"><img src="/src/assets/images/trivial-logo-light-warm.svg"/></a></span>
     <span class="superlink" :class="{active: isActive('dashboard')}"><a href="/dashboard">Dashboards</a></span>
     <span class="superlink" :class="{active: isActive('contract')}"><a href="/contract">Contracts</a></span>
     <span class="settings">
@@ -97,9 +97,13 @@
   import { mapState } from 'vuex'
   import Icon from './Icon.vue'
   import { fetchJSON } from 'trivial-core/lib/component-utils'
-  import { track } from '../../lib/TrackingService'
+  import TrackingService from '../../lib/TrackingService'
   import ToggleButton from './controls/ToggleButton.vue'
-  import { Moon, Sun } from './icons'
+  // import { Moon, Sun } from './icons'
+  import Sun from './icons/sun.vue'
+  import Moon from './icons/moon.vue'
+
+
 
   export default {
     data(){
@@ -133,7 +137,7 @@
       },
 
       styleSheetLink() {
-        return this.theme === 'Dark' ? '/assets/stylesheets/app.css' : '/assets/stylesheets/app-light.css'
+        return this.theme === 'Dark' ? '/src/assets/stylesheets/app.css' : '/src/assets/stylesheets/app-light.css'
       },
 
       ...mapState([
@@ -181,7 +185,7 @@
             break
         }
         await this.themeUpdateCall()
-        track('Changed Theme', {
+        TrackingService.track('Changed Theme', {
           'New Active Theme': this.activeTheme
         })
         this.themeUpdating = false

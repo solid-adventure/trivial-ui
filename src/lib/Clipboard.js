@@ -1,4 +1,4 @@
-class Clipboard {
+export default class Clipboard {
   constructor(content) {
     this.content = content
   }
@@ -42,5 +42,3 @@ class Clipboard {
     return new Clipboard(content).copyContent()
   }
 }
-
-module.exports = Clipboard
