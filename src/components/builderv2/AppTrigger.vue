@@ -111,7 +111,7 @@
       async sendCustom() {
         try {
           const appId = this.app.name
-          await this.$store.state.Session.apiCall(`/webhooks/${appId}/send`, 'POST', JSON.parse(this.customPayload))
+          await this.$store.state.Session.apiCall(`/webhooks/${appId}/send`, 'POST', {payload: JSON.parse(this.customPayload)})
           Notifications.success('Data sent')
         } catch (err) {
           console.error('Failed to send custom data', err)
