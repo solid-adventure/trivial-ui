@@ -1,6 +1,5 @@
 <template>
-  <!-- <super-bar></super-bar> -->
-  <section>
+  <div>
   <nav-tree selected-title="settings"></nav-tree>
   <div class="InstanceSettings">
     <div id="messages">{{errorMessage}}</div>
@@ -96,7 +95,7 @@
     </div>
 
   </div>
-  </section>
+  </div>
 </template>
 
 <style lang="scss">
@@ -308,28 +307,25 @@
         }
       },
 
-
       ...mapState([
         'app'
       ])
 
     },
 
-    async created() {
+    async mounted() {
+      this.setAppDetails()
       await this.loadManifest()
     },
 
-    watch: {
-      'app.id': function() {
+    methods: {
+
+      setAppDetails() {
         this.descriptive_name = this.app.descriptive_name
         this.panels = this.app.panels
         this.schedule = this.app.schedule
         window.document.title = `Settings: ${this.app.descriptive_name}`
-      }
-
-    },
-
-    methods: {
+      },
 
       async loadManifest() {
         try {
