@@ -1,6 +1,3 @@
-// const LastActionMatchesPanelType = require ('./BuilderSuggestions/LastActionMatchesPanelType')
-// const FormatForTableView = require ('./BuilderSuggestions/FormatForTableView')
-
 import LastActionMatchesPanelType from './BuilderSuggestions/LastActionMatchesPanelType'
 import FormatForTableView from './BuilderSuggestions/FormatForTableView'
 

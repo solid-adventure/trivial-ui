@@ -1,6 +1,3 @@
-// const ActionDescriptors = require ('trivial-core/lib/actionsv2/catalog/ActionDescriptors')
-// const BuilderSuggestionBase = require ('./BuilderSuggestionBase')
-// const ActionIterator = require ('trivial-core/lib/actionsv2/catalog/ActionIterator')
 import ActionDescriptors from 'trivial-core/lib/actionsv2/catalog/ActionDescriptors'
 import BuilderSuggestionBase from './BuilderSuggestionBase'
 import ActionIterator from 'trivial-core/lib/actionsv2/catalog/ActionIterator'

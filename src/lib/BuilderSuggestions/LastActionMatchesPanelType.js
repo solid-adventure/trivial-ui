@@ -1,5 +1,3 @@
-// const ActionDescriptors = require ('trivial-core/lib/actionsv2/catalog/ActionDescriptors')
-// const BuilderSuggestionBase = require ('./BuilderSuggestionBase')
 import ActionDescriptors from 'trivial-core/lib/actionsv2/catalog/ActionDescriptors'
 import BuilderSuggestionBase from './BuilderSuggestionBase'
 

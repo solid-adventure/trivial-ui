@@ -1,4 +1,3 @@
-// const { fetchJSON } = require('trivial-core/lib/component-utils')
 import { fetchJSON } from 'trivial-core/lib/component-utils'
 
 export default class App {
