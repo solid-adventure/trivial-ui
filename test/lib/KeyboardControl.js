@@ -1,5 +1,6 @@
-const { expect } = require('chai')
-const KeyboardControl = require('../../source/lib/KeyboardControl')
+import chai from 'chai';
+const expect = chai.expect
+import KeyboardControl from '../../src/lib/KeyboardControl.js'
 
 
 describe('KeyboardControl', () => {

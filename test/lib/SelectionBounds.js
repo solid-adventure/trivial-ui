@@ -1,5 +1,6 @@
-const { expect } = require('chai')
-const SelectionBounds = require('../../source/lib/SelectionBounds')
+import chai from 'chai';
+const expect = chai.expect
+import SelectionBounds from '../../src/lib/SelectionBounds.js'
 
 describe('SelectionBounds', () => {
 
