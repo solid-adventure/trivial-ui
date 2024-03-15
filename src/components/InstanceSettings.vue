@@ -345,7 +345,6 @@
       async loadManifest() {
         try {
           let manifests = await this.$store.state.Session.apiCall(`/manifests?app_id=${this.appId}`)
-          console.log(manifests)
           this.manifest = manifests[0]
           this.manifestContent =
             new ManifestMigrator(JSON.parse(this.manifest.content)).migrate()
