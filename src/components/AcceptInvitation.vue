@@ -3,10 +3,10 @@
         <div class="container">
             <span class="brand"><img/></span>
             <div v-if="completed">
-              Invitation accepted. Please <a href="/signin">sign in</a> to continue.
+              Invitation accepted. Please <RouterLink to ="/signin">sign in</RouterLink> to continue.
             </div>
             <div v-else>
-              <span v-if="loggedIn && !loggedInAsInvited">You are logged in as <strong>{{currentUser.email}}</strong>, but this invitation is for <strong>{{ invitedEmail }}</strong>. Please <a href="/signout">sign out</a> before accepting this invitation.</span>
+              <span v-if="loggedIn && !loggedInAsInvited">You are logged in as <strong>{{currentUser.email}}</strong>, but this invitation is for <strong>{{ invitedEmail }}</strong>. Please <RouterLink to="/signout">sign out</RouterLink> before accepting this invitation.</span>
               <span v-else>
               <h2>Accept Invitation</h2>
                 <form>
@@ -60,16 +60,16 @@
                     <div v-if="existingUser">
                       <ActionButton class = "button-small submit" :action="handleSubmit" value ="Submit" working-value="Updating..."></ActionButton>
                       <p>
-                        Need to create an account? <a href="/" @click.prevent="handleNewUserClick" >Sign up</a>
+                        Need to create an account? <a href="#" @click.prevent="handleNewUserClick" >Sign up</a>
                       </p>
                       <p>
-                        Forgot Password? <a href="/recoverpassword">Reset Password</a>
+                        Forgot Password? <RouterLink to="/recoverpassword">Reset Password</RouterLink>
                       </p>
                     </div>
                     <div v-else>
                       <ActionButton class = "button-small submit" :action="handleSubmit" value ="Submit" working-value="Updating..." :disabled="!isPasswordValid"></ActionButton>
                       <span>
-                        Already have an account? <a href="/" @click.prevent="handleExistingUserClick" >Sign in</a>
+                        Already have an account? <a href="#" @click.prevent="handleExistingUserClick" >Sign in</a>
                       </span>
                     </div>
     	        </form>

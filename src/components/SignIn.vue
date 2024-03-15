@@ -15,8 +15,8 @@
         	        <input v-else type='submit' class='button clicked' value ='Logging In' />
                 </div>
 	        </form>
-	        <a class ="resetPassword" href="/recoverpassword">Forgot Password?</a><br>
-	        <span>New to Trivial? <a href="/register">Sign Up</a></span>
+	        <RouterLink class ="resetPassword" to="/recoverpassword">Forgot Password?</RouterLink><br>
+	        <span>New to Trivial? <RouterLink to="/register">Sign Up</RouterLink></span>
         </div>
     </div>
 </template>

@@ -27,7 +27,10 @@
 
         <ActionButton id="copy_app" class="button-small" :action="copyApp" value="Copy" working-value="Copying..."></ActionButton>
         <transition name="fade">
-            <div v-if="copyMessage" v-html="copyMessage" class="message"></div>
+            <div v-if="copyMessage" class="message">
+              <RouterLink  v-if = "copyAppUrl" :to = "copyAppUrl" >{{ copyMessage }}</RouterLink>
+              <span v-else>{{ copyMessage }}</span>
+            </div>
         </transition>
       </div>
       
@@ -218,6 +221,7 @@
         panels: {},
         schedule:{},
         copyMessage: null,
+        copyAppUrl: null,
         panelMessage: null,
         scheduleMessage: null,
         //assuming path remains as /apps/:id/settings2 or at least includes id param
@@ -392,7 +396,7 @@
             TrackingService.track('Deleted App', {
               'App ID': this.appId
             })
-            window.location = '/'
+            this.$router.push({ path: '/' })
         }
       },
 
@@ -431,13 +435,16 @@
       async copyApp(){
         try{
           this.copyMessage = null
+          this.copyAppUrl = null
           let new_app = await this.$store.state.Session.apiCall(`/apps/${this.appId}/copy`, 'POST', {
             new_app_descriptive_name: this.new_app_descriptive_name
           })
           if (new_app.errors) {
             this.copyMessage = new_app.errors.join(',')
           } else {
-            this.copyMessage = `<a href="/apps/${new_app.name}/builder2">${new_app.descriptive_name} Created!</a>`
+            this.copyAppUrl = `/apps/${new_app.name}/builder2`
+            this.copyMessage = new_app.descriptive_name
+
           }
         }
         catch(error){

@@ -116,7 +116,7 @@ export default {
               )
               this.message = 'Password successfully updated!'
               setTimeout(() => { this.message = null}, 2500)
-              window.location = '/'
+              this.$router.push({path:'/'})
             } catch (err) {
                 console.log('[ResetPassword][handleSubmit] Error: ', err)
                 this.errorMessage = err

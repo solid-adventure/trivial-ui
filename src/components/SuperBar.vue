@@ -1,9 +1,15 @@
 <template>
   <div class="SuperBar">
     <!-- NOTE The brand logo image is overwritten with var(--logo) -->
-    <span class="brand"><a href="/"><img src="/src/assets/images/trivial-logo-light-warm.svg"/></a></span>
-    <span class="superlink" :class="{active: isActive('dashboard')}"><a href="/dashboard">Dashboards</a></span>
-    <span class="superlink" :class="{active: isActive('contract')}"><a href="/contract">Contracts</a></span>
+    <span class="brand">
+      <RouterLink to = "/"><img src="/src/assets/images/trivial-logo-light-warm.svg"/></RouterLink>
+    </span>
+    <span class="superlink" :class="{active: isActive('dashboard')}">
+      <RouterLink to = "/dashboard">Dashboards</RouterLink>
+    </span>
+    <span class="superlink" :class="{active: isActive('contract')}">
+      <RouterLink to = "/contract">Contracts</RouterLink>
+    </span>
     <span class="settings">
       <div class ="theme">
         <ToggleButton
@@ -13,7 +19,7 @@
           on-icon="moon"
           theme-override="dark"></ToggleButton>
       </div>
-      <a href="/settings">Welcome, {{firstName}}!</a>
+      <RouterLink to = "/settings">Welcome, {{firstName}}!</RouterLink>
     </span>
   </div>
 </template>
@@ -152,14 +158,7 @@
       },
 
       isActive(tab) {
-        if (window.location.pathname != '/') { return false }
-        let params =  new URLSearchParams(window.location.search)
-        let panelTypeFromLocation = params.get('paneltype')
-        if (tab == 'dashboard' && !panelTypeFromLocation) {
-          return true
-        }
-        return tab == panelTypeFromLocation
-
+        return this.$route.path.replace('/', '') === tab
       },
 
       async updateToggleButtonState(event){

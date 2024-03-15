@@ -8,7 +8,7 @@
         </div>
       </div>
       <div class="new-button-container">
-        <a class="button-medium headroom-small" :href="`/apps/new?paneltype=${this.panelTypeFilter}`">Add New {{ titleizedAppFilter }}</a>
+        <RouterLink class="button-medium headroom-small" :to="`/apps/new?paneltype=${this.panelTypeFilter}`">Add New {{ titleizedAppFilter }}</RouterLink>
       </div>
 
 
@@ -58,22 +58,22 @@
         </thead>
         <tbody v-if="appsLoaded">
           <tr v-for="app in sortedApps" :key="app.id">
-            <td><a :href="`/apps/${app.name}/`">{{app.descriptive_name}}</a></td>
+            <td><RouterLink :to="`/apps/${app.name}/`">{{app.descriptive_name}}</RouterLink></td>
             <td v-if="displayPanelTypeColumn">
-              <a :href="`/apps/${app.name}/`">{{panelType(app)}}</a>
+              <RouterLink :to="`/apps/${app.name}/`">{{panelType(app)}}</RouterLink>
             </td>
             <td>{{lastRun(app)}}</td>
-            <td><a :href="editLink(app)">Edit</a></td>
+            <td><RouterLink :to="editLink(app)">Edit</RouterLink></td>
             <!-- <td><a :href="`/apps/${app.name}/builder2`">Edit</a></td> -->
             <td colspan="2">
-              <a :href="`/apps/${app.name}/activity`">
+              <RouterLink :to="`/apps/${app.name}/activity`">
                 <StatusLine
                   :start-range="startRange"
                   :end-range="endRange"
                   :stats="statsFor(app)"
                   :interval="chartInterval">
                 </StatusLine>
-              </a>
+              </RouterLink>
             </td>
           </tr>
         </tbody>

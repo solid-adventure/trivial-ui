@@ -1,7 +1,7 @@
 <template>
   <div v-if="editMode">
     <div class="edit-link">
-      <a :href="`/apps/${app_id}/builder2`">Edit</a>
+      <RouterLink :to="`/apps/${app_id}/builder2`">Edit</RouterLink>
     </div>
     <div class="trash-link">
       <a href="#" v-on:click.prevent="deletePanel(app_id)"><Icon icon="trash"></Icon></a>

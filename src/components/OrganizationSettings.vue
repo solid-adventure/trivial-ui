@@ -4,7 +4,7 @@
     <div class="page-inset">
       <h2>{{ organization.name }} | Users And Roles</h2>
       <div class="action-row">
-        <a :href="newInvitationPath" class="button-medium">Add New User</a>
+        <RouterLink :to="newInvitationPath" class="button-medium">Add New User</RouterLink>
       </div>
       <table class="spaced organization-users">
         <thead>

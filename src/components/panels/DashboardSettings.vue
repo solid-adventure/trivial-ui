@@ -28,7 +28,7 @@
     </select>
 
     <div class="advanced-settings">
-      <a :href="`/apps/${appId}/settings2`">Advanced Settings</a>
+      <RouterLink :to="`/apps/${appId}/settings2`">Advanced Settings</RouterLink>
     </div>
 
   </div>

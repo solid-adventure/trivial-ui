@@ -105,7 +105,7 @@ export default {
         await this.$store.state.Session.apiCall('/auth/invitation', 'POST', data)
         Notifications.success('Invitation sent')
         window.setTimeout(() => {
-          window.location = `/organizations/${this.orgId}/edit`
+          this.$router.push({ path: `/organizations/${this.orgId}/edit` })
         }, 2000)
       }
       catch(error){
