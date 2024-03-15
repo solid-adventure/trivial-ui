@@ -1,6 +1,5 @@
-import chai from 'chai';
-const expect = chai.expect
-import Format from '../../src/lib/Format.js'
+const { expect } = require('chai')
+const Format = require('../../source/lib/Format')
 
 describe('Format', () => {
 
