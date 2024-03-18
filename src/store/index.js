@@ -40,7 +40,6 @@ const store = createStore({
     tourSteps: ['action-info', 'credentials', 'transform-config'],
     enableSaveCredentials: import.meta.env.VITE_ENABLE_SAVE_CREDENTIALS,
     enableBuildApps: import.meta.env.VITE_ENABLE_BUILD_APPS,
-    trivialApiUrl: import.meta.env.VITE_TRIVIAL_API_URL,
     enableWebhookAppTrigger: import.meta.env.VITE_ENABLE_WEBHOOK_APP_TRIGGER,
     Session: Session,
   },

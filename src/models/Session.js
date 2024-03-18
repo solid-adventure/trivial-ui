@@ -6,7 +6,8 @@ export default class Session {
   }
 
   static apiUrl(path) {
-    return new URL(path, store.state.trivialApiUrl)
+    const TRIVIAL_API_URL = window.CONTAINER_TRIVIAL_API_URL || import.meta.env.VITE_TRIVIAL_API_URL || 'trivial-api-url-not-set'
+    return new URL(path, TRIVIAL_API_URL)
   }
 
   static async apiCall(path, method='GET', data) {
