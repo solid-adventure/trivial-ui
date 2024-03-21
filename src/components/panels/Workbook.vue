@@ -152,7 +152,7 @@
         let newSheetApp = new App(this.$store)
         newSheetApp.create({name: this.newSheetName, panelOptions: this.newSheetOptions})
         .then(newSheetAppInstance => {
-          let workbookApp = new App(this.$store, this.app.name)
+          let workbookApp = new App(this.$store, this.app.name, this.app)
           workbookApp.appendPanelOption({'app_sheets': newSheetAppInstance.name})
         })
         .then(x => this.setActiveSheet(this.indexForSheet(newSheetApp.name)))

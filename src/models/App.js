@@ -17,9 +17,10 @@ export default class App {
   // const existingApp = new App(this.$store, '12345')
 
 
-  constructor(store, name) {
+  constructor(store, name, app) {
     this.$store = store
     this.name = name
+    this.app = app
   }
 
   async create({ name, panelOptions }) {
@@ -27,6 +28,7 @@ export default class App {
       descriptive_name: name,
       panels: panelOptions
     })
+    this.app = appInstance
     this.name = appInstance.name
     this.panelOptions = panelOptions
     this.$store.commit('addApp', appInstance)
@@ -36,7 +38,7 @@ export default class App {
   }
 
   async save() {
-    let app = this.$store.state.app
+    let app = this.app? this.app: this.$store.state.app
     const appInstance = await this.$store.state.Session.apiCall(`/apps/${this.name}`, 'PUT', {
       descriptive_name: app.descriptive_name,
       panels: {
@@ -99,17 +101,17 @@ export default class App {
   }
 
   async setPanelOption(option) {
-    this.$store.commit('setAppPanelOption', {app_id: this.name, panelOption: option})
+    this.$store.commit('setAppPanelOption', {app_id: this.name, panelOption: option, append_to_app: this.app})
     return this.save()
   }
 
   async appendPanelOption(option) {
-    this.$store.commit('appendAppPanelOption', {app_id: this.name, panelOption: option})
+    this.$store.commit('appendAppPanelOption', {app_id: this.name, panelOption: option, append_to_app: this.app})
     return this.save()
   }
 
   async deletePanelOption(option) {
-    this.$store.commit('deleteAppPanelOption', {app_id: this.name, panelOption: option})
+    this.$store.commit('deleteAppPanelOption', {app_id: this.name, panelOption: option, append_to_app: this.app})
     return this.save()
   }
 
