@@ -7,6 +7,7 @@ import FeatureManager from 'trivial-core/lib/FeatureManager'
 import ActionPath from 'trivial-core/lib/actionsv2/ActionPath'
 import router from '../router'
 import Session from '../models/Session'
+import Permissions from '../models/Permissions'
 
 const store = createStore({
 
@@ -42,6 +43,7 @@ const store = createStore({
     enableBuildApps: import.meta.env.VITE_ENABLE_BUILD_APPS,
     enableWebhookAppTrigger: import.meta.env.VITE_ENABLE_WEBHOOK_APP_TRIGGER,
     Session: Session,
+    Permissions: Permissions
   },
 
   getters: {
@@ -275,6 +277,7 @@ const store = createStore({
       if ( ['Activity', 'Show App', 'Builder', 'Panels', 'Settings'].includes(routeName) ) {
         await dispatch('loadApp', { appId: router.currentRoute.value.params.id })
       }
+      dispatch('loadPermissions')
     },
 
     async loadApps({ commit }) {
@@ -285,6 +288,11 @@ const store = createStore({
     async loadApp({ commit }, { appId }) {
       const app = await Session.apiCall(`/apps/${appId}`)
       await commit('setApp', app)
+    },
+
+    async loadPermissions({state, commit}) {
+      const userPermissions = await Session.apiCall(`/users/${state.user.id}/permissions`)
+      Permissions.setPermissions(userPermissions)
     },
 
     initApp({state, commit}, {appId}) {

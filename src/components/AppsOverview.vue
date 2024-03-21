@@ -294,10 +294,11 @@
         return `${this.titleizedAppFilter}s`
       },
 
-      ...mapState([
-        'apps',
-        'appsLoaded'
-      ])
+      ...mapState({
+        apps: state => state.apps,
+        appsLoaded: state => state.appsLoaded,
+        permitedApps: state => state.Permissions.update
+      })
 
     },
 
