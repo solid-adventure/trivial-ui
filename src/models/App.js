@@ -1,4 +1,5 @@
 import { fetchJSON } from 'trivial-core/lib/component-utils'
+import manifestDefault from 'trivial-core/templates/webhook_relay_0.1/initial-manifest.json'
 
 export default class App {
 
@@ -64,16 +65,16 @@ export default class App {
   }
 
   async instantiateManifest(appInstance) {
-    const manifestContent = await this.initialManifest(appInstance.name, appInstance.port)
+    const manifestContent = this.initialManifest(appInstance.name, appInstance.port)
     const manifest = await this.createManifest(manifestContent)
     return manifest
   }
 
-  async initialManifest(appName, port) {
-    const manifest = await fetchJSON(`/manifest?template=webhook_relay&version=0.1&initial_manifest=${this.initialManifestFilename}`)
-    manifest.app_id = appName
-    manifest.listen_at.port = port
-    return manifest
+  initialManifest(appName, port) {
+    let out = manifestDefault
+    out.app_id = appName
+    out.listen_at.port = port
+    return out
   }
 
   async createManifest(manifest) {
