@@ -13,7 +13,6 @@ const __dirname = path.resolve();
 
 import TrivialCore from 'trivial-core'
 const AppBuilder = TrivialCore.AppBuilder
-const AppManager = TrivialCore.AppManager
 const AppTemplate = TrivialCore.AppTemplate
 const APISpec = TrivialCore.APISpec
 const FeatureManager = TrivialCore.FeatureManager
@@ -60,9 +59,8 @@ serve.use((req, res, next) => {
 const download = async (req, res) => {
   try {
     let builder = new AppBuilder(req.params.id, {req})
-    const archiveData = await builder.createDownload(
-      await AppManager.currentManifest(req.params.id, req)
-    )
+    const manifestContent = JSON.parse(req.body.manifest.content)
+    const archiveData = await builder.createDownload(manifestContent)
     res.attachment(`${req.params.id}-${new Date().toISOString().replace(/[-:.]+/g, '')}.zip`)
     res.send(archiveData)
   } catch (err) {
@@ -83,18 +81,6 @@ const build = async (req, res) => {
     res.sendStatus(200)
   } catch (err) {
     req.log.error({err}, `[build] Could not build app '${req.body.app_id}'`)
-    res.sendStatus(500)
-  }
-}
-
-const initialManifest = async (req, res) => {
-  try {
-    let template = new AppTemplate(req.query.template, req.query.version, req.query.initial_manifest)
-    let manifest = await template.initialManifest()
-    req.log.debug({manifest}, 'initial manifest')
-    res.json(manifest)
-  } catch (err) {
-    req.log.error({err}, '[initialManifest] Failed to load initial manifest')
     res.sendStatus(500)
   }
 }
@@ -166,9 +152,7 @@ serve.delete('/build/:id', (req, res) => {
   teardown(req, res)
 })
 
-serve.get('/download/:id', download)
-
-serve.get('/manifest', initialManifest)
+serve.post('/download/:id', download)
 
 serve.get('/oauth2/skip_authorization', retrieveCode)
 

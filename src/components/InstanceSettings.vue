@@ -49,11 +49,10 @@
       <hr class="headroom accent" />
       <h2 class="headroom section-title">Download Source</h2>
       <em class="section-help-text">Download the compiled source code for this app.</em>
-      <br/>
-      <div>
-        <a class="button-small" :href="downloadLink" download>Download</a>
-      </div>
+      <div class="error">{{downloadMessage}}</div>
 
+      <br/>
+      <a class="button-small" href="#" @click.prevent="handleDownload">Download</a>
       <hr class="headroom accent" />
       <h2 class="headroom section-title">UI Panel Options</h2>
       <p class="section-help-text"><em>Danger zone! Editing the panel settings directly allows you to break how your app renders.</em></p>
@@ -158,6 +157,10 @@
     padding-bottom: 4em;
   }
 
+  .error {
+    color: var(--error);
+  }
+
   .row {
     display: flex;
     align-content: flex-start;
@@ -210,6 +213,7 @@
         rebuilding: false,
         updatingPanels: false,
         updatingSchedule: false,
+        downloadMessage: '',
         message: null,
         errorMessage: null,
         manifestContent: {},
@@ -339,6 +343,38 @@
           console.log('[InstanceSetings][loadManifest] Error:', error)
           this.errorMessage = error.message
         }
+      },
+
+      handleDownload() {
+        this.downloadMessage = ''
+        fetch(this.downloadLink, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({manifest: this.manifest})
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to download')
+          }
+          return response
+        })
+        .then(response => response.blob())
+        .then(blob => {
+          const url = window.URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url
+          a.download = `${this.appId}.zip`
+          document.body.appendChild(a)
+          a.click()
+          window.URL.revokeObjectURL(url)
+        })
+        .catch(error => {
+          console.log('[InstanceSetings][handleDownload] Error:', error)
+          this.downloadMessage = error.message
+        })
+
       },
 
       updated() {
