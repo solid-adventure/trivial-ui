@@ -31,9 +31,9 @@
         ></ActionButton>
       </form>
       <span class="register"
-        >New to Trivial? <a href="/register">Sign Up</a></span
+        >New to Trivial? <RouterLink to="/register">Sign Up</RouterLink></span
       ><br />
-      <span>Already have an account? <a href="/signin">Sign In</a></span>
+      <span>Already have an account? <RouterLink to="/signin">Sign In</RouterLink></span>
     </div>
   </div>
 </template>

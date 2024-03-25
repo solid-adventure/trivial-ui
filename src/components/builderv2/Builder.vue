@@ -15,6 +15,7 @@ import Notices from "../Notices.vue";
 import Editor from "./Editor.vue";
 import AppTrigger from "./AppTrigger.vue";
 import PayloadEditor from "./PayloadEditor.vue";
+import ProgramBreadcrumb from './ProgramBreadcrumb.vue'
 import Confirmation from "./Confirmation.vue";
 import CredentialsVault from "./CredentialsVault.vue";
 import { mapActions, mapMutations, mapState } from "vuex";
@@ -31,6 +32,7 @@ export default {
     NavTree,
     Notices,
     PayloadEditor,
+    ProgramBreadcrumb,
     Confirmation,
   },
 
@@ -210,7 +212,7 @@ export default {
     receivedWebhook(event) {
       Notifications.info("New activity data available", {
         actions: {
-          View: () => (window.location = `/apps/${this.app.name}/activity`),
+          View: () => this.$router.push({path: `/apps/${this.app.name}/activity`}),
         },
       });
     },
@@ -250,7 +252,6 @@ export default {
 </script>
 
 <template>
-  <!-- <super-bar></super-bar> -->
   <div class="builder" :style="{ paddingLeft: this.leftNavWidth }">
     <ChangeSequence
       v-if="displayChangeSequence"
@@ -293,6 +294,12 @@ export default {
       :actions="program.definition.actions"
       :nextIdentifier="nextIdentifier"
     />
+    <ProgramBreadcrumb
+      v-if="program"
+      :value="program"
+      :selected="selectedAction"
+      @navigate="navigateTo"
+    ></ProgramBreadcrumb>
     <div v-if="!displayVault">
       <div class="action-body" ref="actionbody">
         <Editor

@@ -59,29 +59,37 @@
 <template>
   <div class="navtree">
     <div class='app-name-container'>
-      <h1><a :href="`/apps/${this.app.name}`">{{this.app.descriptive_name}}</a></h1>
+      <h1><RouterLink :to="`/apps/${this.app.name}`">{{this.app.descriptive_name}}</RouterLink></h1>
     </div>
-    <a href="builder2">
-      <div class="title" :class="selected('builder')">
-        <Icon icon="contract"></Icon>
-        <span>{{ humanizedProgramTitle }}</span>
-        <!-- This almost works, but navigateTo is causing the page to reload and drop the action -->
-        <!-- Questioning the concept, not worth fixing right now -->
-        <!-- <ProgramTree v-if="program" :value="program" :selected="selectedAction" @navigate="navigateTo"></ProgramTree> -->
-      </div>
-    </a>
-    <a href="activity">
+    <span v-if="selectedTitle === 'builder'">
+        <div class="title" :class="selected('builder')" @click.prevent="navigateTo(program)">
+          <Icon icon="contract"></Icon>
+          <span>{{ humanizedProgramTitle }}</span>
+        </div>
+    </span>
+    <span v-else>
+      <RouterLink to="builder2">
+        <div class="title" :class="selected('builder')">
+          <Icon icon="contract"></Icon>
+          <span>{{ humanizedProgramTitle }}</span>
+          <!-- This almost works, but navigateTo is causing the page to reload and drop the action -->
+          <!-- Questioning the concept, not worth fixing right now -->
+          <!-- <ProgramTree v-if="program" :value="program" :selected="selectedAction" @navigate="navigateTo"></ProgramTree> -->
+        </div>
+      </RouterLink>
+    </span>
+    <RouterLink to="activity">
       <div class="title" :class="selected('activity')">
         <Icon icon="code"></Icon>
         <span>Activity Log</span>
       </div>
-    </a>
-    <a href="settings2">
+    </RouterLink>
+    <RouterLink to="settings2">
       <div class="title" :class="selected('settings')">
         <Icon icon="gear"></Icon>
         <span>Settings</span>
       </div>
-    </a>
+    </RouterLink>
   </div>
 </template>
 

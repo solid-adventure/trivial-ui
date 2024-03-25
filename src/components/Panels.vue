@@ -75,7 +75,7 @@
     computed: {
 
       loaded() {
-        return typeof this.app.panels !== 'undefined'
+        return typeof this.app.panels !== 'undefined' && (this.app.name == this.$route.params.id)
       },
 
       panelComponent() {

@@ -112,9 +112,9 @@
         </form>
       </div>
       <span class="signIn"
-        >Already have an account? <a href="/signin">Sign In</a></span
+        >Already have an account? <RouterLink to="/signin">Sign In</RouterLink></span
       ><br />
-      <a class="resetPassword" href="/recoverpassword">Forgot Password?</a
+      <RouterLink class="resetPassword" to="/recoverpassword">Forgot Password?</RouterLink
       ><br />
     </div>
   </div>
@@ -220,7 +220,7 @@ export default {
                 };
                 TrackingService.identify(identity);
                 TrackingService.track("User Signup", identity);
-                window.location = "/";
+                window.location.href = '/'
             }
         },
         handleRegisterError(e) {

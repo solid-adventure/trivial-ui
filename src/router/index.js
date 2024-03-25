@@ -92,6 +92,11 @@ const routes = [
     component: Builder,
     name: "Actions" }, //change this path
   {
+    path: "/organizations",
+    redirect: "/settings",
+    name: "Organizations",
+  },
+  {
     path: "/organizations/:id/edit",
     component: OrganizationSettings,
     name: "Edit",
@@ -101,6 +106,14 @@ const routes = [
     component: OrganizationInviteUser,
     name: "Invite User",
   },
+  {
+    path: "/organizations/:pathMatch(.*)*",
+    redirect: "/settings",
+  },
+  {
+    path: "/:pathMatch(.*)*",
+    redirect: "/"
+  }
 ];
 
 const router = createRouter({

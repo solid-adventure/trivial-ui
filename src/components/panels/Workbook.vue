@@ -3,9 +3,9 @@
       <Notices :pinned="false"></Notices>
 
       <h1 v-if="standAlone">{{this.app.descriptive_name}}</h1>
-      <a v-else :href="`/apps/${app_id}/`"><h2>{{this.app.descriptive_name}}</h2></a>
+      <RouterLink v-else :to="`/apps/${app_id}/`"><h2>{{this.app.descriptive_name}}</h2></RouterLink>
       <span v-if="editMode">
-        <a :href="`/apps/${app_id}/settings2`">Edit</a>
+        <RouterLink :to="`/apps/${app_id}/settings2`">Edit</RouterLink>
         <span class='pipe'>|</span>
       </span>
       <a href="#" v-on:click.prevent="exportExcel">Download XLS</a>

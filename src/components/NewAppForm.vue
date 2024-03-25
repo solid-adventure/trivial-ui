@@ -118,7 +118,7 @@ export default {
         async stopMessagesAndRedirect() {
             this.stopMessages()
             let locFromPanel = this.appPanel.afterCreatePath(this.appId)
-            window.location = locFromPanel ? locFromPanel : `/apps/${this.appId}`
+            this.$router.push((locFromPanel ? locFromPanel : `/apps/${this.appId}`))
         },
 
         async _createApp() {

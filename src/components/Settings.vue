@@ -5,7 +5,7 @@
 
       <h2>Account Settings</h2>
 
-      <a href="/signout">Sign out</a><br>
+      <RouterLink to="/signout">Sign out</RouterLink><br>
       <div class="section">
         <OrganizationsManager></OrganizationsManager>
       </div>

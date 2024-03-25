@@ -65,7 +65,7 @@ export default {
         },
         navigateTo(orgId){
             // TODO replace with navigation
-           window.location.href = `/organizations/${orgId}/edit`
+           this.$router.push({ path: `/organizations/${orgId}/edit` })
         }
     },
     components: { OrganizationUsersManager }

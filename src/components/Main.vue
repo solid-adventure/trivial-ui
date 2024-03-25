@@ -8,7 +8,7 @@
 
     <!-- Main content area where router views are rendered -->
     <main>
-      <router-view class="clearSuperbar"></router-view>
+      <router-view :key="$route.fullPath" class="clearSuperbar"></router-view>
     </main>
 
     <!-- Common footer for the app -->
@@ -73,11 +73,15 @@ export default {
       ) {
         vars.orgId = this.$route.params.id;
       }
-
+      
+      if(this.$route.path.indexOf("/settings") == 0){
+        vars.orgs = true
+      }
       // trying to standardize the init based on path can use this for new paths, fields, or anything going forward
       if (
         vars.appId !== this.lastVars?.appId ||
         vars.orgId !== this.lastVars?.orgId ||
+        vars.orgs !== this.lastVars?.orgs ||
         !this.lastVars
       ) {
         await store.dispatch("init", vars);
@@ -95,13 +99,12 @@ export default {
       if (allBreaks[allBreaks.length - 1] != url) {
         allBreaks.push(url);
       }
-
       let resolvedRoutes = allBreaks.map((x) =>
         this.$router.resolve({ path: x })
       );
 
       this.breadcrumbs = resolvedRoutes
-        .filter((x) => x.matched && (x.matched.length ?? 0) > 0)
+        .filter((x) => (x.matched && (x.matched.length ?? 0) > 0) && x.name)
         .map((x) => {
           let displayName = x.name;
           let linkPath = x.href;
@@ -116,18 +119,18 @@ export default {
             displayName =
               this.$route?.params?.paneltype ??
               store?.state?.app?.panels?.component ?? this.$route?.query?.paneltype;
+            let linkName = displayName.toLowerCase()
             displayName = `${displayName
               .charAt(0)
               .toUpperCase()}${displayName.slice(1)}`;
             // Order is important here because we want to generate the link before we make the displayName plural
-            linkPath = `/${displayName}`;
+            linkPath = `/${linkName}`;
             if (displayName != "All") {
               displayName = `${displayName}s`;
             }
           }
           return { display: displayName, link: linkPath };
         });
-
       if (!this.breadcrumbs.length) {
         this.breadcrumbs = [{ display: "Home", link: "/" }];
       }
