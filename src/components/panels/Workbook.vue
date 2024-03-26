@@ -10,7 +10,7 @@
       </span>
       <a href="#" v-on:click.prevent="exportExcel">Download XLS</a>
       <div class="tabs-container">
-        <div v-for="(sheetName, index) of sheetNames" class="tab" :class="{active: sheetIsActive(index)}">
+        <div v-for="(sheetName, index) of sheets.name" class="tab" :class="{active: sheetIsActive(index)}">
           <a v-if="!sheetIsActive(index)" href="#" v-on:click.prevent="setActiveSheet(index)">{{sheetName}}</a>
           <span v-else>{{sheetName}}</span>
         </div>
@@ -18,7 +18,7 @@
           <a href="#" v-on:click.prevent="createSheet()" >New</a>
         </div>
       </div>
-      <div v-for="(appSheetId, index) in appSheetIds">
+      <div v-for="(appSheetId, index) in sheets.id">
         <div :class="{hidden: !sheetIsActive(index)}">
           <TableView :app_id="appSheetId" :displayName="false" :options="params" v-bind="$attrs" :isActive="sheetIsActive(index)"/>
           <a v-if="editMode" href='#' v-on:click.prevent="deleteSheet(appSheetId)" class="button-medium secondary-button headroom legroom">Delete Sheet</a>
@@ -98,12 +98,24 @@
         }
       },
 
-      sheetNames() {
-        let out = []
+      sheets() {
+        let sheetNames = []
+        let sheetIds = []
         for (let appId of this.appSheetIds) {
-          out.push(this.sheetName(appId))
+
+          try {
+            let sheetName = this.sheetName(appId)
+            sheetIds.push(appId)
+            sheetNames.push(sheetName)
+          }
+          catch(err) {
+            console.log(err)
+          }
         }
-        return out
+        return {
+            name: sheetNames,
+            id: sheetIds 
+        }
       },
 
       ...mapState([
@@ -160,6 +172,7 @@
       },
 
       async deleteSheet(app_id) {
+        console.log(app_id)
         if (!confirm("Permanently delete this sheet? This cannot be undone.")) { return false }
         let sheetApp = new App(this.$store, app_id)
         sheetApp.destroy()
