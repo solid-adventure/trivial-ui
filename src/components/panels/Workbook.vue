@@ -109,7 +109,7 @@
             sheetNames.push(sheetName)
           }
           catch(err) {
-            console.error('Sheet Name Error: ', err)
+            console.error('Sheet Error: ', err)
           }
         }
         return {
