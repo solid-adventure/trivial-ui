@@ -109,7 +109,7 @@
             sheetNames.push(sheetName)
           }
           catch(err) {
-            console.log(err)
+            console.error('Sheet Name Error: ', err)
           }
         }
         return {
@@ -172,7 +172,6 @@
       },
 
       async deleteSheet(app_id) {
-        console.log(app_id)
         if (!confirm("Permanently delete this sheet? This cannot be undone.")) { return false }
         let sheetApp = new App(this.$store, app_id)
         sheetApp.destroy()

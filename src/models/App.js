@@ -101,17 +101,17 @@ export default class App {
   }
 
   async setPanelOption(option) {
-    this.$store.commit('setAppPanelOption', {app_id: this.name, panelOption: option, append_to_app: this.app})
+    this.$store.commit('setAppPanelOption', {app_id: this.name, panelOption: option, app: this.app})
     return this.save()
   }
 
   async appendPanelOption(option) {
-    this.$store.commit('appendAppPanelOption', {app_id: this.name, panelOption: option, append_to_app: this.app})
+    this.$store.commit('appendAppPanelOption', {app_id: this.name, panelOption: option, app: this.app})
     return this.save()
   }
 
   async deletePanelOption(option) {
-    this.$store.commit('deleteAppPanelOption', {app_id: this.name, panelOption: option, append_to_app: this.app})
+    this.$store.commit('deleteAppPanelOption', {app_id: this.name, panelOption: option, app: this.app})
     return this.save()
   }
 
