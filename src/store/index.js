@@ -124,7 +124,7 @@ const store = createStore({
     },
 
     setAppPanelOption(state, args) {
-      let app = state.app
+      let app = args.app? args.app : state.app
       let option = args.panelOption
       for (let key of Object.keys(args.panelOption)) {
         app.panels.options[key] = args.panelOption[key]
@@ -132,7 +132,7 @@ const store = createStore({
     },
 
     appendAppPanelOption(state, args) {
-      let app = state.app
+      let app = args.app? args.app : state.app
       let option = args.panelOption
       for (let key of Object.keys(args.panelOption)) {
         let existing = app.panels.options[key]
@@ -146,7 +146,7 @@ const store = createStore({
     },
 
     deleteAppPanelOption(state, args) {
-      let app = state.app
+      let app = args.app? args.app : state.app
       let option = args.panelOption
       for (let key of Object.keys(args.panelOption)) {
         let existing = app.panels.options[key]
