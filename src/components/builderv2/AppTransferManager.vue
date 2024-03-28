@@ -154,7 +154,7 @@ export default {
 <style lang="scss" scoped>
 
 #transfer-app-container {
-  width: 70%;
+  width: 100%;
 }
 .active {
   background-color: var(--table-column-head-color);
@@ -168,7 +168,6 @@ tr {
     width: 33%;
   }
 }
-
 #app-notices {
   display: flex;
   height: 8em;
