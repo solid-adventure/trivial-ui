@@ -6,7 +6,7 @@
           <!-- <div class="row"> -->
             <h2 v-if="displayName">{{tableName}}</h2>
             <span v-if="editMode">
-              <a :href="`/apps/${app_id}/builder2`">Edit in Builder</a>
+              <RouterLink :to="`/apps/${app_id}/builder2`">Edit in Builder</RouterLink>
               <!-- Manual Save button, works as expected -->
               <!-- <a :href="`#`" class="button-small" @click.prevent="tableSave">Save</a> -->
             </span>

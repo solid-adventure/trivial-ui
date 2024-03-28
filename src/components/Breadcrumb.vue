@@ -2,7 +2,7 @@
   <div class="Breadcrumb">
     <span v-for="(breadcrumb, i) in breadcrumbs"
       >{{ `${i > 0 ? " > " : ""}` }}
-      <a v-if="i < breadcrumbs.length - 1" class="littleBreadcrumb" :href="breadcrumb.link">{{ `${breadcrumb.display}` }}</a>
+      <RouterLink v-if="i < breadcrumbs.length - 1" class="littleBreadcrumb" :to="breadcrumb.link">{{ `${breadcrumb.display}` }}</RouterLink>
       <a v-else><strong class="lastBreadcrumb">{{ `${breadcrumb.display}` }}</strong></a>
       </span
     >
