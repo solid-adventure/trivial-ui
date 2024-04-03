@@ -40,7 +40,7 @@
 </style>
 
 <script>
-  import { mapState } from 'vuex'
+  import { mapState, mapGetters } from 'vuex'
   import Contract from './panels/Contract.vue'
   import Dashboard from './panels/Dashboard.vue'
   import Headline from './panels/Headline.vue'
@@ -75,7 +75,7 @@
     computed: {
 
       loaded() {
-        return typeof this.app.panels !== 'undefined' && (this.app.name == this.$route.params.id)
+        return typeof this.app.panels !== 'undefined' && this.appLoaded
       },
 
       panelComponent() {
@@ -92,6 +92,10 @@
 
       ...mapState([
         'app'
+      ]),
+
+      ...mapGetters([
+        'appLoaded',
       ])
     }
   }
