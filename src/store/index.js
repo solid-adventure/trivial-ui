@@ -291,7 +291,7 @@ const store = createStore({
       if(state.app !== {}){
         state.app = {}
       }
-      state.app.name = appId
+      await commit('setApp', appId)
     },
 
     async setCurrentPath({state, commit}, {currentPath, route}) {
