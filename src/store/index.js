@@ -347,9 +347,6 @@ const store = createStore({
 
     async loadManifest({ commit, state, dispatch }) {
       const appId = state?.app?.name ?? state?.route?.params?.id
-      // const appId = state?.route?.params?.id
-      console.log(state?.route?.params?.id)
-      console.log(state?.app?.name)
       const all = await Session.apiCall(`/manifests?app_id=${appId}`)
       const manifest = all[0] || {content: '{}'}
       manifest.content = new ManifestMigrator(JSON.parse(manifest.content)).migrate()
