@@ -38,13 +38,14 @@ export default class Session {
     if (text.replaceAll(' ','').length > 0) {
      out = await response.json()
     }
-
     if (response.ok) {
       return out
     } else if (out.error) {
       throw new Error(out.error)
-    } else if (out.errors) {
+    } else if (out.errors && Array.isArray(out.errors)) {
       throw new Error(out.errors.join(', '))
+    } else if (out.errors) {
+      throw new Error(out.errors)
     } else if (response.statusText) {
       throw new Error(response.statusText)
     } else {

@@ -1,11 +1,15 @@
 <script>
-  import WebhooksTable from '../activityLog/WebhooksTable.vue'
+  import FilterEditor from './FilterEditor.vue'
   import NavTree from './NavTree.vue'
+  import Notices from '../Notices.vue'
+  import WebhooksTable from '../activityLog/WebhooksTable.vue'
 
   export default {
     components: {
+      FilterEditor,
+      NavTree,
+      Notices,
       WebhooksTable,
-      'nav-tree': NavTree
     }
   }
 
@@ -14,7 +18,10 @@
 <template>
   <div class="InstanceActivity">
     <!-- <super-bar></super-bar> -->
+    <Notices></Notices>
     <nav-tree :selected-title="'activity'"></nav-tree>
+
+    <FilterEditor></FilterEditor>
     <WebhooksTable></WebhooksTable>
   </div>
 </template>
