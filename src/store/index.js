@@ -291,7 +291,6 @@ const store = createStore({
       if(state.app !== {}){
         state.app = {}
       }
-      console.log("appId: ", appId)
       commit('setAppId', appId)
     },
 
@@ -326,9 +325,6 @@ const store = createStore({
 
     async loadCredentials({ commit, state, dispatch }) {
       let appId = state?.app?.name ?? state?.route?.params?.id
-      console.log("we picked this: ", appId)
-      console.log("another one: ", state.route.params.id)
-      console.log("we are looking for credentials here: ", appId)
       const creds = await Session.apiCall(`/apps/${appId}/credentials`)
       commit('setCredentials', creds.credentials)
       dispatch('notifyCredentialsLoaded')
