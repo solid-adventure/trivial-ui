@@ -117,6 +117,7 @@
 
   td.value {
     text-align: right;
+    white-space: nowrap;
   }
 
   td.total {
