@@ -185,7 +185,7 @@
 </style>
 
 <script>
-  import { mapState } from 'vuex'
+  import { mapGetters, mapState } from 'vuex'
   import { fetchJSON } from 'trivial-core/lib/component-utils'
   import ActionButton from './controls/ActionButton.vue'
   import HideableSection from './controls/HideableSection.vue'
@@ -311,18 +311,23 @@
 
       ...mapState([
         'app'
+      ]),
+
+      ...mapGetters([
+        'appLoaded'
       ])
 
     },
 
     async mounted() {
-      this.setAppDetails()
-      await this.loadManifest()
+      if(this.appLoaded){
+        this.setAppDetails()
+        await this.loadManifest()
+      }
     },
 
     watch: {
         async app(newApp){
-          console.log(newApp)
           if(newApp){
             this.setAppDetails()
             await this.loadManifest()
