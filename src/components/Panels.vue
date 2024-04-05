@@ -75,7 +75,7 @@
     computed: {
 
       loaded() {
-        return typeof this.app.panels !== 'undefined' && this.appLoaded
+        return typeof this.app.panels !== 'undefined'
       },
 
       panelComponent() {
@@ -92,11 +92,8 @@
 
       ...mapState([
         'app'
-      ]),
-
-      ...mapGetters([
-        'appLoaded',
       ])
+
     }
   }
 </script>
