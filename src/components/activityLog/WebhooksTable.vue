@@ -181,6 +181,7 @@
 </style>
 
 <script>
+import SearchFilter from '../../lib/SearchFilter'
 import TrackingService from '../../../lib/TrackingService'
 import { formatJSON, fetchJSON } from 'trivial-core/lib/component-utils'
 import BuildEventMarker from './BuildEventMarker.vue'
@@ -235,6 +236,16 @@ import { mapState } from 'vuex'
       })
     },
 
+    searchParam() {
+      if (this.$route.query.search) {
+        let filters = JSON.parse(this.$route.query.search)
+        let searchFilter = new SearchFilter(filters, null, null, 'payload')
+        return `&search=${JSON.stringify(searchFilter.searchParams)}`
+      } else {
+        return ''
+      }
+    },
+
     ...mapState([
       'app'
     ])
@@ -253,12 +264,12 @@ import { mapState } from 'vuex'
 
     async fetchData() {
       try {
-        await this.$store.state.Session.apiCall(`/activity_entries?app_id=${this.appId}`)
+        await this.$store.state.Session.apiCall(`/activity_entries?app_id=${this.appId}${this.searchParam}`)
         .then(webhooks => this.webhooks = webhooks)
         .then(webhooks => this.selectFirst(webhooks))
       } catch (error) {
         console.error('[WebhooksTable][fetchData] Error:', error)
-        notifications.error(`Could not load webhooks: ${error.message}`)
+        notifications.error(`Could not load activity: ${error.message}`, {autoDismiss: false})
       }
       this.loading = false
     },

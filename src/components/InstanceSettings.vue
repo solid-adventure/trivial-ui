@@ -100,7 +100,7 @@
   </div>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
   .InstanceSettings {
   	height: 100%;
   	margin: 2em;
