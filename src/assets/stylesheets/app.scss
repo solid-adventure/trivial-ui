@@ -77,9 +77,6 @@ table.spaced {
 
   }
 
-
-
-
 }
 
 div.page-container {
@@ -93,8 +90,12 @@ div.page-inset {
   padding: 2em 3em;
   border-radius: 1em;
   border: 1px solid var(--background-80);
-  margin: 2em 2em 12em 2em;
+  margin: 2em 2em 2em 2em;
   min-width: 18em;
+
+  &:last-child {
+    margin-bottom: 12em;
+  }
 }
 
 div.left-inset {

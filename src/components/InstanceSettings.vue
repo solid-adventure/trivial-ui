@@ -6,94 +6,104 @@
 
     <p v-if="loading">Loading...</p>
 
-    <div v-if="!loading">
-      <h2 class="headroom section-title">App Name</h2>
-      <em class="section-help-text">Update the name of your app as it appears in Trivial.</em>
-      <br/>
-      <div>
-        <input class="descriptive-name" type="text" v-model="descriptive_name"/>
-        <br/><ActionButton id="rename_app" class="button-small" :action="updateDescriptiveName" value="Rename" working-value="Updating Name..."></ActionButton>
-        <transition name="fade">
-            <div v-if="message" class="message">{{message}}</div>
-        </transition>
+    <div v-if="!loading" id="instance-setting-container">
+      <div class="page-inset">
+        <h2 class="section-title">App Name</h2>
+        <em class="section-help-text">Update the name of your app as it appears in Trivial.</em>
+        <br/>
+        <div>
+          <input class="descriptive-name" type="text" v-model="descriptive_name"/>
+          <br/>
+          <ActionButton id="rename_app" class="button-small" :action="updateDescriptiveName" value="Rename" working-value="Updating Name..."></ActionButton>
+          <transition name="fade">
+              <div v-if="message" class="message">{{message}}</div>
+          </transition>
+        </div>
       </div>
 
-      <hr class="headroom accent" />
-      <h2 class="headroom section-title">Copy</h2>
-      <em class="section-help-text">Create a duplicate of this app with the same build steps, settings, and credentials.</em>
-      <br/>
-      <div>
-        <input class="descriptive-name" type="text" v-model="suggested_copy_name"/>
+      <div class="page-inset">
+        <h2 class="section-title">Copy</h2>
+        <em class="section-help-text">Create a duplicate of this app with the same build steps, settings, and credentials.</em>
+        <br/>
+        <div>
+          <input class="descriptive-name" type="text" v-model="suggested_copy_name"/>
+          <ActionButton id="copy_app" class="button-small" :action="copyApp" value="Copy" working-value="Copying..."></ActionButton>
+          <transition name="fade">
+              <div v-if="copyMessage" class="message">
+                <RouterLink  v-if = "copyAppUrl" :to = "copyAppUrl" >{{ copyMessage }}</RouterLink>
+                <span v-else>{{ copyMessage }}</span>
+              </div>
+          </transition>
+        </div>
+      </div>
 
-        <ActionButton id="copy_app" class="button-small" :action="copyApp" value="Copy" working-value="Copying..."></ActionButton>
-        <transition name="fade">
-            <div v-if="copyMessage" class="message">
-              <RouterLink  v-if = "copyAppUrl" :to = "copyAppUrl" >{{ copyMessage }}</RouterLink>
-              <span v-else>{{ copyMessage }}</span>
-            </div>
-        </transition>
+      
+      <div class="page-inset">
+        <h2 class="section-title">App Ownership</h2>
+        <p class="section-help-text"><em>Transfer app ownership to organizations you are a member of.</em></p>
+        <div class = "row">
+          <span class = "pro-tip">Pro Tip</span>
+          <p>
+            Transferring a dashboard doesn't include its children apps. Before
+            transferring the dashboard, <br />
+            be sure to transfer each child app individually.
+          </p>
+        </div>
+        <AppTransferManager/>
+      </div>
+
+      <div class="page-inset">
+        <h2 class="section-title">Download Source</h2>
+        <em class="section-help-text">Download the compiled source code for this app.</em>
+        <br/>
+        <div>
+          <a class="button-small" href="#" @click.prevent="handleDownload">Download</a>
+        </div>
       </div>
       
-      <hr class="headroom accent" />
-      <h2 class="headroom section-title">App Ownership</h2>
-      <p class="section-help-text"><em>Transfer app ownership to organizations you are a member of.</em></p>
-      <div class = "row">
-        <span class = "pro-tip">Pro Tip</span>
-        <p>
-          Transferring a dashboard doesn't include its children apps. Before
-          transferring the dashboard, <br />
-          be sure to transfer each child app individually.
-        </p>
+      <div class="page-inset">
+        <h2 class="section-title">UI Panel Options</h2>
+        <p class="section-help-text"><em>Danger zone! Editing the panel settings directly allows you to break how your app renders.</em></p>
+        <p class="section-help-text"><em>This will change how your app is displayed to users.</em></p>
+        <HideableSection :initially-hidden="false" display-name='Options' class="settings">
+          <textarea id="manifest_content" class="code-entry" cols="60" rows="20" spellcheck="false" v-model="formattedPanels"></textarea>
+          <br /><input type="button" class="button-small" :class="{working: updatingPanels}" @click.prevent="updatePanels" :value="updatingPanels ? 'Updating Panel Options...' : 'Update Panel Options' ">
+          <transition name="fade">
+            <div v-if="panelMessage" class="message">{{panelMessage}}</div>
+          </transition>
+        </HideableSection>
+      </div>
+      
+
+      <div class="page-inset">
+        <h2 class="section-title">Schedule</h2>
+        <p class="section-help-text"><em>Settings here will automatically run your app with the payload provided.</em></p>
+        <HideableSection :initially-hidden="false" display-name='Options' class="settings">
+          <textarea id="manifest_content" class="code-entry" cols="60" rows="10" spellcheck="false" v-model="formattedSchedule"></textarea>
+          <br /><input type="button" class="button-small" :class="{working: updatingSchedule}" @click.prevent="updateSchedule" :value="updatingSchedule ? 'Updating Schedule...' : 'Update Schedule' ">
+          <transition name="fade">
+            <div v-if="scheduleMessage" class="message">{{scheduleMessage}}</div>
+          </transition>
+        </HideableSection>
       </div>
 
 
-      <AppTransferManager/>
+      <div class="page-inset">
+        <h2 class="section-title">Manifest.json</h2>
+        <p class="section-help-text"><em>Danger zone! Editing the manifest directly will allow you to break the build.</em></p>
+        <p class="section-help-text"><em>If there is a Lambda managed by this app, it will delete the lambda and recreate it.</em></p>
+        <HideableSection :initially-hidden="true" display-name='Manifest' class="settings">
+          <textarea id="manifest_content" class="code-entry" cols="60" rows="30" spellcheck="false" v-model="formattedManifest"></textarea>
+          <br /><input type="button" id="manifest_content_save" class="button-small" :class="{working: rebuilding}" @click.prevent="save" :value="rebuilding ? 'Updating manifest...' : 'Update Manifest' ">
+        </HideableSection>
+      </div>
+      
+      <div class="page-inset">
+        <h2 class="section-title">Delete</h2>
+        <p class="section-help-text"><em>Danger zone! Deleting this app is permanent and cannot be undone.</em></p>
+        <p><input type="button" class="button-small" :class="{working: deleting}" @click.prevent="deleteApp" :value="deleting ? 'Deleting App...' : 'Delete App'" ></p>
+      </div>
 
-      <hr class="headroom accent" />
-      <h2 class="headroom section-title">Download Source</h2>
-      <em class="section-help-text">Download the compiled source code for this app.</em>
-      <div class="error">{{downloadMessage}}</div>
-
-      <br/>
-      <a class="button-small" href="#" @click.prevent="handleDownload">Download</a>
-      <hr class="headroom accent" />
-      <h2 class="headroom section-title">UI Panel Options</h2>
-      <p class="section-help-text"><em>Danger zone! Editing the panel settings directly allows you to break how your app renders.</em></p>
-      <p class="section-help-text"><em>This will change how your app is displayed to users.</em></p>
-      <HideableSection :initially-hidden="false" display-name='Options' class="settings">
-      <textarea id="manifest_content" class="code-entry" cols="60" rows="20" spellcheck="false" v-model="formattedPanels"></textarea>
-      <br /><input type="button" class="button-small" :class="{working: updatingPanels}" @click.prevent="updatePanels" :value="updatingPanels ? 'Updating Panel Options...' : 'Update Panel Options' ">
-          <transition name="fade">
-              <div v-if="panelMessage" class="message">{{panelMessage}}</div>
-          </transition>
-      </HideableSection>
-
-
-      <hr class="headroom accent" />
-      <h2 class="headroom section-title">Schedule</h2>
-      <p class="section-help-text"><em>Settings here will automatically run your app with the payload provided.</em></p>
-      <HideableSection :initially-hidden="false" display-name='Options' class="settings">
-      <textarea id="manifest_content" class="code-entry" cols="60" rows="10" spellcheck="false" v-model="formattedSchedule"></textarea>
-      <br /><input type="button" class="button-small" :class="{working: updatingSchedule}" @click.prevent="updateSchedule" :value="updatingSchedule ? 'Updating Schedule...' : 'Update Schedule' ">
-          <transition name="fade">
-              <div v-if="scheduleMessage" class="message">{{scheduleMessage}}</div>
-          </transition>
-      </HideableSection>
-
-
-      <hr class="headroom accent" />
-      <h2 class="headroom section-title">Manifest.json</h2>
-      <p class="section-help-text"><em>Danger zone! Editing the manifest directly will allow you to break the build.</em></p>
-      <p class="section-help-text"><em>If there is a Lambda managed by this app, it will delete the lambda and recreate it.</em></p>
-      <HideableSection :initially-hidden="true" display-name='Manifest' class="settings">
-      <textarea id="manifest_content" class="code-entry" cols="60" rows="30" spellcheck="false" v-model="formattedManifest"></textarea>
-      <br /><input type="button" id="manifest_content_save" class="button-small" :class="{working: rebuilding}" @click.prevent="save" :value="rebuilding ? 'Updating manifest...' : 'Update Manifest' ">
-      </HideableSection>
-
-      <hr class="headroom accent" />
-      <h2 class="headroom section-title">Delete</h2>
-      <p class="section-help-text"><em>Danger zone! Deleting this app is permanent and cannot be undone.</em></p>
-      <p class="section-end"><input type="button" class="button-small" :class="{working: deleting}" @click.prevent="deleteApp" :value="deleting ? 'Deleting App...' : 'Delete App'" ></p>
     </div>
 
   </div>
@@ -156,9 +166,6 @@
     }
   }
 
-  .section-end {
-    padding-bottom: 4em;
-  }
 
   .error {
     color: var(--error);
@@ -185,6 +192,14 @@
     }
 
   }
+  
+  #instance-setting-container {
+    padding-bottom: 5em;
+    div {
+      margin-bottom: 0 !important;
+    }
+  }
+
 </style>
 
 <script>
