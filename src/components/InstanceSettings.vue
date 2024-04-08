@@ -8,7 +8,7 @@
 
     <div v-if="!loading" id="instance-setting-container">
       <div class="page-inset">
-        <h2 class="headroom section-title">App Name</h2>
+        <h2 class="section-title">App Name</h2>
         <em class="section-help-text">Update the name of your app as it appears in Trivial.</em>
         <br/>
         <div>
@@ -22,7 +22,7 @@
       </div>
 
       <div class="page-inset">
-        <h2 class="headroom section-title">Copy</h2>
+        <h2 class="section-title">Copy</h2>
         <em class="section-help-text">Create a duplicate of this app with the same build steps, settings, and credentials.</em>
         <br/>
         <div>
@@ -39,7 +39,7 @@
 
       
       <div class="page-inset">
-        <h2 class="headroom section-title">App Ownership</h2>
+        <h2 class="section-title">App Ownership</h2>
         <p class="section-help-text"><em>Transfer app ownership to organizations you are a member of.</em></p>
         <div class = "row">
           <span class = "pro-tip">Pro Tip</span>
@@ -53,7 +53,7 @@
       </div>
 
       <div class="page-inset">
-        <h2 class="headroom section-title">Download Source</h2>
+        <h2 class="section-title">Download Source</h2>
         <em class="section-help-text">Download the compiled source code for this app.</em>
         <br/>
         <div>
@@ -62,7 +62,7 @@
       </div>
       
       <div class="page-inset">
-        <h2 class="headroom section-title">UI Panel Options</h2>
+        <h2 class="section-title">UI Panel Options</h2>
         <p class="section-help-text"><em>Danger zone! Editing the panel settings directly allows you to break how your app renders.</em></p>
         <p class="section-help-text"><em>This will change how your app is displayed to users.</em></p>
         <HideableSection :initially-hidden="false" display-name='Options' class="settings">
@@ -76,7 +76,7 @@
       
 
       <div class="page-inset">
-        <h2 class="headroom section-title">Schedule</h2>
+        <h2 class="section-title">Schedule</h2>
         <p class="section-help-text"><em>Settings here will automatically run your app with the payload provided.</em></p>
         <HideableSection :initially-hidden="false" display-name='Options' class="settings">
           <textarea id="manifest_content" class="code-entry" cols="60" rows="10" spellcheck="false" v-model="formattedSchedule"></textarea>
@@ -89,7 +89,7 @@
 
 
       <div class="page-inset">
-        <h2 class="headroom section-title">Manifest.json</h2>
+        <h2 class="section-title">Manifest.json</h2>
         <p class="section-help-text"><em>Danger zone! Editing the manifest directly will allow you to break the build.</em></p>
         <p class="section-help-text"><em>If there is a Lambda managed by this app, it will delete the lambda and recreate it.</em></p>
         <HideableSection :initially-hidden="true" display-name='Manifest' class="settings">
@@ -99,7 +99,7 @@
       </div>
       
       <div class="page-inset">
-        <h2 class="headroom section-title">Delete</h2>
+        <h2 class="section-title">Delete</h2>
         <p class="section-help-text"><em>Danger zone! Deleting this app is permanent and cannot be undone.</em></p>
         <p><input type="button" class="button-small" :class="{working: deleting}" @click.prevent="deleteApp" :value="deleting ? 'Deleting App...' : 'Delete App'" ></p>
       </div>
