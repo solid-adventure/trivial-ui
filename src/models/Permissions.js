@@ -1,9 +1,11 @@
 import Session from './Session'
 export default class Permissions {
-    constructor() {
-        const userPermissions = await Session.apiCall(`/users/${state.user.id}/permissions`)
+
+    constructor(){}
+
+    static async setUserPermits(user_id){
+        let userPermissions = await Session.apiCall(`/users/${user_id}/permissions`)
+        return userPermissions
     }
-    static setPermissions(permissions){
-        this.update = permissions.update
-    }
+
 }

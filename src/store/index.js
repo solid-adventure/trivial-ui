@@ -43,7 +43,8 @@ const store = createStore({
     enableBuildApps: import.meta.env.VITE_ENABLE_BUILD_APPS,
     enableWebhookAppTrigger: import.meta.env.VITE_ENABLE_WEBHOOK_APP_TRIGGER,
     Session: Session,
-    Permissions: Permissions
+    Permissions: Permissions,
+    permits: null
   },
 
   getters: {
@@ -277,7 +278,7 @@ const store = createStore({
       if ( ['Activity', 'Show App', 'Builder', 'Panels', 'Settings'].includes(routeName) ) {
         await dispatch('loadApp', { appId: router.currentRoute.value.params.id })
       }
-      dispatch('loadPermissions')
+      await dispatch('loadPermissions')
     },
 
     async loadApps({ commit }) {
@@ -291,8 +292,8 @@ const store = createStore({
     },
 
     async loadPermissions({state, commit}) {
-      const userPermissions = await Session.apiCall(`/users/${state.user.id}/permissions`)
-      Permissions.setPermissions(userPermissions)
+      state.permits = Permissions.setUserPermits(state.user.id)
+      console.log(state.permits)
     },
 
     initApp({state, commit}, {appId}) {

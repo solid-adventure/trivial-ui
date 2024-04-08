@@ -78,17 +78,25 @@ export default {
   methods: {
 
     deletable(user) {
-      return user.role != 'admin' || !this.lastAdmin
+      if (this.userRole === 'admin'){
+        return user.role != 'admin' || !this.lastAdmin
+      }
+      return false
     },
 
     async loadOrganization(){
       try{
         this.organization = await this.$store.state.Session.apiCall(`/organizations/${this.orgId}`)
         this.users.push(...this.organization.users)
+        this.findUserRole()
       } catch(error){
         // TODO these should all print to the UI, not the console
         console.error('[OrganizationSettings][loadOrganization] Error:', error)
       }
+    },
+
+    findUserRole(){
+      this.userRole = this.users.find(user => user.user_id === (this.$store.state.user.id))?.role
     },
 
     async deleteOrganization() {
