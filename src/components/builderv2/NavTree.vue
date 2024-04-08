@@ -1,5 +1,5 @@
 <script>
-  import { mapActions, mapMutations, mapState } from 'vuex'
+  import { mapActions, mapMutations, mapState, mapGetters} from 'vuex'
   import Icon from '../Icon.vue'
   // import ProgramTree from './ProgramTree.vue'
 
@@ -50,6 +50,10 @@
 
       ...mapState([
         'app'
+      ]),
+
+      ...mapGetters([
+        'appLoaded'
       ])
     }
 
@@ -59,7 +63,8 @@
 <template>
   <div class="navtree">
     <div class='app-name-container'>
-      <h1><RouterLink :to="`/apps/${this.app.name}`">{{this.app.descriptive_name}}</RouterLink></h1>
+      <h1 v-if = "appLoaded"><RouterLink :to="`/apps/${this.app.name}`">{{this.app.descriptive_name}}</RouterLink></h1>
+      <h1 v-else>Loading...</h1>
     </div>
     <span v-if="selectedTitle === 'builder'">
         <div class="title" :class="selected('builder')" @click.prevent="navigateTo(program)">

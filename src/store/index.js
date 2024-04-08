@@ -50,6 +50,10 @@ const store = createStore({
       return Object.keys(state.manifest.content).length > 0
     },
 
+    appLoaded(state) {
+      return Object.keys(state.app).length > 1
+    },
+
     appUrl(state) {
       const path = (state.manifest.content.listen_at || {}).path
       return new URL(path, `https://${state.app.hostname}.${state.app.domain}`).href
@@ -98,8 +102,7 @@ const store = createStore({
     },
 
     setAppId(state, appId) {
-      const app = state.apps.find(a => appId === a.name)
-      state.app = app || {}
+      state.app.name = appId || null
     },
 
     addApp(state, newApp) {
@@ -243,6 +246,7 @@ const store = createStore({
       if (!state.isAuthenticated) { return }
       try {
         await dispatch('loadProfile')
+        await dispatch('initApp', { appId })
         await dispatch('loadResources', { dispatch, router })
         await dispatch('checkURLState')
       } catch (error) {
@@ -281,6 +285,13 @@ const store = createStore({
     async loadApp({ commit }, { appId }) {
       const app = await Session.apiCall(`/apps/${appId}`)
       await commit('setApp', app)
+    },
+
+    initApp({state, commit}, {appId}) {
+      if(state.app !== {}){
+        state.app = {}
+      }
+      commit('setAppId', appId)
     },
 
     async setCurrentPath({state, commit}, {currentPath, route}) {

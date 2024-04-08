@@ -188,7 +188,7 @@
 </style>
 
 <script>
-  import { mapState } from 'vuex'
+  import { mapGetters, mapState } from 'vuex'
   import { fetchJSON } from 'trivial-core/lib/component-utils'
   import ActionButton from './controls/ActionButton.vue'
   import HideableSection from './controls/HideableSection.vue'
@@ -228,8 +228,6 @@
         copyAppUrl: null,
         panelMessage: null,
         scheduleMessage: null,
-        //assuming path remains as /apps/:id/settings2 or at least includes id param
-        appId: this.$route.params.id
       }
     },
 
@@ -253,7 +251,7 @@
 
       },
       downloadLink() {
-        const base = `/download/${this.appId}`
+        const base = `/download/${this.app.name}`
         const params = FeatureManager.featureParams()
         return params ? `${base}?${params}` : base
       },
@@ -317,15 +315,29 @@
 
       ...mapState([
         'app'
+      ]),
+
+      ...mapGetters([
+        'appLoaded'
       ])
 
     },
 
     async mounted() {
-      this.setAppDetails()
-      await this.loadManifest()
+      if(this.appLoaded){
+        this.setAppDetails()
+        await this.loadManifest()
+      }
     },
 
+    watch: {
+        async app(newApp){
+          if(newApp){
+            this.setAppDetails()
+            await this.loadManifest()
+          }
+        }
+    },
     methods: {
 
       setAppDetails() {
@@ -337,7 +349,8 @@
 
       async loadManifest() {
         try {
-          let manifests = await this.$store.state.Session.apiCall(`/manifests?app_id=${this.appId}`)
+          this.errorMessage = null
+          let manifests = await this.$store.state.Session.apiCall(`/manifests?app_id=${this.app.name}`)
           this.manifest = manifests[0]
           this.manifestContent =
             new ManifestMigrator(JSON.parse(this.manifest.content)).migrate()
@@ -430,7 +443,7 @@
           this.deleting = false
           if (null === this.errorMessage)
             TrackingService.track('Deleted App', {
-              'App ID': this.appId
+              'App ID': this.app.name
             })
             this.$router.push({ path: '/' })
         }
@@ -442,7 +455,7 @@
           this.errorMessage = null
           // Only teardown Lambda if build apps is enabled
           if (this.$store.state.enableBuildApps) {
-            await fetchJSON(`/build/${this.appId}`, {
+            await fetchJSON(`/build/${this.app.name}`, {
               method: 'delete'
             })
             await this.removeCredentials()
@@ -459,20 +472,20 @@
 
       // TODO: Deleting an app should remove its credentials automatically
       async removeCredentials() {
-        await this.$store.state.Session.apiCall(`/apps/${this.appId}/credentials`, 'PUT',
+        await this.$store.state.Session.apiCall(`/apps/${this.app.name}/credentials`, 'PUT',
           {credentials: {}}
         )
       },
 
       async destroy() {
-        await this.$store.state.Session.apiCall(`/apps/${this.appId}`, 'DELETE')
+        await this.$store.state.Session.apiCall(`/apps/${this.app.name}`, 'DELETE')
       },
 
       async copyApp(){
         try{
           this.copyMessage = null
           this.copyAppUrl = null
-          let new_app = await this.$store.state.Session.apiCall(`/apps/${this.appId}/copy`, 'POST', {
+          let new_app = await this.$store.state.Session.apiCall(`/apps/${this.app.name}/copy`, 'POST', {
             new_app_descriptive_name: this.new_app_descriptive_name
           })
           if (new_app.errors) {
@@ -491,7 +504,7 @@
       async updateDescriptiveName(){
         try{
           this.errorMessage = null
-          let response = await this.$store.state.Session.apiCall(`/apps/${this.appId}`, 'PUT', {descriptive_name: this.descriptive_name})
+          let response = await this.$store.state.Session.apiCall(`/apps/${this.app.name}`, 'PUT', {descriptive_name: this.descriptive_name})
           this.message = 'App name successfully updated!'
           setTimeout(() => {
             this.message = null
@@ -511,7 +524,7 @@
         try{
           this.errorMessage = null
           this.updatingPanels = true
-          await this.$store.state.Session.apiCall(`/apps/${this.appId}`, 'PUT', {panels: this.panels})
+          await this.$store.state.Session.apiCall(`/apps/${this.app.name}`, 'PUT', {panels: this.panels})
           this.panelMessage = 'Panel options successfully updated!'
         } catch(error){
           console.log('[InstanceSetings][updatePanels] Error:', error)
@@ -524,7 +537,7 @@
         try{
           this.errorMessage = null
           this.updatingSchedule = true
-          await this.$store.state.Session.apiCall(`/apps/${this.appId}`, 'PUT', {schedule: this.schedule})
+          await this.$store.state.Session.apiCall(`/apps/${this.app.name}`, 'PUT', {schedule: this.schedule})
           this.scheduleMessage = 'Schedule successfully updated!'
         } catch(error){
           console.log('[InstanceSetings][updateSchedule] Error:', error)

@@ -301,7 +301,7 @@ export default {
       @navigate="navigateTo"
     ></ProgramBreadcrumb>
     <div v-if="!displayVault">
-      <div class="action-body" ref="actionbody">
+      <div v-if="loaded" class="action-body" ref="actionbody">
         <Editor
           :value="action"
           :credentials="credentials"
@@ -311,7 +311,9 @@ export default {
           @edit="edit"
         ></Editor>
       </div>
-
+      <div v-else class= "action-body">
+        <p>Loading...</p>
+      </div>
       <CustomFunctionList :value="functions"></CustomFunctionList>
     </div>
     <CredentialsVault v-if="displayVault"></CredentialsVault>
