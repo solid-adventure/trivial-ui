@@ -63,7 +63,7 @@
               <RouterLink :to="`/apps/${app.name}/`">{{panelType(app)}}</RouterLink>
             </td>
             <td>{{lastRun(app)}}</td>
-            <td><RouterLink v-if="canEdit('app.name')" :to="editLink(app)">Edit</RouterLink></td>
+            <td><RouterLink v-if= "validatePermission(app.name)" :to="editLink(app)">Edit</RouterLink></td>
             <!-- <td><a :href="`/apps/${app.name}/builder2`">Edit</a></td> -->
             <td colspan="2">
               <RouterLink :to="`/apps/${app.name}/activity`">
@@ -296,7 +296,7 @@
       ...mapState({
         apps: state => state.apps,
         appsLoaded: state => state.appsLoaded,
-        permitedApps: state => state.permits
+        Permissions: state => state.Permissions
       })
 
     },
@@ -311,16 +311,9 @@
         }
       },
 
-      async canEdit(app_name) {
-        try {
-          let permissions = await this.permitedApps; // Wait for the permissions promise to resolve
-          let result = permissions.update.app_names.includes(app_name);
-          console.log(result)
-          return result
-        } catch (error) {
-            console.error("Error:", error);
-            return false; // Return false in case of any error
-        }
+      validatePermission(app_name) {
+         let result = this.Permissions.canEdit(app_name)
+         return result
       },
 
       async loadStats(type) {

@@ -68,7 +68,7 @@
 
       editMode() {
         let p = new URLSearchParams(window.location.search)
-        return p.get('mode') == 'edit' 
+        return p.get('mode') == 'edit' && this.Permissions.canEdit(this.app_id)
       },
 
       editUrl() {
@@ -145,7 +145,7 @@
       },
 
       ...mapState([
-        'apps', 'user'])
+        'apps', 'user', 'Permissions'])
 
     },
 

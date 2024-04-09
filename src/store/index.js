@@ -43,8 +43,7 @@ const store = createStore({
     enableBuildApps: import.meta.env.VITE_ENABLE_BUILD_APPS,
     enableWebhookAppTrigger: import.meta.env.VITE_ENABLE_WEBHOOK_APP_TRIGGER,
     Session: Session,
-    Permissions: Permissions,
-    permits: null
+    Permissions: new Permissions(),
   },
 
   getters: {
@@ -292,8 +291,7 @@ const store = createStore({
     },
 
     async loadPermissions({state, commit}) {
-      state.permits = Permissions.setUserPermits(state.user.id)
-      console.log(state.permits)
+      state.permits = state.Permissions.setUserPermits(state.user.id)
     },
 
     initApp({state, commit}, {appId}) {
