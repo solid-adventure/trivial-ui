@@ -14,6 +14,7 @@
 
   import App from '../../models/App'
   import Icon from '../Icon.vue'
+  import { mapState } from "vuex";
 
   export default {
 
@@ -37,8 +38,11 @@
     computed: {
       editMode() {
         let p = new URLSearchParams(window.location.search)
-        return p.get('mode') == 'edit'
+        return p.get('mode') == 'edit' && this.Permissions.canEdit(this.app_id)
       },
+      ...mapState({
+        Permissions: state => state.Permissions
+      })
     },
 
     methods: {
