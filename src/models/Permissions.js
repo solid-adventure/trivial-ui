@@ -6,21 +6,25 @@ export default class Permissions {
     this.userId = userId;
     this.permissions = await Session.apiCall(`/users/${userId}/permissions`);
   }
-  canEdit(appName) {
-    if (!this.permissions) {
-      return false;
-    } else {
-      try {
-        let updateAppNames = this.permissions.update.app_names;
-        if (updateAppNames.includes(appName)) {
-          return true;
+
+  can(ability, model, {appName: appName}) {
+    if(this.permissions){
+      if(model === 'App'){
+        let abilities = ['destroy', 'update', 'grant', 'transfer']
+        if (abilities.includes(ability)){
+          try {
+            let appNames = this.permissions[ability].app_names;
+            return appNames.includes(appName)
+          } catch (error) {
+            console.error("Error:", error);
+            return false;
+          }
         } else {
-          return false;
+          console.err(`Ability: ${ability} not found in App permissions`)
+          return false
         }
-      } catch (error) {
-        console.error("Error:", error);
-        return false;
       }
     }
+    return false
   }
 }
