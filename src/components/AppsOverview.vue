@@ -63,7 +63,7 @@
               <RouterLink :to="`/apps/${app.name}/`">{{panelType(app)}}</RouterLink>
             </td>
             <td>{{lastRun(app)}}</td>
-            <td><RouterLink v-if= "validatePermission(app.name)" :to="editLink(app)">Edit</RouterLink></td>
+            <td><RouterLink v-if= "Permissions.canEdit(app.name)" :to="editLink(app)">Edit</RouterLink></td>
             <!-- <td><a :href="`/apps/${app.name}/builder2`">Edit</a></td> -->
             <td colspan="2">
               <RouterLink :to="`/apps/${app.name}/activity`">
@@ -309,11 +309,6 @@
         } else {
           return `/apps/${app.name}/builder2`
         }
-      },
-
-      validatePermission(app_name) {
-         let result = this.Permissions.canEdit(app_name)
-         return result
       },
 
       async loadStats(type) {
