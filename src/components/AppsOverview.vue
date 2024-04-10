@@ -221,6 +221,7 @@
       } else {
         this.panelTypeFilter = this.$route.params.paneltype;
       }
+      this.loadStats(this.chartType)
     },
 
     computed: {
