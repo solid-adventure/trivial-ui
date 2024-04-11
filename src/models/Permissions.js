@@ -2,7 +2,7 @@ import Session from "./Session";
 export default class Permissions {
   constructor() {}
 
-  async setUserPermits(userId) {
+  async loadPermissions(userId) {
     this.userId = userId;
     this.permissions = await Session.apiCall(`/users/${userId}/permissions`);
   }
@@ -23,6 +23,8 @@ export default class Permissions {
           console.err(`Ability: ${ability} not found in App permissions`)
           return false
         }
+      } else {
+        console.error(`Model: ${model} not found`)
       }
     }
     return false

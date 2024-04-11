@@ -291,7 +291,7 @@ const store = createStore({
     },
 
     async loadPermissions({state, commit}) {
-      state.permits = state.Permissions.setUserPermits(state.user.id)
+      state.permits = state.Permissions.loadPermissions(state.user.id)
     },
 
     initApp({state, commit}, {appId}) {
