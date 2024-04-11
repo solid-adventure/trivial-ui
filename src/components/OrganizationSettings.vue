@@ -78,13 +78,6 @@ export default {
 
   methods: {
 
-    // deletable(user) {
-    //   if (this.userRole === 'admin'){
-    //     return user.role != 'admin' || !this.lastAdmin
-    //   }
-    //   return false
-    // },
-
     async loadOrganization(){
       try{
         this.organization = await this.$store.state.Session.apiCall(`/organizations/${this.orgId}`)
