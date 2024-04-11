@@ -25,7 +25,7 @@
 <!--             <td>{{ user.invitation_status }}</td>
             <td>{{ user.date_added }}</td>
  -->            <td>
-              <a v-if="deletable(user)" href="#" @click="removeUser(user)"><Icon icon="trash"></Icon></a>
+              <a v-if="Permissions.can('removeMember', 'Org', {memberRole: user.role, userRole: currentUserRole, lastAdmin: lastAdmin })" href="#" @click="removeUser(user)"><Icon icon="trash"></Icon></a>
             </td>
           </tr>
         </tbody>
@@ -38,7 +38,7 @@
 <script>
 
 import Icon from './Icon.vue'
-
+import { mapState } from "vuex";
 export default {
 
   data(){
@@ -73,16 +73,17 @@ export default {
       return this.users.length === 1
     },
 
+    ...mapState(['Permissions'])
   },
 
   methods: {
 
-    deletable(user) {
-      if (this.userRole === 'admin'){
-        return user.role != 'admin' || !this.lastAdmin
-      }
-      return false
-    },
+    // deletable(user) {
+    //   if (this.userRole === 'admin'){
+    //     return user.role != 'admin' || !this.lastAdmin
+    //   }
+    //   return false
+    // },
 
     async loadOrganization(){
       try{
@@ -96,7 +97,7 @@ export default {
     },
 
     findUserRole(){
-      this.userRole = this.users.find(user => user.user_id === (this.$store.state.user.id))?.role
+      this.currentUserRole = this.users.find(user => user.user_id === (this.$store.state.user.id))?.role
     },
 
     async deleteOrganization() {
