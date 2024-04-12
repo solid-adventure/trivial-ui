@@ -262,6 +262,7 @@ const store = createStore({
         let data = await Session.apiCall('/profile')
         commit('setTheme', data.user.color_theme)
         commit('setUser', data.user)
+        state.Permissions.load(state.user.id)
       } catch (e) {
         console.error('Failed to load profile', e)
         commit('setUser', {name: 'guest'})
@@ -277,7 +278,6 @@ const store = createStore({
       if ( ['Activity', 'Show App', 'Builder', 'Panels', 'Settings'].includes(routeName) ) {
         await dispatch('loadApp', { appId: router.currentRoute.value.params.id })
       }
-      await dispatch('loadPermissions')
     },
 
     async loadApps({ commit }) {
@@ -288,10 +288,6 @@ const store = createStore({
     async loadApp({ commit }, { appId }) {
       const app = await Session.apiCall(`/apps/${appId}`)
       await commit('setApp', app)
-    },
-
-    async loadPermissions({state, commit}) {
-      state.permits = state.Permissions.loadPermissions(state.user.id)
     },
 
     initApp({state, commit}, {appId}) {
