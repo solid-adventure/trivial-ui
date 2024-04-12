@@ -63,11 +63,11 @@ export default class Permissions {
         let appNames = permissions[ability]?.app_names;
         return appNames.includes(appName);
       } else {
-        throw new Error(`Ability - ${ability} not found in App permissions`);
+        console.error(`Ability: ${ability} not found in App permissions`);
         return false;
       }
     } catch (error) {
-      console.error("Error:", error);
+      console.error(error);
       return false;
     }
   }
@@ -83,11 +83,11 @@ export default class Permissions {
         }
         return false;
       } else {
-        throw new Error(`Ability - ${ability} not found in Org permissions`);
+        console.error(`Ability: ${ability} not found in Org permissions`);
         return false;
       }
     } catch (error) {
-      console.error("Error:", error);
+      console.error(error);
       return false;
     }
   }
