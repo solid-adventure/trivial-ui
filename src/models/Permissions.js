@@ -1,4 +1,3 @@
-import Session from "./Session";
 export default class Permissions {
 
   // Creating a Permissions instance:
@@ -24,7 +23,9 @@ export default class Permissions {
   // validateAppAbility() and validateOrgAbility() are called in can(). It's recommended to use can() to ensure
   // that you are committing an ability towards an available/appropriate model
 
-  constructor() {}
+  constructor(Session) {
+    this.Session = Session
+  }
 
   async load(userId) {
     try {
@@ -32,7 +33,7 @@ export default class Permissions {
       if (!this._userId) {
         throw new Error("User ID is required.");
       }
-      this._permissions = await Session.apiCall(
+      this._permissions = await this.Session.apiCall(
         `/users/${this._userId}/permissions`
       );
     } catch (error) {

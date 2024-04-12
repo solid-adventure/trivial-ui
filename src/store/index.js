@@ -43,7 +43,7 @@ const store = createStore({
     enableBuildApps: import.meta.env.VITE_ENABLE_BUILD_APPS,
     enableWebhookAppTrigger: import.meta.env.VITE_ENABLE_WEBHOOK_APP_TRIGGER,
     Session: Session,
-    Permissions: new Permissions(),
+    Permissions: new Permissions(Session),
   },
 
   getters: {
