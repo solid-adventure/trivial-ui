@@ -35,10 +35,20 @@
       Icon
     },
 
+    data(){
+      return {
+        canEdit: false
+      }
+    },
+
     computed: {
       editMode() {
         let p = new URLSearchParams(window.location.search)
-        return p.get('mode') == 'edit' && this.Permissions.can('update', 'App', {appName: this.app_id})
+        this.Permissions.can('update', 'App', {appName: this.app_id})
+        .then((res) => {
+          this.canEdit = res
+        })
+        return p.get('mode') == 'edit' && this.canEdit
       },
       ...mapState({
         Permissions: state => state.Permissions

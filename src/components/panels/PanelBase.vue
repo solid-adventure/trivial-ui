@@ -33,7 +33,7 @@
     },
 
     data() {
-      return this.intialData()
+      return this.initialData()
     },
 
     watch: {
@@ -68,7 +68,11 @@
 
       editMode() {
         let p = new URLSearchParams(window.location.search)
-        return p.get('mode') == 'edit' && this.Permissions.can('update', 'App', {appName: this.app_id})
+        this.Permissions.can('update', 'App', {appName: this.app_id})
+        .then((res) => {
+          this.canEdit = res
+        })
+        return p.get('mode') == 'edit' && this.canEdit
       },
 
       editUrl() {
@@ -168,7 +172,7 @@
         return out
       },
 
-      intialData() {
+      initialData() {
         return {
           chartOptions: {},
           errors: '',
@@ -183,11 +187,12 @@
           rows: [],
           columnNames: [],
           headlines: [{count: '-', title: 'Loading...'}],
+          canEdit: false
         }
       },
 
       resetState() {
-        Object.assign(this.$data, this.intialData())
+        Object.assign(this.$data, this.initialData())
       },
 
       async fetchData() {

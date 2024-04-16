@@ -63,7 +63,7 @@
               <RouterLink :to="`/apps/${app.name}/`">{{panelType(app)}}</RouterLink>
             </td>
             <td>{{lastRun(app)}}</td>
-            <td><RouterLink v-if= "Permissions.can('update', 'App', {appName:app.name})" :to="editLink(app)">Edit</RouterLink></td>
+            <td><RouterLink v-if= "app?.display" :to="editLink(app)">Edit</RouterLink></td>
             <!-- <td><a :href="`/apps/${app.name}/builder2`">Edit</a></td> -->
             <td colspan="2">
               <RouterLink :to="`/apps/${app.name}/activity`">
@@ -198,7 +198,8 @@
         sortAsc: true,
         chartType: 'hourly',
         searchTerm: '',
-        panelTypeFilter: null
+        panelTypeFilter: null,
+        shouldRenderEdit: false
         // panelTypeGroups: [
         //   {name: 'Dashboards', filter: 'Dashboard'},
         //   // {name: 'Workbooks', filter: 'Workbook'},
@@ -240,6 +241,7 @@
             .filter(app => app.panels)
             .filter(app => app.panels.component.toLowerCase() == this.panelTypeFilter.toLowerCase())
         }
+        this.setPermitsForApps(apps)
         return apps
 
       },
@@ -303,6 +305,15 @@
     },
 
     methods: {
+
+      setPermitsForApps(apps){
+        apps.map(app => {
+          return this.Permissions.can('update', 'App', { appName: app.name })
+            .then(res => {
+              app.display = res;
+            });
+        });   
+      },
 
       editLink(app) {
         if (app.panels && app.panels.component == 'Dashboard') {

@@ -35,7 +35,7 @@ export default class App {
     this.$store.commit('addApp', appInstance)
     await this.instantiateManifest(appInstance)
     Object.assign(this, appInstance)
-    await this.$store.state.Permissions.load()
+    await this.$store.state.Permissions.reload()
     return appInstance
   }
 
@@ -61,7 +61,7 @@ export default class App {
     }
     this.$store.state.Session.apiCall(`/apps/${this.name}`, 'DELETE')
     this.$store.commit('removeApp', {name: this.name})
-    await this.$store.state.Permissions.load()
+    await this.$store.state.Permissions.reload()
   }
 
   async removeCredentials() {

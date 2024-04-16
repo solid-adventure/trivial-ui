@@ -43,7 +43,7 @@ const store = createStore({
     enableBuildApps: import.meta.env.VITE_ENABLE_BUILD_APPS,
     enableWebhookAppTrigger: import.meta.env.VITE_ENABLE_WEBHOOK_APP_TRIGGER,
     Session: Session,
-    Permissions: new Permissions(Session),
+    Permissions: null
   },
 
   getters: {
@@ -208,6 +208,10 @@ const store = createStore({
       state.dataSample = dataSample
     },
 
+    initPermissions(state, user){
+      state.Permissions = new Permissions(Session, user)
+    },
+
     addListener(state, {event, listener}) {
       if (! (event in state.listeners)) {
         state.listeners[event] = []
@@ -262,7 +266,7 @@ const store = createStore({
         let data = await Session.apiCall('/profile')
         commit('setTheme', data.user.color_theme)
         commit('setUser', data.user)
-        state.Permissions.load(state.user.id)
+        commit('initPermissions', data.user)
       } catch (e) {
         console.error('Failed to load profile', e)
         commit('setUser', {name: 'guest'})

@@ -23,31 +23,44 @@ export default class Permissions {
   // validateAppAbility() and validateOrgAbility() are called in can(). It's recommended to use can() to ensure
   // that you are committing an ability towards an available/appropriate model
 
-  constructor(Session) {
+  constructor(Session, user) {
     this.Session = Session
-  }
-
-  async load(userId) {
-    try {
-      this._userId = userId || this._userId;
-      if (!this._userId) {
-        throw new Error("User ID is required.");
-      }
-      this._permissions = await this.Session.apiCall(
-        `/users/${this._userId}/permissions`
-      );
-    } catch (error) {
-      console.error("Error loading permissions:", error.message);
+    this._userId = user.id
+    if (!this._userId || !this.Session) {
+      throw new Error("User and Session is required.");
     }
   }
 
+  load() {
+    this._permissions = this._permissions || this.Session.apiCall(
+      `/users/${this._userId}/permissions`
+    );
+    return this._permissions
+  }
+
+  reload(){
+    this._permissions = this.Session.apiCall(
+        `/users/${this._userId}/permissions`
+      );
+  }
+
   can(ability, model, args) {
-    if (!this._permissions) {
+    return this.load().then((permissions) => {
+      return this.validate(permissions, ability, model, args)
+    })
+    .catch((error) => {
+      return false
+      console.error(error)
+    })
+  }
+
+  validate(permissions, ability, model, args){
+    if (!permissions) {
       console.error("Permissions have not been initialized.");
       return false;
     }
     if (model === "App") {
-      return this.validateAppAbility(this._permissions, ability, args);
+      return this.validateAppAbility(permissions, ability, args);
     } else if (model === "Org") {
       return this.validateOrgAbility(ability, args);
     } else {
@@ -56,12 +69,13 @@ export default class Permissions {
     }
   }
 
-  validateAppAbility(permissions, ability, { appName: appName }) {
+  validateAppAbility(permissions, ability, { appName: appName}) {
     try {
-      let abilities = ["destroy", "update", "grant", "transfer"];
+      let abilities = ['destroy', 'update', 'grant', 'transfer'];
       if (abilities.includes(ability)) {
         let appNames = permissions[ability]?.app_names;
-        return appNames.includes(appName);
+        let response = appNames.includes(appName);
+        return response
       } else {
         console.error(`Ability: ${ability} not found in App permissions`);
         return false;
