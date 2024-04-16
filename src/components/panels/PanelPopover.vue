@@ -28,6 +28,11 @@
       app_id: {
         type: String,
         required: true
+      },
+
+      can_update: {
+        type: Boolean,
+        required: true
       }
     },
 
@@ -44,11 +49,7 @@
     computed: {
       editMode() {
         let p = new URLSearchParams(window.location.search)
-        this.Permissions.can('update', 'App', {appName: this.app_id})
-        .then((res) => {
-          this.canEdit = res
-        })
-        return p.get('mode') == 'edit' && this.canEdit
+        return p.get('mode') == 'edit' && this.can_update
       },
       ...mapState({
         Permissions: state => state.Permissions

@@ -17,6 +17,12 @@
         type: String,
         required: false
       },
+      
+      can_update: {
+        type: Boolean, 
+        required: false
+      },
+
       options: {
         type: Object,
         required: false

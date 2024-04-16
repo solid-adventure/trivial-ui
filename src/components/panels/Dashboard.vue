@@ -21,13 +21,13 @@
      </div>
       <div class="panels-container">
         <div class="row" v-for="childApp in partialWidthPanels">
-          <component v-if="start_at && end_at" :is="childApp.component" :key="childApp.id" :app_id="childApp.id" :parent_app_id="app.name" :options="{start_at: start_at, end_at: end_at}" @set-selected-panel-values="setSelectedPanelValues"/>
+          <component v-if="start_at && end_at" :is="childApp.component" :key="childApp.id" :app_id="childApp.id" :parent_app_id="app.name" :can_update = "childApp.canUpdate" :options="{start_at: start_at, end_at: end_at}" @set-selected-panel-values="setSelectedPanelValues"/>
         </div>
       </div>
 
       <div class="full-width-panels-container">
         <div v-for="childApp in fullWidthPanels" class="full-width-panel-container">
-          <component v-if="start_at && end_at" :is="childApp.component" :key="childApp.id" :app_id="childApp.id" :parent_app_id="app.name" :options="{start_at: start_at, end_at: end_at}" @set-selected-panel-values="setSelectedPanelValues"/>
+          <component v-if="start_at && end_at" :is="childApp.component" :key="childApp.id" :app_id="childApp.id" :parent_app_id="app.name" :can_update = "childApp.canUpdate" :options="{start_at: start_at, end_at: end_at}" @set-selected-panel-values="setSelectedPanelValues"/>
         </div>
       </div>
  
@@ -104,7 +104,8 @@
           .map(app => {return {
             id: app.name,
             component: app.panels.component,
-            options: app.panels.options
+            options: app.panels.options,
+            canUpdate: app.canUpdate
             }
           })
           .filter(panel => this.panelIds.includes(panel.id))

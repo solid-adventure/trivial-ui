@@ -276,7 +276,7 @@ const store = createStore({
     async loadResources({ commit }, { dispatch, router }) {
       const routeName = router.currentRoute.value.name
       if ( ['PanelType', 'Show App'].includes(routeName) ) {
-        await dispatch('loadApps')
+        await dispatch('loadApps', {dispatch})
       }
 
       if ( ['Activity', 'Show App', 'Builder', 'Panels', 'Settings'].includes(routeName) ) {
@@ -284,9 +284,19 @@ const store = createStore({
       }
     },
 
-    async loadApps({ commit }) {
+    async loadApps({ commit }, {dispatch}) {
       const apps = await Session.apiCall('/apps')
       await commit('setApps', apps)
+      await dispatch('setAppPermits')
+    },
+    
+    async setAppPermits({state}){
+      state.apps.map(app => {
+        return state.Permissions.can('update', 'App', { appName: app.name })
+          .then(res => {
+            app.canUpdate = res;
+          });
+      });
     },
 
     async loadApp({ commit }, { appId }) {

@@ -25,7 +25,7 @@ export default class Permissions {
 
   constructor(Session, user) {
     this.Session = Session
-    this._userId = user.id
+    this._userId = user?.id
     if (!this._userId || !this.Session) {
       throw new Error("User and Session is required.");
     }
