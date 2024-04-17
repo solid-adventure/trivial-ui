@@ -40,12 +40,6 @@
       Icon
     },
 
-    data(){
-      return {
-        canEdit: false
-      }
-    },
-
     computed: {
       editMode() {
         let p = new URLSearchParams(window.location.search)

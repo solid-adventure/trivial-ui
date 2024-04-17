@@ -280,30 +280,31 @@ const store = createStore({
       }
 
       if ( ['Activity', 'Show App', 'Builder', 'Panels', 'Settings'].includes(routeName) ) {
-        await dispatch('loadApp', { appId: router.currentRoute.value.params.id })
+        await dispatch('loadApp', { dispatch, appId: router.currentRoute.value.params.id })
       }
     },
 
-    async loadApps({ commit }, {dispatch}) {
+    async loadApps({ commit, state }, {dispatch}) {
       const apps = await Session.apiCall('/apps')
       await commit('setApps', apps)
-      await dispatch('setAppPermits')
+      await dispatch('setAppPermits', state.apps)
     },
-    
-    async setAppPermits({state}){
-      state.apps.map(app => {
+
+    async loadApp({ commit, state }, { dispatch, appId }) {
+      const app = await Session.apiCall(`/apps/${appId}`)
+      await commit('setApp', app)
+      await dispatch('setAppPermits', [state.app])
+    },
+
+    async setAppPermits({state}, apps){
+      apps.map(app => {
         return state.Permissions.can('update', 'App', { appName: app.name })
           .then(res => {
             app.canUpdate = res;
           });
       });
     },
-
-    async loadApp({ commit }, { appId }) {
-      const app = await Session.apiCall(`/apps/${appId}`)
-      await commit('setApp', app)
-    },
-
+    
     initApp({state, commit}, {appId}) {
       if(state.app !== {}){
         state.app = {}

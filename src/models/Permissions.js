@@ -38,10 +38,8 @@ export default class Permissions {
     return this._permissions
   }
 
-  reload(){
-    this._permissions = this.Session.apiCall(
-        `/users/${this._userId}/permissions`
-      );
+  reset(){
+    this._permissions = null
   }
 
   can(ability, model, args) {

@@ -25,7 +25,7 @@
 <!--             <td>{{ user.invitation_status }}</td>
             <td>{{ user.date_added }}</td>
  -->            <td>
-              <a v-if="Permissions.can('removeMember', 'Org', {memberRole: user.role, userRole: currentUserRole, lastAdmin: lastAdmin })" href="#" @click="removeUser(user)"><Icon icon="trash"></Icon></a>
+              <a v-if="user.canBeRemoved" href="#" @click="removeUser(user)"><Icon icon="trash"></Icon></a>
             </td>
           </tr>
         </tbody>
@@ -51,8 +51,10 @@ export default {
     }
   },
 
-  created(){
-    this.loadOrganization()
+  async created(){
+    await this.loadOrganization()
+    this.findUserRole()
+    this.setOrgPermits()
   },
 
   components: {
@@ -82,11 +84,19 @@ export default {
       try{
         this.organization = await this.$store.state.Session.apiCall(`/organizations/${this.orgId}`)
         this.users.push(...this.organization.users)
-        this.findUserRole()
       } catch(error){
         // TODO these should all print to the UI, not the console
         console.error('[OrganizationSettings][loadOrganization] Error:', error)
       }
+    },
+
+    setOrgPermits(){
+      this.users.map(user => {
+        return this.$store.state.Permissions.can('removeMember', 'Org', {memberRole: user.role, userRole: this.currentUserRole, lastAdmin: this.lastAdmin })
+          .then(res => {
+            user.canBeRemoved = res;
+          });
+      });
     },
 
     findUserRole(){

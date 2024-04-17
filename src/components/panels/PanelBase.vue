@@ -17,7 +17,7 @@
         type: String,
         required: false
       },
-      
+
       can_update: {
         type: Boolean, 
         required: false
@@ -72,13 +72,9 @@
         return this.app_id == url_app_id
       },
 
-      editMode() {
+      editMode(can_update) {
         let p = new URLSearchParams(window.location.search)
-        this.Permissions.can('update', 'App', {appName: this.app_id})
-        .then((res) => {
-          this.canEdit = res
-        })
-        return p.get('mode') == 'edit' && this.canEdit
+        return p.get('mode') == 'edit' && this.app.canUpdate
       },
 
       editUrl() {
@@ -155,7 +151,7 @@
       },
 
       ...mapState([
-        'apps', 'user', 'Permissions'])
+        'apps', 'user', 'Permissions', 'app'])
 
     },
 
@@ -193,7 +189,7 @@
           rows: [],
           columnNames: [],
           headlines: [{count: '-', title: 'Loading...'}],
-          canEdit: false
+          canUpdate: false
         }
       },
 
