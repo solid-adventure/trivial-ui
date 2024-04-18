@@ -169,7 +169,7 @@ describe("Permissions", () => {
     it("should throw an error if appropriate args are not set for validating org abilities", () => {
       try {
         permissions.validateOrgAbility("removeMember", {memberRole: undefined, userRole: undefined, lastAdmin: undefined});
-        expectt.fail("Validation for args fail did not pass");
+        expectt.fail("Validation for org args fail did not pass");
       } catch (error) {
         expect(error.message).to.equal("memberRole, userRole, and lastAdmin are required in args");
       }
@@ -177,7 +177,7 @@ describe("Permissions", () => {
     it("should throw an error if appropriate args are not set for validating app abilities", () => {
       try {
         permissions.validateAppAbility(mockPermissionsResponse, "update", {appName: undefined});
-        expectt.fail("Validation for args fail did not pass");
+        expectt.fail("Validation for app args fail did not pass");
       } catch (error) {
         expect(error.message).to.equal("appName is required in args");
       }
