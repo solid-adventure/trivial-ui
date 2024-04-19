@@ -82,6 +82,7 @@ export default {
             this.delayTransferIndicator(resolve);
           });
           this.transfer_error = true;
+          console.error(error)
         }
       }
     },

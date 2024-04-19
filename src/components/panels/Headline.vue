@@ -1,7 +1,7 @@
 <template>
   <div class="panel" :class="{standalone: standAlone}">
     <div class="panel-inner">
-      <PanelPopover :app_id="app_id" :parent_app_id="parent_app_id" />
+      <PanelPopover :app_id="app_id" :parent_app_id="parent_app_id" :can_update = "can_update" />
       <h2 v-if="cascadingTitle">{{cascadingTitle}}</h2>
       <p v-if="cascadingDescription">{{cascadingDescription}}</p>
       <h1>

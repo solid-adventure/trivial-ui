@@ -25,7 +25,7 @@
 <!--             <td>{{ user.invitation_status }}</td>
             <td>{{ user.date_added }}</td>
  -->            <td>
-              <a v-if="deletable(user)" href="#" @click="removeUser(user)"><Icon icon="trash"></Icon></a>
+              <a v-if="user.canBeRemoved" href="#" @click="removeUser(user)"><Icon icon="trash"></Icon></a>
             </td>
           </tr>
         </tbody>
@@ -38,7 +38,7 @@
 <script>
 
 import Icon from './Icon.vue'
-
+import { mapState } from "vuex";
 export default {
 
   data(){
@@ -51,8 +51,10 @@ export default {
     }
   },
 
-  created(){
-    this.loadOrganization()
+  async created(){
+    await this.loadOrganization()
+    this.findUserRole()
+    this.setOrgPermits()
   },
 
   components: {
@@ -73,13 +75,10 @@ export default {
       return this.users.length === 1
     },
 
+    ...mapState(['Permissions'])
   },
 
   methods: {
-
-    deletable(user) {
-      return user.role != 'admin' || !this.lastAdmin
-    },
 
     async loadOrganization(){
       try{
@@ -89,6 +88,19 @@ export default {
         // TODO these should all print to the UI, not the console
         console.error('[OrganizationSettings][loadOrganization] Error:', error)
       }
+    },
+
+    setOrgPermits(){
+      this.users.map(user => {
+        return this.$store.state.Permissions.can('removeMember', 'Org', {memberRole: user.role, userRole: this.currentUserRole, lastAdmin: this.lastAdmin })
+          .then(res => {
+            user.canBeRemoved = res;
+          });
+      });
+    },
+
+    findUserRole(){
+      this.currentUserRole = this.users.find(user => user.user_id === (this.$store.state.user.id))?.role
     },
 
     async deleteOrganization() {

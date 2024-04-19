@@ -63,7 +63,7 @@
               <RouterLink :to="`/apps/${app.name}/`">{{panelType(app)}}</RouterLink>
             </td>
             <td>{{lastRun(app)}}</td>
-            <td><RouterLink :to="editLink(app)">Edit</RouterLink></td>
+            <td><RouterLink v-if= "app?.canUpdate" :to="editLink(app)">Edit</RouterLink></td>
             <!-- <td><a :href="`/apps/${app.name}/builder2`">Edit</a></td> -->
             <td colspan="2">
               <RouterLink :to="`/apps/${app.name}/activity`">
@@ -198,7 +198,7 @@
         sortAsc: true,
         chartType: 'hourly',
         searchTerm: '',
-        panelTypeFilter: null
+        panelTypeFilter: null,
         // panelTypeGroups: [
         //   {name: 'Dashboards', filter: 'Dashboard'},
         //   // {name: 'Workbooks', filter: 'Workbook'},
@@ -294,10 +294,11 @@
         return `${this.titleizedAppFilter}s`
       },
 
-      ...mapState([
-        'apps',
-        'appsLoaded'
-      ])
+      ...mapState({
+        apps: state => state.apps,
+        appsLoaded: state => state.appsLoaded,
+        Permissions: state => state.Permissions
+      })
 
     },
 

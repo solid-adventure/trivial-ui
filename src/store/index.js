@@ -7,6 +7,7 @@ import FeatureManager from 'trivial-core/lib/FeatureManager'
 import ActionPath from 'trivial-core/lib/actionsv2/ActionPath'
 import router from '../router'
 import Session from '../models/Session'
+import Permissions from '../models/Permissions'
 
 const store = createStore({
 
@@ -42,6 +43,7 @@ const store = createStore({
     enableBuildApps: import.meta.env.VITE_ENABLE_BUILD_APPS,
     enableWebhookAppTrigger: import.meta.env.VITE_ENABLE_WEBHOOK_APP_TRIGGER,
     Session: Session,
+    Permissions: null
   },
 
   getters: {
@@ -206,6 +208,10 @@ const store = createStore({
       state.dataSample = dataSample
     },
 
+    initPermissions(state, user){
+      state.Permissions = new Permissions(Session, user)
+    },
+
     addListener(state, {event, listener}) {
       if (! (event in state.listeners)) {
         state.listeners[event] = []
@@ -260,6 +266,7 @@ const store = createStore({
         let data = await Session.apiCall('/profile')
         commit('setTheme', data.user.color_theme)
         commit('setUser', data.user)
+        commit('initPermissions', data.user)
       } catch (e) {
         console.error('Failed to load profile', e)
         commit('setUser', {name: 'guest'})
@@ -269,24 +276,35 @@ const store = createStore({
     async loadResources({ commit }, { dispatch, router }) {
       const routeName = router.currentRoute.value.name
       if ( ['PanelType', 'Show App'].includes(routeName) ) {
-        await dispatch('loadApps')
+        await dispatch('loadApps', {dispatch})
       }
 
       if ( ['Activity', 'Show App', 'Builder', 'Panels', 'Settings'].includes(routeName) ) {
-        await dispatch('loadApp', { appId: router.currentRoute.value.params.id })
+        await dispatch('loadApp', { dispatch, appId: router.currentRoute.value.params.id })
       }
     },
 
-    async loadApps({ commit }) {
+    async loadApps({ commit, state }, {dispatch}) {
       const apps = await Session.apiCall('/apps')
       await commit('setApps', apps)
+      await dispatch('setAppPermits', state.apps)
     },
 
-    async loadApp({ commit }, { appId }) {
+    async loadApp({ commit, state }, { dispatch, appId }) {
       const app = await Session.apiCall(`/apps/${appId}`)
       await commit('setApp', app)
+      await dispatch('setAppPermits', [state.app])
     },
 
+    async setAppPermits({state}, apps){
+      apps.map(app => {
+        return state.Permissions.can('update', 'App', { appName: app.name })
+          .then(res => {
+            app.canUpdate = res;
+          });
+      });
+    },
+    
     initApp({state, commit}, {appId}) {
       if(state.app !== {}){
         state.app = {}

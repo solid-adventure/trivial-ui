@@ -17,6 +17,12 @@
         type: String,
         required: false
       },
+
+      can_update: {
+        type: Boolean, 
+        required: false
+      },
+
       options: {
         type: Object,
         required: false
@@ -33,7 +39,7 @@
     },
 
     data() {
-      return this.intialData()
+      return this.initialData()
     },
 
     watch: {
@@ -68,7 +74,7 @@
 
       editMode() {
         let p = new URLSearchParams(window.location.search)
-        return p.get('mode') == 'edit' 
+        return p.get('mode') == 'edit' && this.app.canUpdate
       },
 
       editUrl() {
@@ -145,7 +151,7 @@
       },
 
       ...mapState([
-        'apps', 'user'])
+        'apps', 'user', 'Permissions', 'app'])
 
     },
 
@@ -168,7 +174,7 @@
         return out
       },
 
-      intialData() {
+      initialData() {
         return {
           chartOptions: {},
           errors: '',
@@ -183,11 +189,12 @@
           rows: [],
           columnNames: [],
           headlines: [{count: '-', title: 'Loading...'}],
+          canUpdate: false
         }
       },
 
       resetState() {
-        Object.assign(this.$data, this.intialData())
+        Object.assign(this.$data, this.initialData())
       },
 
       async fetchData() {
