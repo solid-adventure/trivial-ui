@@ -199,7 +199,6 @@
         chartType: 'hourly',
         searchTerm: '',
         panelTypeFilter: null,
-        shouldRenderEdit: false
         // panelTypeGroups: [
         //   {name: 'Dashboards', filter: 'Dashboard'},
         //   // {name: 'Workbooks', filter: 'Workbook'},
