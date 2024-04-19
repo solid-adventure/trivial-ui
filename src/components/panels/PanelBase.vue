@@ -72,7 +72,7 @@
         return this.app_id == url_app_id
       },
 
-      editMode(can_update) {
+      editMode() {
         let p = new URLSearchParams(window.location.search)
         return p.get('mode') == 'edit' && this.app.canUpdate
       },
