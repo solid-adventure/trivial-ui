@@ -19,6 +19,7 @@
         selectedValue: null,
         comperators: ['<', '>', '<=', '>=', '=', '<>', '!='],
         predicates: ['IS NULL','IS NOT NULL','IS TRUE','IS FALSE'],
+        isLoadingFilterKeys: false
         // The API also supports 'IS NOT TRUE', 'IS NOT FALSE'
         // Technically these could produce results, but they *feel* redundant, and aren't expected to be necesssary
       }
@@ -39,7 +40,11 @@
       },
 
       selectedFilter: async function (newVal) {
-        this.selectFilterKeys = await this.searchFilter.getFilterKeys(newVal)
+        if (Object.keys(newVal).length !== 0){
+          this.isLoadingFilterKeys = true
+          this.selectFilterKeys = await this.searchFilter.getFilterKeys(newVal)
+          setTimeout(() => { this.isLoadingFilterKeys = false }, 1000)
+        }
       }
 
     },
@@ -138,16 +143,19 @@
         </div>
 
 
-        <!-- If filter requires key  -->
-        <div class="row-column" v-if="selectedFilterRequiresKey">
-          <p><label for="filter-key">Key</label></p>
-          <select v-model="selectedKey" class="filter-row">
-            <option v-for="key of selectFilterKeys" type="text" id="filter-key" name="filter-key" placeholder="Filter Key">
-              {{ key }}
-            </option>
-          </select>
-
-
+        <div class ="row-column" v-if ="isLoadingFilterKeys">
+          <p>Loading keys...</p>
+        </div>
+        <div v-else>
+          <!-- If filter requires key  -->
+          <div class="row-column" v-if="selectedFilterRequiresKey">
+            <p><label for="filter-key">Key</label></p>
+            <select v-model="selectedKey" class="filter-row">
+              <option v-for="key of selectFilterKeys" type="text" id="filter-key" name="filter-key" placeholder="Filter Key">
+                {{ key }}
+              </option>
+            </select>
+          </div>
         </div>
 
 
