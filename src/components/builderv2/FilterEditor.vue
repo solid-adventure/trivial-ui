@@ -40,9 +40,11 @@
       },
 
       selectedFilter: async function (newVal) {
-        this.isLoadingFilterKeys = true
-        this.selectFilterKeys = await this.searchFilter.getFilterKeys(newVal)
-        this.isLoadingFilterKeys = false
+        if (Object.keys(newVal).length !== 0){
+          this.isLoadingFilterKeys = true
+          this.selectFilterKeys = await this.searchFilter.getFilterKeys(newVal)
+          setTimeout(() => { this.isLoadingFilterKeys = false }, 1000)
+        }
       }
 
     },
