@@ -1,16 +1,14 @@
 <template>
-  <div class="Breadcrumb">
-    <span v-for="(breadcrumb, i) in breadcrumbs"
-      >{{ `${i > 0 ? " > " : ""}` }}
-      <RouterLink v-if="i < breadcrumbs.length - 1" class="littleBreadcrumb" :to="breadcrumb.link">{{ `${breadcrumb.display}` }}</RouterLink>
-      <a v-else><strong class="lastBreadcrumb">{{ `${breadcrumb.display}` }}</strong></a>
-      </span
-    >
+  <div class="breadcrumbs">
+    <span v-for="(breadcrumb, i) in breadcrumbs" :key="i" class="breadcrumb">
+      <span v-if="i > 0" class="delimiter">/</span>
+      <RouterLink :to="breadcrumb.link" class="item" :class="{ 'item__last': !(i < breadcrumbs.length - 1) }">{{ breadcrumb.display }}</RouterLink>
+    </span>
   </div>
 </template>
 
 <style lang="scss" scoped>
-.Breadcrumb {
+/*.Breadcrumb {
   background-color: var(--super-bar-background);
   color: var(--on-primary-darker);
   font-size: 1em;
@@ -36,16 +34,11 @@
   a {
     color: var(--on-primary-darker);
   }
-}
+}*/
 </style>
 
 <script>
-export default {
-  data() {
-    return {};
-  },
-  props: ["breadcrumbs"],
-
-  methods: {},
-};
+  export default {
+    props: ["breadcrumbs"]
+  }
 </script>

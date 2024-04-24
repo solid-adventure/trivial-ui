@@ -1,34 +1,42 @@
 <template>
-  <div id="app" v-if="!loading">
-    <!-- Navbar, sidebar, or other common components can be placed here -->
-    <header v-if="this.$store.state.isAuthenticated">
-      <SuperBar />
-      <Breadcrumb :breadcrumbs="breadcrumbs" />
-    </header>
+  <!-- Navbar, sidebar, or other common components can be placed here -->
+  <!--<header v-if="this.$store.state.isAuthenticated">
+    <SuperBar />
+    <Breadcrumb :breadcrumbs="breadcrumbs" />
+  </header>-->
 
-    <!-- Main content area where router views are rendered -->
-    <main>
-      <router-view :key="$route.fullPath" class="clearSuperbar"></router-view>
-    </main>
+  <!-- Main content area where router views are rendered -->
+  <main class="wrapper">
+    <template v-if="this.$store.state.isAuthenticated">
+      <TheHeader :title="currentHeaderTitle" :breadcrumbs="breadcrumbs" />
+      <TheMenu />
+    </template>
 
-    <!-- Common footer for the app -->
-    <footer>
-      <!-- Footer content -->
-    </footer>
-  </div>
+    <router-view :key="$route.fullPath"></router-view>
+    <!--<router-view :key="$route.fullPath" class="clearSuperbar"></router-view>-->
+  </main>
+
+  <!-- Common footer for the app -->
+  <!--<footer>
+     Footer content
+  </footer>-->
 </template>
 
 <script>
-import SuperBar from "../components/SuperBar.vue";
+//import SuperBar from "../components/SuperBar.vue";
 import router from "../router";
 import store from "../store";
-import Breadcrumb from "./Breadcrumb.vue";
+//import Breadcrumb from "./Breadcrumb.vue";
+import TheMenu from "./aside/TheMenu.vue";
+import TheHeader from "./header/TheHeader.vue";
 
 export default {
   name: "App",
   components: {
-    SuperBar,
-    Breadcrumb,
+    //SuperBar,
+    //Breadcrumb,
+    TheMenu,
+    TheHeader
   },
   data() {
     return {
@@ -52,6 +60,10 @@ export default {
     currentRouteName() {
       return this.$route.fullPath;
     },
+
+    currentHeaderTitle() {
+      return this.$route.params.paneltype || this.$route.name;
+    }
   },
   provide() {
     return { ...(this.lastVars ?? {}) };
