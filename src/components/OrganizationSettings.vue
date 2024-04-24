@@ -3,7 +3,7 @@
 
     <div class="page-inset">
       <h2>{{ organization.name }} | Users And Roles</h2>
-      <div class="action-row">
+      <div class="action-row" v-if = "currentUserRole === 'admin'">
         <RouterLink :to="newInvitationPath" class="button-medium">Add New User</RouterLink>
       </div>
       <table class="spaced organization-users">

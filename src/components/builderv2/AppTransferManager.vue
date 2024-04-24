@@ -77,6 +77,8 @@ export default {
             owner_type: new_owner_type,
             owner_id: new_owner_id,
           });
+          await this.$store.state.Permissions.reset()
+          this.$store.dispatch("setAppPermits", [this.$store.state.app])
         } catch (error) {
           await new Promise((resolve) => {
             this.delayTransferIndicator(resolve);

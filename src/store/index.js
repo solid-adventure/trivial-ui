@@ -297,12 +297,11 @@ const store = createStore({
     },
 
     async setAppPermits({state}, apps){
-      apps.map(app => {
-        return state.Permissions.can('update', 'App', { appName: app.name })
-          .then(res => {
-            app.canUpdate = res;
-          });
-      });
+      await Promise.all(apps.map(async (app) => {
+        app.canUpdate = await state.Permissions.can('update', 'App', { appName: app.name });
+        app.canTransfer = await state.Permissions.can('transfer', 'App', { appName: app.name });
+        app.canDestroy = await state.Permissions.can('destroy', 'App', { appName: app.name });
+      }));
     },
     
     initApp({state, commit}, {appId}) {

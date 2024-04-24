@@ -282,6 +282,7 @@ export default {
           class="build"
           @update:dirty="buildDirty = $event"
           @update:buildInProgress="buildInProgress = $event"
+          v-if = "app.canUpdate"
         ></BuildButton>
       </div>
       <div class="notice-holder">
