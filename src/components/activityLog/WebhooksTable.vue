@@ -117,14 +117,14 @@
         }
 
         &:hover {
-          background-color: var(--on-background-20); 
+          background-color: var(--surface);
+          border: 1px solid var(--on-surface);
           cursor: pointer;
         }
 
 
         &.selected {
-          background-color: var(--accent);
-          color: var(--on-accent);
+          background-color: var(--surface);
         }
 
       }
@@ -161,7 +161,7 @@
     border-bottom: 1px solid var(--on-background-40);
     top: 120px;
     position: sticky;
-    background-color: var(--background);
+    background-color: var(--clr-bg);
     z-index: 2;
   }
 

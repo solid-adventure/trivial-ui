@@ -29,11 +29,11 @@
     cursor: pointer;
     background-color: transparent;
     .icon {
-      fill: var(--link);
+      fill: var(--on-surface);
     }
     .message {
-      background: var(--tool-tip-background);
-      color: var(--tool-tip-color);
+      background: var(--surface);
+      color: var(--on-surface);
       box-shadow: 2px 2px 2px rgba(0, 0, 0, .4);
       white-space: nowrap;
       position: absolute;

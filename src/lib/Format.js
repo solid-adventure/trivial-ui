@@ -12,7 +12,35 @@ export default class Format {
     return isNaN(out) ? token : out
   }
 
+  static currencySymbolConversions(str) {
+    let conversions = {
+      "USD": "$",
+      "GBP": "£",
+      "CAD": "$",
+
+      // These need to be tested before uncommenting. EUR in particular needs commas and periods swapped
+      // "EUR": "€",
+      // "JPY": "¥",
+      // "AUD": "$",
+      // "CNY": "¥",
+      // "CHF": "Fr",
+      // "SEK": "kr",
+      // "NZD": "$",
+      // "KRW": "₩",
+      // "SGD": "$",
+      // "NOK": "kr",
+      // "MXN": "$",
+      // "INR": "₹",
+      // "RUB": "₽",
+      // "ZAR": "R",
+      // "TRY": "₺",
+      // "BRL": "R$"
+    }
+    return conversions[str] || str
+  }
+
   static money(token=null, places=2, symbol='$') {
+    symbol = this.currencySymbolConversions(symbol)
     token = this.sanitize(token)
     if (token == null) { return '' }
     if (isNaN(token)) { return token }

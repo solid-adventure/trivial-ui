@@ -289,8 +289,8 @@
 
     padding: 0;
     margin: 0;
-    background-color: transparent;
-    color: var(--on-surface);
+    // background-color: var(--surface);
+    // color: var(--on-surface);
     min-height: 5em;
     position: relative;
     border-radius: 0px;
@@ -313,8 +313,8 @@
     li {
       margin: 12px 0;
       padding: 0 0 0 1em;
-      background-color: var(--surface-secondary);
-      color: var(--on-surface-secondary);
+      background-color: var(--surface);
+      color: var(--on-surface);
       position: relative;
       z-index: 2;
       border-radius: 0px;
@@ -330,11 +330,6 @@
 
       a.description {
         color: var(--on-background);
-      }
-
-      &.inserting, &.inserting a {
-        background-color: var(--accent);
-        color: var(--on-accent);
       }
 
       img.grabby-dots {

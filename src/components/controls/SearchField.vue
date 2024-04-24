@@ -34,8 +34,6 @@
 	    width: 30em;
 	    height: 4em;
 	    border-radius: 1em;
-	    background-color: var(--background-high-contrast);
-	    color: var(--on-background);
 	    position: relative;
 
 	    input {
@@ -52,6 +50,7 @@
 	      color: inherit;
 	      border: 1px solid var(--background-80);
 	      border-radius: 1em;
+	      background-color: var(--clr-bg);
 
 	      &::placeholder {
 	        color: inherit;

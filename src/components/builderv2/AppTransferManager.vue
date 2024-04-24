@@ -135,10 +135,10 @@ export default {
               <span>Current Owner</span>
             </div>
             <div v-else class="new-button-container">
-              <a
+              <button
                 class="button-small"
                 @click="transferApp('Organization', org.id, org.name)"
-                >Transfer</a
+                >Transfer</button
               >
             </div>
           </td>
@@ -158,7 +158,7 @@ export default {
   width: 100%;
 }
 .active {
-  background-color: var(--table-column-head-color);
+  background-color: var(--background);
 }
 table.user-organizations {
   width: 100%;

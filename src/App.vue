@@ -1,57 +1,50 @@
 <template>
-  <div id="app" v-if="!loading">
-    <!-- Navbar, sidebar, or other common components can be placed here -->
-    <header v-if="this.$store.state.isAuthenticated">
-      <SuperBar />
-      <Breadcrumb :breadcrumbs="breadcrumbs" />
-    </header>
+  <main class="wrapper">
+    <template v-if="this.$store.state.isAuthenticated">
+      <TheHeader :title="currentHeaderTitle" :breadcrumbs="breadcrumbs" />
+      <TheMenu />
+    </template>
 
-    <!-- Main content area where router views are rendered -->
-    <main>
-      <router-view :key="$route.fullPath" class="clearSuperbar"></router-view>
-    </main>
-
-    <!-- Common footer for the app -->
-    <footer>
-      <!-- Footer content -->
-    </footer>
-  </div>
+    <div class="wrapper__content">
+      <Toast />
+      <Suspense>
+        <template #default>
+          <router-view :key="$route.fullPath"></router-view>
+        </template>
+        <template #fallback>
+          Loading
+        </template>
+      </Suspense>
+    </div>
+  </main>
 </template>
 
 <script>
-import SuperBar from "../components/SuperBar.vue";
-import router from "../router";
-import store from "../store";
-import Breadcrumb from "./Breadcrumb.vue";
+import router from "./router";
+import store from "./store";
+import TheMenu from "@/components/aside/TheMenu.vue";
+import TheHeader from "@/components/header/TheHeader.vue";
 
 export default {
   name: "App",
   components: {
-    SuperBar,
-    Breadcrumb,
+    TheMenu,
+    TheHeader
   },
   data() {
     return {
       lastVars: null,
-      breadcrumbs: [],
-      loading: true,
+      breadcrumbs: []
     };
-  },
-  created() {
-    if (store.state.theme === "Dark") {
-      import('/src/assets/stylesheets/app.scss');
-    } else {
-      import('/src/assets/stylesheets/app-light.scss');
-    }
-    // Don't love this, but it's a quick fix for now and prevents FOUC
-    window.setTimeout(() => {
-      this.loading = false;
-    }, 300);
   },
   computed: {
     currentRouteName() {
       return this.$route.fullPath;
     },
+
+    currentHeaderTitle() {
+      return this.$route.params.paneltype || this.$route.name;
+    }
   },
   provide() {
     return { ...(this.lastVars ?? {}) };
@@ -138,11 +131,3 @@ export default {
   },
 };
 </script>
-
-<style lang="scss" scoped>
-.clearSuperBar {
-  margin-top: 80px;
-}
-
-/* global styles go here */
-</style>

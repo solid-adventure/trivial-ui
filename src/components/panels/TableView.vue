@@ -785,14 +785,14 @@
     }
 
     .invisible, {
-      background-color: var(--background);
-      color: var(--background);
+      background-color: var(--clr-bg);
+      color: var(--clr-bg);
 
       th {
-         background-color: var(--background);
-         border-left-color: var(--background);
-         border-right-color: var(--background);
-         border-top-color: var(--background);
+         background-color: var(--clr-bg);
+         border-left-color: var(--clr-bg);
+         border-right-color: var(--clr-bg);
+         border-top-color: var(--clr-bg);
        }
 
     }
@@ -800,7 +800,7 @@
     .summary-bar-backer {
       position: sticky;
       top: 120px;
-      background-color: var(--background);
+      background-color: var(--clr-bg);
     }
 
     .summary-bar {

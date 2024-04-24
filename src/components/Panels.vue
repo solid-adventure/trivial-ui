@@ -8,21 +8,21 @@
 <style lang="scss" scoped>
 
   .panels {
-    position: absolute;
+    /*position: absolute;
     width: 100%;
-    top: 120px; /* clear the SuperBar*/
+    top: 120px; /* clear the SuperBar*
     padding: 0;
     margin: 0;
     height: calc(100% - 80px);
-    z-index: 10;
+    z-index: 10;*/
 
     div.loading {
-      position: absolute;
+      //position: absolute;
       width: 100%;
-      height: 100%;
-      top: -120px;
-      left: 0;
-      background: #fff;
+      height: 100dvh;
+      //top: -120px;
+      //left: 0;
+      background-color: var(--surface);
       display: flex;
       justify-content: center;
       align-items: center;

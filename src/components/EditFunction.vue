@@ -57,7 +57,7 @@
 
     div.success-row {
       color: var(--success-highlight);
-      background-color: var(--background);
+      background-color: var(--clr-bg);
       border-radius: 6px;
       padding: 1em;
       display: flex;

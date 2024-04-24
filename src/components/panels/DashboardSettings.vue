@@ -176,12 +176,12 @@ p {
 }
 
 label {
-  color: var(--on-background);
+  color: var(--on-surface);
 }
 
 em {
   display: block;
-  color: var(--on-background-40);
+  color: var(--on-surface);
 }
 
 input, select {
@@ -192,21 +192,22 @@ input, select {
 .dashboard-settings-container {
   position: fixed;
   top: 120px;
-  left: 0;
-  background: var(--background);
-  color: var(--on-background);
+  left: 50%;
+  background: var(--surface);
+  color: var(--on-surface);
   padding: 2em;
   height: calc(100% - 80px - 4em);
   z-index: 10;
   max-width: 24em;
-  box-shadow: 6px 0px 5px 0px var(--on-background-20);
-  -webkit-box-shadow: 6px 0px 5px 0px var(--on-background-20);
-  -moz-box-shadow: 6px 0px 5px 0px var(--on-background-20);
+  box-shadow: 6px 0px 5px 0px var(--surface);
+  -webkit-box-shadow: 6px 0px 5px 0px var(--surface);
+  -moz-box-shadow: 6px 0px 5px 0px var(--surface);
 
   .close {
     position: absolute;
     top: 1em;
     right: 1em;
+    color: var(--on-surface);
   }
 
   .saving-status {
@@ -223,6 +224,10 @@ input, select {
   .advanced-settings {
     position: absolute;
     bottom: 4em;
+
+    & a {
+      color: var(--on-surface);
+    }
   }
 
 }

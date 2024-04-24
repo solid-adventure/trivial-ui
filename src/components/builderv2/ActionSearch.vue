@@ -215,8 +215,8 @@
         row-gap: 2px;
 
         .search-field {
-          background-color: var(--background-high-contrast);
-          color: var(--on-background);
+          background-color: var(--surface);
+          color: var(--on-surface);
           position: relative;
 
           .search-icon {
@@ -244,8 +244,8 @@
           margin: 0;
           padding: 1em;
           list-style: none;
-          background-color: var(--background-high-contrast);
-          color: var(--on-background);
+          background-color: var(--surface);
+          color: var(--on-surface);
           box-sizing: border-box;
           max-height: calc(19em - 2px);
           overflow: auto;
@@ -253,8 +253,8 @@
       }
 
       .action-inspector {
-        background-color: var(--background-high-contrast);
-        color: var(--on-background);
+        background-color: var(--surface);
+        color: var(--on-surface);
         overflow: auto;
         padding: 2em;
 

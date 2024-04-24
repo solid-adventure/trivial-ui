@@ -1,19 +1,15 @@
+<!DOCTYPE html>
 <html>
-<head>
-  <link rel="shortcut icon" href="/src/assets/images/favicon.png" type="image/png" />
+  <head>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/png" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  	<title>Trivial Dashboard</title>
-</head>
+    <link id="theme-link" rel="stylesheet" href="/public/assets/primevue-themes/aura-dark-blue/theme.css" id="theme-link" />
+    <title>Trivial Dashboard</title>
+  </head>
 
-<body>
-  <script type="text/javascript">
-    // CONTAINER_INJECTION_TARGET
-  </script>
-  <div id="app">
-    <router-view></router-view>
-  </div>
-</body>
-
-<script type="module" src="/src/packs/Index.js"></script>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
 </html>

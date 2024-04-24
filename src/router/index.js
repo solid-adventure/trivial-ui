@@ -17,6 +17,7 @@ import OrganizationSettings from "../components/OrganizationSettings.vue";
 import OrganizationInviteUser from "../components/OrganizationInviteUser.vue";
 import Actions from "../components/Actions.vue";
 import FunctionWriter from "../components/FunctionWriter.vue";
+import Sales from "@/views/Sales.vue";
 import Session from "../models/Session.js";
 
 const routes = [
@@ -105,6 +106,11 @@ const routes = [
     path: "/organizations/:id/invitations/new",
     component: OrganizationInviteUser,
     name: "Invite User",
+  },
+  {
+    path: "/sales",
+    component: Sales,
+    name: "Sales",
   },
   {
     path: "/organizations/:pathMatch(.*)*",

@@ -1,9 +1,9 @@
-@import "includes/reset";
-@import "includes/theme-defaults";
+/*@import "includes/reset";
 @import "includes/lato";
+//@import "includes/theme-defaults";
 @import "includes/modals";
 @import "includes/forms";
-@import "includes/transitions";
+@import "includes/transitions";*/
 
 html, body {
   margin: 0;
@@ -13,8 +13,8 @@ html, body {
 }
 
 body {
-  background: $background;
-  color: $on-background;
+  background: var(--background);
+  color: var(--on-background);
 }
 
 h1, h2, h3, h4 {
@@ -27,14 +27,14 @@ a {
 }
 
 input, textarea, select {
-  background-color: $background-high-contrast;
-  color: $on-background-high-contrast;
-  caret-color: $accent;
+  //background-color: $background-high-contrast;
+  //color: $on-background-high-contrast;
+  //caret-color: $accent;
 }
 
 a, input, textarea, select, button {
     &:focus {
-      outline-color: $secondary;
+      //outline-color: $secondary;
       outline-width: thin;
       outline-style: solid;
   }
@@ -49,7 +49,7 @@ table.spaced {
 
   thead {
     tr {
-      background-color: var(--background);
+     // background-color: var(--background);
 
       th {
         font-weight: 700;
@@ -63,7 +63,7 @@ table.spaced {
 
   tbody {
     tr {
-      border-bottom: 1px solid $background-80;
+     // border-bottom: 1px solid $background-80;
 
       td {
         font-weight: 400;
@@ -79,23 +79,29 @@ table.spaced {
 
 }
 
+/*** Wrapper router and page content ***/
+div.wrapper__content {
+  padding: 2rem 1rem;
+}
+/*******/
+
 div.page-container {
-  top: 80px;
+  /*top: 80px;
   margin: 2em;
-  position: relative;
+  position: relative;*/
 }
 
 div.page-inset {
-  background: var(--surface);
-  padding: 2em 3em;
+  padding: 1em;
   border-radius: 1em;
-  border: 1px solid var(--background-80);
+  background: var(--surface);
+  /*border: 1px solid var(--background-80);
   margin: 2em 2em 2em 2em;
   min-width: 18em;
 
   &:last-child {
     margin-bottom: 12em;
-  }
+  }*/
 }
 
 div.left-inset {
@@ -119,7 +125,7 @@ div.left-inset {
   border: none;
   background: #ff5d00;
   background: linear-gradient(170deg, rgba(255,6,238,1) 0%, rgba(255,93,0,1) 100%, rgba(0,212,255,1) 100%);
-  overflow: hidden;
+  /*overflow: hidden;*/
 }
 
 .main-btn:hover {
@@ -130,7 +136,7 @@ div.left-inset {
 
 .btn-hover {
   position: relative;
-  overflow: hidden;
+  /*overflow: hidden;*/
 }
 
 .btn-hover::after {
@@ -203,7 +209,7 @@ hr.accent {
 .well {
   padding: 1em;
   margin: 1em 0;
-  background: $surface;
+  background: var(--surface);
   border-radius: 0px;
 }
 
@@ -216,9 +222,8 @@ hr.accent {
 .button-small, input[type=button].button-small {
   font-size: 1em;
   font-weight: 100;
-  color: $link;
   padding: 8px;
-  background-color: $background-high-contrast;
+  background-color: transparent;
   border-radius: 0px;
   cursor: pointer;
   display: inline-block;
@@ -250,6 +255,7 @@ hr.accent {
 }
 
 .button-medium a, .button-small a {
+  background-color: transparent;
   color: $on-primary;
 }
 
@@ -309,6 +315,8 @@ hr.accent {
   height: 1.5em;
 }
 
+
+
 // datepicker
 $namespace: 'xmx'; // change the 'mx' to 'xmx'. then <date-picker prefix-class="xmx" />
 
@@ -316,7 +324,7 @@ $namespace: 'xmx'; // change the 'mx' to 'xmx'. then <date-picker prefix-class="
 // $default-color: #555;
 // $primary-color: #e71296;
 
-$default-color: $on-surface-secondary;
+$default-color: var(--on-surface-secondary);
 $primary-color: $link;
 
 $today-color: mix($background, $primary-color, 10%);
@@ -352,12 +360,22 @@ $time-hover-background-color: mix($background, $calendar-active-background-color
 
 @import '../../../node_modules/vue-datepicker-next/scss/index.scss';
 
-
-.#{$namespace}-input {
+/*
+.# {$namespace}-input {
   background-color: $surface;
   color: $on-surface;
 }
 
-.#{$namespace}-datepicker-main {
+.# {$namespace}-datepicker-main {
   background-color: $surface;
 }
+*/
+
+
+/*
+@import './theme.scss';
+@import './layout.scss';
+@import './header.scss';
+@import './sidebar.scss';
+@import './registers.scss';
+*/
