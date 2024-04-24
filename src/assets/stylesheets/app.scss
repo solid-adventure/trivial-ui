@@ -361,3 +361,8 @@ $time-hover-background-color: mix($background, $calendar-active-background-color
 .#{$namespace}-datepicker-main {
   background-color: $surface;
 }
+
+@import './layout.scss';
+@import './header.scss';
+@import './sidebar.scss';
+@import './registers.scss';
