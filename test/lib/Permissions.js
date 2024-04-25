@@ -74,18 +74,18 @@ describe("Permissions", () => {
   });
 
   describe("can-org", () => {
-    it("should return false when userRole is admin, memberRole is admin and lastAdmin is true ", async () => {
+    it("removeMember: should return false when userRole is admin, memberRole is admin and lastAdmin is true ", async () => {
       result = await permissions.can("removeMember", "Org", { memberRole: "admin", userRole: "admin", lastAdmin: true });
       expect(result).to.be.false;
 
     });
     
-    it("should return true when userRole is admin, memberRole is admin and lastAdmin is true ", async () => {
+    it("removeMember: should return true when userRole is admin, memberRole is admin and lastAdmin is true ", async () => {
       result = await permissions.can("removeMember", "Org", { memberRole: "member", userRole: "admin", lastAdmin: true });
       expect(result).to.be.true;
     });
 
-    it("should return true when userRole is admin and lastAdmin is false", async () => {
+    it("removeMember: should return true when userRole is admin and lastAdmin is false", async () => {
       result = await permissions.can("removeMember", "Org", { memberRole: "admin", userRole: "admin", lastAdmin: false });
       expect(result).to.be.true;
       result = await permissions.can("removeMember", "Org", { memberRole: "member", userRole: "admin", lastAdmin: false });
@@ -93,7 +93,7 @@ describe("Permissions", () => {
     });
 
     // userRole member automatically defaults to false before checking memberRole and lastAdmin
-    it("should return false when userRole is member", async () => {
+    it("removeMember: should return false when userRole is member", async () => {
       result = await permissions.can("removeMember", "Org", { memberRole: "admin", userRole: "member", lastAdmin: false });
       expect(result).to.be.false;
       result = await permissions.can("removeMember", "Org", { memberRole: "member", userRole: "member", lastAdmin: false });
@@ -104,6 +104,15 @@ describe("Permissions", () => {
       expect(result).to.be.false;
     });
 
+    it("addMember: should return false when user is member", async () => {
+      result = await permissions.can("addMember", "Org", { userRole: "member" });
+      expect(result).to.be.false;
+    })
+
+    it("addMember: should return true when user is admin", async () => {
+      result = await permissions.can("addMember", "Org", { userRole: "admin" });
+      expect(result).to.be.true;
+    })
   })
 
   beforeEach(() => {
@@ -112,7 +121,7 @@ describe("Permissions", () => {
 
   describe("can-app", () => {
 
-    it("should return true when appropriate ability, model, and args are inputted", async () => {
+    it("should return true when app exists in users permissions", async () => {
       appName = "8dfe7a96b0b5e4";
       result = await permissions.can("update", "App", { appName: appName });
       expect(result).to.be.true;

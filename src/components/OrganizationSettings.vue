@@ -3,7 +3,7 @@
 
     <div class="page-inset">
       <h2>{{ organization.name }} | Users And Roles</h2>
-      <div class="action-row" v-if = "currentUserRole === 'admin'">
+      <div class="action-row" v-if = "canAddMember">
         <RouterLink :to="newInvitationPath" class="button-medium">Add New User</RouterLink>
       </div>
       <table class="spaced organization-users">
@@ -47,7 +47,8 @@ export default {
       updatedBillingEmail:'',
       updatedName: '',
       users: [],
-      orgId: this.$route.params.id
+      orgId: this.$route.params.id, 
+      canAddMember: false
     }
   },
 
@@ -91,6 +92,11 @@ export default {
     },
 
     setOrgPermits(){
+      this.$store.state.Permissions.can('addMember', 'Org', {userRole: this.currentUserRole}).then(
+        res => {
+          this.canAddMember = res
+        }
+      )
       this.users.map(user => {
         return this.$store.state.Permissions.can('removeMember', 'Org', {memberRole: user.role, userRole: this.currentUserRole, lastAdmin: this.lastAdmin })
           .then(res => {
