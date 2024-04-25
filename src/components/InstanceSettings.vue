@@ -350,6 +350,13 @@
             this.setAppDetails()
             await this.loadManifest()
           }
+        },
+        'app.canUpdate'(newPermit) {
+          if (newPermit == false) {
+            setTimeout(()=>{
+              this.$router.push({ name: 'Home' });
+            }, 1500)
+          }
         }
     },
     methods: {
