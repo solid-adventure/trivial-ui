@@ -21,7 +21,7 @@
         </div>
       </div>
 
-      <div class="page-inset" v-if = "app.canUpdate">
+      <div class="page-inset">
         <h2 class="section-title">Copy</h2>
         <em class="section-help-text">Create a duplicate of this app with the same build steps, settings, and credentials.</em>
         <br/>
