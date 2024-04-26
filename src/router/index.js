@@ -18,6 +18,8 @@ import OrganizationInviteUser from "../components/OrganizationInviteUser.vue";
 import Actions from "../components/Actions.vue";
 import FunctionWriter from "../components/FunctionWriter.vue";
 import Session from "../models/Session.js";
+import Unauthorized from "../components/Unauthorized.vue";
+import store from "../store/index.js";
 
 const routes = [
   { path: "/",
@@ -114,6 +116,11 @@ const routes = [
     path: "/:pathMatch(.*)*",
     redirect: "/"
   }
+  {
+    path: "/unauthorized",
+    component: Unauthorized,
+    name: "Unauthorized",
+  },
 ];
 
 const router = createRouter({
@@ -125,6 +132,30 @@ const redirectToSignIn = (to, loggedIn) => {
   if (to.path === "/signin") { return false }
   if (to.meta.requiresAuth === false) { return false }
   return !loggedIn
+}
+
+const redirectToUnAuth = async (to) => {
+    let permissions = await getPermissionState()
+    console.log(permissions)
+    const result = await permissions.can("update", "App", { appName: to.params.id });
+    console.log("this is the result: ", result)
+    return result
+};
+
+function getPermissionState(){
+  return new Promise((resolve, reject) => {
+    if (!store.state.Permissions) {
+      const unwatch = store.watch(
+        () => store.state.Permissions,
+        (value) => {
+          unwatch()
+          resolve(value)
+        }
+      )
+    } else {
+      resolve(store.state.Permissions)
+    }
+  })
 }
 
 router.beforeEach(async (to, from) => {
@@ -140,5 +171,14 @@ router.beforeEach(async (to, from) => {
     }
   }
 })
+
+router.afterEach(async (to, from) => {
+  if (to.name === "Settings") {
+    let result = await redirectToUnAuth(to)
+    if(!result){
+      router.push({ name: 'Unauthorized' });
+    }
+  }
+});
 
 export default router;
