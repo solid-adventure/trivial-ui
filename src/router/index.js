@@ -136,9 +136,7 @@ const redirectToSignIn = (to, loggedIn) => {
 
 const redirectToUnAuth = async (to) => {
     let permissions = await getPermissionState()
-    console.log(permissions)
     const result = await permissions.can("update", "App", { appName: to.params.id });
-    console.log("this is the result: ", result)
     return result
 };
 

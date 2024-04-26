@@ -77,11 +77,15 @@ export default {
       if(this.$route.path.indexOf("/settings") == 0){
         vars.orgs = true
       }
+      if(this.$route.path.indexOf("/unauthorized") == 0){
+        vars.unauthorized = true
+      }
       // trying to standardize the init based on path can use this for new paths, fields, or anything going forward
       if (
         vars.appId !== this.lastVars?.appId ||
         vars.orgId !== this.lastVars?.orgId ||
         vars.orgs !== this.lastVars?.orgs ||
+        vars.unauthorized !== this.lastVars?.unauthorized ||
         !this.lastVars
       ) {
         await store.dispatch("init", vars);
