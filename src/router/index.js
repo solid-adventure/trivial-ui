@@ -115,12 +115,12 @@ const routes = [
   {
     path: "/:pathMatch(.*)*",
     redirect: "/"
-  }
+  },
   {
     path: "/unauthorized",
     component: Unauthorized,
     name: "Unauthorized",
-  },
+  }
 ];
 
 const router = createRouter({
