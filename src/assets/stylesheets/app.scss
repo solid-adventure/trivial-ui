@@ -79,23 +79,29 @@ table.spaced {
 
 }
 
+/*** Wrapper router and page content ***/
+div.wrapper__content {
+  padding: 2rem 1rem;
+}
+/*******/
+
 div.page-container {
-  top: 80px;
+  /*top: 80px;
   margin: 2em;
-  position: relative;
+  position: relative;*/
 }
 
 div.page-inset {
-  background: var(--surface);
-  padding: 2em 3em;
+  padding: 1em;
   border-radius: 1em;
-  border: 1px solid var(--background-80);
+  background: var(--surface);
+  /*border: 1px solid var(--background-80);
   margin: 2em 2em 2em 2em;
   min-width: 18em;
 
   &:last-child {
     margin-bottom: 12em;
-  }
+  }*/
 }
 
 div.left-inset {

@@ -108,7 +108,7 @@ const routes = [
     name: "Invite User",
   },
   {
-    path: "/registers/:id",
+    path: "/registers/",
     component: Registers,
     name: "Registers",
   },

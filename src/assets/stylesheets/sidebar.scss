@@ -3,7 +3,6 @@
 	display: grid;
 	align-content: start;
 	width: 260px;
-	height: 100dvh;
 	padding-block: 40px;
 	padding-right: 10px;
 	transition: width 400ms ease-in-out;
@@ -93,7 +92,7 @@
 			}
 
 			&:last-child {
-				transform: translateY(450%);
+				transform: translateY(350%);
 			}
 
 			& > div {
