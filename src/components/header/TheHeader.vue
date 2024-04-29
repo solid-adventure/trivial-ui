@@ -9,7 +9,7 @@
 				</select>
 
 				<router-link to="#" class="main__header__top__content--link">
-					<i class="fa-regular fa-user"></i>
+					<Icon icon="fa6-regular:user" />
 				</router-link>
 			</div>
 		</div>
@@ -18,6 +18,7 @@
 </template>
 
 <script setup>
+	import { Icon } from '@iconify/vue'
 	import Breadcrumb from '../Breadcrumb.vue'
 
 	defineProps({
