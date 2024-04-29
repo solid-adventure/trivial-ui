@@ -19,8 +19,6 @@
   <div class="InstanceActivity">
     <!-- <super-bar></super-bar> -->
     <Notices></Notices>
-    <nav-tree :selected-title="'activity'"></nav-tree>
-
     <FilterEditor></FilterEditor>
     <WebhooksTable></WebhooksTable>
   </div>
@@ -29,10 +27,7 @@
 <style lang="scss">
   .InstanceActivity {
   	margin: 2em;
-    left: 23em;
-    top: 120px;
     position: relative;
-    width: calc(100% - 27em);
   }
 
 </style>

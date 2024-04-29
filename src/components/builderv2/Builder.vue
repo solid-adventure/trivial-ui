@@ -155,10 +155,6 @@ export default {
       return this.configResolver.resolve(this.action.config);
     },
 
-    leftNavWidth() {
-      return this.playgroundMode ? "6em" : "24em";
-    },
-
     ...mapState(["app", "credentials", "playgroundMode"]),
   },
 
@@ -252,18 +248,18 @@ export default {
 </script>
 
 <template>
-  <div class="builder" :style="{ paddingLeft: this.leftNavWidth }">
+  <div class="builder">
     <ChangeSequence
       v-if="displayChangeSequence"
       @close="displayChangeSequence = false"
     />
-    <NavTree
+<!--     <NavTree
       :selectedTitle="'builder'"
       :program="program"
       :selectedAction="selectedAction"
       @programNavigate="navigateTo"
     ></NavTree>
-    <div v-if="!playgroundMode" class="action-bar">
+ -->    <div v-if="!playgroundMode" class="action-bar">
       <div class="action-holder">
         <div class="trigger-section">
           <AppTrigger
@@ -333,10 +329,11 @@ export default {
 
 <style lang="scss" scoped>
 .builder {
-  padding-top: calc(80px + 3.625em + 1px + 1em);
+
+  padding-top: 2em;
   padding-right: 1em;
   padding-bottom: 1em;
-  // padding-left: set inline
+
   input {
     font-family: inherit;
   }
@@ -344,10 +341,9 @@ export default {
   .action-bar {
     position: fixed;
     top: 120px;
-    left: 23em;
     box-sizing: border-box;
     height: 3.625em;
-    width: calc(100% - 23em);
+    width: 100%;
     padding: 0.5em 2em;
     border-bottom: 1px solid var(--on-background-20);
     background-color: var(--background);

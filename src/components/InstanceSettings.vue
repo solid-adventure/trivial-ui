@@ -1,6 +1,5 @@
 <template>
   <div>
-  <nav-tree selected-title="settings"></nav-tree>
   <div class="InstanceSettings">
     <div id="messages">{{errorMessage}}</div>
 
@@ -114,10 +113,7 @@
   .InstanceSettings {
   	height: 100%;
   	margin: 2em;
-    left: 23em;
-    top: 120px;
     position: relative;
-    width: calc(100% - 27em);
   }
 
   h2.section-title, h3.section-title, h4.section-title {
@@ -210,7 +206,6 @@
   import ManifestMigrator from 'trivial-core/lib/ManifestMigrator'
   import TrackingService from '../../lib/TrackingService'
   import FeatureManager from 'trivial-core/lib/FeatureManager'
-  import NavTree from './builderv2/NavTree.vue'
   import AppTransferManager from './builderv2/AppTransferManager.vue'
 
   export default {

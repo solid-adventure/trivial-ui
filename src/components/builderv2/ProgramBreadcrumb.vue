@@ -47,11 +47,11 @@
   div.program-breadcrumb {
     margin-left: 0;
     position: fixed;
-    background: var(--secondary);
+    background: var(--surface);
     width: 100%;
     padding-left: 2em;
+    margin-left: 0;
     top: 11em;
-    left: 23em;
     line-height: 2em;
     z-index: 1;
 

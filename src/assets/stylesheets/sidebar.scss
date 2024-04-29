@@ -69,6 +69,14 @@
 		font-size: 1.2rem;
 		font-weight: 600;
 
+		/* TODO Actual Style */
+		& .aside__nav__link_child {
+			color: red;
+			border-left: 4px solid transparent;
+			margin-top: 0;
+			margin-left: 4em;
+		}
+
 		& .aside__nav__link {
 			display: flex;
 			align-items: center;
@@ -86,6 +94,8 @@
 					background-color: #3c3c3c;
 				}
 			}
+
+
 
 			&:focus {
 				outline: none;
