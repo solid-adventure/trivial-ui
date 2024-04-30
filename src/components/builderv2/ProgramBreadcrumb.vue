@@ -45,7 +45,7 @@
 
 <style lang="scss" scoped>
   div.program-breadcrumb {
-    margin-left: 0;
+    /*margin-left: 0;
     position: fixed;
     background: var(--secondary);
     width: 100%;
@@ -53,7 +53,11 @@
     top: 11em;
     left: 23em;
     line-height: 2em;
-    z-index: 1;
+    z-index: 1;*/
+    
+    width: 100%;
+    line-height: 2em;
+    background: var(--secondary);
 
     span.divider {
       margin: 0 0.25em;

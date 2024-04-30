@@ -10,6 +10,8 @@ import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
 import InputText from 'primevue/inputtext'
 import Button from "primevue/button"
+import Dropdown from 'primevue/dropdown';
+import Image from 'primevue/image';
 import router from './router'
 import store from './store'
 
@@ -22,5 +24,7 @@ app.component('Column', Column)
 app.component('IconField', IconField)
 app.component('InputIcon', InputIcon)
 app.component('InputText', InputText)
+app.component('Dropdown', Dropdown)
+app.component('Image', Image)
 app.component('Button', Button)
 app.mount('#app')

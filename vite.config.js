@@ -23,4 +23,11 @@ export default defineConfig({
       include: [/trivial-core/, /node_modules/],
     },
   },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        additionalData: '@import "./src/assets/stylesheets/app-light.scss";'
+      }
+    }
+  }
 })

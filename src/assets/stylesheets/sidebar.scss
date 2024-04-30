@@ -27,6 +27,7 @@
 		position: absolute;
 		top: 3.1rem;
 		left: calc(100% - .9rem);
+		z-index: 100;
 		display: flex;
 		justify-content: center;
 		align-items: center;
@@ -59,7 +60,6 @@
 	}
 
 	& nav.aside__nav {
-		position: relative;
 		display: grid;
 		gap: .5rem;
 		align-items: center;

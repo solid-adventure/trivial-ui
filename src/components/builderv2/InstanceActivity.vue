@@ -21,18 +21,29 @@
     <Notices></Notices>
     <nav-tree :selected-title="'activity'"></nav-tree>
 
-    <FilterEditor></FilterEditor>
-    <WebhooksTable></WebhooksTable>
+    <div class="instance-activity-items">
+      <FilterEditor></FilterEditor>
+      <WebhooksTable></WebhooksTable>
+    </div>
   </div>
 </template>
 
 <style lang="scss">
   .InstanceActivity {
-  	margin: 2em;
+  	/*margin: 2em;
     left: 23em;
     top: 120px;
     position: relative;
-    width: calc(100% - 27em);
+    width: calc(100% - 27em);*/
+
+    display: flex;
+    flex-wrap: wrap;
+
+    & .instance-activity-items {
+      display: flex;
+      flex-direction: column;
+      width: calc(100% - 310px);
+    }
   }
 
 </style>

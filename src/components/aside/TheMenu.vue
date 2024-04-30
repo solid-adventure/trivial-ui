@@ -5,7 +5,7 @@
 		</button>
 
 		<RouterLink to="/">
-			<img :src="menuLogoImg" alt="Logo image" class="menu__logo" />
+			<Image :src="menuLogoImg" transition alt="Logo image" imageClass="menu__logo" />
 		</RouterLink>
 
 		<Naviagation />

@@ -101,7 +101,7 @@
 <style lang="scss" scoped>
 
     .navtree {
-      position: fixed;
+      /*position: fixed;
       top: 120px;
       left: 0;
       box-sizing: border-box;
@@ -110,7 +110,11 @@
       height: 100%;
       overflow: auto;
       border-right: 1px solid var(--on-background-20);
-      background-color: var(--surface);
+      background-color: var(--surface);*/
+
+      position: sticky;
+      top: 120px;
+      border-right: 1px solid var(--on-background-20);
 
       .app-name-container {
         padding: 1em;
