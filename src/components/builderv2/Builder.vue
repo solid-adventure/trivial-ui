@@ -252,17 +252,8 @@ export default {
 </script>
 
 <template>
-  <div class="builder" :style="{ paddingLeft: this.leftNavWidth }">
-    <ChangeSequence
-      v-if="displayChangeSequence"
-      @close="displayChangeSequence = false"
-    />
-    <NavTree
-      :selectedTitle="'builder'"
-      :program="program"
-      :selectedAction="selectedAction"
-      @programNavigate="navigateTo"
-    ></NavTree>
+  <!--<div class="builder" :style="{ paddingLeft: this.leftNavWidth }">-->
+  <div class="builder">
     <div v-if="!playgroundMode" class="action-bar">
       <div class="action-holder">
         <div class="trigger-section">
@@ -288,18 +279,28 @@ export default {
         <Notices :pinned="false" class="right"></Notices>
       </div>
     </div>
-    <BuilderAssistant
-      v-if="loaded"
-      :app="app"
-      :actions="program.definition.actions"
-      :nextIdentifier="nextIdentifier"
-    />
     <ProgramBreadcrumb
       v-if="program"
       :value="program"
       :selected="selectedAction"
       @navigate="navigateTo"
     ></ProgramBreadcrumb>
+    <NavTree
+      :selectedTitle="'builder'"
+      :program="program"
+      :selectedAction="selectedAction"
+      @programNavigate="navigateTo"
+    ></NavTree>
+    <ChangeSequence
+      v-if="displayChangeSequence"
+      @close="displayChangeSequence = false"
+    />
+    <BuilderAssistant
+      v-if="loaded"
+      :app="app"
+      :actions="program.definition.actions"
+      :nextIdentifier="nextIdentifier"
+    />
     <div v-if="!displayVault">
       <div v-if="loaded" class="action-body" ref="actionbody">
         <Editor
@@ -333,16 +334,21 @@ export default {
 
 <style lang="scss" scoped>
 .builder {
-  padding-top: calc(80px + 3.625em + 1px + 1em);
+  /*padding-top: calc(80px + 3.625em + 1px + 1em);
   padding-right: 1em;
   padding-bottom: 1em;
   // padding-left: set inline
+  */
+
+  display: flex;
+  flex-wrap: wrap;
+
   input {
     font-family: inherit;
   }
 
   .action-bar {
-    position: fixed;
+    /*position: fixed;
     top: 120px;
     left: 23em;
     box-sizing: border-box;
@@ -353,13 +359,26 @@ export default {
     background-color: var(--background);
     z-index: 50;
     display: flex;
-    flex-direction: column;
+    flex-direction: column;*/
+
+    position: sticky;
+    top: 120px;
+    width: 100%;
+    padding-block: 1rem;
+    border-bottom: 1px solid var(--on-background-20);
+    z-index: 50;
 
     .action-holder {
-      width: 100%;
+      /*width: 100%;
       display: flex;
       flex-direction: row;
+      justify-content: space-between;*/
+
+      display: flex;
+      align-items: center;
       justify-content: space-between;
+      width: 100%;
+      z-index: 100;
     }
 
     .notice-holder {
@@ -378,9 +397,11 @@ export default {
   }
 
   .action-body {
-    padding: 1em;
+    /*padding: 1em;
     margin: 1em 0;
-    background: transparent;
+    background: transparent;*/
+    width: 100%;
+    padding: 1rem;
   }
 
   .disabled {

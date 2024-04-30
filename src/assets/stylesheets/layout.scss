@@ -8,6 +8,9 @@
 	& > header.main__header {
 		grid-column: 2;
 		grid-row: 1;
+		position: sticky;
+		top: 0;
+		z-index: 100;
 	}
 
 	& > aside.menu {
@@ -15,7 +18,7 @@
 		grid-column: 1;
 	}
 
-	& > div.page-container {
+	& > div.wrapper__content {
 		grid-row: 2;
 		grid-column: 2;
 		top: unset;

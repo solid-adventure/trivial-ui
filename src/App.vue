@@ -6,7 +6,14 @@
     </template>
 
     <div class="wrapper__content">
-      <router-view :key="$route.fullPath"></router-view>
+      <Suspense>
+        <template #default>
+          <router-view :key="$route.fullPath"></router-view>
+        </template>
+        <template #fallback>
+          Loading
+        </template>
+      </Suspense>
     </div>
   </main>
 </template>
@@ -27,10 +34,10 @@ export default {
     return {
       lastVars: null,
       breadcrumbs: [],
-      loading: true,
+      //loading: true,
     };
   },
-  created() {
+  /*created() {
     if (store.state.theme === "Dark") {
       import('/src/assets/stylesheets/app.scss');
     } else {
@@ -40,7 +47,7 @@ export default {
     window.setTimeout(() => {
       this.loading = false;
     }, 300);
-  },
+  },*/
   computed: {
     currentRouteName() {
       return this.$route.fullPath;

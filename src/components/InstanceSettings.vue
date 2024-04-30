@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="settings2">
   <nav-tree selected-title="settings"></nav-tree>
   <div class="InstanceSettings">
     <div id="messages">{{errorMessage}}</div>
@@ -111,13 +111,17 @@
 </template>
 
 <style lang="scss" scoped>
+  .settings2 {
+    display: flex;
+  }
+
   .InstanceSettings {
-  	height: 100%;
+  	/*height: 100%;
   	margin: 2em;
     left: 23em;
     top: 120px;
     position: relative;
-    width: calc(100% - 27em);
+    width: calc(100% - 27em);*/
   }
 
   h2.section-title, h3.section-title, h4.section-title {

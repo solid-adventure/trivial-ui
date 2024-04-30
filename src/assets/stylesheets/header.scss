@@ -23,14 +23,8 @@ header.main__header {
 			align-items: center;
 			gap: 0 2rem;
 
-			& select {
-				width: 220px;
-				height: 40px;
-				border-radius: 6px;
-				border: none;
-				font-weight: 600;
-				text-align: center;
-				color: var(--background-60);
+			& .main__header__top__content__dropdown {
+				width: 15rem;
 				background-color: var(--background);
 			}
 
@@ -38,7 +32,7 @@ header.main__header {
 				display: flex;
 				justify-content: center;
 				align-items: center;
-				width: 36px;
+				width: 32px;
 				aspect-ratio: 1;
 				border-radius: 6px;
 				outline: 2px solid #eee;
