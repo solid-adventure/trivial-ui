@@ -151,7 +151,7 @@
       },
 
       ...mapState([
-        'apps', 'user', 'Permissions', 'app'])
+        'apps', 'user', 'Permissions'])
 
     },
 
