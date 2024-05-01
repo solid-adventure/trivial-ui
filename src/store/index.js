@@ -43,7 +43,8 @@ const store = createStore({
     enableBuildApps: import.meta.env.VITE_ENABLE_BUILD_APPS,
     enableWebhookAppTrigger: import.meta.env.VITE_ENABLE_WEBHOOK_APP_TRIGGER,
     Session: Session,
-    Permissions: null
+    Permissions: null,
+    orgId: null
   },
 
   getters: {
@@ -66,7 +67,9 @@ const store = createStore({
       if (state.tourStep != state.tourSteps.indexOf(section)) { return true }
       return false
     },
-
+    getOrgId(state) {
+      return state.orgId
+    }
   },
 
   mutations: {
@@ -244,6 +247,9 @@ const store = createStore({
       if (index !== -1) {
         state.credentialSets.splice(index, 1)
       }
+    },
+    setOrgId(state, id) {
+      state.orgId = id
     }
   },
 
@@ -491,7 +497,10 @@ const store = createStore({
     async destroyCredentialSet({ commit }, { id }) {
       await Session.apiCall(`/credential_sets/${id}`, 'DELETE')
       commit('removeCredentialSet', { id })
-    }
+    },
+    async selectOrgId({ commit, state }, id) {
+      await commit('setOrgId', id)
+    },
   }
 
 })

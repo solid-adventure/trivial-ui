@@ -113,6 +113,7 @@
 <style lang="scss" scoped>
   .settings2 {
     display: flex;
+    gap: 1rem;
   }
 
   .InstanceSettings {
@@ -122,6 +123,14 @@
     top: 120px;
     position: relative;
     width: calc(100% - 27em);*/
+
+    width: 100%;
+    
+    & #instance-setting-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
   }
 
   h2.section-title, h3.section-title, h4.section-title {
