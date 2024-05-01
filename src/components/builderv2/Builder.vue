@@ -301,7 +301,7 @@ export default {
       :actions="program.definition.actions"
       :nextIdentifier="nextIdentifier"
     />
-    <div v-if="!displayVault">
+    <div v-if="!displayVault" class="action-function">
       <div v-if="loaded" class="action-body" ref="actionbody">
         <Editor
           :value="action"
@@ -396,11 +396,13 @@ export default {
     }
   }
 
-  .action-body {
+  .action-function {
+    width: calc(100% - 250px);
+  }
+  .action-body, .function-body {
     /*padding: 1em;
     margin: 1em 0;
     background: transparent;*/
-    width: 100%;
     padding: 1rem;
   }
 

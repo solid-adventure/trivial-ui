@@ -1,0 +1,18 @@
+.registers_table {
+
+	& .calendar__search {
+		height: 2.125rem;
+	}
+
+	& table thead {
+		text-transform: capitalize;
+
+		& tr:first-child > th {
+			background-color: var(--surface-50);
+
+			&:hover {
+				background-color: var(--surface-100);
+			}
+		}
+	}
+}

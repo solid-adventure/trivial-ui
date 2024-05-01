@@ -37,12 +37,11 @@
     width: calc(100% - 27em);*/
 
     display: flex;
-    flex-wrap: wrap;
 
     & .instance-activity-items {
       display: flex;
       flex-direction: column;
-      width: calc(100% - 310px);
+      width: 100%;
     }
   }
 
