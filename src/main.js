@@ -10,9 +10,9 @@ import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
 import InputText from 'primevue/inputtext'
 import Button from "primevue/button"
-import Dropdown from 'primevue/dropdown';
-import Image from 'primevue/image';
-import Calendar from 'primevue/Calendar';
+import Dropdown from 'primevue/dropdown'
+import Image from 'primevue/image'
+import Calendar from 'primevue/calendar'
 import router from './router'
 import store from './store'
 
