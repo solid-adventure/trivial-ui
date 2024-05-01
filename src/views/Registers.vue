@@ -61,19 +61,24 @@
 
 		try {
 			//registers.value = await store.state.Session.apiCall(`/registers?search={"owner_type: "Organization", "owner_id": ${orgId}`)
-			allRegisters = await store.state.Session.apiCall(`/registers/${orgId}`)
-			
+			allRegisters = await store.state.Session.apiCall(`/registers`)
+			let register = allRegisters.find(r => r.owner_type == 'Organization' && r.owner_id == orgId && r.name == 'Sales')
 			// Setting dynamic table columns headers
-			for (const property in allRegisters.meta) {
-				columns.push({field: allRegisters.meta[property], header: allRegisters.meta[property].replace('_', ' ')})
-				globalFilterFields.push(allRegisters.meta[property])
+			for (const property in register.meta) {
+				columns.push({field: register.meta[property], header: register.meta[property].replace('_', ' ')})
+				globalFilterFields.push(register.meta[property])
 			}
+			columns.push({field: 'description', header: 'Description'})
+			columns.push({field: 'originated_at', header: 'Original Date'})
+			columns.push({field: 'unique_key', header: 'Unique Key'})
+			columns.push({field: 'units', header: 'Units'})
+			columns.push({field: 'amount', header: 'Amount'})
 
 			// Settign filters dynamic fileds for search options
 			//globalFilterFields.forEach(item => filters.value[item] = {value: null, matchMode: FilterMatchMode.CONTAINS})
 
 			// Get registers item 
-			let regArr = await store.state.Session.apiCall(`/register_items?register_id=${allRegisters.id}`)
+			let regArr = await store.state.Session.apiCall(`/register_items?register_id=${register.id}`)
 
 			// Format the date (created_at property) and add new property to the register item
 			registers.value = regArr.map(item => Object.assign(item, { formatted_date: intlDateTime.format(new Date(item.created_at)) }))
