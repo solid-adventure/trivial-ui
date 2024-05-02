@@ -114,6 +114,8 @@
 
       position: sticky;
       top: 120px;
+      max-width: 250px;
+      width: 100%;
       border-right: 1px solid var(--on-background-20);
 
       .app-name-container {

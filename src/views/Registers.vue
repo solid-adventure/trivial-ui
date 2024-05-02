@@ -13,7 +13,10 @@
 	        </div>
 	    </template>
 	    <template #empty>No revenues found.</template>
-	    <template #loading>Loading revenues data. Please wait.</template>
+	    <template #loading>
+	    	<Image :src="loadingImg" alt="Loader" width="160" />
+	    	<h3>Loading revenues data. Please wait.</h3>
+	    </template>
 
         <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header" sortable />
 
@@ -29,6 +32,8 @@
 	import { FilterMatchMode } from 'primevue/api'
 	import { ref, onMounted, computed, watch } from 'vue'
 	import { useStore } from 'vuex'
+	import notifications from '@/components/notifications'
+	import loadingImg from '@/assets/images/trivial-loading.gif'
 
 	const loading = ref(false),
 			filters = ref({
@@ -47,13 +52,20 @@
 
 	let columns = [{field: 'formatted_date', header: 'Date'}],
 		globalFilterFields = [],
-		allRegisters = null
+		allRegisters = null,
+		localStorageOrgId = null
 
 	const orgId = computed(() => store.getters.getOrgId)
 	watch(orgId, async (newVal, oldVal) => await getRegisters(newVal))
 
 	onMounted(async () => {
-		orgId.value ? await getRegisters(orgId.value) : false
+		localStorageOrgId = JSON.parse(localStorage.getItem('orgId'))
+
+		if (orgId.value) {
+			await getRegisters(orgId.value)
+		} else if (localStorageOrgId) {
+			await getRegisters(localStorageOrgId)
+		}
 	})
 
 	const getRegisters = async orgId => {
@@ -81,6 +93,7 @@
 			loading.value = false
 		} catch (err) {
 			console.log(err)
+			notifications.error(`Failed to fetch data: ${err}`)
 			loading.value = false
 		}
 	}
