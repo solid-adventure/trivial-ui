@@ -17,7 +17,7 @@
 <script setup>
 	import { Icon } from '@iconify/vue'
 	import Breadcrumb from '../Breadcrumb.vue'
-	import { ref, watch } from 'vue'
+	import { ref, watch, onMounted } from 'vue'
 	import { useStore } from 'vuex'
 	import notifications from '@/components/notifications'
 
@@ -37,10 +37,17 @@
 	const selectedOrg = ref(),
 		organisations = ref([{name: '', id: null}]),
 		store = useStore()
+	let localStorageOrgId = null
 
 	watch(selectedOrg, async (newVal, oldVal) => {
 		let org = newVal === undefined ? oldVal : newVal
 		localStorage.setItem('orgId', JSON.stringify(org.id))
+	})
+
+	onMounted(async () => {
+		await fetchData()
+
+		persistSelectedOrg()
 	})
 
 	const handleSelected = () => {
@@ -56,5 +63,13 @@
 		}
 	}
 
-	fetchData()
+	// Set the org. dropdown value if there is org. id in the localstorage when user refresh the page
+	const persistSelectedOrg = () => {
+		localStorageOrgId = JSON.parse(localStorage.getItem('orgId'))
+
+		// Select organization dropdown value if organization ID is stored in local storage
+		if (localStorageOrgId) {
+			selectedOrg.value = organisations.value.find(item => item.id === parseInt(localStorageOrgId, 10))
+		}
+	}
 </script>
