@@ -8,6 +8,7 @@
 		text-transform: capitalize;
 
 		& tr:first-child > th {
+			font-size: .9rem;
 			background-color: var(--surface-50);
 
 			&:hover {
@@ -15,4 +16,18 @@
 			}
 		}
 	}
+
+	& table tbody {
+		& tr > td {
+			font-size: .9rem;
+		}
+	}
+}
+
+input[type="text"].p-inputtext {
+    color: #334155;
+    padding: .5rem .75rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    outline-color: transparent;
 }

@@ -1,0 +1,1 @@
+export const useFormatDate = (date, options = { weekday:"short" }) => new Intl.DateTimeFormat('en-US', options).format(new Date(date))
