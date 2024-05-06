@@ -53,7 +53,7 @@ header.main__header {
 			align-items: center;
 
 			& a {
-				color: #1fb982;
+				color: var(--primary);
 
 				&:focus {
 					outline: none;
