@@ -22,6 +22,7 @@
     "express": "^4.17.1",
     "express-sslify": "^1.2.0",
     "fast-redact": "^3.0.2",
+    "floating-vue": "^5.2.2",
     "handsontable": "^14.0.0",
     "javascript-time-ago": "^2.5.9",
     "jsonwebtoken": "^8.5.1",
