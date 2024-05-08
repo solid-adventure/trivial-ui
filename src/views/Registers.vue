@@ -34,9 +34,8 @@
 
 		<Column header="Date" filterField="date" dataType="date" key="date">
 			<template #body="{ data }">
-				<div v-tooltip="`${useFormatDate(data.created_at, dateOptions)}`">
-					{{ useFormatDate(data.created_at, dateOptions) }}
-				</div>
+				<div class="date">{{ useFormatDate(data.created_at, dateOptions) }}</div>
+				<div class="time">{{ useFormatDate(data.created_at, timeOptions) }} {{ useFormatDate(data.created_at, timeZoneOptions).split(' ')[1] }}</div>
 			</template>
 			<template #filter="{ filterModel }">
 				<Calendar v-model="filterModel.value" dateFormat="mm/dd/yy" placeholder="mm/dd/yyyy" mask="99/99/9999" @blur=" getDateFilter(filterModel)" />
@@ -52,7 +51,8 @@
         <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header" sortable>
 			<template #body="{ data }">
 				<div class="flex align-items-center" v-tooltip="{ content: `${data[col.field]}`, disabled: isDisabledTooltip(data[col.field]) }">
-					{{ data[col.field] }}
+					<span v-if="col.field == 'amount'">{{ Format.money(data[col.field], 2, data['units']) }}</span>
+					<span v-else>{{ data[col.field] }}</span>
 				</div>
 			</template>
         </Column>
@@ -92,15 +92,22 @@
 			rows = 10,
 			dateOptions = {
 				dateStyle: 'short',
-				timeStyle: 'short',
 				timeZone: 'America/New_York'
+			},
+			timeOptions = {
+				timeStyle: 'short',
+				timeZone: 'America/New_York',
+				hourCycle: "h12"
+			},
+			timeZoneOptions = {
+				timeZone: 'America/New_York',
+				timeZoneName: 'short'
 			}
 
 	let columns = [
 			{field: 'description', header: 'Description'},
-			{field: 'originated_at', header: 'Original Date'},
+			{field: 'originated_at', header: 'Originated'},
 			{field: 'unique_key', header: 'Unique Key'},
-			{field: 'units', header: 'Units'},
 			{field: 'amount', header: 'Amount'}
 		],
 		totalsColumns = {

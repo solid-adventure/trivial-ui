@@ -12,9 +12,15 @@
 	& table thead {
 		text-transform: capitalize;
 
+		& tr > th {
+			& div {
+				justify-content: center;
+			}
+		}
+
 		& tr:first-child > th {
 			width: calc(100% / var(--cols));
-			max-width: 135.66px;
+			max-width: 146px;
 			min-width: 100px;
 			font-size: .9rem;
 			text-overflow: ellipsis;
@@ -31,17 +37,27 @@
 	& table tbody {
 		& tr > td {
 			width: calc(100% / var(--cols));
-			max-width: 135.66px;
+			max-width: 146px;
 			min-width: 100px;
 
 			& > div {
-				width: 100%;
-				max-width: 130px;
-				min-width: 100px;
-				font-size: .9rem;
-				text-overflow: ellipsis;
-				overflow: hidden;
-				white-space: nowrap;
+				justify-content: center;
+
+				& > span {
+					font-size: .9rem;
+					text-overflow: ellipsis;
+					overflow: hidden;
+					white-space: nowrap;
+				}
+			}
+
+			& > div.date {
+				font-weight: 600;
+			}
+
+			& > div.time {
+				font-size: .8rem;
+				color: var(--gray-500);
 			}
 		}
 	}
@@ -50,8 +66,13 @@
 
 		& > div {
 			width: calc(100% / var(--cols));
-			max-width: 135.66px;
+			max-width: 146px;
 			min-width: 100px;
+			text-align: center;
+		}
+
+		& > div:first-child {
+			text-align: inherit;
 		}
 	}
 }
