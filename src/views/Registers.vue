@@ -153,10 +153,10 @@
 
 			// Get registers item 
 			registers.value = await store.state.Session.apiCall(`/register_items?register_id=${register.id}`)
-      
+
 			await getTotalAmountCol()
 
-      loading.value = false
+      		loading.value = false
 		} catch (err) {
 			console.log(err)
 			notifications.error(`Failed to fetch data: ${err}`)
