@@ -10,11 +10,15 @@
 		tableStyle="min-width: 50rem" 
 		dataKey="id"
 		filterDisplay="menu" 
-		class="border-round-sm registers_table">
+		class="border-round-sm registers_table"
+		ref="dt">
 
 	    <template #header>
+			<h2 class="m-0">Revenue Detail</h2>
 	        <div class="flex justify-content-between py-5">
-	        	<h2 class="m-0">Revenue Detail</h2>
+				<div style="text-align: left">
+            		<Button icon="pi pi-external-link" label="Export" @click="exportCSV($event)" />
+        		</div>
 	            <IconField iconPosition="right">
 	                <InputText v-model="filters['global'].value" placeholder="Keyword Search" />
 					<InputIcon>
@@ -56,6 +60,11 @@
 	import Format from '@/lib/Format'
 	import { useFormatDate } from '@/composable/formatDate.js'
 	import loadingImg from '@/assets/images/trivial-loading.gif'
+
+	const dt = ref();
+	const exportCSV = () => {
+		dt.value.exportCSV();
+	};
 
 	const loading = ref(false),
 			filters = ref({
@@ -112,7 +121,6 @@
 
 			// Get registers item 
 			registers.value = await store.state.Session.apiCall(`/register_items?register_id=${register.id}`)
-
 			loading.value = false
 		} catch (err) {
 			console.log(err)
