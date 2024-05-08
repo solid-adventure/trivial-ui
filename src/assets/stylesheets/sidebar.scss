@@ -40,7 +40,7 @@
 		font-size: 1rem;
 		line-height: 1.5;
 		color: white;
-		background-color: #1fb982;
+		background-color: var(--primary);
 	}
 
 	& > a {
@@ -79,10 +79,10 @@
 			color: #8b8f8b;
 
 			&:hover, &.router-link-exact-active {
-				border-color: #1fb982;
+				border-color: var(--primary);
 
 				& div {
-					color: #1fb982;	
+					color: var(--primary);
 					background-color: #3c3c3c;
 				}
 			}

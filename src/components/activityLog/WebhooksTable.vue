@@ -123,8 +123,7 @@
 
 
         &.selected {
-          background-color: var(--accent);
-          color: var(--on-accent);
+          background-color: var(--on-background-20);
         }
 
       }
