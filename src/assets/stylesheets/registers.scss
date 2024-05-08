@@ -1,5 +1,10 @@
 .registers_table {
 
+	& div.p-datatable-loading-overlay.p-component-overlay {
+		flex-direction: column;
+		color: #FFF;
+	}
+
 	& .calendar__search {
 		height: 2.125rem;
 	}
@@ -8,7 +13,13 @@
 		text-transform: capitalize;
 
 		& tr:first-child > th {
+			width: calc(100% / var(--cols));
+			max-width: 135.66px;
+			min-width: 100px;
 			font-size: .9rem;
+			text-overflow: ellipsis;
+			overflow: hidden;
+			white-space: nowrap;
 			background-color: var(--surface-50);
 
 			&:hover {
@@ -19,7 +30,28 @@
 
 	& table tbody {
 		& tr > td {
-			font-size: .9rem;
+			width: calc(100% / var(--cols));
+			max-width: 135.66px;
+			min-width: 100px;
+
+			& > div {
+				width: 100%;
+				max-width: 130px;
+				min-width: 100px;
+				font-size: .9rem;
+				text-overflow: ellipsis;
+				overflow: hidden;
+				white-space: nowrap;
+			}
+		}
+	}
+
+	& .footer__col {
+
+		& > div {
+			width: calc(100% / var(--cols));
+			max-width: 135.66px;
+			min-width: 100px;
 		}
 	}
 }
