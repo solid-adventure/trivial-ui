@@ -2,7 +2,6 @@
 	display: grid;
 	grid-template-columns: auto 1fr;
 	grid-template-rows: 100px 1fr;
-	height: 100svh;
 	box-sizing: border-box;
 
 	& > header.main__header {
@@ -21,7 +20,7 @@
 	& > div.wrapper__content {
 		grid-row: 2;
 		grid-column: 2;
-		top: unset;
+		height: 100dvh;
 		background-color: var(--background);
 	}
 }
