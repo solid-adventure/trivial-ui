@@ -125,7 +125,7 @@ div.left-inset {
   border: none;
   background: #ff5d00;
   background: linear-gradient(170deg, rgba(255,6,238,1) 0%, rgba(255,93,0,1) 100%, rgba(0,212,255,1) 100%);
-  overflow: hidden;
+  /*overflow: hidden;*/
 }
 
 .main-btn:hover {
@@ -136,7 +136,7 @@ div.left-inset {
 
 .btn-hover {
   position: relative;
-  overflow: hidden;
+  /*overflow: hidden;*/
 }
 
 .btn-hover::after {
