@@ -70,10 +70,17 @@ describe('Format', () => {
       expect(Format.money(1000, 0)).to.eql('$1,000')
     })
 
-    it('handles GBP', () => {
+    it('handles GBP symbol', () => {
       expect(Format.money(12, 2, '£')).to.eql('£12.00')
     })
 
+    it('handles GBP abbreviation', () => {
+      expect(Format.money(12, 2, 'GBP')).to.eql('£12.00')
+    })
+
+    it('handles a 3 character currency abbreviation', () => {
+      expect(Format.money(12, 2, 'USD')).to.eql('$12.00')
+    })
 
   })
 
