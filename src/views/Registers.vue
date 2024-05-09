@@ -1,5 +1,8 @@
 <template>
 	<DataTable 
+		v-model:editingRows="editingRows"
+		editMode="row"
+		@row-edit-save="onRowEditSave"
 		v-model:filters="filters" 
 		:value="registers" 
 		:loading="loading" 
@@ -13,6 +16,7 @@
 		scrollable
 		scrollHeight="100%"
 		class="border-round-sm registers_table"
+		:style="{ width: '80vw' }"
 		>
 
 	    <template #header>
@@ -55,8 +59,11 @@
 					{{ data[col.field] }}
 				</div>
 			</template>
+			<template #editor="{ data, field }" v-if = "col.canEdit">
+            	<InputText v-model="data[field]" />
+            </template>
         </Column>
-
+		<Column key = "edit" header = "Edit" :rowEditor="true" bodyStyle="text-align:center"></Column>
         <template #footer>
 			<div class="flex justify-content-start footer__col">
 				<div>
@@ -80,6 +87,17 @@
 	import { useFormatDate } from '@/composable/formatDate.js'
 	import loadingImg from '@/assets/images/trivial-loading.gif'
 
+	const editingRows = ref([]);
+
+	const onRowEditSave = async (event) => {
+    	let { newData, index } = event;
+		try {
+			let results = await store.state.Session.apiCall(`/register_items/${newData.id}`, 'PUT', newData)
+			register.value[index] = results
+		} catch (error){
+			notifications.error(`${error}`)
+		}
+	};
 	const loading = ref(false),
 			filters = ref({
 				global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -97,11 +115,10 @@
 			}
 
 	let columns = [
-			{field: 'description', header: 'Description'},
-			{field: 'originated_at', header: 'Original Date'},
-			{field: 'unique_key', header: 'Unique Key'},
-			{field: 'units', header: 'Units'},
-			{field: 'amount', header: 'Amount'}
+			{field: 'description', header: 'Description', canEdit: true},
+			{field: 'unique_key', header: 'Unique Key', canEdit: false },
+			{field: 'units', header: 'Units', canEdit: true},
+			{field: 'amount', header: 'Amount', canEdit: true}
 		],
 		totalsColumns = {
 			amount: 'amount'
@@ -134,7 +151,7 @@
 
 			// Setting dynamic table columns headers
 			for (const property in register.meta) {
-				columns.push({field: register.meta[property], header: register.meta[property].replace('_', ' ')})
+				columns.push({field: register.meta[property], header: register.meta[property].replace('_', ' '), canEdit: register.meta[property] === "income_account"})
 				globalFilterFields.push(register.meta[property])
 			}
 
