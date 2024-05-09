@@ -14,6 +14,7 @@ import Button from "primevue/button"
 import Dropdown from 'primevue/dropdown'
 import Image from 'primevue/image'
 import Calendar from 'primevue/calendar'
+import OverlayPanel from 'primevue/overlaypanel'
 import router from './router'
 import store from './store'
 import FloatingVue from 'floating-vue'
@@ -33,4 +34,5 @@ app.component('Dropdown', Dropdown)
 app.component('Image', Image)
 app.component('Button', Button)
 app.component('Calendar', Calendar)
+app.component('OverlayPanel', OverlayPanel)
 app.mount('#app')

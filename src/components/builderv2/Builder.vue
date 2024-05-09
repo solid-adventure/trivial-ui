@@ -109,7 +109,9 @@ export default {
 
     program() {
       return (
-        this.manifest.program ||
+        /*this.manifest.program ||
+        ActionDescriptors.actionDefinitionOfType("ReceiveWebhook", 1)*/
+        this.manifest?.content ||
         ActionDescriptors.actionDefinitionOfType("ReceiveWebhook", 1)
       );
     },
@@ -364,9 +366,11 @@ export default {
     position: sticky;
     top: 120px;
     width: 100%;
+    height: 100px;
     padding-block: 1rem;
     border-bottom: 1px solid var(--on-background-20);
     z-index: 50;
+    background-color: $background;
 
     .action-holder {
       /*width: 100%;

@@ -11,7 +11,7 @@
 		dataKey="id"
 		filterDisplay="menu"
 		scrollable
-		scrollHeight="100%"
+
 		class="border-round-sm registers_table"
 		>
 
@@ -41,10 +41,10 @@
 				<Calendar v-model="filterModel.value" dateFormat="mm/dd/yy" placeholder="mm/dd/yyyy" mask="99/99/9999" @blur=" getDateFilter(filterModel)" />
 			</template>
 			<template #filterclear="{ filterCallback }">
-				<Button type="button" @click="filterCallback(), getTotalAmountCol()" label="Clear" outlined />
+				<Button type="button" @click="filterCallback(), getTotalAmountCol()" label="Clear" outlined class="date__clear-btn" />
 			</template>
 			<template #filterapply="{ filterCallback }">
-				<Button type="button" @click="filterCallback(), getTotalAmountCol()" label="Apply" severity="success" />
+				<Button type="button" @click="filterCallback(), getTotalAmountCol()" label="Apply" class="date__apply-btn" />
 			</template>
 		</Column>
 
@@ -60,7 +60,13 @@
         <template #footer>
 			<div class="flex justify-content-start footer__col">
 				<div>
-					<h4 class="m-0">Totals</h4>
+					<h4 class="flex align-items-center m-0">
+						Totals
+						<Button type="button" icon="pi pi-info-circle" severity="secondary" size="small" text rounded outlined aria-label="Info" @click="toggleTotalInfoPopup" class="info__btn ml-2 p-0" />
+						<OverlayPanel ref="totalInfoPopup">
+							<p class="m-0">Total includes results from all pages, including those not displayed.</p>
+						</OverlayPanel>
+					</h4>
 				</div>
 				<div v-for="(col, index) of columns" :key="index">
 					<!--<span v-if="col.field === totalsColumns[col.field]">{{ setTotalColValue(totalsColumns[col.field]) }}</span>-->
@@ -88,6 +94,7 @@
 			store = useStore(),
 			registers = ref([]),
 			totalAmount = ref(null),
+			totalInfoPopup = ref(),
 			rowsPerPageOpt = [5, 10, 20, 50],
 			rows = 10,
 			dateOptions = {
@@ -199,4 +206,6 @@
 	const clearFilterDate = () => filterDate = {end_at: null, start_at: null}
 
 	const isDisabledTooltip = data => data?.length < 14
+
+	const toggleTotalInfoPopup = event => totalInfoPopup.value.toggle(event)
 </script>

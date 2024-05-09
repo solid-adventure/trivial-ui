@@ -5,9 +5,9 @@
 
 			<div class="main__header__top__content">
 				<Dropdown v-model="selectedOrg" :options="organisations" optionLabel="name" placeholder="Select Organization" class="main__header__top__content__dropdown" :change="handleSelected()" />
-				<router-link to="#" class="main__header__top__content--link">
+				<!--<router-link to="#" class="main__header__top__content--link">
 					<Icon icon="fa6-regular:user" />
-				</router-link>
+				</router-link>-->
 			</div>
 		</div>
 		<Breadcrumb :breadcrumbs="breadcrumbs" />

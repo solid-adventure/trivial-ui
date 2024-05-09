@@ -2,7 +2,8 @@
 
 	& div.p-datatable-loading-overlay.p-component-overlay {
 		flex-direction: column;
-		color: #FFF;
+		color: var(--gray-900);
+		background-color: rgba(255, 255, 255, .7);
 	}
 
 	& .calendar__search {
@@ -21,7 +22,7 @@
 		& tr:first-child > th {
 			width: calc(100% / var(--cols));
 			max-width: 146px;
-			min-width: 100px;
+			min-width: 120px;
 			font-size: .9rem;
 			text-overflow: ellipsis;
 			overflow: hidden;
@@ -38,7 +39,7 @@
 		& tr > td {
 			width: calc(100% / var(--cols));
 			max-width: 146px;
-			min-width: 100px;
+			min-width: 120px;
 
 			& > div {
 				justify-content: center;
@@ -63,17 +64,33 @@
 	}
 
 	& .footer__col {
+		max-width: 100%;
 
 		& > div {
 			width: calc(100% / var(--cols));
 			max-width: 146px;
-			min-width: 100px;
+			min-width: 120px;
 			text-align: center;
 		}
 
 		& > div:first-child {
 			text-align: inherit;
 		}
+
+		& .info__btn {
+			width: 14px;
+			height: 14px;
+		}
+	}
+}
+
+div.p-column-filter-buttonbar {
+	& .date__apply-btn {
+		background-color: $primary;
+	}
+
+	& .date__clear-btn {
+		color: $primary;
 	}
 }
 

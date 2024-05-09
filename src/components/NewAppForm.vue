@@ -142,11 +142,13 @@ export default {
       async build(appInstance, manifest) {
         try {
           const params = FeatureManager.featureParams()
-          fetchJSON(`/build?${params}`, { // await removed
-            method: 'post',
-            headers: {'content-type': 'application/json'},
-            body: JSON.stringify(manifest)
-          })
+            if (params) {
+                fetchJSON(`/build?${params}`, { // await removed
+                    method: 'post',
+                    headers: {'content-type': 'application/json'},
+                    body: JSON.stringify(manifest)
+                })
+            }
           this.buildStatus = 'complete'
           this.appId = appInstance.name
           this.stopMessagesAndRedirect()
