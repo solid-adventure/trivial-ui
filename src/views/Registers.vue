@@ -58,6 +58,9 @@
 					<span v-else>{{ data[col.field] }}</span>
 				</div>
 			</template>
+			<template #editor="{ data, field }" v-if = "col.canEdit">
+            	<InputText class = "editInput" v-model="data[field]" />
+            </template>
         </Column>
 
 		<Column key = "edit" :rowEditor="true" bodyStyle="text-align:center"></Column>
@@ -128,10 +131,10 @@
 			}
 
 	let columns = [
-			{field: 'description', header: 'Description'},
-			{field: 'originated_at', header: 'Originated'},
-			{field: 'unique_key', header: 'Unique Key'},
-			{field: 'amount', header: 'Amount'}
+			{field: 'description', header: 'Description', canEdit: true},
+			{field: 'originated_at', header: 'Originated', canEdit: false},
+			{field: 'unique_key', header: 'Unique Key', canEdit: false},
+			{field: 'amount', header: 'Amount', canEdit: true}
 		],
 		totalsColumns = {
 			amount: 'amount'
@@ -164,7 +167,7 @@
 
 			// Setting dynamic table columns headers
 			for (const property in register.meta) {
-				columns.push({field: register.meta[property], header: register.meta[property].replace('_', ' '), canEdit: register.meta[property] === "income_account"})
+				columns.push({field: register.meta[property], header: register.meta[property].replace('_', ' '), canEdit: true})
 				globalFilterFields.push(register.meta[property])
 			}
 
