@@ -29,7 +29,7 @@
 	    <template #empty>No revenues found.</template>
 	    <template #loading>
 	    	<Image :src="loadingImg" alt="Loader" width="160" />
-	    	<h3>Loading revenues data. Please wait.</h3>
+	    	<h3>Loading ...</h3>
 	    </template>
 
 		<Column header="Date" filterField="date" dataType="date" key="date">
@@ -48,7 +48,7 @@
 			</template>
 		</Column>
 
-        <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header" sortable>
+        <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header" sortable> 
 			<template #body="{ data }">
 				<div class="flex align-items-center" v-tooltip="{ content: `${data[col.field]}`, disabled: isDisabledTooltip(data[col.field]) }">
 					<span v-if="col.field == 'amount'">{{ Format.money(data[col.field], 2, data['units']) }}</span>
@@ -111,7 +111,8 @@
 				timeZoneName: 'short'
 			}
 
-	let columns = [
+	let columns = [],
+		fixedColumns = [
 			{field: 'description', header: 'Description'},
 			{field: 'originated_at', header: 'Originated'},
 			{field: 'unique_key', header: 'Unique Key'},
@@ -138,8 +139,11 @@
 
 	const getRegisters = async orgId => {
 		loading.value = true
+		columns = [] // Reset columns before new set of columns from API call
 
 		try {
+			columns = [...fixedColumns] // Add fixed columns at the beginig of the table
+
 			//registers.value = await store.state.Session.apiCall(`/registers?search={"owner_type: "Organization", "owner_id": ${orgId}`)
 			allRegisters = await store.state.Session.apiCall(`/registers`)
 			let register = allRegisters.find(r => r.owner_type == 'Organization' && r.owner_id == orgId && r.name == 'Sales')
@@ -148,10 +152,11 @@
 
 			// Setting dynamic table columns headers
 			for (const property in register.meta) {
-				columns.push({field: register.meta[property], header: register.meta[property].replace('_', ' ')})
+				columns.push({field: register.meta[property], header: register.meta[property].replaceAll('_', ' ')})
 				globalFilterFields.push(register.meta[property])
 			}
 
+			//console.log('columns 2 - ', columns)
 			setCssPropColsLength()
 
 			// Settign filters dynamic fileds for search options

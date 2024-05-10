@@ -297,7 +297,8 @@
       ...mapState({
         apps: state => state.apps,
         appsLoaded: state => state.appsLoaded,
-        Permissions: state => state.Permissions
+        Permissions: state => state.Permissions,
+        orgId: state => state.orgId
       })
 
     },

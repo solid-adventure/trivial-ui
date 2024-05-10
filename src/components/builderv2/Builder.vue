@@ -109,9 +109,7 @@ export default {
 
     program() {
       return (
-        /*this.manifest.program ||
-        ActionDescriptors.actionDefinitionOfType("ReceiveWebhook", 1)*/
-        this.manifest?.content ||
+        this.manifest?.program ||
         ActionDescriptors.actionDefinitionOfType("ReceiveWebhook", 1)
       );
     },
