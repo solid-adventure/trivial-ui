@@ -11,6 +11,9 @@
 		dataKey="id"
 		filterDisplay="menu"
 		scrollable
+		v-model:editingRows="editingRows"
+		editMode="row"
+		@row-edit-save="onRowEditSave"
 
 		class="border-round-sm registers_table"
 		>
@@ -57,6 +60,8 @@
 			</template>
         </Column>
 
+		<Column key = "edit" :rowEditor="true" bodyStyle="text-align:center"></Column>
+		
         <template #footer>
 			<div class="flex justify-content-start footer__col">
 				<div>
@@ -85,6 +90,17 @@
 	import Format from '@/lib/Format'
 	import { useFormatDate } from '@/composable/formatDate.js'
 	import loadingImg from '@/assets/images/trivial-loading.gif'
+
+	const editingRows = ref([]);
+	const onRowEditSave = async (event) => {
+		let { newData, index } = event;
+		try {
+			let results = await store.state.Session.apiCall(`/register_items/${newData.id}`, 'PUT', newData)
+			registers.value[index] = results
+		} catch (error){
+			notifications.error(error)
+		}
+	};
 
 	const loading = ref(false),
 			filters = ref({
@@ -148,7 +164,7 @@
 
 			// Setting dynamic table columns headers
 			for (const property in register.meta) {
-				columns.push({field: register.meta[property], header: register.meta[property].replace('_', ' ')})
+				columns.push({field: register.meta[property], header: register.meta[property].replace('_', ' '), canEdit: register.meta[property] === "income_account"})
 				globalFilterFields.push(register.meta[property])
 			}
 
