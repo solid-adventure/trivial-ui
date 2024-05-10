@@ -63,7 +63,7 @@
             	<InputText v-model="data[field]" />
             </template>
         </Column>
-		<Column key = "edit" header = "Edit" :rowEditor="true" bodyStyle="text-align:center"></Column>
+		<Column key = "edit" :rowEditor="true" bodyStyle="text-align:center"></Column>
         <template #footer>
 			<div class="flex justify-content-start footer__col">
 				<div>
@@ -93,9 +93,9 @@
     	let { newData, index } = event;
 		try {
 			let results = await store.state.Session.apiCall(`/register_items/${newData.id}`, 'PUT', newData)
-			register.value[index] = results
+			registers.value[index] = results
 		} catch (error){
-			notifications.error(`${error}`)
+			notifications.error(error)
 		}
 	};
 	const loading = ref(false),
