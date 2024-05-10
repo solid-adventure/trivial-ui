@@ -59,7 +59,7 @@
 				</div>
 			</template>
 			<template #editor="{ data, field }" v-if = "col.canEdit">
-            	<InputText class = "editInput" v-model="data[field]" />
+            	<InputText class = "editInput" v-model="data[col.field]" />
             </template>
         </Column>
 
@@ -96,9 +96,10 @@
 
 	const editingRows = ref([]);
 	const onRowEditSave = async (event) => {
-		let { newData, index } = event;
+		let { newData } = event;
 		try {
 			let results = await store.state.Session.apiCall(`/register_items/${newData.id}`, 'PUT', newData)
+			let index = (registers.value).findIndex(item => item.id === results.id);
 			registers.value[index] = results
 		} catch (error){
 			notifications.error(error)
