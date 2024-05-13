@@ -192,7 +192,7 @@ input, select {
 .dashboard-settings-container {
   position: fixed;
   top: 120px;
-  left: 0;
+  left: 50%;
   background: var(--background);
   color: var(--on-background);
   padding: 2em;

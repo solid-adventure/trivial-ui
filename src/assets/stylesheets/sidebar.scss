@@ -6,7 +6,7 @@
 	padding-block: 40px;
 	padding-right: 10px;
 	transition: width 400ms ease-in-out;
-	background-color: var(--on-background-high-contrast);
+	background-color: var(--surface);
 
 	&.close {
 		width: 100px;
@@ -91,9 +91,9 @@
 				outline: none;
 			}
 
-			&:last-child {
+			/*&:last-child {
 				transform: translateY(350%);
-			}
+			}*/
 
 			& > div {
 				position: relative;
@@ -113,6 +113,14 @@
 					font-size: 1.05rem;
 					line-height: 1;
 					transition: opacity 400ms ease-in-out, visibility 400ms ease-in-out;
+				}
+			}
+
+			&.aside__nav__link--sublink {
+				justify-content: flex-end;
+				
+				& > div {
+					width: 85%;
 				}
 			}
 		}

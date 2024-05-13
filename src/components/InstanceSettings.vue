@@ -1,12 +1,13 @@
 <template>
   <div class="settings2">
-  <nav-tree selected-title="settings"></nav-tree>
+  <!--<nav-tree selected-title="settings"></nav-tree>-->
   <div class="InstanceSettings">
     <div id="messages">{{errorMessage}}</div>
 
     <p v-if="loading">Loading...</p>
 
     <div v-if="!loading" id="instance-setting-container">
+      <h1><RouterLink :to="`/apps/${this.app.name}/builder2`">{{this.app.descriptive_name}}</RouterLink></h1>
       <div class="page-inset">
         <h2 class="section-title">App Name</h2>
         <em class="section-help-text">Update the name of your app as it appears in Trivial.</em>
@@ -223,7 +224,7 @@
   import ManifestMigrator from 'trivial-core/lib/ManifestMigrator'
   import TrackingService from '../../lib/TrackingService'
   import FeatureManager from 'trivial-core/lib/FeatureManager'
-  import NavTree from './builderv2/NavTree.vue'
+  //import NavTree from './builderv2/NavTree.vue'
   import AppTransferManager from './builderv2/AppTransferManager.vue'
 
   export default {
@@ -233,7 +234,7 @@
         ActionButton,
         HideableSection,
         AppTransferManager,
-        'nav-tree': NavTree
+        //'nav-tree': NavTree
     },
 
     data() {

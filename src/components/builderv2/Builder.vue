@@ -7,7 +7,7 @@ import ActionCatalog from "trivial-core/lib/actionsv2/catalog/ActionCatalog";
 import ActionIterator from "trivial-core/lib/actionsv2/catalog/ActionIterator";
 import ChangeSequence from "./help/ChangeSequence.vue";
 import ConfigResolver from "trivial-core/lib/ConfigResolver";
-import NavTree from "./NavTree.vue";
+//import NavTree from "./NavTree.vue";
 import Notifications from "../notifications";
 import CustomFunctionList from "../CustomFunctionList.vue";
 import BuildButton from "../controls/BuildButton.vue";
@@ -29,7 +29,7 @@ export default {
     CredentialsVault,
     CustomFunctionList,
     Editor,
-    NavTree,
+    //NavTree,
     Notices,
     PayloadEditor,
     ProgramBreadcrumb,
@@ -257,6 +257,7 @@ export default {
     <div v-if="!playgroundMode" class="action-bar">
       <div class="action-holder">
         <div class="trigger-section">
+          <h1>{{ this.app.descriptive_name }}</h1>
           <AppTrigger
             :customPayload="customPayload"
             :buildDirty="buildDirty"
@@ -285,12 +286,12 @@ export default {
       :selected="selectedAction"
       @navigate="navigateTo"
     ></ProgramBreadcrumb>
-    <NavTree
+    <!--<NavTree
       :selectedTitle="'builder'"
       :program="program"
       :selectedAction="selectedAction"
       @programNavigate="navigateTo"
-    ></NavTree>
+    ></NavTree>-->
     <ChangeSequence
       v-if="displayChangeSequence"
       @close="displayChangeSequence = false"
@@ -395,6 +396,7 @@ export default {
     .trigger-section {
       display: flex;
       align-items: center;
+      gap: 0 1rem;
     }
   }
 

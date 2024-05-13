@@ -1,15 +1,20 @@
 <script>
   import FilterEditor from './FilterEditor.vue'
-  import NavTree from './NavTree.vue'
+  //import NavTree from './NavTree.vue'
   import Notices from '../Notices.vue'
   import WebhooksTable from '../activityLog/WebhooksTable.vue'
+  import { mapState, mapGetters } from 'vuex'
 
   export default {
     components: {
       FilterEditor,
-      NavTree,
+      //NavTree,
       Notices,
       WebhooksTable,
+    },
+    computed: {
+      ...mapState(['app']),
+      ...mapGetters(['appLoaded'])
     }
   }
 
@@ -19,9 +24,13 @@
   <div class="InstanceActivity">
     <!-- <super-bar></super-bar> -->
     <Notices></Notices>
-    <nav-tree :selected-title="'activity'"></nav-tree>
+    <!--<nav-tree :selected-title="'activity'"></nav-tree>-->
 
     <div class="instance-activity-items">
+      <div class='app-name-container'>
+        <h1 v-if = "appLoaded"><RouterLink :to="`/apps/${this.app.name}/builder2`">{{this.app.descriptive_name}}</RouterLink></h1>
+        <h1 v-else>Loading...</h1>
+      </div>
       <FilterEditor></FilterEditor>
       <WebhooksTable></WebhooksTable>
     </div>

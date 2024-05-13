@@ -1,0 +1,26 @@
+/* Light theme */
+html[color-scheme="light"] {
+  color-scheme: light;
+
+  --background: #FFFFFF;
+  --surface: #fafafa;
+}
+
+/* Dark theme override */
+html[color-scheme="dark"] {
+  color-scheme: dark;
+
+  --background: #171717;
+  --surface: #212121;
+}
+
+
+/* Dark theme (system preference) - Default (same as dark theme override) */
+@media (prefers-color-scheme: dark) {
+  html:not([color-scheme]) {
+    color-scheme: dark;
+
+    --background: #171717;
+    --surface: #212121;
+  }
+}

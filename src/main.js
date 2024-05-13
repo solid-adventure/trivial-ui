@@ -15,6 +15,11 @@ import Dropdown from 'primevue/dropdown'
 import Image from 'primevue/image'
 import Calendar from 'primevue/calendar'
 import OverlayPanel from 'primevue/overlaypanel'
+import Menu from 'primevue/menu'
+import Avatar from 'primevue/avatar'
+import ToggleButton from 'primevue/togglebutton'
+import Breadcrumb from 'primevue/breadcrumb'
+import Ripple from 'primevue/ripple'
 import router from './router'
 import store from './store'
 import FloatingVue from 'floating-vue'
@@ -35,4 +40,10 @@ app.component('Image', Image)
 app.component('Button', Button)
 app.component('Calendar', Calendar)
 app.component('OverlayPanel', OverlayPanel)
+app.component('Menu', Menu)
+app.component('Avatar', Avatar)
+app.component('ToggleButton', ToggleButton)
+app.component('Breadcrumb', Breadcrumb)
+app.directive('ripple', Ripple)
+
 app.mount('#app')

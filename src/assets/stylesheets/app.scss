@@ -1,6 +1,6 @@
 @import "includes/reset";
 @import "includes/lato";
-@import "includes/theme-defaults";
+//@import "includes/theme-defaults";
 @import "includes/modals";
 @import "includes/forms";
 @import "includes/transitions";
@@ -368,6 +368,7 @@ $time-hover-background-color: mix($background, $calendar-active-background-color
   background-color: $surface;
 }
 
+@import './theme.scss';
 @import './layout.scss';
 @import './header.scss';
 @import './sidebar.scss';

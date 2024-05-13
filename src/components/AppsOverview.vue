@@ -179,6 +179,7 @@
   import StatusLine from './StatusLine.vue'
   import SortableHead from './controls/SortableHead.vue'
   import store from '../store'
+  import { toRaw } from 'vue'
 
 
 
@@ -227,8 +228,10 @@
     computed: {
 
       filteredApps() {
+        let filtredByOrgIdApps = toRaw(this.apps).filter(r => r.owner_id === this.orgId)
+
         const term = this.searchTerm.toUpperCase()
-        let apps = this.apps.filter(app => {
+        let apps = filtredByOrgIdApps.filter(app => {
           return (
             (! term) ||
             (String(app.descriptive_name).toUpperCase().indexOf(term) !== -1)
@@ -237,7 +240,7 @@
 
         if (!['any', 'all'].includes(this.panelTypeFilter)) {
           apps = apps
-            .filter(app => app.panels)
+            //.filter(app => app.panels)
             .filter(app => app.panels.component.toLowerCase() == this.panelTypeFilter.toLowerCase())
         }
         return apps
