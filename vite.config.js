@@ -26,7 +26,7 @@ export default defineConfig({
   css: {
     preprocessorOptions: {
       scss: {
-        additionalData: '@import "./src/assets/stylesheets/app-light.scss";'
+        additionalData: '@import "./src/assets/stylesheets/main.scss";'
       }
     }
   }

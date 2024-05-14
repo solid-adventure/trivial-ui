@@ -131,6 +131,10 @@
       display: flex;
       flex-direction: column;
       gap: 1rem;
+
+      & a {
+        color: var(--clr-text-primary);
+      }
     }
   }
 

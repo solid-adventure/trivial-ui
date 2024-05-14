@@ -1,8 +1,19 @@
 .registers_table {
+	
+
+	.p-datatable-header {
+		color: var(--clr-text-primary);
+		background-color: var(--clr-surface);
+
+		& .p-inputtext.p-component {
+			color: var(--clr-text-primary);
+			background-color: var(--clr-bg);
+		}
+	}
 
 	& div.p-datatable-loading-overlay.p-component-overlay {
 		flex-direction: column;
-		color: var(--gray-900);
+		color: var(--clr-text-primary);
 		background-color: rgba(255, 255, 255, .7);
 	}
 
@@ -27,39 +38,60 @@
 			text-overflow: ellipsis;
 			overflow: hidden;
 			white-space: nowrap;
-			background-color: var(--surface-50);
+			color: var(--clr-text-primary);
+			background-color: var(--clr-bg);
 
 			&:hover {
-				background-color: var(--surface-100);
+				background-color: #f1f5f9;
 			}
 		}
 	}
 
 	& table tbody {
-		& tr > td {
-			width: calc(100% / var(--cols));
-			max-width: 146px;
-			min-width: 120px;
 
-			& > div {
-				justify-content: center;
+		& tr {
+			color: var(--clr-text-primary);
+			background-color: var(--clr-surface);
 
-				& > span {
-					font-size: .9rem;
-					text-overflow: ellipsis;
-					overflow: hidden;
-					white-space: nowrap;
+			& td {
+				width: calc(100% / var(--cols));
+				max-width: 146px;
+				min-width: 120px;
+
+				& > div {
+					justify-content: center;
+
+					& > span {
+						font-size: .9rem;
+						text-overflow: ellipsis;
+						overflow: hidden;
+						white-space: nowrap;
+					}
+				}
+
+				& > div.date {
+					font-weight: 600;
+				}
+
+				& > div.time {
+					font-size: .8rem;
+					color: var(--clr-text-secondary);
 				}
 			}
+		}
+	}
 
-			& > div.date {
-				font-weight: 600;
-			}
+	& .p-datatable-footer, 
+	& .p-paginator.p-component {
+		color: var(--clr-text-primary);
+		background-color: var(--clr-surface);
+	}
 
-			& > div.time {
-				font-size: .8rem;
-				color: var(--gray-500);
-			}
+	& .p-dropdown.p-component.p-inputwrapper.p-inputwrapper-filled.p-paginator-rpp-options {
+		background-color: var(--clr-surface);
+
+		& .p-dropdown-label.p-inputtext {
+			color: var(--clr-text-primary);
 		}
 	}
 
@@ -78,26 +110,23 @@
 		}
 
 		& .info__btn {
-			width: 14px;
-			height: 14px;
+			width: 16px;
+			height: 16px;
 		}
 	}
 }
 
 div.p-column-filter-buttonbar {
 	& .date__apply-btn {
-		background-color: $primary;
+		background-color: var(--clr-green);
 	}
 
 	& .date__clear-btn {
-		color: $primary;
+		color: var(--clr-green);
 	}
 }
 
 input[type="text"].p-inputtext {
-    color: #334155;
-    padding: .5rem .75rem;
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
-    outline-color: transparent;
+	padding: .5rem .75rem;
+	border-radius: 6px;
 }

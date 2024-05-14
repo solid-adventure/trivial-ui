@@ -160,7 +160,7 @@
     border-bottom: 1px solid var(--on-background-40);
     top: 120px;
     position: sticky;
-    background-color: var(--background);
+    background-color: var(--clr-bg);
     z-index: 2;
   }
 

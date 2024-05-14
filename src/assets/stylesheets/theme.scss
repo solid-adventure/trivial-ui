@@ -2,16 +2,18 @@
 html[color-scheme="light"] {
   color-scheme: light;
 
-  --background: #FFFFFF;
-  --surface: #fafafa;
+  --clr-bg: #F8F9FC; // light gray
+  --clr-surface: #FFFFFF; // surface white
+  --clr-text-primary: #3F3F3F; // dark gray
 }
 
 /* Dark theme override */
 html[color-scheme="dark"] {
   color-scheme: dark;
 
-  --background: #171717;
-  --surface: #212121;
+  --clr-bg: #3F3F3F; // dark bg
+  --clr-surface: #1E1E1E; // light surface color
+  --clr-text-primary: #FFFFFF; // white text
 }
 
 
@@ -20,7 +22,8 @@ html[color-scheme="dark"] {
   html:not([color-scheme]) {
     color-scheme: dark;
 
-    --background: #171717;
-    --surface: #212121;
+    --clr-bg: #3F3F3F; // dark bg
+    --clr-surface: #1E1E1E; // light surface color
+    --clr-text-primary: #FFFFFF; // white text
   }
 }

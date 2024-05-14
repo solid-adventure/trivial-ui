@@ -51,6 +51,10 @@
       display: flex;
       flex-direction: column;
       width: 100%;
+
+      & a {
+        color: var(--clr-text-primary);
+      }
     }
   }
 

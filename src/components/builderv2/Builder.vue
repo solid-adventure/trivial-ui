@@ -363,13 +363,13 @@ export default {
     flex-direction: column;*/
 
     position: sticky;
-    top: 120px;
+    top: 0;
     width: 100%;
     height: 100px;
     padding-block: 1rem;
     border-bottom: 1px solid var(--on-background-20);
     z-index: 50;
-    background-color: $background;
+    background-color: var(--clr-bg);
 
     .action-holder {
       /*width: 100%;

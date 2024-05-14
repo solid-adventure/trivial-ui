@@ -1,9 +1,9 @@
-@import "includes/reset";
+/*@import "includes/reset";
 @import "includes/lato";
 //@import "includes/theme-defaults";
 @import "includes/modals";
 @import "includes/forms";
-@import "includes/transitions";
+@import "includes/transitions";*/
 
 html, body {
   margin: 0;
@@ -13,8 +13,8 @@ html, body {
 }
 
 body {
-  background: $background;
-  color: $on-background;
+  background: var(--clr-bg);
+  color: var(--clr-text-primary);
 }
 
 h1, h2, h3, h4 {
@@ -94,7 +94,7 @@ div.page-container {
 div.page-inset {
   padding: 1em;
   border-radius: 1em;
-  background: var(--surface);
+  background: var(--clr-surface);
   /*border: 1px solid var(--background-80);
   margin: 2em 2em 2em 2em;
   min-width: 18em;
@@ -315,6 +315,7 @@ hr.accent {
   height: 1.5em;
 }
 
+/*
 // datepicker
 $namespace: 'xmx'; // change the 'mx' to 'xmx'. then <date-picker prefix-class="xmx" />
 
@@ -359,17 +360,22 @@ $time-hover-background-color: mix($background, $calendar-active-background-color
 @import '../../../node_modules/vue-datepicker-next/scss/index.scss';
 
 
-.#{$namespace}-input {
+.# {$namespace}-input {
   background-color: $surface;
   color: $on-surface;
 }
 
-.#{$namespace}-datepicker-main {
+.# {$namespace}-datepicker-main {
   background-color: $surface;
 }
 
+*/
+
+
+/*
 @import './theme.scss';
 @import './layout.scss';
 @import './header.scss';
 @import './sidebar.scss';
 @import './registers.scss';
+*/

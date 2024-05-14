@@ -6,7 +6,7 @@
 	padding-block: 40px;
 	padding-right: 10px;
 	transition: width 400ms ease-in-out;
-	background-color: var(--surface);
+	background-color: var(--clr-black);
 
 	&.close {
 		width: 100px;
@@ -40,7 +40,7 @@
 		font-size: 1rem;
 		line-height: 1.5;
 		color: white;
-		background-color: var(--primary);
+		background-color: var(--clr-green);
 	}
 
 	& > a {
@@ -76,14 +76,14 @@
 			padding-inline: 20px;
 			border-left: 4px solid transparent;
 			transition: border-color 400ms ease-in-out;
-			color: #8b8f8b;
+			color: var(--clr-lightgray);
 
 			&:hover, &.router-link-exact-active {
-				border-color: var(--primary);
+				border-color: var(--clr-green);
 
 				& div {
-					color: var(--primary);
-					background-color: #3c3c3c;
+					color: var(--clr-green);
+					background-color: var(--clr-darkgray);
 				}
 			}
 

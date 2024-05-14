@@ -193,7 +193,7 @@ input, select {
   position: fixed;
   top: 120px;
   left: 50%;
-  background: var(--background);
+  background: var(--clr-bg);
   color: var(--on-background);
   padding: 2em;
   height: calc(100% - 80px - 4em);
