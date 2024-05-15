@@ -367,9 +367,9 @@ export default {
     width: 100%;
     height: 100px;
     padding-block: 1rem;
-    border-bottom: 1px solid var(--on-background-20);
+    border-bottom: 1px solid var(--on-background);
     z-index: 50;
-    background-color: var(--clr-bg);
+    background-color: var(--background);
 
     .action-holder {
       /*width: 100%;

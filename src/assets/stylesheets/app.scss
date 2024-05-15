@@ -13,8 +13,8 @@ html, body {
 }
 
 body {
-  background: var(--clr-bg);
-  color: var(--clr-text-primary);
+  background: var(--background);
+  color: var(--on-background);
 }
 
 h1, h2, h3, h4 {
@@ -27,14 +27,14 @@ a {
 }
 
 input, textarea, select {
-  background-color: $background-high-contrast;
-  color: $on-background-high-contrast;
-  caret-color: $accent;
+  //background-color: $background-high-contrast;
+  //color: $on-background-high-contrast;
+  //caret-color: $accent;
 }
 
 a, input, textarea, select, button {
     &:focus {
-      outline-color: $secondary;
+      //outline-color: $secondary;
       outline-width: thin;
       outline-style: solid;
   }
@@ -49,7 +49,7 @@ table.spaced {
 
   thead {
     tr {
-      background-color: var(--background);
+     // background-color: var(--background);
 
       th {
         font-weight: 700;
@@ -63,7 +63,7 @@ table.spaced {
 
   tbody {
     tr {
-      border-bottom: 1px solid $background-80;
+     // border-bottom: 1px solid $background-80;
 
       td {
         font-weight: 400;
@@ -94,7 +94,7 @@ div.page-container {
 div.page-inset {
   padding: 1em;
   border-radius: 1em;
-  background: var(--clr-surface);
+  background: var(--surface);
   /*border: 1px solid var(--background-80);
   margin: 2em 2em 2em 2em;
   min-width: 18em;
@@ -315,7 +315,8 @@ hr.accent {
   height: 1.5em;
 }
 
-/*
+
+
 // datepicker
 $namespace: 'xmx'; // change the 'mx' to 'xmx'. then <date-picker prefix-class="xmx" />
 
@@ -323,7 +324,7 @@ $namespace: 'xmx'; // change the 'mx' to 'xmx'. then <date-picker prefix-class="
 // $default-color: #555;
 // $primary-color: #e71296;
 
-$default-color: $on-surface-secondary;
+$default-color: var(--on-surface-secondary);
 $primary-color: $link;
 
 $today-color: mix($background, $primary-color, 10%);
@@ -359,7 +360,7 @@ $time-hover-background-color: mix($background, $calendar-active-background-color
 
 @import '../../../node_modules/vue-datepicker-next/scss/index.scss';
 
-
+/*
 .# {$namespace}-input {
   background-color: $surface;
   color: $on-surface;
@@ -368,7 +369,6 @@ $time-hover-background-color: mix($background, $calendar-active-background-color
 .# {$namespace}-datepicker-main {
   background-color: $surface;
 }
-
 */
 
 

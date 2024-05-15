@@ -7,11 +7,10 @@
 		:rows="rows" 
 		:rowsPerPageOptions="rowsPerPageOpt"
 		paginator
-		tableStyle="min-width: 50rem" 
+		tableStyle="max-width: 100%" 
 		dataKey="id"
 		filterDisplay="menu"
 		scrollable
-
 		class="border-round-sm registers_table"
 		>
 
@@ -163,7 +162,10 @@
 			//globalFilterFields.forEach(item => filters.value[item] = {value: null, matchMode: FilterMatchMode.CONTAINS})
 
 			// Get registers item 
-			registers.value = await store.state.Session.apiCall(`/register_items?register_id=${register.id}`)
+			//registers.value = await store.state.Session.apiCall(`/register_items?register_id=${register.id}`)
+			let { register_items } = await store.state.Session.apiCall(`/register_items?register_id=${register.id}`)
+
+			registers.value = register_items;
 
 			await getTotalAmountCol()
 

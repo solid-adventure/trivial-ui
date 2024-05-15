@@ -2,18 +2,30 @@
 html[color-scheme="light"] {
   color-scheme: light;
 
-  --clr-bg: #F8F9FC; // light gray
-  --clr-surface: #FFFFFF; // surface white
-  --clr-text-primary: #3F3F3F; // dark gray
+  // Background color
+  --background: #F8F9FC; // light gray
+  --surface: #FFFFFF; // surface white
+
+  // Text color
+  --on-background: #3F3F3F; // dark gray
+  --on-surface: #3F3F3F; // dark gray
+  --on-background-secondary: #A6AAA4; // light gray
+  --on-surface-secondary: #A6AAA4; // light gray
 }
 
 /* Dark theme override */
 html[color-scheme="dark"] {
   color-scheme: dark;
 
-  --clr-bg: #3F3F3F; // dark bg
-  --clr-surface: #1E1E1E; // light surface color
-  --clr-text-primary: #FFFFFF; // white text
+  // Background colors
+  --background: #2F2F2F; // dark bg
+  --surface: #18181b; // light surface color
+  
+  // Text colors
+  --on-background: #FFFFFF; // white text
+  --on-surface: #FFFFFF; // white text
+  --on-background-secondary: #A6AAA4; // light gray
+  --on-surface-secondary: #A6AAA4; // light gray
 }
 
 
@@ -22,8 +34,14 @@ html[color-scheme="dark"] {
   html:not([color-scheme]) {
     color-scheme: dark;
 
-    --clr-bg: #3F3F3F; // dark bg
-    --clr-surface: #1E1E1E; // light surface color
-    --clr-text-primary: #FFFFFF; // white text
+    // Background colors
+    --background: #3F3F3F; // dark bg
+    --surface: #18181b; // light surface color
+
+    // Text colors
+    --on-background: #FFFFFF; // white text
+    --on-surface: #FFFFFF; // white text
+    --on-background-secondary: #A6AAA4; // light gray
+    --on-surface-secondary: #A6AAA4; // light gray
   }
 }

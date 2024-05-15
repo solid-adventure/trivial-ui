@@ -146,7 +146,7 @@
       border-top: 1px solid;
       border-left: 1px solid;
       border-right: 1px solid;
-      border-color: var(--background-80);
+      border-color: var(--background);
       background-color: var(--surface);
       color: var(--on-surface);
     }
@@ -154,7 +154,7 @@
   }
 
  .tab.active, .active{
-    background-color: var(--table-column-head-color);
+    background-color: var(--background);
     color: var(--on-background);
     border-bottom: 0;
     border-color: var(--accent);
@@ -166,7 +166,6 @@
   }
 
   th.period button {
-    background-color: var(--table-column-head-color);
     color: var(--on-background);
   }
 

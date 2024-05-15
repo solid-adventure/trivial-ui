@@ -8,7 +8,7 @@
 				
 				<Button type="button" icon="pi pi-user" @click="toggleMenu" aria-haspopup="true" aria-controls="overlay_menu" severity="secondary" aria-label="User" class="main__header__top__content__user-btn" />
 
-				<ToggleButton v-model="checkedTheme" @click="toggleDark()" v-ripple onLabel="" offLabel="" onIcon="pi pi-sun" offIcon="pi pi-moon" class="w-2.5rem main__header__top__content__theme-btn" aria-label="Do you confirm" />
+				<ToggleButton v-model="checkedTheme" @click="toggleTheme()" v-ripple onLabel="" offLabel="" onIcon="pi pi-sun" offIcon="pi pi-moon" class="w-2.5rem main__header__top__content__theme-btn" aria-label="Do you confirm" />
 				
 				<div class="card flex justify-content-center">
 			        <Menu ref="menu" id="overlay_menu" :model="items" :popup="true" class="w-full md:w-15rem">
@@ -54,7 +54,8 @@
 	import AvatarIcon from '@/assets/images/user.svg'
 	import LogoImgArrows from '../../assets/images/trivial-logo-arrows-warm.svg'
 	import { useDark, useToggle } from '@vueuse/core'
-	import { useRouter } from 'vue-router';
+	import { useRouter } from 'vue-router'
+	import { usePrimeVue } from 'primevue/config'
 
 	defineProps({
 		title: {
@@ -93,9 +94,12 @@
 				]
 		    },
 		    { separator: true }
-		])
+		]),
+		primeVue = usePrimeVue()
 
-	let localStorageOrgId = null
+	let localStorageOrgId = null,
+		currentTheme = 'aura-light-green',
+		nextTheme = 'aura-dark-blue'
 
 	const isDark = useDark({
 		selector: 'html',
@@ -103,6 +107,7 @@
 		valueDark: 'dark',
 		valueLight: 'light'
 	})
+
 	const toggleDark = useToggle(isDark)
 
 	const user = computed(() => store.state.user)
@@ -118,6 +123,23 @@
 		setCheckedTheme()
 		persistSelectedOrg()
 	})
+
+	const toggleTheme = () => {
+		toggleDark() // Main page theme
+
+		let vueuseColorScheme = localStorage.getItem('vueuse-color-scheme') // Local Storage key for dark/light theme
+		
+		// Toggle PrimeVue theme for UI components
+		if (vueuseColorScheme !== null && vueuseColorScheme === 'light') {
+			currentTheme = 'aura-light-green';
+			nextTheme = 'aura-dark-blue';
+		} else {
+			currentTheme = 'aura-dark-blue';
+			nextTheme = 'aura-light-green';
+		}
+
+		primeVue.changeTheme(currentTheme, nextTheme, 'theme-link')
+	}
 
 	const toggleMenu = (event) => menu.value.toggle(event)
 

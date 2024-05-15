@@ -1,19 +1,8 @@
 .registers_table {
-	
-
-	.p-datatable-header {
-		color: var(--clr-text-primary);
-		background-color: var(--clr-surface);
-
-		& .p-inputtext.p-component {
-			color: var(--clr-text-primary);
-			background-color: var(--clr-bg);
-		}
-	}
 
 	& div.p-datatable-loading-overlay.p-component-overlay {
 		flex-direction: column;
-		color: var(--clr-text-primary);
+		color: var(--on-surface);
 		background-color: rgba(255, 255, 255, .7);
 	}
 
@@ -38,8 +27,6 @@
 			text-overflow: ellipsis;
 			overflow: hidden;
 			white-space: nowrap;
-			color: var(--clr-text-primary);
-			background-color: var(--clr-bg);
 
 			&:hover {
 				background-color: #f1f5f9;
@@ -50,8 +37,6 @@
 	& table tbody {
 
 		& tr {
-			color: var(--clr-text-primary);
-			background-color: var(--clr-surface);
 
 			& td {
 				width: calc(100% / var(--cols));
@@ -75,23 +60,8 @@
 
 				& > div.time {
 					font-size: .8rem;
-					color: var(--clr-text-secondary);
 				}
 			}
-		}
-	}
-
-	& .p-datatable-footer, 
-	& .p-paginator.p-component {
-		color: var(--clr-text-primary);
-		background-color: var(--clr-surface);
-	}
-
-	& .p-dropdown.p-component.p-inputwrapper.p-inputwrapper-filled.p-paginator-rpp-options {
-		background-color: var(--clr-surface);
-
-		& .p-dropdown-label.p-inputtext {
-			color: var(--clr-text-primary);
 		}
 	}
 
@@ -118,11 +88,11 @@
 
 div.p-column-filter-buttonbar {
 	& .date__apply-btn {
-		background-color: var(--clr-green);
+		background-color: var(--primary);
 	}
 
 	& .date__clear-btn {
-		color: var(--clr-green);
+		color: var(--primary);
 	}
 }
 

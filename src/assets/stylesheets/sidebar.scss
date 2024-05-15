@@ -40,7 +40,7 @@
 		font-size: 1rem;
 		line-height: 1.5;
 		color: white;
-		background-color: var(--clr-green);
+		background-color: var(--primary);
 	}
 
 	& > a {
@@ -79,10 +79,10 @@
 			color: var(--clr-lightgray);
 
 			&:hover, &.router-link-exact-active {
-				border-color: var(--clr-green);
+				border-color: var(--primary);
 
 				& div {
-					color: var(--clr-green);
+					color: var(--primary);
 					background-color: var(--clr-darkgray);
 				}
 			}

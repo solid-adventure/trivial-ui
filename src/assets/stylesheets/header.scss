@@ -3,7 +3,7 @@ header.main__header {
     grid-template-rows: 2fr;
     padding-inline: 34px;
     padding-block: 10px;
-    background-color: var(--clr-surface);
+    background-color: var(--surface);
 
     & .main__header__top {
 		grid-row: 1;
@@ -14,7 +14,7 @@ header.main__header {
 		& h1 {
 			margin: unset;
 			text-transform: capitalize;
-			color: var(--clr-text-primary);
+			color: var(--on-surface);
 		}
 
 		& .main__header__top__content {
@@ -25,44 +25,7 @@ header.main__header {
 
 			& .main__header__top__content__dropdown {
 				width: 15rem;
-				background-color: var(--clr-bg);
-
-				& .p-dropdown-label.p-inputtext {
-					color: var(--clr-text-secondary);
-				}
 			}
-
-			& .main__header__top__content__user-btn {
-				color: var(--clr-text-secondary);
-				border-color: var(--clr-bg);
-				background-color: var(--clr-bg);
-			}
-
-			& .main__header__top__content__theme-btn {
-
-				& div.p-button.p-component.p-button-icon-only {
-					border-color: var(--clr-bg);
-					background-color: var(--clr-bg);
-
-					& span.p-button-icon {
-						color: var(--clr-text-secondary);
-					}
-				}
-			}
-			
-
-			/*& .main__header__top__content--link {
-				display: flex;
-				justify-content: center;
-				align-items: center;
-				width: 32px;
-				aspect-ratio: 1;
-				border-radius: 6px;
-				outline: 2px solid #eee;
-				font-size: 1.25rem;
-				color: var(--background-60);
-				background-color: $clr-bg;
-			}*/
 		}
     }
 
@@ -76,7 +39,7 @@ header.main__header {
 			align-items: center;
 
 			& a {
-				color: var(--clr-green);
+				color: var(--primary);
 
 				&:focus {
 					outline: none;
@@ -85,13 +48,13 @@ header.main__header {
 
 			& .delimiter {
 				margin-inline: 4px;
-				color: var(--clr-text-primary);
+				color: var(--on-surface);
 			}
 
 			& .item__last {
 				font-weight: 500;
 				pointer-events: none;
-				color: var(--clr-text-primary);
+				color: var(--on-surface);
 			}
 		}
     }

@@ -158,7 +158,7 @@ export default {
   width: 100%;
 }
 .active {
-  background-color: var(--table-column-head-color);
+  background-color: var(--background);
 }
 table.user-organizations {
   width: 100%;

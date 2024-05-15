@@ -33,21 +33,9 @@ export default {
   data() {
     return {
       lastVars: null,
-      breadcrumbs: [],
-      //loading: true,
+      breadcrumbs: []
     };
   },
-  /*created() {
-    if (store.state.theme === "Dark") {
-      import('/src/assets/stylesheets/app.scss');
-    } else {
-      import('/src/assets/stylesheets/app-light.scss');
-    }
-    // Don't love this, but it's a quick fix for now and prevents FOUC
-    window.setTimeout(() => {
-      this.loading = false;
-    }, 300);
-  },*/
   computed: {
     currentRouteName() {
       return this.$route.fullPath;

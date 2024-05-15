@@ -1,5 +1,4 @@
 import { createApp } from 'vue'
-import "primevue/resources/themes/aura-light-green/theme.css"
 import "primeicons/primeicons.css"
 import 'primeflex/primeflex.scss'
 import 'floating-vue/dist/style.css'
