@@ -31,7 +31,7 @@
     }
 
     .pro-tip {
-      background-color: var(--background-high-contrast);
+      background-color: var(--background);
       color: var(--success-highlight);
       padding: 4px 8px;
       margin-right: 8px;

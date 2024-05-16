@@ -82,7 +82,7 @@
       position: absolute;
       top: 0;
       background-color: transparent;
-      color: var(--link);
+      color: var(--on-background-secondary);
       cursor: pointer;
       padding-left: 20px;
       text-transform: uppercase;
@@ -95,14 +95,14 @@
         width: 0;
         height: 0;
         border: 6px solid transparent;
-        border-bottom-color: var(--link);
+        border-bottom-color: var(--on-background-secondary);
         opacity: .8;
       }
 
       &.closed:before {
         top: 9px;
         border-bottom-color: transparent;
-        border-top-color: var(--link);
+        border-top-color: var(--on-background-secondary);
       }
     }
 
