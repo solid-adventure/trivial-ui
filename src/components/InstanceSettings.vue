@@ -133,7 +133,7 @@
       gap: 1rem;
 
       & a {
-        color: var(--clr-text-primary);
+        color: var(--on-background);
       }
     }
   }
@@ -195,7 +195,7 @@
     padding-top: 1em;
 
     .pro-tip {
-      background-color: var(--background-high-contrast);
+      background-color: var(--background);
       color: var(--success-highlight);
       padding: 10px 8px;
       margin-right: 8px;

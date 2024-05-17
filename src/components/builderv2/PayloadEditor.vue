@@ -147,7 +147,7 @@
     padding-top: 1em;
 
     .pro-tip {
-      background-color: var(--background-high-contrast);
+      background-color: var(--background);
       color: var(--success-highlight);
       padding: 4px 8px;
       margin-right: 8px;
@@ -219,8 +219,8 @@
           height: 100%;
           text-align: center;
           overflow: hidden;
-          background-color: var(--background-high-contrast);
-          color: var(--on-background-high-contrast);
+          background-color: var(--background);
+          color: var(--on-background);
         }
       }
     }

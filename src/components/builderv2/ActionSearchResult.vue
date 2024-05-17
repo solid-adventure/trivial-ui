@@ -100,13 +100,14 @@
     padding: 0 0 0 1.5em;
 
     &.selected {
-      color: var(--on-surface);
+      color: var(--on-background);
+      background-color: var(--background);
     }
   
   }
 
   .highlightHover:hover {
-      background-color: var(--on-background-20);
+      background-color: var(--background);;
   }
 
   button {

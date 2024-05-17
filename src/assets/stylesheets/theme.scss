@@ -11,6 +11,9 @@ html[color-scheme="light"] {
   --on-surface: #3F3F3F; // dark gray
   --on-background-secondary: #A6AAA4; // light gray
   --on-surface-secondary: #A6AAA4; // light gray
+
+  --logo-login: url("/src/assets/images/trivial-logo-simplified-dark-on-light.svg");
+
 }
 
 /* Dark theme override */
@@ -22,10 +25,13 @@ html[color-scheme="dark"] {
   --surface: #18181b; // light surface color
   
   // Text colors
-  --on-background: #FFFFFF; // white text
-  --on-surface: #FFFFFF; // white text
+  --on-background: #d2d2d2; // white text
+  --on-surface: #d2d2d2; // white text
   --on-background-secondary: #A6AAA4; // light gray
   --on-surface-secondary: #A6AAA4; // light gray
+
+  --logo-login: url("/src/assets/images/trivial-logo-simplified-light-on-dark.svg");
+
 }
 
 
@@ -39,9 +45,13 @@ html[color-scheme="dark"] {
     --surface: #18181b; // light surface color
 
     // Text colors
-    --on-background: #FFFFFF; // white text
-    --on-surface: #FFFFFF; // white text
+    --on-background: #d2d2d2; // white text
+    --on-surface: #d2d2d2; // white text
     --on-background-secondary: #A6AAA4; // light gray
     --on-surface-secondary: #A6AAA4; // light gray
+
+
+    --logo-login: url("/src/assets/images/trivial-logo-simplified-light-on-dark.svg");
+
   }
 }

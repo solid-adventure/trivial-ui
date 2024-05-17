@@ -117,13 +117,14 @@
         }
 
         &:hover {
-          background-color: var(--on-background-20); 
+          background-color: var(--surface);
+          border: 1px solid var(--on-surface);
           cursor: pointer;
         }
 
 
         &.selected {
-          background-color: var(--on-background-20);
+          background-color: var(--surface);
         }
 
       }

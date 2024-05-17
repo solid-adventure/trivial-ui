@@ -50,11 +50,12 @@ import en from 'javascript-time-ago/locale/en'
 	    flex: none;
 	    margin: 0 1em;
 			font-family: 'Lato';
-	    color: var(--webhook-pre-color);
+			color: var(--primary);
+
   	}
 
 		hr.divider {
-			border: 1px solid var(--accent);
+			border: 1px solid var(--primary);
 			width: 100%;
 			height: 0;
 		}
