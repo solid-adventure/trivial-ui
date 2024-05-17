@@ -133,7 +133,7 @@
       gap: 1rem;
 
       & a {
-        color: var(--clr-text-primary);
+        color: var(--on-background);
       }
     }
   }

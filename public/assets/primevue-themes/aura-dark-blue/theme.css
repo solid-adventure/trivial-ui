@@ -4254,7 +4254,7 @@
   }
   .p-datatable .p-datatable-header {
     background: #18181b;
-    color: #ffffff;
+    color: var(--on-surface);
     border: 1px solid #27272a;
     border-width: 0 0 1px 0;
     padding: 0.75rem 1rem;
@@ -4262,7 +4262,7 @@
   }
   .p-datatable .p-datatable-footer {
     background: #18181b;
-    color: #ffffff;
+    color: var(--on-surface);
     border: 1px solid #27272a;
     border-width: 0 0 1px 0;
     padding: 0.75rem 1rem;
@@ -4274,7 +4274,7 @@
     border: 1px solid #27272a;
     border-width: 0 0 1px 0;
     font-weight: 600;
-    color: #ffffff;
+    color: var(--on-surface);
     background: #18181b;
     transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s, outline-color 0.2s;
   }
@@ -4284,7 +4284,7 @@
     border: 1px solid #27272a;
     border-width: 0 0 1px 0;
     font-weight: 600;
-    color: #ffffff;
+    color: var(--on-surface);
     background: #18181b;
   }
   .p-datatable .p-sortable-column .p-sortable-column-icon {
@@ -4302,10 +4302,10 @@
   }
   .p-datatable .p-sortable-column:not(.p-highlight):hover {
     background: rgba(255, 255, 255, 0.03);
-    color: #ffffff;
+    color: var(--on-surface);
   }
   .p-datatable .p-sortable-column:not(.p-highlight):hover .p-sortable-column-icon {
-    color: #ffffff;
+    color: var(--on-surface);
   }
   .p-datatable .p-sortable-column.p-highlight {
     background: rgba(96, 165, 250, 0.16);
@@ -4327,7 +4327,7 @@
   }
   .p-datatable .p-datatable-tbody > tr {
     background: #18181b;
-    color: #ffffff;
+    color: var(--on-surface);
     transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s, outline-color 0.2s;
   }
   .p-datatable .p-datatable-tbody > tr > td {
@@ -4353,7 +4353,7 @@
 .p-datatable .p-datatable-tbody > tr > td .p-row-editor-init:enabled:hover,
 .p-datatable .p-datatable-tbody > tr > td .p-row-editor-save:enabled:hover,
 .p-datatable .p-datatable-tbody > tr > td .p-row-editor-cancel:enabled:hover {
-    color: #ffffff;
+    color: var(--on-surface);
     border-color: transparent;
     background: rgba(255, 255, 255, 0.03);
   }

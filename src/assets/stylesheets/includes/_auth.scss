@@ -9,8 +9,10 @@
 }
 
 .container {
-    width: 340px;
     text-align: center;
+    padding: 4em;
+    background-color: var(--surface);
+    color: var(--on-surface)
 }
 
 .text-field{

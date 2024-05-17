@@ -289,8 +289,8 @@
 
     padding: 0;
     margin: 0;
-    background-color: var(--surface);
-    color: var(--on-surface);
+    // background-color: var(--surface);
+    // color: var(--on-surface);
     min-height: 5em;
     position: relative;
     border-radius: 0px;

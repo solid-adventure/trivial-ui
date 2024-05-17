@@ -209,7 +209,7 @@ hr.accent {
 .well {
   padding: 1em;
   margin: 1em 0;
-  background: $surface;
+  background: var(--surface);
   border-radius: 0px;
 }
 
@@ -222,9 +222,8 @@ hr.accent {
 .button-small, input[type=button].button-small {
   font-size: 1em;
   font-weight: 100;
-  color: $link;
   padding: 8px;
-  background-color: $background-high-contrast;
+  background-color: transparent;
   border-radius: 0px;
   cursor: pointer;
   display: inline-block;
@@ -256,6 +255,7 @@ hr.accent {
 }
 
 .button-medium a, .button-small a {
+  background-color: transparent;
   color: $on-primary;
 }
 
