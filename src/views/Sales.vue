@@ -6,23 +6,37 @@
 		:globalFilterFields="globalFilterFields" 
 		:rows="rows" 
 		:rowsPerPageOptions="rowsPerPageOpt"
+		:first="first"
+		:totalRecords="totalRecords"
 		paginator
+		lazy
 		tableStyle="max-width: 100%" 
 		dataKey="id"
 		filterDisplay="menu"
 		scrollable
 		class="border-round-sm registers_table"
+		@page="onPage($event)"
+		@sort="onSort($event)"
+		@filter="onFilter($event)"
+		editMode="cell" 
+		@cell-edit-complete="onCellEditComplete" 
+		:pt="{
+			column: {
+				bodycell: ({ state }) => ({ class: [{ 'pt-0 pb-0': state['d_editing'] }] })
+			}
+		}"
 		>
-
+		
 	    <template #header>
 	        <div class="flex justify-content-between py-5">
 	        	<h2 class="m-0">Revenue Detail</h2>
-	            <IconField iconPosition="right">
+	        	<!-- Global keyword search filed -->
+	            <!--<IconField iconPosition="right">
 	                <InputText v-model="filters['global'].value" placeholder="Keyword Search" />
 					<InputIcon>
 						<i class="pi pi-search" />
 					</InputIcon>
-	            </IconField>
+	            </IconField>-->
 	        </div>
 	    </template>
 	    <template #empty>No revenues found.</template>
@@ -31,12 +45,12 @@
 	    	<h3>Loading ...</h3>
 	    </template>
 
-		<Column header="Date" filterField="date" dataType="date" key="date">
+		<Column header="Date" filterField="date" dataType="date" key="date" :filterMatchModeOptions="dateFilterMatchModes">
 			<template #body="{ data }">
 				<div class="date">{{ useFormatDate(data.created_at, dateOptions) }}</div>
 				<div class="time">{{ useFormatDate(data.created_at, timeOptions) }} {{ useFormatDate(data.created_at, timeZoneOptions).split(' ')[1] }}</div>
 			</template>
-			<template #filter="{ filterModel }">
+			<!--<template #filter="{ filterModel, filterCallback }">
 				<Calendar v-model="filterModel.value" dateFormat="mm/dd/yy" placeholder="mm/dd/yyyy" mask="99/99/9999" @blur=" getDateFilter(filterModel)" />
 			</template>
 			<template #filterclear="{ filterCallback }">
@@ -44,10 +58,16 @@
 			</template>
 			<template #filterapply="{ filterCallback }">
 				<Button type="button" @click="filterCallback(), getTotalAmountCol()" label="Apply" class="date__apply-btn" />
-			</template>
+			</template>-->
 		</Column>
 
-        <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header" sortable> 
+        <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header" sortable filter :filterMatchModeOptions="filterMatchModesOpt">
+			<template #filter="{ filterModel, filterCallback }" v-if="filters.hasOwnProperty(col.field)"> 
+				<InputText v-model="filterModel.value" type="text" @keydown.enter="filterCallback()" class="p-column-filter" />
+			</template>
+			<template #editor="{ data, field }">
+				<InputText v-model="data[field]" autofocus />
+			</template>
 			<template #body="{ data }">
 				<div class="flex align-items-center" v-tooltip="{ content: `${data[col.field]}`, disabled: isDisabledTooltip(data[col.field]) }">
 					<span v-if="col.field == 'amount'">{{ Format.money(data[col.field], 2, data['units']) }}</span>
@@ -68,7 +88,6 @@
 					</h4>
 				</div>
 				<div v-for="(col, index) of columns" :key="index">
-					<!--<span v-if="col.field === totalsColumns[col.field]">{{ setTotalColValue(totalsColumns[col.field]) }}</span>-->
 					<span v-if="col.field === totalsColumns[col.field]">{{ totalAmount }}</span>
 				</div>
 			</div>
@@ -78,7 +97,7 @@
 
 <script setup>
 	import { FilterMatchMode, FilterOperator } from 'primevue/api'
-	import { ref, onMounted, computed, watch } from 'vue'
+	import { ref, onMounted, computed, watch, toRaw } from 'vue'
 	import { useStore } from 'vuex'
 	import notifications from '@/components/notifications'
 	import Format from '@/lib/Format'
@@ -86,16 +105,15 @@
 	import loadingImg from '@/assets/images/trivial-loading.gif'
 
 	const loading = ref(false),
-			filters = ref({
-				global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-				date: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] },
-			}),
+			filters = ref({}),
 			store = useStore(),
 			registers = ref([]),
 			totalAmount = ref(null),
+			rows = ref(10), // per_page
+			totalRecords = ref(0),
+			first = ref(1),
 			totalInfoPopup = ref(),
-			rowsPerPageOpt = [5, 10, 20, 50],
-			rows = 10,
+			rowsPerPageOpt = [10, 20, 50],
 			dateOptions = {
 				dateStyle: 'short',
 				timeZone: 'America/New_York'
@@ -108,6 +126,41 @@
 			timeZoneOptions = {
 				timeZone: 'America/New_York',
 				timeZoneName: 'short'
+			},
+			// Define custom match modes for the date field
+			dateFilterMatchModes = [
+				{ label: 'Date is', value: FilterMatchMode.DATE_IS },
+				{ label: 'Date is before', value: FilterMatchMode.DATE_BEFORE },
+				{ label: 'Date is after', value: FilterMatchMode.DATE_AFTER },
+				{ label: 'Date is not', value: FilterMatchMode.DATE_IS_NOT },
+			],
+			// Define custom match modes for the date field
+			filterMatchModesOpt = [
+				{ label: 'Equals', value: FilterMatchMode.EQUALS },
+				{ label: 'Not Equals', value: FilterMatchMode.NOT_EQUALS },
+				{ label: 'Less Than Or Equal To', value: FilterMatchMode.LESS_THAN_OR_EQUAL_TO },
+				{ label: 'Less Than', value: FilterMatchMode.LESS_THAN },
+				{ label: 'Greater Than Or Equal To', value: FilterMatchMode.GREATER_THAN_OR_EQUAL_TO },
+				{ label: 'Greater Than', value: FilterMatchMode.GREATER_THAN },
+			],
+			// Mapping filter match modes to their corresponding textual or mathematical signs
+			filterMatchModeMapping = {
+				between: 'between',
+				contains: 'contains',
+				dateAfter: '>',
+				dateBefore: '<',
+				dateIs: '=',
+				dateIsNot: '!=',
+				endsWith: 'ends with',
+				equals: '=',
+				gt: '>',
+				gte: '>=',
+				in: 'in',
+				lt: '<',
+				lte: '<=',
+				notContains: 'does not contain',
+				notEquals: '!=',
+				startsWith: 'starts with'
 			}
 
 	let columns = [],
@@ -117,6 +170,12 @@
 			{field: 'unique_key', header: 'Unique Key'},
 			{field: 'amount', header: 'Amount'}
 		],
+		fiexdFilters = {
+			// global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+			// date: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] },
+			date: { constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] },
+		},
+		filterDefaultMode = {value: null, matchMode: FilterMatchMode.EQUALS},
 		totalsColumns = {
 			amount: 'amount'
 		},
@@ -139,33 +198,40 @@
 	const getRegisters = async orgId => {
 		loading.value = true
 		columns = [] // Reset columns before new set of columns from API call
+		filters.value = {} // Reset filters before new set of dynamic filters
 
 		try {
 			columns = [...fixedColumns] // Add fixed columns at the beginig of the table
+			filters.value = fiexdFilters
 
-			//registers.value = await store.state.Session.apiCall(`/registers?search={"owner_type: "Organization", "owner_id": ${orgId}`)
-			allRegisters = await store.state.Session.apiCall(`/registers`)
+			allRegisters = await store.state.Session.apiCall('/registers')
 			let register = allRegisters.find(r => r.owner_type == 'Organization' && r.owner_id == orgId && r.name == 'Sales')
 
 			regId = register.id
 
 			// Setting dynamic table columns headers
-			for (const property in register.meta) {
+			for (let property in register.meta) {
 				columns.push({field: register.meta[property], header: register.meta[property].replaceAll('_', ' ')})
-				globalFilterFields.push(register.meta[property])
 			}
 
-			//console.log('columns 2 - ', columns)
 			setCssPropColsLength()
 
+			// Get Searchable Columns
+			let searchableColumns = await store.state.Session.apiCall(`/register_items/columns?register_id=${regId}`)
+
 			// Settign filters dynamic fileds for search options
-			//globalFilterFields.forEach(item => filters.value[item] = {value: null, matchMode: FilterMatchMode.CONTAINS})
+			searchableColumns.forEach(item => {
+				globalFilterFields.push(item) // Search dynamic fields
+				filters.value[item] = filterDefaultMode
+			})
 
-			// Get registers item 
-			//registers.value = await store.state.Session.apiCall(`/register_items?register_id=${register.id}`)
-			let { register_items } = await store.state.Session.apiCall(`/register_items?register_id=${register.id}`)
+			// Get registers item - query string -> register_id=${registerId}&order_by=${orderBy}&ordering_direction=${orderingDirection}&per_page=${perPage}&page=${page}`
+			
+			let queryString = `per_page=${rows.value}`
+			let { current_page, register_items, total_pages } = await getRegistersData(queryString)
 
-			registers.value = register_items;
+			totalRecords.value = totalPaginatorPages(total_pages, rows.value)
+			registers.value = register_items
 
 			await getTotalAmountCol()
 
@@ -176,6 +242,9 @@
 			loading.value = false
 		}
 	}
+
+	const getRegistersData = async (query = '') => await store.state.Session.apiCall(`/register_items?register_id=${regId}&${query}`)
+	const totalPaginatorPages = (totalPages, itemsPerPage) => totalPages * itemsPerPage
 
 	const setTotalColValue = searchProp => {
 		let total = null
@@ -215,4 +284,73 @@
 	const isDisabledTooltip = data => data?.length < 14
 
 	const toggleTotalInfoPopup = event => totalInfoPopup.value.toggle(event)
+
+	const onPage = async event => {
+		loading.value = true
+
+		first.value = event?.first || 0
+		rows.value = event?.rows || 10
+
+		let page = event?.page + 1,
+			queryString = `per_page=${rows.value}&page=${page}`
+		
+		const { register_items } = await getRegistersData(queryString)
+
+		registers.value = register_items
+
+		loading.value = false
+	}
+
+	const onSort = async event => {
+		loading.value = true
+
+		first.value = event?.first || 0
+		rows.value = event?.rows || 10
+
+		let orderingDirection = event?.sortOrder === 1 ? 'ASC' : 'DESC',
+			queryString = `per_page=${rows.value}&order_by=${event?.sortField}&ordering_direction=${orderingDirection}`
+		
+		const { register_items } = await getRegistersData(queryString)
+
+		registers.value = register_items
+
+		loading.value = false
+	}
+
+	const onFilter = async event => {
+		loading.value = true
+
+		let selectedFilter = toRaw(event.filters),
+			queryArr = [],
+			queryString = ''
+
+		for (let property in selectedFilter) {
+			console.log(selectedFilter[property])
+			if (selectedFilter[property].value) {
+				queryArr.push({
+					c: property, 
+					o: filterMatchModeMapping[selectedFilter[property].matchMode], 
+					p: selectedFilter[property].value 
+				})
+			} else if (property === 'date') {
+				let dateConstraints = toRaw(selectedFilter[property].constraints)
+
+				if (dateConstraints[0].value) {
+					queryArr.push({
+						c: property, 
+						o: filterMatchModeMapping[dateConstraints[0].matchMode], 
+						p: dateConstraints[0].value 
+					})
+				}
+			}
+		}
+
+		const { register_items } = await getRegistersData(queryString)
+
+		registers.value = register_items
+
+		loading.value = false
+	}
+
+	const onCellEditComplete = event => { console.log(event) }
 </script>

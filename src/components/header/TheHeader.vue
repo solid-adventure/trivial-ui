@@ -122,11 +122,15 @@
 
 		setCheckedTheme()
 		persistSelectedOrg()
+		toggleTheme()
 	})
 
 	const toggleTheme = () => {
 		toggleDark() // Main page theme
+		setPrimeVueTheme()
+	}
 
+	const setPrimeVueTheme = () => {
 		let vueuseColorScheme = localStorage.getItem('vueuse-color-scheme') // Local Storage key for dark/light theme
 		
 		// Toggle PrimeVue theme for UI components

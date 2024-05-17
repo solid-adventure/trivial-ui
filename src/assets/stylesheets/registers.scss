@@ -15,7 +15,7 @@
 
 		& tr > th {
 			& div {
-				justify-content: center;
+				// justify-content: center;
 			}
 		}
 
@@ -28,9 +28,9 @@
 			overflow: hidden;
 			white-space: nowrap;
 
-			&:hover {
+			/*&:hover {
 				background-color: #f1f5f9;
-			}
+			}*/
 		}
 	}
 
@@ -62,6 +62,12 @@
 					font-size: .8rem;
 				}
 			}
+
+			& td.p-cell-editing {
+				& input.p-inputtext.p-component.p-filled {
+					max-width: 100%;
+				}
+			}
 		}
 	}
 
@@ -87,11 +93,11 @@
 }
 
 div.p-column-filter-buttonbar {
-	& .date__apply-btn {
+	& .date__apply-btn, .p-button[aria-label="Apply"] {
 		background-color: var(--primary);
 	}
 
-	& .date__clear-btn {
+	& .date__clear-btn, .p-button.p-button-outlined[aria-label="Clear"] {
 		color: var(--primary);
 	}
 }
