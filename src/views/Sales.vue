@@ -61,8 +61,8 @@
 			</template>-->
 		</Column>
 
-        <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header" sortable filter :filterMatchModeOptions="filterMatchModesOpt">
-			<template #filter="{ filterModel, filterCallback }" v-if="filters.hasOwnProperty(col.field)"> 
+        <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header" :filterField="col.field" sortable :filter="true" :filterMatchModeOptions="filterMatchModesOpt">
+        	<template #filter="{ filterModel, filterCallback }" v-if="filters.hasOwnProperty(col.field)">
 				<InputText v-model="filterModel.value" type="text" @keydown.enter="filterCallback()" class="p-column-filter" />
 			</template>
 			<template #editor="{ data, field }">
@@ -141,7 +141,7 @@
 				{ label: 'Less Than Or Equal To', value: FilterMatchMode.LESS_THAN_OR_EQUAL_TO },
 				{ label: 'Less Than', value: FilterMatchMode.LESS_THAN },
 				{ label: 'Greater Than Or Equal To', value: FilterMatchMode.GREATER_THAN_OR_EQUAL_TO },
-				{ label: 'Greater Than', value: FilterMatchMode.GREATER_THAN },
+				{ label: 'Greater Than', value: FilterMatchMode.GREATER_THAN }
 			],
 			// Mapping filter match modes to their corresponding textual or mathematical signs
 			filterMatchModeMapping = {
@@ -173,20 +173,14 @@
 		fiexdFilters = {
 			// global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 			// date: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] },
-			date: { constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] },
+			// date: { constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] },
 		},
-		filterDefaultMode = {value: null, matchMode: FilterMatchMode.EQUALS},
-		totalsColumns = {
-			amount: 'amount'
-		},
+		totalsColumns = { amount: 'amount' },
 		globalFilterFields = [],
 		allRegisters = null,
 		localStorageOrgId = null,
 		regId = null,
-		filterDate = {
-			end_at: null,
-			start_at: null
-		}
+		filterDate = { end_at: null, start_at: null }
 
 	const orgId = computed(() => store.getters.getOrgId)
 	watch(orgId, async (newVal, oldVal) => await getRegisters(newVal))
@@ -222,7 +216,8 @@
 			// Settign filters dynamic fileds for search options
 			searchableColumns.forEach(item => {
 				globalFilterFields.push(item) // Search dynamic fields
-				filters.value[item] = filterDefaultMode
+				//filters.value[item] = filterDefaultMode
+				filters.value[item] = { constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] }
 			})
 
 			// Get registers item - query string -> register_id=${registerId}&order_by=${orderBy}&ordering_direction=${orderingDirection}&per_page=${perPage}&page=${page}`
@@ -275,8 +270,6 @@
 		} else if (date?.matchMode === 'dateBefore') {
 			filterDate.end_at = date.value
 		}
-
-		return
 	}
 
 	const clearFilterDate = () => filterDate = {end_at: null, start_at: null}
@@ -325,25 +318,21 @@
 			queryString = ''
 
 		for (let property in selectedFilter) {
-			console.log(selectedFilter[property])
-			if (selectedFilter[property].value) {
-				queryArr.push({
-					c: property, 
-					o: filterMatchModeMapping[selectedFilter[property].matchMode], 
-					p: selectedFilter[property].value 
-				})
-			} else if (property === 'date') {
-				let dateConstraints = toRaw(selectedFilter[property].constraints)
 
-				if (dateConstraints[0].value) {
+			let dateConstraints = toRaw(selectedFilter[property].constraints)
+
+			dateConstraints.forEach(item => {
+				if (item.value) {
 					queryArr.push({
 						c: property, 
-						o: filterMatchModeMapping[dateConstraints[0].matchMode], 
-						p: dateConstraints[0].value 
+						o: filterMatchModeMapping[item.matchMode], 
+						p: item.value 
 					})
 				}
-			}
+			})
 		}
+
+		queryString = `search=${JSON.stringify(queryArr)}`
 
 		const { register_items } = await getRegistersData(queryString)
 

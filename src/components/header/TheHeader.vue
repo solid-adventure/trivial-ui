@@ -119,22 +119,19 @@
 
 	onMounted(async () => {
 		await fetchData()
-
+		setSelectedOrg()
 		setCheckedTheme()
-		persistSelectedOrg()
-		toggleTheme()
+		setPrimeVueTheme()
 	})
 
 	const toggleTheme = () => {
 		toggleDark() // Main page theme
-		setPrimeVueTheme()
+		setPrimeVueTheme() // VuePrime theme
 	}
 
 	const setPrimeVueTheme = () => {
-		let vueuseColorScheme = localStorage.getItem('vueuse-color-scheme') // Local Storage key for dark/light theme
-		
 		// Toggle PrimeVue theme for UI components
-		if (vueuseColorScheme !== null && vueuseColorScheme === 'light') {
+		if (isDark.value) {
 			currentTheme = 'aura-light-green';
 			nextTheme = 'aura-dark-blue';
 		} else {
@@ -153,13 +150,12 @@
 		try {
 			organisations.value = await store.state.Session.apiCall('/organizations')
 		} catch (err) {
-			console.log(err)
 			notifications.error(`Failed to fetch data: ${err}`)
 		}
 	}
 
 	// Set the org. dropdown value if there is org. id in the localstorage when user refresh the page
-	const persistSelectedOrg = () => {
+	const setSelectedOrg = () => {
 		localStorageOrgId = JSON.parse(localStorage.getItem('orgId'))
 
 		// Select organization dropdown value if organization ID is stored in local storage
