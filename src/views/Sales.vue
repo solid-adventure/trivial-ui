@@ -1,7 +1,7 @@
 <template>
 	<DataTable 
 		v-model:filters="filters" 
-		:value="registers" 
+		:value="registersComp" 
 		:loading="loading" 
 		:globalFilterFields="globalFilterFields" 
 		:rows="rows" 
@@ -188,6 +188,7 @@
 		filterDate = { end_at: null, start_at: null }
 
 	const orgId = computed(() => store.getters.getOrgId)
+	const registersComp = computed(() => registers.value)
 	watch(orgId, async (newVal, oldVal) => await getRegisters(newVal))
 
 	onMounted(async () => {
@@ -269,7 +270,6 @@
 	}
 
 	const getDateFilter = (date = {}) => {
-
 		if (date?.matchMode === 'dateAfter') {
 			filterDate.start_at = date.value
 		} else if (date?.matchMode === 'dateBefore') {
@@ -379,27 +379,33 @@
 		getRegisters()
 	}
 
-	const onCellEditComplete = async event => { 
+	const onCellEditComplete = async event => {
+		console.log(event)
 		let cellPayload =  {
-			method: 'PUT',
-			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify({amount: event.newValue, description: event.field })
-		}
+				method: 'PUT',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({amount: event.newValue, description: event.field })
+			}
 
 		try {
-			let rawNewCellData = toRaw(event.newData)
+			if (event.type === 'enter') {
+				let rawNewCellData = toRaw(event.newData)
+				// Update value in the DB
+				await store.state.Session.apiCall(`/register_items/${rawNewCellData.id}`, 'PUT', cellPayload)
 
-			// Update value in the DB
-			await store.state.Session.apiCall('/register_items', 'PUT', cellPayload)
+				// Update value on the table (in memory)
+				toRaw(registers.value).find(item => {
+					if (item.id === rawNewCellData.id) {
+						item[event.field] = event.newValue
+					}
+				})
 
-			// Update value on the table (in memory)
-			toRaw(registers.value).find(item => {
-				if (item.id === rawNewCellData.id) {
-					item[event.field] = event.newValue
-				}
-			})
+				toast.add({ severity: 'success', summary: 'Success', detail: 'Table cell updated!', life: 3000 })
+				return
+			}
 
-			toast.add({ severity: 'success', summary: 'Success', detail: 'Table cell updated!', life: 3000 })
+			toast.add({ severity: 'info', summary: 'Info', detail: 'To save data, please hit enter', life: 3000 })
+
 		} catch (err) {
 			toast.add({ severity: 'error', summary: 'Error', detail: 'There was an error', life: 3000 })
 			console.log(err)
