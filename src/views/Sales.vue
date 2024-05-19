@@ -1,7 +1,7 @@
 <template>
 	<DataTable 
 		v-model:filters="filters" 
-		:value="registersComp" 
+		:value="registers" 
 		:loading="loading" 
 		:globalFilterFields="globalFilterFields" 
 		:rows="rows" 
@@ -188,7 +188,6 @@
 		filterDate = { end_at: null, start_at: null }
 
 	const orgId = computed(() => store.getters.getOrgId)
-	const registersComp = computed(() => registers.value)
 	watch(orgId, async (newVal, oldVal) => await getRegisters(newVal))
 
 	onMounted(async () => {
