@@ -6,6 +6,7 @@
     </template>
 
     <div class="wrapper__content">
+      <Toast />
       <Suspense>
         <template #default>
           <router-view :key="$route.fullPath"></router-view>

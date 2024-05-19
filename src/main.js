@@ -19,6 +19,8 @@ import Avatar from 'primevue/avatar'
 import ToggleButton from 'primevue/togglebutton'
 import Breadcrumb from 'primevue/breadcrumb'
 import Ripple from 'primevue/ripple'
+import Toast from 'primevue/toast'
+import ToastService from 'primevue/toastservice'
 import router from './router'
 import store from './store'
 import FloatingVue from 'floating-vue'
@@ -29,6 +31,7 @@ app.use(router)
 app.use(store)
 app.use(PrimeVue)
 app.use(FloatingVue)
+app.use(ToastService)
 app.component('DataTable', DataTable)
 app.component('Column', Column)
 app.component('IconField', IconField)
@@ -43,6 +46,7 @@ app.component('Menu', Menu)
 app.component('Avatar', Avatar)
 app.component('ToggleButton', ToggleButton)
 app.component('Breadcrumb', Breadcrumb)
+app.component('Toast', Toast)
 app.directive('ripple', Ripple)
 
 app.mount('#app')

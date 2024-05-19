@@ -2,8 +2,8 @@
 
 	& div.p-datatable-loading-overlay.p-component-overlay {
 		flex-direction: column;
-		color: var(--on-surface);
-		background-color: rgba(255, 255, 255, .7);
+		color: var(--onBackground);
+		background-color: color-mix(in srgb, var(--background) 80%, transparent);
 	}
 
 	& .calendar__search {
@@ -93,11 +93,12 @@
 }
 
 div.p-column-filter-buttonbar {
-	& .date__apply-btn, .p-button[aria-label="Apply"] {
+	& .apply-btn, .p-button[aria-label="Apply"] {
+		color: var(--onBackground);
 		background-color: var(--primary);
 	}
 
-	& .date__clear-btn, .p-button.p-button-outlined[aria-label="Clear"] {
+	& .clear-btn {
 		color: var(--primary);
 	}
 }

@@ -54,16 +54,19 @@
 				<Calendar v-model="filterModel.value" dateFormat="mm/dd/yy" placeholder="mm/dd/yyyy" mask="99/99/9999" @blur=" getDateFilter(filterModel)" />
 			</template>
 			<template #filterclear="{ filterCallback }">
-				<Button type="button" @click="filterCallback(), getTotalAmountCol()" label="Clear" outlined class="date__clear-btn" />
+				<Button type="button" @click="() => { filterCallback(); getTotalAmountCol()}" label="Clear" outlined class="clear-btn" />
 			</template>
 			<template #filterapply="{ filterCallback }">
-				<Button type="button" @click="filterCallback(), getTotalAmountCol()" label="Apply" class="date__apply-btn" />
+				<Button type="button" @click="filterCallback(), getTotalAmountCol()" label="Apply" class="apply-btn" />
 			</template>-->
 		</Column>
 
-        <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header" :filterField="col.field" sortable :filter="true" :filterMatchModeOptions="filterMatchModesOpt">
+        <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header" :filterField="col.field" sortable filter :filterMatchModeOptions="filterMatchModesOpt">
         	<template #filter="{ filterModel, filterCallback }" v-if="filters.hasOwnProperty(col.field)">
 				<InputText v-model="filterModel.value" type="text" @keydown.enter="filterCallback()" class="p-column-filter" />
+			</template>
+			<template #filterclear="{ filterCallback }">
+				<Button type="button" @click="() => { filterCallback(); onFilterClear(col.field); }" label="Clear" outlined class="clear-btn" />
 			</template>
 			<template #editor="{ data, field }">
 				<InputText v-model="data[field]" autofocus />
@@ -99,7 +102,7 @@
 	import { FilterMatchMode, FilterOperator } from 'primevue/api'
 	import { ref, onMounted, computed, watch, toRaw } from 'vue'
 	import { useStore } from 'vuex'
-	import notifications from '@/components/notifications'
+	import { useToast } from 'primevue/usetoast'
 	import Format from '@/lib/Format'
 	import { useFormatDate } from '@/composable/formatDate.js'
 	import loadingImg from '@/assets/images/trivial-loading.gif'
@@ -161,7 +164,8 @@
 				notContains: 'does not contain',
 				notEquals: '!=',
 				startsWith: 'starts with'
-			}
+			},
+			toast = useToast()
 
 	let columns = [],
 		fixedColumns = [
@@ -170,11 +174,12 @@
 			{field: 'unique_key', header: 'Unique Key'},
 			{field: 'amount', header: 'Amount'}
 		],
-		fiexdFilters = {
+		// Fiexed colums filters and constrains - implementation when API is finished
+		/*fiexdFilters = {
 			// global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 			// date: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] },
 			// date: { constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] },
-		},
+		},*/
 		totalsColumns = { amount: 'amount' },
 		globalFilterFields = [],
 		allRegisters = null,
@@ -196,7 +201,7 @@
 
 		try {
 			columns = [...fixedColumns] // Add fixed columns at the beginig of the table
-			filters.value = fiexdFilters
+			//filters.value = fiexdFilters
 
 			allRegisters = await store.state.Session.apiCall('/registers')
 			let register = allRegisters.find(r => r.owner_type == 'Organization' && r.owner_id == orgId && r.name == 'Sales')
@@ -233,7 +238,7 @@
 			loading.value = false
 		} catch (err) {
 			console.log(err)
-			notifications.error(`Failed to fetch data: ${err}`)
+			toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to fetch data', life: 3000 });
 			loading.value = false
 		}
 	}
@@ -287,9 +292,13 @@
 		let page = event?.page + 1,
 			queryString = `per_page=${rows.value}&page=${page}`
 		
-		const { register_items } = await getRegistersData(queryString)
-
-		registers.value = register_items
+		try {
+			const { register_items } = await getRegistersData(queryString)
+			registers.value = register_items
+		} catch (err) {
+			loading.value = false
+			console.log(err)
+		}
 
 		loading.value = false
 	}
@@ -303,9 +312,13 @@
 		let orderingDirection = event?.sortOrder === 1 ? 'ASC' : 'DESC',
 			queryString = `per_page=${rows.value}&order_by=${event?.sortField}&ordering_direction=${orderingDirection}`
 		
-		const { register_items } = await getRegistersData(queryString)
-
-		registers.value = register_items
+		try {
+			const { register_items } = await getRegistersData(queryString)
+			registers.value = register_items
+		} catch (err) {
+			loading.value = false
+			console.log(err)
+		}
 
 		loading.value = false
 	}
@@ -334,12 +347,62 @@
 
 		queryString = `search=${JSON.stringify(queryArr)}`
 
-		const { register_items } = await getRegistersData(queryString)
+		try {
+			const { register_items } = await getRegistersData(queryString)
 
-		registers.value = register_items
+			registers.value = register_items
+		} catch (err) {
+			loading.value = false
+			console.log(err)
+		}
 
 		loading.value = false
 	}
 
-	const onCellEditComplete = event => { console.log(event) }
+	const onFilterClear = field => {
+		const rawFilters = toRaw(filters.value);
+
+		// Reset the specific filter
+		if (rawFilters.hasOwnProperty(field)) {
+			const rawFiltersConstrains = toRaw(rawFilters[field].constraints)
+			
+			rawFiltersConstrains[0].value = null; // or reset as per your logic
+			rawFiltersConstrains[0].matchMode = 'equals'; // default match mode
+
+			rawFilters[field].constraints = { ...rawFiltersConstrains }
+		}
+
+		// Update the reactive filters object
+		filters.value = { ...rawFilters }
+
+		// Fetch original register data
+		getRegisters()
+	}
+
+	const onCellEditComplete = async event => { 
+		let cellPayload =  {
+			method: 'PUT',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify({amount: event.newValue, description: event.field })
+		}
+
+		try {
+			let rawNewCellData = toRaw(event.newData)
+
+			// Update value in the DB
+			await store.state.Session.apiCall('/register_items', 'PUT', cellPayload)
+
+			// Update value on the table (in memory)
+			toRaw(registers.value).find(item => {
+				if (item.id === rawNewCellData.id) {
+					item[event.field] = event.newValue
+				}
+			})
+
+			toast.add({ severity: 'success', summary: 'Success', detail: 'Table cell updated!', life: 3000 })
+		} catch (err) {
+			toast.add({ severity: 'error', summary: 'Error', detail: 'There was an error', life: 3000 })
+			console.log(err)
+		}
+	}
 </script>
