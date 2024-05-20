@@ -379,25 +379,23 @@
 	}
 
 	const onCellEditComplete = async event => {
-		console.log(event)
-		let cellPayload =  {
+		const { newData, field, data, newValue } = event,
+			rowIndex = registers.value.findIndex(item => item.id === data.id),
+			cellPayload =  {
 				method: 'PUT',
 				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({amount: event.newValue, description: event.field })
+				body: JSON.stringify({amount: newValue, description: field })
 			}
 
 		try {
 			if (event.type === 'enter') {
-				let rawNewCellData = toRaw(event.newData)
 				// Update value in the DB
-				await store.state.Session.apiCall(`/register_items/${rawNewCellData.id}`, 'PUT', cellPayload)
+				await store.state.Session.apiCall(`/register_items/${newData.id}`, 'PUT', cellPayload)
 
-				// Update value on the table (in memory)
-				toRaw(registers.value).find(item => {
-					if (item.id === rawNewCellData.id) {
-						item[event.field] = event.newValue
-					}
-				})
+				// Update value on the table (in memory)				
+				if (rowIndex !== -1) {
+					registers.value[rowIndex][field] = newData[field]
+				}
 
 				toast.add({ severity: 'success', summary: 'Success', detail: 'Table cell updated!', life: 3000 })
 				return
