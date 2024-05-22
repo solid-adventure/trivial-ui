@@ -44,7 +44,7 @@
 				min-width: 120px;
 
 				& > div {
-					justify-content: center;
+					/*justify-content: center;*/
 
 					& > span {
 						font-size: .9rem;
@@ -76,9 +76,9 @@
 
 		& > div {
 			width: calc(100% / var(--cols));
-			max-width: 146px;
+			max-width: 156px;
 			min-width: 120px;
-			text-align: center;
+			text-align: right;
 		}
 
 		& > div:first-child {

@@ -1,0 +1,1 @@
+export const useIsNumeric = strNum => /^[+-]?\d+(\.\d+)?$/.test(strNum)

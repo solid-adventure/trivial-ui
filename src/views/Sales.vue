@@ -1,7 +1,7 @@
 <template>
 	<DataTable 
 		v-model:filters="filters" 
-		:value="registers" 
+		:value="registersItems" 
 		:loading="loading" 
 		:globalFilterFields="globalFilterFields" 
 		:rows="rows" 
@@ -14,6 +14,7 @@
 		dataKey="id"
 		filterDisplay="menu"
 		scrollable
+		resizableColumns
 		class="border-round-sm registers_table"
 		@page="onPage($event)"
 		@sort="onSort($event)"
@@ -21,10 +22,10 @@
 		editMode="cell" 
 		@cell-edit-complete="onCellEditComplete" 
 		:pt="{
-			column: {
-				bodycell: ({ state }) => ({ class: [{ 'pt-0 pb-0': state['d_editing'] }] })
-			}
-		}"
+				column: {
+					bodycell: ({ state }) => ({ class: [{ 'pt-0 pb-0': state['d_editing'] }] })
+				}
+			}"
 		>
 		
 	    <template #header>
@@ -32,7 +33,7 @@
 	        	<h2 class="m-0">Revenue Detail</h2>
 	        	<!-- Global keyword search filed -->
 	            <!--<IconField iconPosition="right">
-	                <InputText v-model="filters['global'].value" placeholder="Keyword Search" />
+	                <InputText v-model="defaultFilters['global'].value" placeholder="Keyword Search" />
 					<InputIcon>
 						<i class="pi pi-search" />
 					</InputIcon>
@@ -45,23 +46,23 @@
 	    	<h3>Loading ...</h3>
 	    </template>
 
-		<Column header="Date" filterField="date" dataType="date" key="date" :filterMatchModeOptions="dateFilterMatchModes">
+		<Column header="Date" filterField="originated_at" dataType="date" key="originated_at" :filterMatchModeOptions="dateFilterMatchModes">
 			<template #body="{ data }">
-				<div class="date">{{ useFormatDate(data.created_at, dateOptions) }}</div>
-				<div class="time">{{ useFormatDate(data.created_at, timeOptions) }} {{ useFormatDate(data.created_at, timeZoneOptions).split(' ')[1] }}</div>
+				<div class="date">{{ useFormatDate(data.originated_at, dateOptions) }}</div>
+				<div class="time">{{ useFormatDate(data.originated_at, timeOptions) }} {{ useFormatDate(data.originated_at, timeZoneOptions).split(' ')[1] }}</div>
 			</template>
-			<!--<template #filter="{ filterModel, filterCallback }">
-				<Calendar v-model="filterModel.value" dateFormat="mm/dd/yy" placeholder="mm/dd/yyyy" mask="99/99/9999" @blur=" getDateFilter(filterModel)" />
+			<template #filter="{ filterModel, filterCallback }">
+				<Calendar v-model="filterModel.value" dateFormat="mm/dd/yy" placeholder="mm/dd/yyyy" mask="99/99/9999" />
 			</template>
 			<template #filterclear="{ filterCallback }">
-				<Button type="button" @click="() => { filterCallback(); getTotalAmountCol()}" label="Clear" outlined class="clear-btn" />
+				<Button type="button" @click="() => { filterCallback() }" label="Clear" outlined class="clear-btn" />
 			</template>
 			<template #filterapply="{ filterCallback }">
-				<Button type="button" @click="filterCallback(), getTotalAmountCol()" label="Apply" class="apply-btn" />
-			</template>-->
+				<Button type="button" @click="() => { filterCallback() }" label="Apply" class="apply-btn" />
+			</template>
 		</Column>
 
-        <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header" :filterField="col.field" sortable filter :filterMatchModeOptions="filterMatchModesOpt">
+        <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header" :filterField="col.field" sortable filter :filterMatchModeOptions="setFilterMatchModes(col.field)">
         	<template #filter="{ filterModel, filterCallback }" v-if="filters.hasOwnProperty(col.field)">
 				<InputText v-model="filterModel.value" type="text" @keydown.enter="filterCallback()" class="p-column-filter" />
 			</template>
@@ -72,7 +73,7 @@
 				<InputText v-model="data[field]" autofocus />
 			</template>
 			<template #body="{ data }">
-				<div class="flex align-items-center" v-tooltip="{ content: `${data[col.field]}`, disabled: isDisabledTooltip(data[col.field]) }">
+				<div class="flex align-items-center" :class="{ 'numeric__col justify-content-end': useIsNumeric(data[col.field]) }" v-tooltip="{ content: `${data[col.field]}`, disabled: isDisabledTooltip(data[col.field]) }">
 					<span v-if="col.field == 'amount'">{{ Format.money(data[col.field], 2, data['units']) }}</span>
 					<span v-else>{{ data[col.field] }}</span>
 				</div>
@@ -99,164 +100,124 @@
 </template>
 
 <script setup>
-	import { FilterMatchMode, FilterOperator } from 'primevue/api'
 	import { ref, onMounted, computed, watch, toRaw } from 'vue'
 	import { useStore } from 'vuex'
 	import { useToast } from 'primevue/usetoast'
 	import Format from '@/lib/Format'
 	import { useFormatDate } from '@/composable/formatDate.js'
+	import { useIsNumeric } from '@/composable/isNumeric.js'
+	import { useDateTimeZoneOptions } from '@/composable/dateTimeZoneOptions.js'
+	import { useFilterMatchModes } from '@/composable/filterMatchModes.js'
 	import loadingImg from '@/assets/images/trivial-loading.gif'
 
 	const loading = ref(false),
 			filters = ref({}),
-			store = useStore(),
 			registers = ref([]),
 			totalAmount = ref(null),
 			rows = ref(10), // per_page
 			totalRecords = ref(0),
 			first = ref(1),
 			totalInfoPopup = ref(),
+			sortField = ref(null),
+			sortOrder = ref(null),
 			rowsPerPageOpt = [10, 20, 50],
-			dateOptions = {
-				dateStyle: 'short',
-				timeZone: 'America/New_York'
-			},
-			timeOptions = {
-				timeStyle: 'short',
-				timeZone: 'America/New_York',
-				hourCycle: "h12"
-			},
-			timeZoneOptions = {
-				timeZone: 'America/New_York',
-				timeZoneName: 'short'
-			},
-			// Define custom match modes for the date field
-			dateFilterMatchModes = [
-				{ label: 'Date is', value: FilterMatchMode.DATE_IS },
-				{ label: 'Date is before', value: FilterMatchMode.DATE_BEFORE },
-				{ label: 'Date is after', value: FilterMatchMode.DATE_AFTER },
-				{ label: 'Date is not', value: FilterMatchMode.DATE_IS_NOT },
-			],
-			// Define custom match modes for the date field
-			filterMatchModesOpt = [
-				{ label: 'Equals', value: FilterMatchMode.EQUALS },
-				{ label: 'Not Equals', value: FilterMatchMode.NOT_EQUALS },
-				{ label: 'Less Than Or Equal To', value: FilterMatchMode.LESS_THAN_OR_EQUAL_TO },
-				{ label: 'Less Than', value: FilterMatchMode.LESS_THAN },
-				{ label: 'Greater Than Or Equal To', value: FilterMatchMode.GREATER_THAN_OR_EQUAL_TO },
-				{ label: 'Greater Than', value: FilterMatchMode.GREATER_THAN }
-			],
-			// Mapping filter match modes to their corresponding textual or mathematical signs
-			filterMatchModeMapping = {
-				between: 'between',
-				contains: 'contains',
-				dateAfter: '>',
-				dateBefore: '<',
-				dateIs: '=',
-				dateIsNot: '!=',
-				endsWith: 'ends with',
-				equals: '=',
-				gt: '>',
-				gte: '>=',
-				in: 'in',
-				lt: '<',
-				lte: '<=',
-				notContains: 'does not contain',
-				notEquals: '!=',
-				startsWith: 'starts with'
-			},
-			toast = useToast()
+			{dateOptions, timeOptions, timeZoneOptions} = useDateTimeZoneOptions(),
+			{
+				dateFilterMatchModes,
+				numericFilterMatchModes,
+				textFilterMatchModes,
+				filterMatchModeMapping,
+				defaultFilters,
+				defaultMatchMode,
+				globalFilterFields
+			} = useFilterMatchModes(),
+			toast = useToast(),
+			store = useStore()
 
 	let columns = [],
-		fixedColumns = [
+		defaultColumns = [
 			{field: 'description', header: 'Description'},
-			{field: 'originated_at', header: 'Originated'},
 			{field: 'unique_key', header: 'Unique Key'},
 			{field: 'amount', header: 'Amount'}
 		],
-		// Fiexed colums filters and constrains - implementation when API is finished
-		/*fiexdFilters = {
-			// global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-			// date: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] },
-			// date: { constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] },
-		},*/
 		totalsColumns = { amount: 'amount' },
-		globalFilterFields = [],
 		allRegisters = null,
-		localStorageOrgId = null,
 		regId = null,
-		filterDate = { end_at: null, start_at: null }
+		filterDate = { end_at: null, start_at: null },
+		page = 1 // Default start page is from first
 
 	const orgId = computed(() => store.getters.getOrgId)
+	const registersItems = computed(() => registers.value)
 	watch(orgId, async (newVal, oldVal) => await getRegisters(newVal))
 
 	onMounted(async () => {
-		orgId.value ? await getRegisters(orgId.value) : false
+		if (orgId.value) {
+			await getRegisters(orgId.value)
+		}
 	})
+
+	const setCSSCustomProp = () => document.documentElement.style.setProperty('--cols', columns.length + 1)
+	const totalPaginatorPages = (totalPages, itemsPerPage) => totalPages * itemsPerPage
+	const setColumns = () => columns = [...defaultColumns] // Add fixed columns at the beginig of the table
+	const setFilters = () => filters.value = defaultFilters
+	const resetColumns = () => columns = [] // Reset columns before new set of columns from API call
+	const resetFilters = () => filters.value = {} // Reset filters before new set of dynamic filters
+	const resetDateFilter = () => filterDate = {end_at: null, start_at: null}
+	const isDisabledTooltip = data => data?.length < 14
+	const toggleTotalInfoPopup = event => totalInfoPopup.value.toggle(event)
+	const setFilterMatchModes = field => field === 'amount' ? numericFilterMatchModes : textFilterMatchModes
 
 	const getRegisters = async orgId => {
 		loading.value = true
-		columns = [] // Reset columns before new set of columns from API call
-		filters.value = {} // Reset filters before new set of dynamic filters
+		resetColumns()
+		resetFilters()
 
 		try {
-			columns = [...fixedColumns] // Add fixed columns at the beginig of the table
-			//filters.value = fiexdFilters
+			setColumns()
+			setFilters()
 
 			allRegisters = await store.state.Session.apiCall('/registers')
-			let register = allRegisters.find(r => r.owner_type == 'Organization' && r.owner_id == orgId && r.name == 'Sales')
-
+			let register = allRegisters.find(r => r.owner_type === 'Organization' && r.owner_id === orgId && r.name === 'Sales')
 			regId = register.id
 
-			// Setting dynamic table columns headers
-			for (let property in register.meta) {
-				columns.push({field: register.meta[property], header: register.meta[property].replaceAll('_', ' ')})
-			}
+			setMetaColumns(register.meta)
+			setCSSCustomProp()
+			getSearchableCols()
 
-			setCssPropColsLength()
-
-			// Get Searchable Columns
-			let searchableColumns = await store.state.Session.apiCall(`/register_items/columns?register_id=${regId}`)
-
-			// Settign filters dynamic fileds for search options
-			searchableColumns.forEach(item => {
-				globalFilterFields.push(item) // Search dynamic fields
-				//filters.value[item] = filterDefaultMode
-				filters.value[item] = { constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] }
-			})
-
-			// Get registers item - query string -> register_id=${registerId}&order_by=${orderBy}&ordering_direction=${orderingDirection}&per_page=${perPage}&page=${page}`
-			
-			let queryString = `per_page=${rows.value}`
-			let { current_page, register_items, total_pages } = await getRegistersData(queryString)
-
-			totalRecords.value = totalPaginatorPages(total_pages, rows.value)
+			let queryString = updateQueryString()
+			const { register_items, total_pages } = await getRegistersData(queryString)
 			registers.value = register_items
+			totalRecords.value = totalPaginatorPages(total_pages, rows.value)
 
-			await getTotalAmountCol()
-
-			loading.value = false
+			await getTotalAmount()
 		} catch (err) {
 			console.log(err)
 			toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to fetch data', life: 3000 });
-			loading.value = false
+		}
+
+		loading.value = false
+	}
+
+	const getRegistersData = async queryString => {
+		try {
+			return await store.state.Session.apiCall(`/register_items?register_id=${regId}&${queryString}`);
+		} catch (err) {
+			toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to fetch data', life: 3000 });
+			console.error(err);
 		}
 	}
 
-	const getRegistersData = async (query = '') => await store.state.Session.apiCall(`/register_items?register_id=${regId}&${query}`)
-	const totalPaginatorPages = (totalPages, itemsPerPage) => totalPages * itemsPerPage
 
-	const setTotalColValue = searchProp => {
+	// Alternative way to update total amount col
+	/*const setTotalAmount = searchProp => {
 		let total = null
 
 		registers.value.forEach(item => total += parseInt(item[searchProp]))
 
 		return Format.money(total)
-	}
+	}*/
 
-	const setCssPropColsLength = () => document.documentElement.style.setProperty('--cols', columns.length + 1)
-
-	const getTotalAmountCol = async () => {
+	const getTotalAmount = async () => {
 		let end_at = filterDate.end_at || new Date().setYear('2100'),
 			start_at = filterDate.start_at || new Date().setYear('2000'),
 			total = null
@@ -265,33 +226,45 @@
 
 		totalAmount.value = Format.money(total.count)
 
-		clearFilterDate()
+		resetDateFilter()
 	}
 
-	const getDateFilter = (date = {}) => {
+	// For date field filter
+	/*const getDateFilter = (date = {}) => {
 		if (date?.matchMode === 'dateAfter') {
 			filterDate.start_at = date.value
 		} else if (date?.matchMode === 'dateBefore') {
 			filterDate.end_at = date.value
 		}
+	}*/
+
+	const getSearchableCols = async () => {
+		// Get Searchable Columns
+		let searchableColumns = await store.state.Session.apiCall(`/register_items/columns?register_id=${regId}`)
+
+		// Settign filters dynamic fileds for search options
+		searchableColumns.forEach(item => {
+			globalFilterFields.push(item) // Search dynamic fields
+			filters.value[item] = { constraints: [{ value: null, matchMode: defaultMatchMode }] }
+		})
 	}
 
-	const clearFilterDate = () => filterDate = {end_at: null, start_at: null}
-
-	const isDisabledTooltip = data => data?.length < 14
-
-	const toggleTotalInfoPopup = event => totalInfoPopup.value.toggle(event)
+	// Setting dynamic table columns headers - (register.meta)
+	const setMetaColumns = metaCols => {
+		for (let property in metaCols) {
+			columns.push({field: metaCols[property], header: metaCols[property].replaceAll('_', ' ')})
+		}
+	}
 
 	const onPage = async event => {
 		loading.value = true
 
 		first.value = event?.first || 0
 		rows.value = event?.rows || 10
+		page = event?.page + 1
 
-		let page = event?.page + 1,
-			queryString = `per_page=${rows.value}&page=${page}`
-		
 		try {
+			const queryString = updateQueryString()
 			const { register_items } = await getRegistersData(queryString)
 			registers.value = register_items
 		} catch (err) {
@@ -305,13 +278,11 @@
 	const onSort = async event => {
 		loading.value = true
 
-		first.value = event?.first || 0
-		rows.value = event?.rows || 10
+		sortField.value = event.sortField
+		sortOrder.value = event?.sortOrder === 1 ? 'ASC' : 'DESC'
 
-		let orderingDirection = event?.sortOrder === 1 ? 'ASC' : 'DESC',
-			queryString = `per_page=${rows.value}&order_by=${event?.sortField}&ordering_direction=${orderingDirection}`
-		
 		try {
+			const queryString = updateQueryString()
 			const { register_items } = await getRegistersData(queryString)
 			registers.value = register_items
 		} catch (err) {
@@ -324,32 +295,21 @@
 
 	const onFilter = async event => {
 		loading.value = true
-
-		let selectedFilter = toRaw(event.filters),
-			queryArr = [],
-			queryString = ''
-
-		for (let property in selectedFilter) {
-
-			let dateConstraints = toRaw(selectedFilter[property].constraints)
-
-			dateConstraints.forEach(item => {
-				if (item.value) {
-					queryArr.push({
-						c: property, 
-						o: filterMatchModeMapping[item.matchMode], 
-						p: item.value 
-					})
-				}
-			})
-		}
-
-		queryString = `search=${JSON.stringify(queryArr)}`
+		filters.value = event.filters
 
 		try {
-			const { register_items } = await getRegistersData(queryString)
+			const queryString = updateQueryString()
 
+			// Get registers data
+			const { register_items, total_pages, current_page } = await getRegistersData(queryString)
+			
+			// Set paggination
+			totalRecords.value = totalPaginatorPages(total_pages, rows.value)
+
+			// Set table registers value
 			registers.value = register_items
+			
+			//await getTotalAmount()
 		} catch (err) {
 			loading.value = false
 			console.log(err)
@@ -358,33 +318,34 @@
 		loading.value = false
 	}
 
-	const onFilterClear = field => {
-		const rawFilters = toRaw(filters.value);
-
-		// Reset the specific filter
-		if (rawFilters.hasOwnProperty(field)) {
-			const rawFiltersConstrains = toRaw(rawFilters[field].constraints)
-			
-			rawFiltersConstrains[0].value = null; // or reset as per your logic
-			rawFiltersConstrains[0].matchMode = 'equals'; // default match mode
-
-			rawFilters[field].constraints = { ...rawFiltersConstrains }
+	const onFilterClear = async field => {
+		if (filters.value.hasOwnProperty(field)) {
+			filters.value[field].constraints = [{ value: null, matchMode: defaultMatchMode }]
 		}
 
-		// Update the reactive filters object
-		filters.value = { ...rawFilters }
-
-		// Fetch original register data
-		getRegisters()
+		try {
+			page = 1
+			const queryString = updateQueryString()
+			const { register_items } = await getRegistersData(queryString)
+			registers.value = register_items
+			// await getTotalAmount()
+		} catch (err) {
+			console.error(err)
+		}
 	}
 
 	const onCellEditComplete = async event => {
-		const { newData, field, data, newValue } = event,
-			rowIndex = registers.value.findIndex(item => item.id === data.id),
-			cellPayload =  {
+		let bodyObj = {}
+
+		const { newData, field, data, newValue } = event
+		
+		bodyObj[field] = newValue
+
+		const rowIndex = registers.value.findIndex(item => item.id === data.id),
+			cellPayload = {
 				method: 'PUT',
 				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({amount: newValue, description: field })
+				body: JSON.stringify(bodyObj)
 			}
 
 		try {
@@ -397,15 +358,48 @@
 					registers.value[rowIndex][field] = newData[field]
 				}
 
-				toast.add({ severity: 'success', summary: 'Success', detail: 'Table cell updated!', life: 3000 })
+				toast.add({ severity: 'success', summary: 'Success', detail: 'Table cell updated.', life: 3000 })
 				return
 			}
 
-			toast.add({ severity: 'info', summary: 'Info', detail: 'To save data, please hit enter', life: 3000 })
+			toast.add({ severity: 'info', summary: 'Info', detail: 'To save data, please hit enter.', life: 3000 })
 
 		} catch (err) {
-			toast.add({ severity: 'error', summary: 'Error', detail: 'There was an error', life: 3000 })
+			toast.add({ severity: 'error', summary: 'Error', detail: 'There was an error.', life: 3000 })
 			console.log(err)
 		}
+	}
+
+	const updateQueryString = () => {
+		let queryString = `per_page=${rows.value}&page=${page}`
+
+		if (sortField.value) {
+			queryString += `&order_by=${sortField.value}&ordering_direction=${sortOrder.value}`
+		}
+
+		const filtersArray = []
+
+		for (let key in filters.value) {
+			const filter = filters.value[key]
+
+			if (filter.constraints && filter.constraints.length > 0) {
+				filter.constraints.forEach(constraint => {
+				
+					if (constraint.value) {
+						filtersArray.push({
+							c: key,
+							o: filterMatchModeMapping[constraint.matchMode],
+							p: constraint.value
+						})
+					}
+				})
+			}
+		}
+
+		if (filtersArray.length > 0) {
+			queryString += `&search=${encodeURIComponent(JSON.stringify(filtersArray))}`
+		}
+
+		return queryString
 	}
 </script>
