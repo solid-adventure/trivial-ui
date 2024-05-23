@@ -118,7 +118,7 @@
 <style lang="scss" scoped>
   .error-container {
     padding: 1em;
-    background-color: var(--background);
+    background-color: var(--clr-bg);
     color: var(--on-background);
     border-radius: 6px;
 

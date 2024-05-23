@@ -199,7 +199,7 @@
       top: 0.325em;
       font-size: 0.75em;
       color: var(--on-background);
-      background-color: var(--background);
+      background-color: var(--clr-bg);
       text-transform: uppercase;
       z-index: 2;
 

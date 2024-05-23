@@ -101,7 +101,7 @@
 <style lang="scss" scoped>
 
     .navtree {
-      position: fixed;
+      /*position: fixed;
       top: 120px;
       left: 0;
       box-sizing: border-box;
@@ -110,11 +110,17 @@
       height: 100%;
       overflow: auto;
       border-right: 1px solid var(--on-background-20);
-      background-color: var(--surface);
+      background-color: var(--surface);*/
+
+      position: sticky;
+      top: 120px;
+      max-width: 250px;
+      width: 100%;
+      border-right: 1px solid var(--on-background-20);
 
       .app-name-container {
-        padding: 1em;
-        font-size: 1.5em;
+        padding: .25rem;
+        font-size: 1rem;
       }
 
       .title {
@@ -128,9 +134,9 @@
       }
 
       .unselected, .selected {
-        padding: 1em;
-        margin: 0 2em;
-        border-radius: 1em;
+        padding: .5rem;
+        margin: 0 .25rem;
+        border-radius: .25rem;
       }
 
       .unselected {

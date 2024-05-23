@@ -25,10 +25,6 @@
 </template>
 
 <style lang="scss" scoped>
-  .function-body {
-    margin: 1em;
-  }
-
   .function-list {
     list-style: none;
     margin: 0;

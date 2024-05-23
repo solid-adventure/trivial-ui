@@ -146,7 +146,7 @@
       border-top: 1px solid;
       border-left: 1px solid;
       border-right: 1px solid;
-      border-color: var(--background-80);
+      border-color: var(--background);
       background-color: var(--surface);
       color: var(--on-surface);
     }
@@ -154,7 +154,7 @@
   }
 
  .tab.active, .active{
-    background-color: var(--table-column-head-color);
+    background-color: var(--background);
     color: var(--on-background);
     border-bottom: 0;
     border-color: var(--accent);
@@ -166,7 +166,6 @@
   }
 
   th.period button {
-    background-color: var(--table-column-head-color);
     color: var(--on-background);
   }
 
@@ -179,6 +178,7 @@
   import StatusLine from './StatusLine.vue'
   import SortableHead from './controls/SortableHead.vue'
   import store from '../store'
+  import { toRaw } from 'vue'
 
 
 
@@ -227,8 +227,10 @@
     computed: {
 
       filteredApps() {
+        let filtredByOrgIdApps = toRaw(this.apps).filter(r => r.owner_id === this.orgId)
+
         const term = this.searchTerm.toUpperCase()
-        let apps = this.apps.filter(app => {
+        let apps = filtredByOrgIdApps.filter(app => {
           return (
             (! term) ||
             (String(app.descriptive_name).toUpperCase().indexOf(term) !== -1)
@@ -237,7 +239,7 @@
 
         if (!['any', 'all'].includes(this.panelTypeFilter)) {
           apps = apps
-            .filter(app => app.panels)
+            //.filter(app => app.panels)
             .filter(app => app.panels.component.toLowerCase() == this.panelTypeFilter.toLowerCase())
         }
         return apps
@@ -297,7 +299,8 @@
       ...mapState({
         apps: state => state.apps,
         appsLoaded: state => state.appsLoaded,
-        Permissions: state => state.Permissions
+        Permissions: state => state.Permissions,
+        orgId: state => state.orgId
       })
 
     },

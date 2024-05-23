@@ -3,9 +3,9 @@
 
     <div class="page-inset">
 
-      <h2>Account Settings</h2>
+      <!--<h2>Account Settings</h2>
 
-      <RouterLink to="/signout">Sign out</RouterLink><br>
+      <RouterLink to="/signout">Sign out</RouterLink><br>-->
       <div class="section">
         <OrganizationsManager></OrganizationsManager>
       </div>
