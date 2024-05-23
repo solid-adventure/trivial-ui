@@ -341,17 +341,12 @@
 		
 		bodyObj[field] = newValue
 
-		const rowIndex = registers.value.findIndex(item => item.id === data.id),
-			cellPayload = {
-				method: 'PUT',
-				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify(bodyObj)
-			}
+		const rowIndex = registers.value.findIndex(item => item.id === data.id)
 
 		try {
 			if (event.type === 'enter') {
 				// Update value in the DB
-				await store.state.Session.apiCall(`/register_items/${newData.id}`, 'PUT', cellPayload)
+				await store.state.Session.apiCall(`/register_items/${newData.id}`, 'PUT', bodyObj)
 
 				// Update value on the table (in memory)				
 				if (rowIndex !== -1) {
