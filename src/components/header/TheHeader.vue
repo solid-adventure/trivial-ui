@@ -99,7 +99,8 @@
 
 	let localStorageOrgId = null,
 		currentTheme = 'aura-light-green',
-		nextTheme = 'aura-dark-blue'
+		nextTheme = 'aura-dark-blue',
+		defaultTheme = '/assets/primevue-themes/aura-dark-blue/theme.css'
 
 	const isDark = useDark({
 		selector: 'html',
@@ -118,11 +119,26 @@
 	})
 
 	onMounted(async () => {
+		injectLinkStyle(defaultTheme)
 		await fetchData()
 		setSelectedOrg()
 		setCheckedTheme()
 		setPrimeVueTheme()
 	})
+
+	const injectLinkStyle = href => {
+		let link = document.getElementById('theme-link')
+		
+		if (link) {
+			link.href = href
+		} else {
+			link = document.createElement('link')
+			link.rel = 'stylesheet'
+			link.href = href
+			link.id = 'theme-link'
+			document.head.appendChild(link)
+		}
+	}
 
 	const toggleTheme = () => {
 		toggleDark() // Main page theme
@@ -132,11 +148,11 @@
 	const setPrimeVueTheme = () => {
 		// Toggle PrimeVue theme for UI components
 		if (isDark.value) {
-			currentTheme = 'aura-light-green';
-			nextTheme = 'aura-dark-blue';
+			currentTheme = 'aura-light-green'
+			nextTheme = 'aura-dark-blue'
 		} else {
-			currentTheme = 'aura-dark-blue';
-			nextTheme = 'aura-light-green';
+			currentTheme = 'aura-dark-blue'
+			nextTheme = 'aura-light-green'
 		}
 
 		primeVue.changeTheme(currentTheme, nextTheme, 'theme-link')
