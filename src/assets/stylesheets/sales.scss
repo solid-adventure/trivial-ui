@@ -1,5 +1,12 @@
 .registers_table {
 
+	.p-datatable-header {
+		button.add__row-btn {
+			color: var(--surface);
+			background-color: var(--primary);
+		}
+	}
+
 	& div.p-datatable-loading-overlay.p-component-overlay {
 		flex-direction: column;
 		color: var(--onBackground);
@@ -16,6 +23,12 @@
 		& tr > th {
 			& div {
 				// justify-content: center;
+			}
+
+			& div.active__col--filter {
+				& button {
+					color: var(--primary)
+				}
 			}
 		}
 
@@ -63,8 +76,8 @@
 				}
 			}
 
-			& td.p-cell-editing {
-				& input.p-inputtext.p-component.p-filled {
+			& td.p-cell-editing, & td.p-editable-column {
+				& input.p-inputtext.p-component {
 					max-width: 100%;
 				}
 			}

@@ -23,8 +23,10 @@
 		@cell-edit-complete="onCellEditComplete" 
 		:pt="{
 				column: {
-					bodycell: ({ state }) => ({ class: [{ 'pt-0 pb-0': state['d_editing'] }] })
+					bodycell: ({ state }) => ({ class: [{ 'pt-0 pb-0': state['d_editing'] }] }),
+					columnFilter: ({ props }) => ({ class: [{ 'active__col--filter': toRaw(filters[props.field]) && toRaw(filters[props.field]).constraints[0].value }] })
 				}
+
 			}"
 		>
 		
@@ -38,6 +40,8 @@
 						<i class="pi pi-search" />
 					</InputIcon>
 	            </IconField>-->
+
+	            <!-- <Button icon="pi pi-plus" class="add__row-btn" @click="addRow" title="Add Row" /> -->
 	        </div>
 	    </template>
 	    <template #empty>No revenues found.</template>
@@ -166,6 +170,12 @@
 	const isDisabledTooltip = data => data?.length < 14
 	const toggleTotalInfoPopup = event => totalInfoPopup.value.toggle(event)
 	const setFilterMatchModes = field => field === 'amount' ? numericFilterMatchModes : textFilterMatchModes
+	
+	const addRow = () => {
+		let emptyRowObj = { 'originated_at': new Date() }
+		columns.forEach(item => emptyRowObj[item.field] = '')
+		registers.value.unshift(emptyRowObj) 
+	}
 
 	const getRegisters = async orgId => {
 		loading.value = true
@@ -294,6 +304,7 @@
 	}
 
 	const onFilter = async event => {
+		console.log('event - ', event)
 		loading.value = true
 		filters.value = event.filters
 
