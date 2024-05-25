@@ -63,7 +63,7 @@
               <RouterLink :to="`/apps/${app.name}/`">{{panelType(app)}}</RouterLink>
             </td>
             <td>{{lastRun(app)}}</td>
-            <td><RouterLink v-if= "app?.canUpdate" :to="editLink(app)">Edit</RouterLink></td>
+            <td><RouterLink v-if="app?.canUpdate" :to="editLink(app)">Edit</RouterLink></td>
             <!-- <td><a :href="`/apps/${app.name}/builder2`">Edit</a></td> -->
             <td colspan="2">
               <RouterLink :to="`/apps/${app.name}/activity`">
@@ -172,7 +172,7 @@
 </style>
 
 <script>
-  import { mapState } from 'vuex'
+  import { mapState, mapGetters } from 'vuex'
   import { fetchJSON } from 'trivial-core/lib/component-utils'
   import SearchField from './controls/SearchField.vue'
   import StatusLine from './StatusLine.vue'
@@ -225,9 +225,12 @@
     },
 
     computed: {
+      ...mapGetters(['getApps']),
 
       filteredApps() {
-        let filtredByOrgIdApps = toRaw(this.apps).filter(r => r.owner_id === this.orgId)
+        // deep copy using JSON.parse and JSON.stringify, because we need canUpdate prop in template
+        let copyApps = JSON.parse(JSON.stringify(this.getApps))
+        let filtredByOrgIdApps = copyApps.filter(r => r.owner_id === this.orgId)
 
         const term = this.searchTerm.toUpperCase()
         let apps = filtredByOrgIdApps.filter(app => {

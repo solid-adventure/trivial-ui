@@ -8,6 +8,7 @@ import ActionPath from 'trivial-core/lib/actionsv2/ActionPath'
 import router from '../router'
 import Session from '../models/Session'
 import Permissions from '../models/Permissions'
+import { toRaw } from 'vue'
 
 const store = createStore({
 
@@ -69,6 +70,10 @@ const store = createStore({
     },
     getOrgId(state) {
       return state.orgId
+    },
+
+    getApps(state) {
+      return state.apps;
     }
   },
 
