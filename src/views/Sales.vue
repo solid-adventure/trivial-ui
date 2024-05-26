@@ -50,25 +50,10 @@
 	    	<h3>Loading ...</h3>
 	    </template>
 
-		<Column header="Date" filterField="originated_at" dataType="date" key="originated_at" :filterMatchModeOptions="dateFilterMatchModes">
-			<template #body="{ data }">
-				<div class="date">{{ useFormatDate(data.originated_at, dateOptions) }}</div>
-				<div class="time">{{ useFormatDate(data.originated_at, timeOptions) }} {{ useFormatDate(data.originated_at, timeZoneOptions).split(' ')[1] }}</div>
-			</template>
-			<template #filter="{ filterModel, filterCallback }">
-				<Calendar v-model="filterModel.value" dateFormat="mm/dd/yy" placeholder="mm/dd/yyyy" mask="99/99/9999" />
-			</template>
-			<template #filterclear="{ filterCallback }">
-				<Button type="button" @click="() => { filterCallback() }" label="Clear" outlined class="clear-btn" />
-			</template>
-			<template #filterapply="{ filterCallback }">
-				<Button type="button" @click="() => { filterCallback() }" label="Apply" class="apply-btn" />
-			</template>
-		</Column>
-
         <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header" :filterField="col.field" sortable filter :filterMatchModeOptions="setFilterMatchModes(col.field)">
         	<template #filter="{ filterModel, filterCallback }" v-if="filters.hasOwnProperty(col.field)">
-				<InputText v-model="filterModel.value" type="text" @keydown.enter="filterCallback()" class="p-column-filter" />
+        		<Calendar v-if="col.field === 'originated_at'" v-model="filterModel.value" dateFormat="mm/dd/yy" placeholder="mm/dd/yyyy" mask="99/99/9999" />
+				<InputText v-else v-model="filterModel.value" type="text" @keydown.enter="filterCallback()" class="p-column-filter" />
 			</template>
 			<template #filterclear="{ filterCallback }">
 				<Button type="button" @click="() => { filterCallback(); onFilterClear(col.field); }" label="Clear" outlined class="clear-btn" />
@@ -78,7 +63,11 @@
 			</template>
 			<template #body="{ data }">
 				<div class="flex align-items-center" :class="{ 'numeric__col justify-content-end': useIsNumeric(data[col.field]) }" v-tooltip="{ content: `${data[col.field]}`, disabled: isDisabledTooltip(data[col.field]) }">
-					<span v-if="col.field == 'amount'">{{ Format.money(data[col.field], 2, data['units']) }}</span>
+					<span v-if="col.field == 'originated_at'">
+						<div class="date">{{ useFormatDate(data.originated_at, dateOptions) }}</div>
+						<div class="time">{{ useFormatDate(data.originated_at, timeOptions) }} {{ useFormatDate(data.originated_at, timeZoneOptions).split(' ')[1] }}</div>
+					</span>
+					<span v-else-if="col.field == 'amount'">{{ Format.money(data[col.field], 2, data['units']) }}</span>
 					<span v-else>{{ data[col.field] }}</span>
 				</div>
 			</template>
@@ -86,17 +75,17 @@
 
         <template #footer>
 			<div class="flex justify-content-start footer__col">
-				<div>
-					<h4 class="flex align-items-center m-0">
-						Totals
-						<Button type="button" icon="pi pi-info-circle" severity="secondary" size="small" text rounded outlined aria-label="Info" @click="toggleTotalInfoPopup" class="info__btn ml-2 p-0" />
-						<OverlayPanel ref="totalInfoPopup">
-							<p class="m-0">Total includes results from all pages, including those not displayed.</p>
-						</OverlayPanel>
-					</h4>
-				</div>
 				<div v-for="(col, index) of columns" :key="index">
-					<span v-if="col.field === totalsColumns[col.field]">{{ totalAmount }}</span>
+					<div v-if="index == 0">
+						<h4 class="flex align-items-center m-0">
+							Totals
+							<Button type="button" icon="pi pi-info-circle" severity="secondary" size="small" text rounded outlined aria-label="Info" @click="toggleTotalInfoPopup" class="info__btn ml-2 p-0" />
+							<OverlayPanel ref="totalInfoPopup">
+								<p class="m-0">Total includes results from all pages, including those not displayed.</p>
+							</OverlayPanel>
+						</h4>
+					</div>
+					<span v-else-if="col.field === totalsColumns[col.field]">{{ totalAmount }}</span>
 				</div>
 			</div>
         </template>
@@ -140,6 +129,7 @@
 
 	let columns = [],
 		defaultColumns = [
+			{field: 'originated_at', header: 'Date'},
 			{field: 'description', header: 'Description'},
 			{field: 'unique_key', header: 'Unique Key'},
 			{field: 'amount', header: 'Amount'}
@@ -160,16 +150,18 @@
 		}
 	})
 
-	const setCSSCustomProp = () => document.documentElement.style.setProperty('--cols', columns.length + 1)
+	const setCSSCustomProp = () => document.documentElement.style.setProperty('--cols', columns.length - 1)
 	const totalPaginatorPages = (totalPages, itemsPerPage) => totalPages * itemsPerPage
 	const setColumns = () => columns = [...defaultColumns] // Add fixed columns at the beginig of the table
 	const setFilters = () => filters.value = defaultFilters
 	const resetColumns = () => columns = [] // Reset columns before new set of columns from API call
 	const resetFilters = () => filters.value = {} // Reset filters before new set of dynamic filters
 	const resetDateFilter = () => filterDate = {end_at: null, start_at: null}
+	const resetRegisters = () => registers.value = []
+	const resetTotlaAmount = () => totalAmount.value = null
 	const isDisabledTooltip = data => data?.length < 14
 	const toggleTotalInfoPopup = event => totalInfoPopup.value.toggle(event)
-	const setFilterMatchModes = field => field === 'amount' ? numericFilterMatchModes : textFilterMatchModes
+	const setFilterMatchModes = field => field === 'amount' ? numericFilterMatchModes : field === 'originated_at' ? dateFilterMatchModes : textFilterMatchModes
 	
 	const addRow = () => {
 		let emptyRowObj = { 'originated_at': new Date() }
@@ -188,8 +180,18 @@
 
 			allRegisters = await store.state.Session.apiCall('/registers')
 			let register = allRegisters.find(r => r.owner_type === 'Organization' && r.owner_id === orgId && r.name === 'Sales')
-			regId = register.id
 
+			// If regiester don't exists or don't have sales data for table
+			if (!register) {
+				resetColumns()
+				resetFilters()
+				resetRegisters()
+				resetTotlaAmount()
+				loading.value = false
+				return
+			}
+
+			regId = register.id
 			setMetaColumns(register.meta)
 			setCSSCustomProp()
 			getSearchableCols()
@@ -304,7 +306,6 @@
 	}
 
 	const onFilter = async event => {
-		console.log('event - ', event)
 		loading.value = true
 		filters.value = event.filters
 
