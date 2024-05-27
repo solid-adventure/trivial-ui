@@ -101,7 +101,7 @@
 	import { useIsNumeric } from '@/composable/isNumeric.js'
 	import { useDateTimeZoneOptions } from '@/composable/dateTimeZoneOptions.js'
 	import { useFilterMatchModes } from '@/composable/filterMatchModes.js'
-	import loadingImg from '@/assets/images/trivial-loading.gif'
+	import loadingImg from '@/assets/images/trivial-loading-optimized.webp'
 
 	const loading = ref(false),
 			filters = ref({}),
