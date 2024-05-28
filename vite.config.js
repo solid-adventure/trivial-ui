@@ -29,5 +29,6 @@ export default defineConfig({
         additionalData: '@import "./src/assets/stylesheets/main.scss";'
       }
     }
-  }
+  },
+  publicDir: 'public' // The default is already 'public'
 })
