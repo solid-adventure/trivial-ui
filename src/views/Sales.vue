@@ -122,6 +122,7 @@
 				filterMatchModeMapping,
 				defaultFilters,
 				defaultMatchMode,
+				defaultDateMatchMode,
 				globalFilterFields
 			} = useFilterMatchModes(),
 			toast = useToast(),
@@ -257,7 +258,9 @@
 		// Settign filters dynamic fileds for search options
 		searchableColumns.forEach(item => {
 			globalFilterFields.push(item) // Search dynamic fields
-			filters.value[item] = { constraints: [{ value: null, matchMode: defaultMatchMode }] }
+			
+			let matchMode = item !== 'originated_at' ? defaultMatchMode : defaultDateMatchMode;
+			filters.value[item] = { constraints: [{ value: null, matchMode }] }
 		})
 	}
 
