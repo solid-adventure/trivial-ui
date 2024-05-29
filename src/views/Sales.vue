@@ -40,8 +40,6 @@
 						<i class="pi pi-search" />
 					</InputIcon>
 	            </IconField>-->
-
-	            <!-- <Button icon="pi pi-plus" class="add__row-btn" @click="addRow" title="Add Row" /> -->
 	        </div>
 	    </template>
 	    <template #empty>No revenues found.</template>
@@ -164,12 +162,6 @@
 	const isDisabledTooltip = data => data?.length < 14
 	const toggleTotalInfoPopup = event => totalInfoPopup.value.toggle(event)
 	const setFilterMatchModes = field => field === 'amount' ? numericFilterMatchModes : field === 'originated_at' ? dateFilterMatchModes : textFilterMatchModes
-	
-	const addRow = () => {
-		let emptyRowObj = { 'originated_at': new Date() }
-		columns.forEach(item => emptyRowObj[item.field] = '')
-		registers.value.unshift(emptyRowObj) 
-	}
 
 	const getRegisters = async orgId => {
 		loading.value = true
