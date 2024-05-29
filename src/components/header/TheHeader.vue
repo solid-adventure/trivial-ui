@@ -46,7 +46,7 @@
 </template>
 
 <script setup>
-	import { Icon } from '@iconify/vue'
+	//import { Icon } from '@iconify/vue'
 	import Breadcrumb from '../Breadcrumb.vue'
 	import { ref, watch, onMounted, computed } from 'vue'
 	import { useStore } from 'vuex'
