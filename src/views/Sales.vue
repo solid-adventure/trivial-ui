@@ -40,7 +40,10 @@
 	            </IconField>-->
 	        </div>
 	    </template>
-	    <template #empty>No revenues found.</template>
+	    <template #empty>
+	    	<h3 v-if="!orgId">{{ selectOrgMsgInfo }}</h3>
+	    	No revenues found.
+		</template>
 	    <template #loading>
 	    	<Image :src="loadingImg" alt="Loader" width="160" />
 	    	<h3>Loading ...</h3>
@@ -133,10 +136,12 @@
 			} = useFilterMatchModes(),
 			toast = useToast(),
 			store = useStore(),
-			registersNames = ['Sales', 'Income Account']
+			registersNames = ['Sales', 'Income Account'],
+			selectOrgMsgInfo = 'Please, select an organization.'
 
 	let columns = [],
 		defaultColumns = [
+			//{field: 'originated_at', header: 'Date'},
 			{field: 'description', header: 'Description'},
 			{field: 'unique_key', header: 'Unique Key'},
 			{field: 'amount', header: 'Amount'}
@@ -149,11 +154,23 @@
 
 	const orgId = computed(() => store.getters.getOrgId)
 	const registersItems = computed(() => registers.value)
-	watch(orgId, async (newVal, oldVal) => await getRegisters(newVal))
+	watch(orgId, async (newVal, oldVal) => {
+		if (!newVal) {
+			resetColumns()
+			resetFilters()
+			resetFilters()
+			toast.add({ severity: 'info', summary: 'Info', detail: selectOrgMsgInfo, life: 6000 })
+			return
+		}
+
+		await getRegisters(newVal)
+	})
 
 	onMounted(async () => {
 		if (orgId.value) {
 			await getRegisters(orgId.value)
+		} else {
+			toast.add({ severity: 'info', summary: 'Info', detail: selectOrgMsgInfo, life: 6000 })
 		}
 	})
 

@@ -71,7 +71,7 @@
 	})
 
 	const selectedOrg = ref(),
-		organisations = ref([{name: '', id: null}]),
+		organisations = ref([]),
 		store = useStore(),
 		checkedTheme = ref(false),
 		router = useRouter(),
@@ -149,6 +149,7 @@
 	const fetchData = async () => {
 		try {
 			organisations.value = await store.state.Session.apiCall('/organizations')
+			organisations.value.unshift({name: 'None', id: null})
 		} catch (err) {
 			notifications.error(`Failed to fetch data: ${err}`)
 		}
@@ -161,6 +162,8 @@
 		// Select organization dropdown value if organization ID is stored in local storage
 		if (localStorageOrgId) {
 			selectedOrg.value = organisations.value.find(item => item.id === parseInt(localStorageOrgId, 10))
+		} else {
+			selectedOrg.value = {name: 'None', id: null}
 		}
 	}
 
