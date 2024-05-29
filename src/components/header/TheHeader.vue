@@ -132,11 +132,11 @@
 	const setPrimeVueTheme = () => {
 		// Toggle PrimeVue theme for UI components
 		if (isDark.value) {
-			currentTheme = 'aura-light-green';
-			nextTheme = 'aura-dark-blue';
+			currentTheme = 'aura-light-green'
+			nextTheme = 'aura-dark-blue'
 		} else {
-			currentTheme = 'aura-dark-blue';
-			nextTheme = 'aura-light-green';
+			currentTheme = 'aura-dark-blue'
+			nextTheme = 'aura-light-green'
 		}
 
 		primeVue.changeTheme(currentTheme, nextTheme, 'theme-link')

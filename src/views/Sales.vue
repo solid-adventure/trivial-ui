@@ -126,7 +126,8 @@
 				globalFilterFields
 			} = useFilterMatchModes(),
 			toast = useToast(),
-			store = useStore()
+			store = useStore(),
+			registersNames = ['Sales', 'Income Account']
 
 	let columns = [],
 		defaultColumns = [
@@ -180,7 +181,7 @@
 			setFilters()
 
 			allRegisters = await store.state.Session.apiCall('/registers')
-			let register = allRegisters.find(r => r.owner_type === 'Organization' && r.owner_id === orgId && r.name === 'Sales')
+			let register = allRegisters.find(r => r.owner_type === 'Organization' && r.owner_id === orgId && registersNames.includes(r.name))
 
 			// If regiester don't exists or don't have sales data for table
 			if (!register) {

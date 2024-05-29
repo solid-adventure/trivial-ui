@@ -2,7 +2,7 @@
 
 	.p-datatable-header {
 		button.add__row-btn {
-			color: var(--surface);
+			color: white;
 			background-color: var(--primary);
 		}
 	}
@@ -120,4 +120,8 @@ div.p-column-filter-buttonbar {
 input[type="text"].p-inputtext {
 	padding: .5rem .75rem;
 	border-radius: 6px;
+}
+
+.p-dropdown:not(.p-disabled).p-focus {
+	outline-color: var(--primary);
 }

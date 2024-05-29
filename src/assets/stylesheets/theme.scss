@@ -13,7 +13,6 @@ html[color-scheme="light"] {
   --on-surface-secondary: #A6AAA4; // light gray
 
   --logo-login: url("/src/assets/images/trivial-logo-simplified-dark-on-light.svg");
-
 }
 
 /* Dark theme override */
@@ -31,7 +30,6 @@ html[color-scheme="dark"] {
   --on-surface-secondary: #A6AAA4; // light gray
 
   --logo-login: url("/src/assets/images/trivial-logo-simplified-light-on-dark.svg");
-
 }
 
 
@@ -50,8 +48,6 @@ html[color-scheme="dark"] {
     --on-background-secondary: #A6AAA4; // light gray
     --on-surface-secondary: #A6AAA4; // light gray
 
-
     --logo-login: url("/src/assets/images/trivial-logo-simplified-light-on-dark.svg");
-
   }
 }
