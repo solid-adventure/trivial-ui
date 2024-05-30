@@ -16,9 +16,9 @@
 		scrollable
 		resizableColumns
 		class="border-round-sm registers_table"
-		@page="onPage($event)"
-		@sort="onSort($event)"
-		@filter="onFilter($event)"
+		@page="onPage"
+		@sort="onSort"
+		@filter="onFilter"
 		editMode="cell" 
 		@cell-edit-complete="onCellEditComplete" 
 		:pt="{
@@ -26,7 +26,6 @@
 					bodycell: ({ state }) => ({ class: [{ 'pt-0 pb-0': state['d_editing'] }] }),
 					columnFilter: ({ props }) => ({ class: [{ 'active__col--filter': toRaw(filters[props.field]) && toRaw(filters[props.field]).constraints[0].value }] })
 				}
-
 			}"
 		>
 		
@@ -48,7 +47,7 @@
 	    	<h3>Loading ...</h3>
 	    </template>
 
-        <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header" :filterField="col.field" sortable filter :filterMatchModeOptions="setFilterMatchModes(col.field)">
+        <Column v-for="col in columns" :key="col.field" :field="col.field" :header="col.header" :filterField="col.field" sortable filter :filterMatchModeOptions="setFilterMatchModes(col.field)">
         	<template #filter="{ filterModel, filterCallback }" v-if="filters.hasOwnProperty(col.field)">
         		<Calendar v-if="col.field === 'originated_at'" v-model="filterModel.value" dateFormat="mm/dd/yy" placeholder="mm/dd/yyyy" mask="99/99/9999" />
 				<InputText v-else v-model="filterModel.value" type="text" @keydown.enter="filterCallback()" class="p-column-filter" />
@@ -69,11 +68,11 @@
 					<span v-else>{{ data[col.field] }}</span>
 				</div>
 			</template>
-        </Column>
+		</Column>
 
-        <template #footer>
+		<template #footer>
 			<div class="flex justify-content-start footer__col">
-				<div v-for="(col, index) of columns" :key="index">
+				<div v-for="(col, index) in columns" :key="index">
 					<div v-if="index == 0">
 						<h4 class="flex align-items-center m-0">
 							Totals
@@ -86,8 +85,8 @@
 					<span v-else-if="col.field === totalsColumns[col.field]">{{ totalAmount }}</span>
 				</div>
 			</div>
-        </template>
-    </DataTable>
+		</template>
+	</DataTable>
 </template>
 
 <script setup>
@@ -120,7 +119,6 @@
 				filterMatchModeMapping,
 				defaultFilters,
 				defaultMatchMode,
-				defaultDateMatchMode,
 				globalFilterFields
 			} = useFilterMatchModes(),
 			toast = useToast(),
@@ -158,7 +156,7 @@
 	const resetFilters = () => filters.value = {} // Reset filters before new set of dynamic filters
 	const resetDateFilter = () => filterDate = {end_at: null, start_at: null}
 	const resetRegisters = () => registers.value = []
-	const resetTotlaAmount = () => totalAmount.value = null
+	const resetTotalAmount = () => totalAmount.value = null
 	const isDisabledTooltip = data => data?.length < 14
 	const toggleTotalInfoPopup = event => totalInfoPopup.value.toggle(event)
 	const setFilterMatchModes = field => field === 'amount' ? numericFilterMatchModes : field === 'originated_at' ? dateFilterMatchModes : textFilterMatchModes
@@ -180,7 +178,7 @@
 				resetColumns()
 				resetFilters()
 				resetRegisters()
-				resetTotlaAmount()
+				resetTotalAmount()
 				loading.value = false
 				return
 			}
@@ -188,7 +186,7 @@
 			regId = register.id
 			setMetaColumns(register.meta)
 			setCSSCustomProp()
-			getSearchableCols()
+			await getSearchableCols()
 
 			let queryString = updateQueryString()
 			const { register_items, total_pages } = await getRegistersData(queryString)
@@ -224,8 +222,8 @@
 	}*/
 
 	const getTotalAmount = async () => {
-		let end_at = filterDate.end_at || new Date().setYear('2100'),
-			start_at = filterDate.start_at || new Date().setYear('2000'),
+		let end_at = filterDate.end_at || new Date().setFullYear(2100),
+			start_at = filterDate.start_at || new Date().setFullYear(2000),
 			total = null
 
 		total = await store.state.Session.apiCall('/reports/item_sum', 'POST', { register_ids: regId, start_at: new Date(start_at).toISOString(), end_at: new Date(end_at).toISOString() })
@@ -251,9 +249,7 @@
 		// Settign filters dynamic fileds for search options
 		searchableColumns.forEach(item => {
 			globalFilterFields.push(item) // Search dynamic fields
-			
-			let matchMode = item !== 'originated_at' ? defaultMatchMode : defaultDateMatchMode;
-			filters.value[item] = { constraints: [{ value: null, matchMode }] }
+			setDefaultFilters(item)
 		})
 	}
 
@@ -261,6 +257,14 @@
 	const setMetaColumns = metaCols => {
 		for (let property in metaCols) {
 			columns.push({field: metaCols[property], header: metaCols[property].replaceAll('_', ' ')})
+		}
+	}
+
+	const setDefaultFilters = field => {
+		if (field !== 'originated_at') {
+			filters.value[field] = { constraints: [{ value: null, matchMode: defaultMatchMode }] }
+		} else {
+			filters.value[field] = defaultFilters.originated_at
 		}
 	}
 
@@ -327,8 +331,10 @@
 	}
 
 	const onFilterClear = async field => {
+		loading.value = true
+
 		if (filters.value.hasOwnProperty(field)) {
-			filters.value[field].constraints = [{ value: null, matchMode: defaultMatchMode }]
+			setDefaultFilters(field)
 		}
 
 		try {
@@ -337,9 +343,12 @@
 			const { register_items } = await getRegistersData(queryString)
 			registers.value = register_items
 			// await getTotalAmount()
+			loading.value = false
 		} catch (err) {
 			console.error(err)
 		}
+
+		loading.value = false
 	}
 
 	const onCellEditComplete = async event => {
