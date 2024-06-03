@@ -21,6 +21,8 @@ import Breadcrumb from 'primevue/breadcrumb'
 import Ripple from 'primevue/ripple'
 import Toast from 'primevue/toast'
 import ToastService from 'primevue/toastservice'
+import Dialog from 'primevue/dialog'
+import Message from 'primevue/message'
 import router from './router'
 import store from './store'
 import FloatingVue from 'floating-vue'
@@ -47,6 +49,8 @@ app.component('Avatar', Avatar)
 app.component('ToggleButton', ToggleButton)
 app.component('Breadcrumb', Breadcrumb)
 app.component('Toast', Toast)
+app.component('Dialog', Dialog)
+app.component('Message', Message)
 app.directive('ripple', Ripple)
 
 app.mount('#app')
