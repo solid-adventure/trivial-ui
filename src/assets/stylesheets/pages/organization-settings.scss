@@ -1,0 +1,210 @@
+.organization-settings {
+
+	& .p-tabview-nav {
+		& .header__tabs {
+			& a {
+				font-weight: 500;
+				color: var(--primary);
+			}
+		}
+
+		& li.p-tabview-ink-bar {
+			background-color: var(--primary);
+		}
+	}
+
+	& .p-tabview-panels {
+		padding-inline: unset;
+	}
+
+	& .organization-settings__dashboard {
+
+		& .actuals__list {
+			list-style: none;
+
+			& .actuals__list--icon {
+				color: var(--primary);
+			}
+		}
+
+		& .revenue__gross {
+			& a {
+				padding-left: 0;
+			}
+			
+			& .revenue__gross--icon {
+				color: var(--primary);
+			}
+
+			& .revenue__gross--title {
+				text-transform: capitalize;
+				color: var(--on-surface)
+			}
+		}
+	}
+
+	& .org-settings__table {
+
+		& .org-settings__table__add--btn {
+			border-color: var(--primary);
+			color: var(--on-primary);
+			background-color: var(--primary);
+		}
+
+		& .org-settings__table__delete--btn {
+			color: var(--on-primary);
+
+			&.organization__delete--btn {
+				color: #f87171;
+			}
+		}
+
+		& .org-settings__table__action {
+			width: 3rem;
+		}
+
+		& .info__btn {
+			width: 1rem;
+			height: 1rem;
+		}
+	}
+
+	.text-muted {
+		color: #858585;
+	}
+
+	.text-cliped {
+		height: .875rem;
+		line-break: anywhere;
+	}
+
+	.customize__btn {
+		font-weight: 600;
+	}
+}
+
+
+/* Organization Settings Dialog */
+.org-settings__dialog {
+	width: 28rem;
+
+	& .p-dialog-header {
+		& .p-dialog-title {
+			font-size: 1.8rem;
+			font-weight: 500;
+		}
+	}
+
+	& .p-dialog-content {
+		& p {
+			line-height: 1.4;
+		}
+	}
+
+	.modal__cancel--btn {
+		color: var(--on-background);
+	}
+
+	.modal__next--btn {
+		color: var(--on-primary);
+		background-color: var(--primary);
+
+		&.delete--btn {
+			background-color: #D85C57;
+		}
+	}
+
+	.org-settings__dialog__copy--btn {
+		cursor: copy;
+	}
+	
+	.org-settings__dialog__msg {
+		& svg.p-icon.p-message-icon, button.p-message-close.p-link {
+			align-self: flex-start;
+		}
+
+		& svg.p-icon.p-message-icon {
+			margin-top: .5rem;
+		}
+	}
+
+	& .org-settings__dialog__muted--txt {
+		/*color: #D6D6D6;*/
+	}
+
+	.text-muted {
+		color: #858585;
+	}
+
+	.organization-settings__icon.up {
+		color: var(--primary);
+	}
+
+	.organization-settings__icon.down {
+		color: #ff0000;
+	}
+
+	&.revenue__gross {
+		position: relative;
+		width: 40%;
+
+		& .revenue__gross__draggable {
+			min-height: 11rem;
+			background-image: url('/src/assets/images/organization-settings/light/dropzone-placeholder.svg');
+			background-repeat: no-repeat;
+			background-size: contain;
+			background-position: center;
+
+			&.bg-none {
+				background-image: unset;
+			}
+		}
+
+		& a {
+			padding-left: 0;
+		}
+		
+		& .revenue__gross--icon {
+			color: var(--primary);
+
+			&.draggable, &.number {
+				color: lightgray;
+			}
+
+			&.number {
+				justify-self: flex-start;
+				width: 1.2rem;
+				height: 1.2rem;
+			}
+		}
+
+		& .revenue__gross--title {
+			text-transform: capitalize;
+			color: var(--on-surface)
+		}
+
+		& .revenue__gross__table {
+
+			& .revenue__gross__table--rowspan-cell {
+				vertical-align: top;
+			}
+		}
+	}
+
+	& .list-group {
+		& div.sortable-ghost {
+			border-color: var(--primary) !important
+		}
+	}
+
+	& .p-accordion .p-accordion-header .p-accordion-header-link.revenue__gross__tab__action {
+		border-radius: 0px !important;
+	}
+}
+
+
+    .p-timeline-event {
+        .p-timeline-event-opposite {
+            display: none;
+        }
+    }

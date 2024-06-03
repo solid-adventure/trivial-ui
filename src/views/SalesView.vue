@@ -41,14 +41,14 @@
 	            </IconField>-->
 	        </div>
 	    </template>
-	    <template #empty>
-	    	<h3 v-if="!orgId">{{ selectOrgMsgInfo }}</h3>
-	    	No revenues found.
+		<template #empty>
+			<h3 v-if="!orgId">{{ selectOrgMsgInfo }}</h3>
+			No revenues found.
 		</template>
-	    <template #loading>
-	    	<Image :src="loadingImg" alt="Loader" width="160" />
-	    	<h3>Loading ...</h3>
-	    </template>
+		<template #loading>
+			<Image :src="loadingImg" alt="Loader" width="160" />
+			<h3>Loading ...</h3>
+		</template>
 
         <Column v-for="col in columns" :key="col.field" :field="col.field" :header="col.header" :filterField="col.field" sortable filter :filterMatchModeOptions="setFilterMatchModes(col.field)">
         	<template #filter="{ filterModel, filterCallback }" v-if="filters.hasOwnProperty(col.field)">
@@ -67,41 +67,44 @@
 						<div class="date">{{ useFormatDate(data.originated_at, dateOptions) }}</div>
 						<div class="time">{{ useFormatDate(data.originated_at, timeOptions) }} {{ useFormatDate(data.originated_at, timeZoneOptions).split(' ')[1] }}</div>
 					</span>
-					<span v-else-if="col.field == 'amount'">{{ Format.money(data[col.field], 2, data['units']) }}</span>
+					<span v-else-if="col.field == 'amount'">{{ useFormatCurrency(data[col.field], data['units'], 2) }}</span>
 					<span v-else>{{ data[col.field] }}</span>
 				</div>
 			</template>
 		</Column>
 
-		<template #footer>
-			<div class="flex justify-content-start footer__col">
-				<div v-for="(col, index) in columns" :key="index">
-					<div v-if="index == 0">
-						<h4 class="flex align-items-center m-0">
-							Totals
-							<Button type="button" icon="pi pi-info-circle" severity="secondary" size="small" text rounded outlined aria-label="Info" @click="toggleTotalInfoPopup" class="info__btn ml-2 p-0" />
-							<OverlayPanel ref="totalInfoPopup">
-								<p class="m-0">Total includes results from all pages, including those not displayed.</p>
-							</OverlayPanel>
-						</h4>
-					</div>
-					<span v-else-if="col.field === totalsColumns[col.field]">{{ totalAmount }}</span>
-				</div>
-			</div>
-		</template>
+		<ColumnGroup type="footer">
+			<Row>
+				<template v-for="(col, index) in columns" :key="index">
+					<Column v-if="index == 0">
+						<template #footer>
+							<div class="flex align-items-center footer__col">
+								<h4 class="m-0">Totals</h4>
+								<Button type="button" icon="pi pi-info-circle" severity="secondary" size="small" text rounded outlined aria-label="Info" @click="toggleTotalInfoPopup" class="info__btn ml-2 p-0" />
+								<OverlayPanel ref="totalInfoPopup">
+									<p class="m-0">Total includes results from all pages, including those not displayed.</p>
+								</OverlayPanel>
+							</div>
+						</template>
+					</Column>
+					<Column v-else-if="col.field === totalsColumns[col.field]" :footer="totalAmount" footerStyle="text-align:right" />
+					<Column v-else />
+				</template>
+			</Row>
+		</ColumnGroup>
 	</DataTable>
 </template>
 
 <script setup>
 	import { ref, onMounted, computed, watch, toRaw } from 'vue'
 	import { useStore } from 'vuex'
-	import { useToast } from 'primevue/usetoast'
-	import Format from '@/lib/Format'
+	import { useFormatCurrency } from '@/composable/formatCurrency.js'
 	import { useFormatDate } from '@/composable/formatDate.js'
 	import { useIsNumeric } from '@/composable/isNumeric.js'
 	import { useDateTimeZoneOptions } from '@/composable/dateTimeZoneOptions.js'
 	import { useFilterMatchModes } from '@/composable/filterMatchModes.js'
 	import loadingImg from '@/assets/images/trivial-loading-optimized.webp'
+	import { useToastNotifications } from '@/composable/toastNotification'
 
 	const loading = ref(false),
 			filters = ref({}),
@@ -124,7 +127,7 @@
 				defaultMatchMode,
 				globalFilterFields
 			} = useFilterMatchModes(),
-			toast = useToast(),
+			{ showSuccessToast, showErrorToast, showInfoToast } = useToastNotifications(),
 			store = useStore(),
 			registersNames = ['Sales', 'Income Account'],
 			selectOrgMsgInfo = 'Please, select an organization.'
@@ -148,8 +151,7 @@
 		if (!newVal) {
 			resetColumns()
 			resetFilters()
-			resetFilters()
-			toast.add({ severity: 'info', summary: 'Info', detail: selectOrgMsgInfo, life: 6000 })
+			resetRegisters()
 			return
 		}
 
@@ -160,7 +162,7 @@
 		if (orgId.value) {
 			await getRegisters(orgId.value)
 		} else {
-			toast.add({ severity: 'info', summary: 'Info', detail: selectOrgMsgInfo, life: 6000 })
+			showInfoToast('Info', selectOrgMsgInfo, 6000)
 		}
 	})
 
@@ -174,8 +176,10 @@
 	const resetRegisters = () => registers.value = []
 	const resetTotalAmount = () => totalAmount.value = null
 	const isDisabledTooltip = data => data?.length < 14
-	const toggleTotalInfoPopup = event => totalInfoPopup.value.toggle(event)
+	const toggleTotalInfoPopup = event => totalInfoPopup.value[0].toggle(event)
 	const setFilterMatchModes = field => field === 'amount' ? numericFilterMatchModes : field === 'originated_at' ? dateFilterMatchModes : textFilterMatchModes
+	const dateToISOString = date => new Date(date).toISOString()
+	const dateSetFullYear = date => new Date().setFullYear(date)
 
 	const getRegisters = async orgId => {
 		loading.value = true
@@ -212,7 +216,7 @@
 			await getTotalAmount()
 		} catch (err) {
 			console.log(err)
-			toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to fetch data', life: 3000 });
+			showErrorToast('Error', 'Failed to fetch data.')
 		}
 
 		loading.value = false
@@ -220,9 +224,9 @@
 
 	const getRegistersData = async queryString => {
 		try {
-			return await store.state.Session.apiCall(`/register_items?register_id=${regId}&${queryString}`);
+			return await store.state.Session.apiCall(`/register_items?register_id=${regId}&${queryString}`)
 		} catch (err) {
-			toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to fetch data', life: 3000 });
+			showErrorToast('Error', 'Failed to fetch data.')
 			console.error(err);
 		}
 	}
@@ -238,13 +242,13 @@
 	}*/
 
 	const getTotalAmount = async () => {
-		let end_at = filterDate.end_at || new Date().setFullYear(2100),
-			start_at = filterDate.start_at || new Date().setFullYear(2000),
+		let end_at = filterDate.end_at || dateSetFullYear(2100),
+			start_at = filterDate.start_at || dateSetFullYear(2000),
 			total = null
 
-		total = await store.state.Session.apiCall('/reports/item_sum', 'POST', { register_ids: regId, start_at: new Date(start_at).toISOString(), end_at: new Date(end_at).toISOString() })
+		total = await store.state.Session.apiCall('/reports/item_sum', 'POST', { register_id: regId, start_at: dateToISOString(start_at), end_at: dateToISOString(end_at) })
 
-		totalAmount.value = Format.money(total.count)
+		totalAmount.value = useFormatCurrency(total.count[0].value, 'USD', 2)
 
 		resetDateFilter()
 	}
@@ -386,14 +390,14 @@
 					registers.value[rowIndex][field] = newData[field]
 				}
 
-				toast.add({ severity: 'success', summary: 'Success', detail: 'Table cell updated.', life: 3000 })
+				showSuccessToast('Success', 'Table cell updated.')
 				return
 			}
 
-			toast.add({ severity: 'info', summary: 'Info', detail: 'To save data, please hit enter.', life: 3000 })
+			showInfoToast('Info', 'To save data, please hit enter.')
 
 		} catch (err) {
-			toast.add({ severity: 'error', summary: 'Error', detail: 'There was an error.', life: 3000 })
+			showErrorToast('Error', 'There was an error.')
 			console.log(err)
 		}
 	}

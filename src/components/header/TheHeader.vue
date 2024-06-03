@@ -50,12 +50,12 @@
 	import Breadcrumb from '../Breadcrumb.vue'
 	import { ref, watch, onMounted, computed } from 'vue'
 	import { useStore } from 'vuex'
-	import notifications from '@/components/notifications'
 	import AvatarIcon from '@/assets/images/user.svg'
 	import LogoImgArrows from '../../assets/images/trivial-logo-arrows-warm.svg'
 	import { useDark, useToggle } from '@vueuse/core'
 	import { useRouter } from 'vue-router'
 	import { usePrimeVue } from 'primevue/config'
+	import { useToastNotifications } from '@/composable/toastNotification'
 
 	defineProps({
 		title: {
@@ -95,7 +95,8 @@
 		    },
 		    { separator: true }
 		]),
-		primeVue = usePrimeVue()
+		primeVue = usePrimeVue(),
+		{ showErrorToast } = useToastNotifications()
 
 	let localStorageOrgId = null,
 		currentTheme = 'aura-light-green',
@@ -111,10 +112,16 @@
 	const toggleDark = useToggle(isDark)
 
 	const user = computed(() => store.state.user)
+	const storedOrgId = computed(() => store.getters.getOrgId)
 
 	watch(selectedOrg, async (newVal, oldVal) => {
 		let org = newVal === undefined ? oldVal : newVal
 		localStorage.setItem('orgId', JSON.stringify(org.id))
+	})
+
+	watch(storedOrgId, async (newVal, oldVal) => {
+		await fetchData()
+		setSelectedOrg()
 	})
 
 	onMounted(async () => {
@@ -134,9 +141,11 @@
 		if (isDark.value) {
 			currentTheme = 'aura-light-green'
 			nextTheme = 'aura-dark-blue'
+			store.dispatch('getDarkTheme', isDark.value)
 		} else {
 			currentTheme = 'aura-dark-blue'
 			nextTheme = 'aura-light-green'
+			store.dispatch('getDarkTheme', isDark.value)
 		}
 
 		primeVue.changeTheme(currentTheme, nextTheme, 'theme-link')
@@ -151,7 +160,7 @@
 			organisations.value = await store.state.Session.apiCall('/organizations')
 			organisations.value.unshift({name: 'None', id: null})
 		} catch (err) {
-			notifications.error(`Failed to fetch data: ${err}`)
+			showErrorToast('Error', `Failed to fetch data: ${err}`)
 		}
 	}
 

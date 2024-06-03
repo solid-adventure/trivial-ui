@@ -298,7 +298,7 @@
   }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 
   .standAlone {
     padding: 1em 3em;

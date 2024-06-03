@@ -1,18 +1,32 @@
 .menu {
-	position: relative;
+	position: sticky;
+	top: 0;
+	z-index: 200;
 	display: grid;
 	align-content: start;
+	gap: 40px 0;
 	width: 260px;
+	height: 100svh;;
+	min-height: 100svh;
+	max-height: 100svh;
 	padding-block: 40px;
 	padding-right: 10px;
 	transition: width 400ms ease-in-out;
+	transition-behavior: allow-discrete;
 	background-color: var(--clr-black);
 
 	&.close {
 		width: 100px;
 
+		& > a {
+			&.menu__logo {
+				background-image: url('/src/assets/images/trivial-logo-arrows-warm.svg');
+			}
+		}
+
 		& nav.aside__nav {
 			& .aside__nav__link {
+				
 				& div {
 					& span {
 						opacity: 0;
@@ -20,14 +34,20 @@
 					}
 				}
 			}
+
+			&.aside__nav--secundary {
+				& .aside__nav__link {
+					width: 90%;
+				}
+			}
 		}
 	}
 
 	& > .menu__close--btn {
 		position: absolute;
-		top: 3.1rem;
+		top: 3.2rem;
 		left: calc(100% - .9rem);
-		z-index: 100;
+		z-index: 300;
 		display: flex;
 		justify-content: center;
 		align-items: center;
@@ -48,14 +68,16 @@
 			outline: none;
 		}
 
-		img.menu__logo {
-			display: block;
-			margin-left: 24px;
+		&.menu__logo {
 			max-width: 100%;
-			width: 55%;
+			width: 100%;
 			height: 50px;
-			object-fit: contain;
-			transition: all 400ms ease-in-out;
+			background-image: url('/src/assets/images/trivial-logo-light-warm.svg');
+			background-repeat: no-repeat;
+			background-size: 80%;
+			background-position: center;
+			transition: all 600ms ease-in-out;
+			transition-behavior: allow-discrete;
 		}
 	}
 
@@ -64,16 +86,23 @@
 		gap: .5rem;
 		align-items: center;
 		width: 100%;
-		height: 100%;
-		margin-top: 40px;
 		font-size: 1.2rem;
 		font-weight: 600;
+
+		&.aside__nav--secundary {
+			position: absolute;
+			bottom: 40px;
+
+			& .aside__nav__link {
+				width: 96%;
+			}
+		}
 
 		& .aside__nav__link {
 			display: flex;
 			align-items: center;
 			height: 60px;
-			padding-inline: 20px;
+			padding-left: 10px;
 			border-left: 4px solid transparent;
 			transition: border-color 400ms ease-in-out;
 			color: var(--clr-lightgray);
@@ -91,10 +120,6 @@
 				outline: none;
 			}
 
-			/*&:last-child {
-				transform: translateY(350%);
-			}*/
-
 			& > div {
 				position: relative;
 				display: flex;
@@ -102,17 +127,18 @@
 				gap: 0 .75rem;
 				width: 100%;
 				height: 100%;
-				padding-inline: 20px;
+				padding-left: 28px;
 				border-radius: 6px;
 				overflow: hidden;
-				transition: color 400ms ease-in-out, background-color 400ms ease-in-out;
+				transition: all 400ms ease-in-out;
 
 				& span {
 					position: absolute;
 					left: 3.5rem;
 					font-size: 1.05rem;
 					line-height: 1;
-					transition: opacity 400ms ease-in-out, visibility 400ms ease-in-out;
+					transition: all 400ms ease-in-out;
+					transition-behavior: allow-discrete;
 				}
 			}
 
@@ -121,6 +147,7 @@
 				
 				& > div {
 					width: 85%;
+					padding-left: 10px;
 				}
 			}
 		}
@@ -140,10 +167,16 @@
 				& div {
 					& span {
 						opacity: 0;
-						visibility: hidden;
+						display: none;
 					}
 				}
 			}
 		}
+	}
+}
+
+@media only screen and (max-width: 425px) {
+	.menu {
+		min-height: 153svh;
 	}
 }

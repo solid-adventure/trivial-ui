@@ -37,7 +37,7 @@
   </div>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
   .InstanceActivity {
   	/*margin: 2em;
     left: 23em;

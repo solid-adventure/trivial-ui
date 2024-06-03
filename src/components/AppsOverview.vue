@@ -96,6 +96,12 @@
 </template>
 
 <style lang="scss" scoped>
+  input[type=button], button {
+    border: 0px none;
+    font-size: inherit;
+    font-weight: inherit;
+    margin: 0;
+  }
   .overview {
     position: absolute;
     width: 100%;
