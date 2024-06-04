@@ -17,6 +17,13 @@
 			& div {
 				// justify-content: center;
 			}
+
+			& div.active__col--filter {
+				& button {
+					color: var(--primary);
+					background: rgba(96, 165, 250, .16);
+				}
+			}
 		}
 
 		& tr:first-child > th {
@@ -54,17 +61,17 @@
 					}
 				}
 
-				& > div.date {
+				& div.date {
 					font-weight: 600;
 				}
 
-				& > div.time {
+				& div.time {
 					font-size: .8rem;
 				}
 			}
 
-			& td.p-cell-editing {
-				& input.p-inputtext.p-component.p-filled {
+			& td.p-cell-editing, & td.p-editable-column {
+				& input.p-inputtext.p-component {
 					max-width: 100%;
 				}
 			}
@@ -76,7 +83,7 @@
 
 		& > div {
 			width: calc(100% / var(--cols));
-			max-width: 156px;
+			/*max-width: 156px;*/
 			min-width: 120px;
 			text-align: right;
 		}
@@ -93,8 +100,8 @@
 }
 
 div.p-column-filter-buttonbar {
-	& .apply-btn, .p-button[aria-label="Apply"] {
-		color: var(--onBackground);
+	& button.p-button[aria-label="Apply"] {
+		color: white;
 		background-color: var(--primary);
 	}
 
@@ -106,4 +113,8 @@ div.p-column-filter-buttonbar {
 input[type="text"].p-inputtext {
 	padding: .5rem .75rem;
 	border-radius: 6px;
+}
+
+.p-dropdown:not(.p-disabled).p-focus {
+	outline-color: var(--primary);
 }

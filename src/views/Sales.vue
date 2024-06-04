@@ -16,14 +16,15 @@
 		scrollable
 		resizableColumns
 		class="border-round-sm registers_table"
-		@page="onPage($event)"
-		@sort="onSort($event)"
-		@filter="onFilter($event)"
+		@page="onPage"
+		@sort="onSort"
+		@filter="onFilter"
 		editMode="cell" 
 		@cell-edit-complete="onCellEditComplete" 
 		:pt="{
 				column: {
-					bodycell: ({ state }) => ({ class: [{ 'pt-0 pb-0': state['d_editing'] }] })
+					bodycell: ({ state }) => ({ class: [{ 'pt-0 pb-0': state['d_editing'] }] }),
+					columnFilter: ({ props }) => ({ class: [{ 'active__col--filter': toRaw(filters[props.field]) && toRaw(filters[props.field]).constraints[0].value }] })
 				}
 			}"
 		>
@@ -49,25 +50,10 @@
 	    	<h3>Loading ...</h3>
 	    </template>
 
-		<Column header="Date" filterField="originated_at" dataType="date" key="originated_at" :filterMatchModeOptions="dateFilterMatchModes">
-			<template #body="{ data }">
-				<div class="date">{{ useFormatDate(data.originated_at, dateOptions) }}</div>
-				<div class="time">{{ useFormatDate(data.originated_at, timeOptions) }} {{ useFormatDate(data.originated_at, timeZoneOptions).split(' ')[1] }}</div>
-			</template>
-			<template #filter="{ filterModel, filterCallback }">
-				<Calendar v-model="filterModel.value" dateFormat="mm/dd/yy" placeholder="mm/dd/yyyy" mask="99/99/9999" />
-			</template>
-			<template #filterclear="{ filterCallback }">
-				<Button type="button" @click="() => { filterCallback() }" label="Clear" outlined class="clear-btn" />
-			</template>
-			<template #filterapply="{ filterCallback }">
-				<Button type="button" @click="() => { filterCallback() }" label="Apply" class="apply-btn" />
-			</template>
-		</Column>
-
-        <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header" :filterField="col.field" sortable filter :filterMatchModeOptions="setFilterMatchModes(col.field)">
+        <Column v-for="col in columns" :key="col.field" :field="col.field" :header="col.header" :filterField="col.field" sortable filter :filterMatchModeOptions="setFilterMatchModes(col.field)">
         	<template #filter="{ filterModel, filterCallback }" v-if="filters.hasOwnProperty(col.field)">
-				<InputText v-model="filterModel.value" type="text" @keydown.enter="filterCallback()" class="p-column-filter" />
+        		<Calendar v-if="col.field === 'originated_at'" v-model="filterModel.value" dateFormat="mm/dd/yy" placeholder="mm/dd/yyyy" mask="99/99/9999" />
+				<InputText v-else v-model="filterModel.value" type="text" @keydown.enter="filterCallback()" class="p-column-filter" />
 			</template>
 			<template #filterclear="{ filterCallback }">
 				<Button type="button" @click="() => { filterCallback(); onFilterClear(col.field); }" label="Clear" outlined class="clear-btn" />
@@ -77,29 +63,33 @@
 			</template>
 			<template #body="{ data }">
 				<div class="flex align-items-center" :class="{ 'numeric__col justify-content-end': useIsNumeric(data[col.field]) }" v-tooltip="{ content: `${data[col.field]}`, disabled: isDisabledTooltip(data[col.field]) }">
-					<span v-if="col.field == 'amount'">{{ Format.money(data[col.field], 2, data['units']) }}</span>
+					<span v-if="col.field == 'originated_at'">
+						<div class="date">{{ useFormatDate(data.originated_at, dateOptions) }}</div>
+						<div class="time">{{ useFormatDate(data.originated_at, timeOptions) }} {{ useFormatDate(data.originated_at, timeZoneOptions).split(' ')[1] }}</div>
+					</span>
+					<span v-else-if="col.field == 'amount'">{{ Format.money(data[col.field], 2, data['units']) }}</span>
 					<span v-else>{{ data[col.field] }}</span>
 				</div>
 			</template>
-        </Column>
+		</Column>
 
-        <template #footer>
+		<template #footer>
 			<div class="flex justify-content-start footer__col">
-				<div>
-					<h4 class="flex align-items-center m-0">
-						Totals
-						<Button type="button" icon="pi pi-info-circle" severity="secondary" size="small" text rounded outlined aria-label="Info" @click="toggleTotalInfoPopup" class="info__btn ml-2 p-0" />
-						<OverlayPanel ref="totalInfoPopup">
-							<p class="m-0">Total includes results from all pages, including those not displayed.</p>
-						</OverlayPanel>
-					</h4>
-				</div>
-				<div v-for="(col, index) of columns" :key="index">
-					<span v-if="col.field === totalsColumns[col.field]">{{ totalAmount }}</span>
+				<div v-for="(col, index) in columns" :key="index">
+					<div v-if="index == 0">
+						<h4 class="flex align-items-center m-0">
+							Totals
+							<Button type="button" icon="pi pi-info-circle" severity="secondary" size="small" text rounded outlined aria-label="Info" @click="toggleTotalInfoPopup" class="info__btn ml-2 p-0" />
+							<OverlayPanel ref="totalInfoPopup">
+								<p class="m-0">Total includes results from all pages, including those not displayed.</p>
+							</OverlayPanel>
+						</h4>
+					</div>
+					<span v-else-if="col.field === totalsColumns[col.field]">{{ totalAmount }}</span>
 				</div>
 			</div>
-        </template>
-    </DataTable>
+		</template>
+	</DataTable>
 </template>
 
 <script setup>
@@ -111,7 +101,7 @@
 	import { useIsNumeric } from '@/composable/isNumeric.js'
 	import { useDateTimeZoneOptions } from '@/composable/dateTimeZoneOptions.js'
 	import { useFilterMatchModes } from '@/composable/filterMatchModes.js'
-	import loadingImg from '@/assets/images/trivial-loading.gif'
+	import loadingImg from '@/assets/images/trivial-loading-optimized.webp'
 
 	const loading = ref(false),
 			filters = ref({}),
@@ -141,7 +131,7 @@
 
 	let columns = [],
 		defaultColumns = [
-			//{field: 'originated_at', header: 'Date'},
+			{field: 'originated_at', header: 'Date'},
 			{field: 'description', header: 'Description'},
 			{field: 'unique_key', header: 'Unique Key'},
 			{field: 'amount', header: 'Amount'}
@@ -174,16 +164,18 @@
 		}
 	})
 
-	const setCSSCustomProp = () => document.documentElement.style.setProperty('--cols', columns.length + 1)
+	const setCSSCustomProp = () => document.documentElement.style.setProperty('--cols', columns.length - 1)
 	const totalPaginatorPages = (totalPages, itemsPerPage) => totalPages * itemsPerPage
 	const setColumns = () => columns = [...defaultColumns] // Add fixed columns at the beginig of the table
 	const setFilters = () => filters.value = defaultFilters
 	const resetColumns = () => columns = [] // Reset columns before new set of columns from API call
 	const resetFilters = () => filters.value = {} // Reset filters before new set of dynamic filters
 	const resetDateFilter = () => filterDate = {end_at: null, start_at: null}
+	const resetRegisters = () => registers.value = []
+	const resetTotalAmount = () => totalAmount.value = null
 	const isDisabledTooltip = data => data?.length < 14
 	const toggleTotalInfoPopup = event => totalInfoPopup.value.toggle(event)
-	const setFilterMatchModes = field => field === 'amount' ? numericFilterMatchModes : textFilterMatchModes
+	const setFilterMatchModes = field => field === 'amount' ? numericFilterMatchModes : field === 'originated_at' ? dateFilterMatchModes : textFilterMatchModes
 
 	const getRegisters = async orgId => {
 		loading.value = true
@@ -196,11 +188,21 @@
 
 			allRegisters = await store.state.Session.apiCall('/registers')
 			let register = allRegisters.find(r => r.owner_type === 'Organization' && r.owner_id === orgId && registersNames.includes(r.name))
-			regId = register.id
 
+			// If regiester don't exists or don't have sales data for table
+			if (!register) {
+				resetColumns()
+				resetFilters()
+				resetRegisters()
+				resetTotalAmount()
+				loading.value = false
+				return
+			}
+
+			regId = register.id
 			setMetaColumns(register.meta)
 			setCSSCustomProp()
-			getSearchableCols()
+			await getSearchableCols()
 
 			let queryString = updateQueryString()
 			const { register_items, total_pages } = await getRegistersData(queryString)
@@ -236,8 +238,8 @@
 	}*/
 
 	const getTotalAmount = async () => {
-		let end_at = filterDate.end_at || new Date().setYear('2100'),
-			start_at = filterDate.start_at || new Date().setYear('2000'),
+		let end_at = filterDate.end_at || new Date().setFullYear(2100),
+			start_at = filterDate.start_at || new Date().setFullYear(2000),
 			total = null
 
 		total = await store.state.Session.apiCall('/reports/item_sum', 'POST', { register_ids: regId, start_at: new Date(start_at).toISOString(), end_at: new Date(end_at).toISOString() })
@@ -263,7 +265,7 @@
 		// Settign filters dynamic fileds for search options
 		searchableColumns.forEach(item => {
 			globalFilterFields.push(item) // Search dynamic fields
-			filters.value[item] = { constraints: [{ value: null, matchMode: defaultMatchMode }] }
+			setDefaultFilters(item)
 		})
 	}
 
@@ -271,6 +273,14 @@
 	const setMetaColumns = metaCols => {
 		for (let property in metaCols) {
 			columns.push({field: metaCols[property], header: metaCols[property].replaceAll('_', ' ')})
+		}
+	}
+
+	const setDefaultFilters = field => {
+		if (field !== 'originated_at') {
+			filters.value[field] = { constraints: [{ value: null, matchMode: defaultMatchMode }] }
+		} else {
+			filters.value[field] = defaultFilters.originated_at
 		}
 	}
 
@@ -337,8 +347,10 @@
 	}
 
 	const onFilterClear = async field => {
+		loading.value = true
+
 		if (filters.value.hasOwnProperty(field)) {
-			filters.value[field].constraints = [{ value: null, matchMode: defaultMatchMode }]
+			setDefaultFilters(field)
 		}
 
 		try {
@@ -347,9 +359,12 @@
 			const { register_items } = await getRegistersData(queryString)
 			registers.value = register_items
 			// await getTotalAmount()
+			loading.value = false
 		} catch (err) {
 			console.error(err)
 		}
+
+		loading.value = false
 	}
 
 	const onCellEditComplete = async event => {
