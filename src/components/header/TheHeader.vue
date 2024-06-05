@@ -5,10 +5,10 @@
 
 			<div class="main__header__top__content">
 				<Dropdown v-model="selectedOrg" :options="organisations" optionLabel="name" placeholder="Select Organization" class="main__header__top__content__dropdown" :change="handleSelected()" />
-				
-				<Button type="button" icon="pi pi-user" @click="toggleMenu" aria-haspopup="true" aria-controls="overlay_menu" severity="secondary" aria-label="User" class="main__header__top__content__user-btn" />
 
 				<ToggleButton v-model="checkedTheme" @click="toggleTheme()" v-ripple onLabel="" offLabel="" onIcon="pi pi-sun" offIcon="pi pi-moon" class="w-2.5rem main__header__top__content__theme-btn" aria-label="Do you confirm" />
+
+				<Button type="button" icon="pi pi-user" @click="toggleMenu" aria-haspopup="true" aria-controls="overlay_menu" severity="secondary" aria-label="User" class="main__header__top__content__user-btn" />
 				
 				<div class="card flex justify-content-center">
 			        <Menu ref="menu" id="overlay_menu" :model="items" :popup="true" class="w-full md:w-15rem">
@@ -46,7 +46,7 @@
 </template>
 
 <script setup>
-	import { Icon } from '@iconify/vue'
+	//import { Icon } from '@iconify/vue'
 	import Breadcrumb from '../Breadcrumb.vue'
 	import { ref, watch, onMounted, computed } from 'vue'
 	import { useStore } from 'vuex'
@@ -71,7 +71,7 @@
 	})
 
 	const selectedOrg = ref(),
-		organisations = ref([{name: '', id: null}]),
+		organisations = ref([]),
 		store = useStore(),
 		checkedTheme = ref(false),
 		router = useRouter(),
@@ -149,6 +149,7 @@
 	const fetchData = async () => {
 		try {
 			organisations.value = await store.state.Session.apiCall('/organizations')
+			organisations.value.unshift({name: 'None', id: null})
 		} catch (err) {
 			notifications.error(`Failed to fetch data: ${err}`)
 		}
@@ -161,6 +162,8 @@
 		// Select organization dropdown value if organization ID is stored in local storage
 		if (localStorageOrgId) {
 			selectedOrg.value = organisations.value.find(item => item.id === parseInt(localStorageOrgId, 10))
+		} else {
+			selectedOrg.value = {name: 'None', id: null}
 		}
 	}
 
