@@ -1,11 +1,11 @@
 <template>
-	<Dialog v-model:visible="visible" modal @hide="closeModal" header="Confirm API Key Deletion" class="apikey__dialog">
+	<Dialog v-model:visible="visible" modal @hide="closeModal" header="Confirm API Key Deletion" class="org-settings__dialog">
 		<div>
 			<p class="mb-0">Are you sure you want to Delete API Key</p>
 			<p class="mt-1"><strong>{{ deletedApiKey.key }}</strong>?</p>
 		</div>
 		<div class="mt-5">
-			<p class="mb-0 apikey__dialog__muted--txt">Description</p>
+			<p class="mb-0 text--muted">Description</p>
 			<p class="mt-1">{{ deletedApiKey.description }}</p>
 		</div>
 

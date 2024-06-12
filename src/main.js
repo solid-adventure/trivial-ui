@@ -23,6 +23,8 @@ import Toast from 'primevue/toast'
 import ToastService from 'primevue/toastservice'
 import Dialog from 'primevue/dialog'
 import Message from 'primevue/message'
+import Card from 'primevue/card'
+import RadioButton from 'primevue/radiobutton'
 import router from './router'
 import store from './store'
 import FloatingVue from 'floating-vue'
@@ -51,6 +53,8 @@ app.component('Breadcrumb', Breadcrumb)
 app.component('Toast', Toast)
 app.component('Dialog', Dialog)
 app.component('Message', Message)
+app.component('Card', Card)
+app.component('RadioButton', RadioButton)
 app.directive('ripple', Ripple)
 
 app.mount('#app')

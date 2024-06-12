@@ -1,5 +1,5 @@
 <template>
-	<Dialog v-model:visible="visible" modal @hide="closeModal" header="Add New API Key" class="apikey__dialog">
+	<Dialog v-model:visible="visible" modal @hide="closeModal" header="Add New API Key" class="org-settings__dialog">
 		<VForm v-slot="{ meta }">
 			<div v-if="step === 1" class="flex flex-column gap-1 mb-5 mt-2">
 				<label for="apikey">Description</label>
@@ -12,12 +12,12 @@
 				<label for="apikey">API Key</label>
 				<VField id="apikey" name="apikey" :rules="{ required, min: 6 }" v-slot="{ field, errors }">
 					<IconField iconPosition="right">
-						<InputIcon class="pi pi-copy apikey__dialog__copy--btn" @click="copyApiKey(apiKey)" />
+						<InputIcon class="pi pi-copy org-settings__dialog__copy--btn" @click="copyApiKey(apiKey)" />
 						<InputText v-model.trim="apiKey" class="flex-auto w-full" autocomplete="off" />
 					</IconField>
 					<span v-if="errors.length" class="p-error text-xs">{{ errors[0] }}</span>
 				</VField>
-				<Message severity="info" class="apikey__dialog__msg">
+				<Message severity="info" class="org-settings__dialog__msg">
 					This API key is displayed only once at this moment. Therefore, please copy and securely store this key in a location that is both safe and accessible. If you lose this key, you will need to delete it and generate a new one.
 				</Message>
 			</div>
@@ -39,7 +39,7 @@
 	import { required, min } from '@vee-validate/rules'
 	import { ref, watch, computed } from 'vue'
 	import { useClipboard } from '@vueuse/core'
-	import { useToast } from 'primevue/usetoast'
+	import { useToastNotifications } from '@/composable/toastNotification'
 
 	const props = defineProps(['visible'])
 	const emit = defineEmits(['closeAddKeyModal'])
@@ -50,7 +50,7 @@
 		visible = ref(false),
 		totalSteps = ref(2),		
 		{ text, copy } = useClipboard(),
-		toast = useToast()
+		{ showSuccessToast } = useToastNotifications()
 
 	// Define validation rules and use vee validate
 	defineRule('required', required);
@@ -81,7 +81,7 @@
 
 	const copyApiKey = key => { 
 		copy(key)
-		toast.add({ severity: 'success', summary: 'Success', detail: `API key ${copiedApiKey.value} has been copied`, life: 3000 })
+		showSuccessToast('Success', `API key ${copiedApiKey.value} has been copied`)
 	}
 
 	const addApiKey = () => {
@@ -89,6 +89,6 @@
 		console.log('API KEY - ', apiKey.value)
 
 		closeModal()
-		toast.add({ severity: 'success', summary: 'Success', detail: 'Successfully added new API Key.', life: 3000 })
+		showSuccessToast('Success', 'Successfully added new API Key.')
 	}
 </script>

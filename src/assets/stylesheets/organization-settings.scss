@@ -1,23 +1,43 @@
-.apikeys__table {
+.org-settings__table {
 
-	& .apikeys__table__add--btn {
+	& .org-settings__table__add--btn {
+		border-color: var(--primary);
 		color: var(--on-primary);
 		background-color: var(--primary);
 	}
 
-	& .apikeys__table__action {
+	& .org-settings__table__delete--btn {
+		color: var(--on-primary);
+
+		&.organization__delete--btn {
+			color: #f87171;
+		}
+	}
+
+	& .org-settings__table__action {
 		width: 3rem;
+	}
+
+	& .info__btn {
+		width: 1rem;
+		height: 1rem;
 	}
 }
 
 
-.apikey__dialog {
+.org-settings__dialog {
 	width: 28rem;
 
 	& .p-dialog-header {
 		& .p-dialog-title {
 			font-size: 1.8rem;
 			font-weight: 500;
+		}
+	}
+
+	& .p-dialog-content {
+		& p {
+			line-height: 1.4;
 		}
 	}
 
@@ -34,11 +54,11 @@
 		}
 	}
 
-	.apikey__dialog__copy--btn {
+	.org-settings__dialog__copy--btn {
 		cursor: copy;
 	}
 	
-	.apikey__dialog__msg {
+	.org-settings__dialog__msg {
 		& svg.p-icon.p-message-icon, button.p-message-close.p-link {
 			align-self: flex-start;
 		}
@@ -48,7 +68,11 @@
 		}
 	}
 
-	& .apikey__dialog__muted--txt {
+	& .org-settings__dialog__muted--txt {
 		/*color: #D6D6D6;*/
+	}
+
+	.text-muted {
+		color: #858585;
 	}
 }

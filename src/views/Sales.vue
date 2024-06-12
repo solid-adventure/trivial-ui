@@ -95,13 +95,13 @@
 <script setup>
 	import { ref, onMounted, computed, watch, toRaw } from 'vue'
 	import { useStore } from 'vuex'
-	import { useToast } from 'primevue/usetoast'
 	import Format from '@/lib/Format'
 	import { useFormatDate } from '@/composable/formatDate.js'
 	import { useIsNumeric } from '@/composable/isNumeric.js'
 	import { useDateTimeZoneOptions } from '@/composable/dateTimeZoneOptions.js'
 	import { useFilterMatchModes } from '@/composable/filterMatchModes.js'
 	import loadingImg from '@/assets/images/trivial-loading-optimized.webp'
+	import { useToastNotifications } from '@/composable/toastNotification'
 
 	const loading = ref(false),
 			filters = ref({}),
@@ -124,7 +124,7 @@
 				defaultMatchMode,
 				globalFilterFields
 			} = useFilterMatchModes(),
-			toast = useToast(),
+			{ showSuccessToast, showErrorToast, showInfoToast } = useToastNotifications(),
 			store = useStore(),
 			registersNames = ['Sales', 'Income Account'],
 			selectOrgMsgInfo = 'Please, select an organization.'
@@ -148,8 +148,7 @@
 		if (!newVal) {
 			resetColumns()
 			resetFilters()
-			resetFilters()
-			toast.add({ severity: 'info', summary: 'Info', detail: selectOrgMsgInfo, life: 6000 })
+			resetRegisters()
 			return
 		}
 
@@ -160,7 +159,7 @@
 		if (orgId.value) {
 			await getRegisters(orgId.value)
 		} else {
-			toast.add({ severity: 'info', summary: 'Info', detail: selectOrgMsgInfo, life: 6000 })
+			showInfoToast('Info', selectOrgMsgInfo, 6000)
 		}
 	})
 
@@ -212,7 +211,7 @@
 			await getTotalAmount()
 		} catch (err) {
 			console.log(err)
-			toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to fetch data', life: 3000 });
+			showErrorToast('Error', 'Failed to fetch data.')
 		}
 
 		loading.value = false
@@ -220,9 +219,9 @@
 
 	const getRegistersData = async queryString => {
 		try {
-			return await store.state.Session.apiCall(`/register_items?register_id=${regId}&${queryString}`);
+			return await store.state.Session.apiCall(`/register_items?register_id=${regId}&${queryString}`)
 		} catch (err) {
-			toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to fetch data', life: 3000 });
+			showErrorToast('Error', 'Failed to fetch data.')
 			console.error(err);
 		}
 	}
@@ -386,14 +385,14 @@
 					registers.value[rowIndex][field] = newData[field]
 				}
 
-				toast.add({ severity: 'success', summary: 'Success', detail: 'Table cell updated.', life: 3000 })
+				showSuccessToast('Success', 'Table cell updated.')
 				return
 			}
 
-			toast.add({ severity: 'info', summary: 'Info', detail: 'To save data, please hit enter.', life: 3000 })
+			showInfoToast('Info', 'To save data, please hit enter.')
 
 		} catch (err) {
-			toast.add({ severity: 'error', summary: 'Error', detail: 'There was an error.', life: 3000 })
+			showErrorToast('Error', 'There was an error.')
 			console.log(err)
 		}
 	}
