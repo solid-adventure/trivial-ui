@@ -1,24 +1,54 @@
 <template>
-	<!-- ************* API KEY TABLE *************** -->
-	<UsersRolesTable :organization="orgData" @openAddUserModal="openAddUserModal" @openDeleteUserModal="setDeletedUser" @openDeleteOrgModal="setDeleteOrg" />
+	<Panel class="organization-settings">
+		<TabView>
+			<TabPanel header="Dashboard" :pt="tabPanelPt">
+				<h2 class="mb-1">Dashboard</h2>
+				<p class="mt-2 text-muted">The data displayed on the Dashboard page can be customized here.</p>
 
-	<!-- ADD USER DIALOG/MODAL -->
-	<AddUserDialog :visible="addUserModal" @closeUserModal="closeAddUserModal" @addNewUser="addNewUser" />
+				<div class="organization-settings__dashboard">
+					<ActualsPanel />
+				</div>
+			</TabPanel>
+			<TabPanel header="Sales" :disabled="true" :pt="tabPanelPt">
+				<!--<p class="m-0">
+				Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim
+				ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Consectetur, adipisci velit, sed quia non numquam eius modi.
+				</p>-->
+			</TabPanel>
+			<TabPanel header="Contracts" :disabled="true" :pt="tabPanelPt">
+				<!--<p class="m-0">
+				At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui
+				officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus.
+				</p>-->
+			</TabPanel>
+			<TabPanel header="Users" :pt="tabPanelPt">
+				<h2>Users and Roles</h2>
+				<!-- ************* Users TABLE *************** -->
+				<UsersRolesTable :organization="orgData" @openAddUserModal="openAddUserModal" @openDeleteUserModal="setDeletedUser" @openDeleteOrgModal="setDeleteOrg" />
 
-	<!-- DELETE USER DIALOG/MODAL -->
-	<DeleteUserDialog :visible="deleteUserModal" :deletedUser="deletedUser" @closeDeleteUserModal="closeDeleteUserModal" @deleteUser="deleteUser" />
+				<!-- ADD USER DIALOG/MODAL -->
+				<AddUserDialog :visible="addUserModal" @closeUserModal="closeAddUserModal" @addNewUser="addNewUser" />
 
-	<!-- DELETE ORGANIZATION DIALOG/MODAL -->
-	<DeleteOrganizationDialog :visible="deleteOrganizationModal" :deletedOrg="deletedOrg" @closeDeleteOrgModal="closeDeleteOrgModal" @deleteOrganization="deleteOrganization" />
+				<!-- DELETE USER DIALOG/MODAL -->
+				<DeleteUserDialog :visible="deleteUserModal" :deletedUser="deletedUser" @closeDeleteUserModal="closeDeleteUserModal" @deleteUser="deleteUser" />
 
-	<!-- ************* API KEY TABLE *************** -->
-	<ApiKeysTable :keys="keys" @openAddKeyModal="openAddKeyModal" @openDeleteKeyModal="setDeletedApiKey" />
+				<!-- DELETE ORGANIZATION DIALOG/MODAL -->
+				<DeleteOrganizationDialog :visible="deleteOrganizationModal" :deletedOrg="deletedOrg" @closeDeleteOrgModal="closeDeleteOrgModal" @deleteOrganization="deleteOrganization" />
+			</TabPanel>
+			<TabPanel header="API Keys" :pt="tabPanelPt" :disabled="true">
+				<!-- !!!! The values are hardcoded until the API is implemented !!!! -->
+				<!--<h2>API Keys</h2>-->
+				<!-- ************* API KEY TABLE *************** -->
+				<!--<ApiKeysTable :keys="keys" @openAddKeyModal="openAddKeyModal" @openDeleteKeyModal="setDeletedApiKey" /> -->
 
-	<!-- ADD API KEY DIALOG/MODAL -->
-	<AddApiKeysDialog :visible="addKeyDialogVisible" @closeAddKeyModal="closeAddKeyModal" />
+				<!-- ADD API KEY DIALOG/MODAL -->
+				<!--<AddApiKeysDialog :visible="addKeyDialogVisible" @closeAddKeyModal="closeAddKeyModal" />-->
 
-	<!-- DELETE DIALOG/MODAL -->
-	<DeleteApiKeysDialog :visible="delKeyDialogVisible" :deletedApiKey="deletedApiKey" @closeDeleteKeyModal="closeDeleteKeyModal" @deleteApiKey="deleteApiKey" />
+				<!-- DELETE DIALOG/MODAL -->
+				<!--<DeleteApiKeysDialog :visible="delKeyDialogVisible" :deletedApiKey="deletedApiKey" @closeDeleteKeyModal="closeDeleteKeyModal" @deleteApiKey="deleteApiKey" /> -->
+			</TabPanel>
+		</TabView>
+	</Panel>
 </template>
 
 <script setup>
@@ -27,14 +57,24 @@
 	import { useRoute, useRouter } from 'vue-router'
 	import { useBrowserLocation } from '@vueuse/core'
 	import { useToastNotifications } from '@/composable/toastNotification'
-	import ApiKeysTable from '@/components/organization-settings/ApiKeysTable.vue'
-	import AddApiKeysDialog from '@/components/organization-settings/AddApiKeyDialog.vue'
-	import DeleteApiKeysDialog from '@/components/organization-settings/DeleteApiKeyDialog.vue'
-	import UsersRolesTable from '@/components/organization-settings/UsersRolesTable.vue'
-	import AddUserDialog from '@/components/organization-settings/AddUserDialog.vue'
-	import DeleteUserDialog from '@/components/organization-settings/DeleteUserDialog.vue'
-	import DeleteOrganizationDialog from '@/components/organization-settings/DeleteOrganizationDialog.vue'
+	import ApiKeysTable from '@/components/organization-settings/apikeys/ApiKeysTable.vue'
+	import AddApiKeysDialog from '@/components/organization-settings/apikeys/AddApiKeyDialog.vue'
+	import DeleteApiKeysDialog from '@/components/organization-settings/apikeys/DeleteApiKeyDialog.vue'
+	import UsersRolesTable from '@/components/organization-settings/users/UsersRolesTable.vue'
+	import AddUserDialog from '@/components/organization-settings/users/AddUserDialog.vue'
+	import DeleteUserDialog from '@/components/organization-settings/users/DeleteUserDialog.vue'
+	import DeleteOrganizationDialog from '@/components/organization-settings/users/DeleteOrganizationDialog.vue'
+	import ActualsPanel from '@/components/organization-settings/dashboard/actuals/ActualsPanel.vue'
 
+	/***************************** TABS MENUS *******************************/
+	const tabPanelPt = ref({
+		header: 'header-tabs',
+		content: 'content-tabs'
+	})
+	/********************* ENDO OF TABS MENUS *******************************/
+	
+
+	/************** USERS AND ROLES TABLE AND DIALOGS **************/
 	const keys = ref(null),
 		addKeyDialogVisible = ref(false),
 		delKeyDialogVisible = ref(false),
@@ -160,6 +200,7 @@
 	// Get Organization Users and Roles
 	await getOrganization(orgId.value)
 
+	/************************************************** END OF USER AND ROLES SECTION *******************************************************/
 
 
 

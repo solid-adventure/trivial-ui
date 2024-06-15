@@ -1,30 +1,70 @@
-.org-settings__table {
+.organization-settings {
 
-	& .org-settings__table__add--btn {
-		border-color: var(--primary);
-		color: var(--on-primary);
-		background-color: var(--primary);
-	}
+	& .p-tabview-nav {
+		& .header-tabs {
+			& a {
+				font-weight: 500;
+				color: var(--primary);
+			}
+		}
 
-	& .org-settings__table__delete--btn {
-		color: var(--on-primary);
-
-		&.organization__delete--btn {
-			color: #f87171;
+		& li.p-tabview-ink-bar {
+			background-color: var(--primary);
 		}
 	}
 
-	& .org-settings__table__action {
-		width: 3rem;
+	& .p-tabview-panels {
+		padding-inline: unset;
 	}
 
-	& .info__btn {
-		width: 1rem;
-		height: 1rem;
+	& .organization-settings__dashboard {
+
+		& .actuals__list {
+			list-style: none;
+
+			& .actuals__list--icon {
+				color: var(--primary);
+			}
+		}
+	}
+
+	& .org-settings__table {
+
+		& .org-settings__table__add--btn {
+			border-color: var(--primary);
+			color: var(--on-primary);
+			background-color: var(--primary);
+		}
+
+		& .org-settings__table__delete--btn {
+			color: var(--on-primary);
+
+			&.organization__delete--btn {
+				color: #f87171;
+			}
+		}
+
+		& .org-settings__table__action {
+			width: 3rem;
+		}
+
+		& .info__btn {
+			width: 1rem;
+			height: 1rem;
+		}
+	}
+
+	.text-muted {
+		color: #858585;
+	}
+
+	.customize__btn {
+		font-weight: 600;
 	}
 }
 
 
+/* Organization Settings Dialog */
 .org-settings__dialog {
 	width: 28rem;
 
@@ -70,9 +110,5 @@
 
 	& .org-settings__dialog__muted--txt {
 		/*color: #D6D6D6;*/
-	}
-
-	.text-muted {
-		color: #858585;
 	}
 }

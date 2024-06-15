@@ -13,11 +13,11 @@ import AccountLocked from "../components/AccountLocked.vue";
 import InstanceSettings from "../components/InstanceSettings.vue";
 import InstanceActivity from "../components/builderv2/InstanceActivity.vue";
 import Builder from "../components/builderv2/Builder.vue";
-import OrganizationSettings from "../components/OrganizationSettings.vue";
+//import OrganizationSettings from "../components/OrganizationSettings.vue";
 import OrganizationInviteUser from "../components/OrganizationInviteUser.vue";
 import Actions from "../components/Actions.vue";
 import FunctionWriter from "../components/FunctionWriter.vue";
-import Sales from "@/views/Sales.vue";
+import SalesView from "@/views/Sales.vue";
 import OrganizationSettingsView from "@/views/OrganizationsSettings.vue";
 import Session from "../models/Session.js";
 
@@ -98,13 +98,13 @@ const routes = [
     redirect: "/settings",
     name: "Organizations",
   },
-  {
+  /*{
     path: "/organizations/:id/edit",
     component: OrganizationSettings,
     name: "Edit",
-  },
+  },*/
   {
-    path: "/organizations-setting/:id/edit",
+    path: "/organization-settings/:id",
     component: OrganizationSettingsView,
     name: "Organization Settings",
   },
@@ -115,7 +115,7 @@ const routes = [
   },
   {
     path: "/sales",
-    component: Sales,
+    component: SalesView,
     name: "Sales",
   },
   {

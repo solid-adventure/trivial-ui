@@ -25,6 +25,10 @@ import Dialog from 'primevue/dialog'
 import Message from 'primevue/message'
 import Card from 'primevue/card'
 import RadioButton from 'primevue/radiobutton'
+import TabView from 'primevue/tabview'
+import TabPanel from 'primevue/tabpanel'
+import Panel from 'primevue/panel'
+import Checkbox from 'primevue/checkbox'
 import router from './router'
 import store from './store'
 import FloatingVue from 'floating-vue'
@@ -55,6 +59,10 @@ app.component('Dialog', Dialog)
 app.component('Message', Message)
 app.component('Card', Card)
 app.component('RadioButton', RadioButton)
+app.component('TabView', TabView)
+app.component('TabPanel', TabPanel)
+app.component('Panel', Panel)
+app.component('Checkbox', Checkbox)
 app.directive('ripple', Ripple)
 
 app.mount('#app')
