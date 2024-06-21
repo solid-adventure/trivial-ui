@@ -26,6 +26,20 @@
 				color: var(--primary);
 			}
 		}
+
+		& .revenue__gross {
+			& a {
+				padding-left: 0;
+			}
+			
+			& .revenue__gross--icon {
+				color: var(--primary);
+			}
+
+			& .revenue__gross--title {
+				color: var(--on-surface)
+			}
+		}
 	}
 
 	& .org-settings__table {
@@ -58,8 +72,21 @@
 		color: #858585;
 	}
 
+	.text-cliped {
+		height: .875rem;
+		line-break: anywhere;
+	}
+
 	.customize__btn {
 		font-weight: 600;
+	}
+
+	.organization-settings__icon.up {
+		color: var(--primary);
+	}
+
+	.organization-settings__icon.down {
+		color: #ff0000;
 	}
 }
 
@@ -110,5 +137,43 @@
 
 	& .org-settings__dialog__muted--txt {
 		/*color: #D6D6D6;*/
+	}
+
+	.text-muted {
+		color: #858585;
+	}
+
+	.organization-settings__icon.up {
+		color: var(--primary);
+	}
+
+	.organization-settings__icon.down {
+		color: #ff0000;
+	}
+
+	&.revenue__gross {
+		width: 50%;
+
+		& a {
+			padding-left: 0;
+		}
+		
+		& .revenue__gross--icon {
+			color: var(--primary);
+
+			&.draggable {
+				color: lightgray;
+			}
+		}
+
+		& .revenue__gross--title {
+			color: var(--on-surface)
+		}
+	}
+
+	& .list-group {
+		& div.sortable-ghost {
+			border-color: var(--primary) !important
+		}
 	}
 }

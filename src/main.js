@@ -29,6 +29,9 @@ import TabView from 'primevue/tabview'
 import TabPanel from 'primevue/tabpanel'
 import Panel from 'primevue/panel'
 import Checkbox from 'primevue/checkbox'
+import Accordion from 'primevue/accordion'
+import AccordionTab from 'primevue/accordiontab'
+import Tag from 'primevue/tag'
 import router from './router'
 import store from './store'
 import FloatingVue from 'floating-vue'
@@ -63,6 +66,9 @@ app.component('TabView', TabView)
 app.component('TabPanel', TabPanel)
 app.component('Panel', Panel)
 app.component('Checkbox', Checkbox)
+app.component('Accordion', Accordion)
+app.component('AccordionTab', AccordionTab)
+app.component('Tag', Tag)
 app.directive('ripple', Ripple)
 
 app.mount('#app')

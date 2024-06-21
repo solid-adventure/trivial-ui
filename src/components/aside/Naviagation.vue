@@ -23,8 +23,9 @@
 <script setup>
 	import { Icon } from '@iconify/vue';
 	import { RouterLink } from 'vue-router'
-	import { ref, computed } from 'vue'
+	import { ref, computed, onMounted } from 'vue'
 	import { useStore } from 'vuex'
+	import { useLocalStorage } from '@vueuse/core'
 
 	const menuItems = ref([
 		{ path: "/dashboard", title: 'Dashboard', icon: 'fa6-solid:house' },
@@ -53,10 +54,17 @@
 			]
 		},
 		//{ path: "/#", title: 'Transactions', icon: 'fa6-solid:book-open' },
-		//{ path: "/settings", title: 'Settings', icon: 'fa6-solid:gear' }
+		{ path: "", title: 'Settings', icon: 'fa6-solid:gear' }
 	]),
 	store = useStore()
 
 	const isAppId = computed(() => store.state.app.name ? true : false)
 	const appName = computed(() => store.state.app.name)
+	const orgId = computed(() => useLocalStorage('orgId').value)
+
+	onMounted(() => {
+		setOrganizatioSettingsPath(orgId.value)
+	})
+
+	const setOrganizatioSettingsPath = id => menuItems.value[menuItems.value.length - 1].path = `/organization-settings/${id}` 
 </script>
