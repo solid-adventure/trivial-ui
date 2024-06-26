@@ -38,8 +38,7 @@
         </div>
       </div>
 
-      
-      <div class="page-inset">
+      <div class="page-inset" v-if = "app.canTransfer">
         <h2 class="section-title">App Ownership</h2>
         <p class="section-help-text"><em>Transfer app ownership to organizations you are a member of.</em></p>
         <div class = "row">
@@ -99,7 +98,7 @@
         </HideableSection>
       </div>
       
-      <div class="page-inset">
+      <div class="page-inset" v-if = "app.canDestroy">
         <h2 class="section-title">Delete</h2>
         <p class="section-help-text"><em>Danger zone! Deleting this app is permanent and cannot be undone.</em></p>
         <p><input type="button" class="button-small" :class="{working: deleting}" @click.prevent="deleteApp" :value="deleting ? 'Deleting App...' : 'Delete App'" ></p>
@@ -368,6 +367,13 @@
           if(newApp){
             this.setAppDetails()
             await this.loadManifest()
+          }
+        },
+        'app.canUpdate'(newPermit) {
+          if (newPermit == false) {
+            setTimeout(()=>{
+              this.$router.push({ name: 'Home' });
+            }, 500)
           }
         }
     },

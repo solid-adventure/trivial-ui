@@ -95,6 +95,8 @@ export default class Permissions {
         }
         return false;
       }
+    } else if (ability === "addMember") {
+      return userRole === "admin"
     } else {
       throw new Error(`Ability: ${ability} not found in Org permissions`);
     }
