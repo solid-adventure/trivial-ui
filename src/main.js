@@ -36,6 +36,7 @@ import Tag from 'primevue/tag'
 import Row from 'primevue/row'
 import Sidebar from 'primevue/sidebar'
 import Timeline from 'primevue/timeline'
+import Divider from 'primevue/divider'
 import router from './router'
 import store from './store'
 import FloatingVue from 'floating-vue'
@@ -77,6 +78,7 @@ app.component('Tag', Tag)
 app.component('Row', Row)
 app.component('Sidebar', Sidebar)
 app.component('Timeline', Timeline)
+app.component('Divider', Divider)
 app.directive('ripple', Ripple)
 
 app.mount('#app')

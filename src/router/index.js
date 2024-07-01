@@ -18,6 +18,7 @@ import OrganizationInviteUser from "../components/OrganizationInviteUser.vue";
 import Actions from "../components/Actions.vue";
 import FunctionWriter from "../components/FunctionWriter.vue";
 import SalesView from "@/views/Sales.vue";
+import DashboardView from "@/views/Dashboard.vue";
 import OrganizationSettingsView from "@/views/OrganizationsSettings.vue";
 import Session from "../models/Session.js";
 
@@ -104,19 +105,28 @@ const routes = [
     name: "Edit",
   },*/
   {
-    path: "/organization-settings/:id",
-    component: OrganizationSettingsView,
-    name: "Organization Settings",
-  },
-  {
     path: "/organizations/:id/invitations/new",
     component: OrganizationInviteUser,
     name: "Invite User",
   },
   {
+    path: "/new-dashboard",
+    component: DashboardView,
+    name: "Analytics and Real-Time Data",
+  },
+  {
+    path: "/organization-settings/:id",
+    component: OrganizationSettingsView,
+    name: "Organization Settings",
+  },
+  {
     path: "/sales",
     component: SalesView,
     name: "Sales",
+  },
+  {
+    path: "/organization-settings",
+    redirect: "/new-dashboard",
   },
   {
     path: "/organizations/:pathMatch(.*)*",

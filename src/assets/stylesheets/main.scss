@@ -14,8 +14,10 @@
 @import './layout.scss';
 @import './header.scss';
 @import './sidebar.scss';
-@import './sales.scss';
-@import './organization-settings.scss';
+
+@import './pages/_index.scss';
+
+//@use 'pages';
 
 // Odl CSS
 @import './app.scss';

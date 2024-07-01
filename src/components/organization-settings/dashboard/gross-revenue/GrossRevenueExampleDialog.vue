@@ -1,19 +1,20 @@
 <template>
-	<Dialog v-model:visible="visible" :draggable="false" modal @hide="closeModal" header="Example of Other Cash Impacts" class="org-settings__dialog revenue__gross w-10">
-		<CashImpacts :cashImpacts="ciData" />
+	<Dialog v-model:visible="visible" :draggable="false" modal @hide="closeModal" header="Example of Gross Revenue" class="org-settings__dialog revenue__gross w-10">
+		<GrossRevenue :grossRevenue="grData" />
 	</Dialog>
 </template>
 
 <script setup>
 	import { ref, watch } from "vue"
-	import CashImpacts from '@/components/dashboard/CashImpacts.vue'
+	import GrossRevenue from '@/components/dashboard/GrossRevenue.vue'
 
 	const props = defineProps(['visible'])
 	const emit = defineEmits(['closeExampleModal'])
 
 	const visible = ref(false),
-			ciData = ref([{
-		        revenueType: 'Gross Revenue',
+			grData = ref([{
+		        customerType: 'Retail',
+		        location: 'Location 1',
 		        q1: {
 		            january: 67491,
 		            february: 72907,
@@ -41,7 +42,8 @@
 		        grandTotal: 307435
 		    },
 		    {
-		        revenueType: 'Gross Revenue',
+		        customerType: 'Retail',
+		        location: 'Location 2',
 		        q1: {
 		            january: 52932,
 		            february: 54138,
@@ -69,7 +71,37 @@
 		        grandTotal: 234637
 		    },
 		    {
-		        revenueType: 'Sales Tax',
+		        customerType: 'Retail',
+		        location: 'Location 3',
+		        q1: {
+		            january: 21488,
+		            february: 17739,
+		            march: 16704,
+		            total: 57931
+		        },
+		        q2: {
+		            april: 19446,
+		            may: 2240,
+		            june: 4478,
+		            total: 21686
+		        },
+		        q3: {
+		            september: 8750,
+		            july: 2024,
+		            august: 3678,
+		            total: 87427
+		        },
+		        q4: {
+		            october: 3257,
+		            november: 9854,
+		            december: 6741,
+		            total: 75427
+		        },
+		        grandTotal: 79617
+		    },
+		    {
+		        customerType: 'Wholesale',
+		        location: 'Location 4',
 		        q1: {
 		            january: 35134,
 		            february: 34736,
@@ -97,7 +129,8 @@
 		        grandTotal: 152537
 		    },
 		    {
-		        revenueType: 'Sales Tax',
+		        customerType: 'Wholesale',
+		        location: 'Location 5',
 		        q1: {
 		            january: 20873,
 		            february: 17705,
@@ -125,7 +158,8 @@
 		        grandTotal: 89994
 		    },
 		    {
-		        revenueType: 'Tip Wage',
+		        customerType: 'Services',
+		        location: 'Location 6',
 		        q1: {
 		            january: 35134,
 		            february: 5965,

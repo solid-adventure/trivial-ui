@@ -58,17 +58,17 @@
 		</Panel>
 	</div>
 
-	<CustomizeRevenueGrossDialog :visible="isDialogOpen" :selected="selected" @saveSelected="updateSelected" @closeModal="closeDialog" />
+	<CustomizeGrossRevenueDialog :visible="isDialogOpen" :selected="selected" @saveSelected="updateSelected" @closeModal="closeDialog" />
 
-	<RevenueGrossExampleDialog :visible="isExampleDialogOpen" @closeExampleModal="closeExampleDialog" :selected="selected" />
+	<GrossRevenueExampleDialog :visible="isExampleDialogOpen" @closeExampleModal="closeExampleDialog" :selected="selected" />
 </template>
 
 <script setup>
 	import { ref, computed, watch, onMounted } from 'vue'
 	import { useStore } from 'vuex'
 	import { Icon } from '@iconify/vue'
-	import CustomizeRevenueGrossDialog from './CustomizeRevenueGrossDialog.vue'
-	import RevenueGrossExampleDialog from './RevenueGrossExampleDialog.vue'
+	import CustomizeGrossRevenueDialog from './CustomizeGrossRevenueDialog.vue'
+	import GrossRevenueExampleDialog from './GrossRevenueExampleDialog.vue'
 	import GrossRevenueLightImgPreview from '@/assets/images/organization-settings/light/gross-revenue-preview.svg'
 	import GrossRevenueDarkImgPreview from '@/assets/images/organization-settings/dark/gross-revenue-preview.svg'
 

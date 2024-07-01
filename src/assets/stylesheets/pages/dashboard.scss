@@ -1,0 +1,18 @@
+.actuals {
+	width: calc((100% - 5.250rem) / 5);
+	gap: 0 3rem;
+
+}
+
+
+.text-muted {
+	color: var(--grey-400);
+}
+
+.indicator__icon.up {
+	color: var(--primary);
+}
+
+.indicator__icon.down {
+	color: #ff0000;
+}

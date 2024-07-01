@@ -1,12 +1,13 @@
 <template>
 	<Dialog v-model:visible="visible" :draggable="false" modal @hide="closeModal" header="Example of Revenue Walk" class="org-settings__dialog revenue__gross w-10">
-		<Panel class="shadow-2">
+		<!--<Panel class="shadow-2">
 			<DataTable :value="data" scrollable rowGroupMode="rowspan" groupRowsBy="revenueType" tableStyle="min-width: 120rem" class="revenue__gross__table">
 				<template #header>
 					<div class="flex justify-content-between align-items-center">
 						<h2 class="font-semibold">Revenue Walk($)</h2>
 
-						<Dropdown v-model="selectedQuarters" :options="quarters" optionLabel="name" placeholder="Select Quarter(s)" class="w-14rem" />
+						<!-- SELECT QUARTERS--
+						<!--<Dropdown v-model="selectedQuarters" :options="quarters" optionLabel="name" placeholder="Select Quarter(s)" class="w-14rem" />--
 					</div>
 				</template>
 				<ColumnGroup type="header">
@@ -164,27 +165,21 @@
 					</Row>
 				</ColumnGroup>
 			</DataTable>
-		</Panel>
+		</Panel>-->
+
+		<RevenueWalk :revenueWalk="rwData" />
 	</Dialog>
 </template>
 
 <script setup>
-	import { ref, watch, computed, onMounted } from "vue"
-	import { Icon } from '@iconify/vue'
-	import { useFormatCurrency } from '@/composable/formatCurrency.js'
+	import { ref, watch } from "vue"
+	import RevenueWalk from '@/components/dashboard/RevenueWalk.vue'
 
-	const props = defineProps(['visible', 'selected'])
+	const props = defineProps(['visible'])
 	const emit = defineEmits(['closeExampleModal'])
 
 	const visible = ref(false),
-			selectedQuarters = ref(),
-			quarters = ref([
-				//{name: 'Quarter Q1', item: 'q1'},
-				//{name: 'Quarter Q2', item: 'q2'},
-				{name: 'Quarter Q3', item: 'q3'},
-				{name: 'Quarter Q4', item: 'q4'}
-			]),
-			data = ref([{
+			rwData = ref([{
 		        revenueType: 'Gross Revenue',
 		        q1: {
 		            january: 67491,
@@ -355,9 +350,6 @@
 		])
 
 	watch(props, newVal => visible.value = newVal.visible)
-
-	/*onMounted(() => {
-	})*/
 
 	const closeModal = () => {
 		visible.value = false
