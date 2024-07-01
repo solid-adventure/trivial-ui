@@ -1,4 +1,10 @@
 .registers_table {
+	.p-datatable-header {
+		button.add__row-btn {
+			color: white;
+			background-color: var(--primary);
+		}
+	}
 
 	& div.p-datatable-loading-overlay.p-component-overlay {
 		flex-direction: column;

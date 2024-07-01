@@ -39,6 +39,7 @@
 						<i class="pi pi-search" />
 					</InputIcon>
 	            </IconField>-->
+	            <Button icon="pi pi-plus" class="add__row-btn" @click="addRow" title="Add Row" />
 	        </div>
 	    </template>
 	    <template #empty>
@@ -257,6 +258,12 @@
 			filterDate.end_at = date.value
 		}
 	}*/
+
+	const addRow = () => {
+		let emptyRowObj = { 'originated_at': new Date() }
+		columns.forEach(item => emptyRowObj[item.field] = '')
+		registers.value.unshift(emptyRowObj) 
+	}
 
 	const getSearchableCols = async () => {
 		// Get Searchable Columns
