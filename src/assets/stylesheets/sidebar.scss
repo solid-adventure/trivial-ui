@@ -91,9 +91,9 @@
 				outline: none;
 			}
 
-			/*&:last-child {
-				transform: translateY(350%);
-			}*/
+			&:last-child {
+				transform: translateY(330%);
+			}
 
 			& > div {
 				position: relative;

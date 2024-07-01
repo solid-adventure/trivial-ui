@@ -1,17 +1,25 @@
+// Old CSS
 @import "includes/theme-defaults.scss";
 @import "app-light.scss";
-@import "includes/variables";
-@import "includes/reset";
-@import "includes/lato";
 @import "includes/modals";
 @import "includes/forms";
+// End of old CSS
+
+@import "fonts.scss";
+@import "includes/reset";
+@import "includes/variables";
 
 // Theme, Layout, Pages 
 @import './theme.scss';
 @import './layout.scss';
 @import './header.scss';
 @import './sidebar.scss';
-@import './sales.scss';
 
+@import './pages/_index.scss';
+
+//@use 'pages';
+
+// Odl CSS
 @import './app.scss';
 @import './signin.scss';
+// End of old CSS

@@ -16,7 +16,8 @@ const store = createStore({
     currentPath: '/',
     route: null,
     user: {},
-    theme: localStorage.getItem('theme')?.toLowerCase() === 'dark' ? 'Dark' : 'Light',
+    //theme: localStorage.getItem('vueuse-color-scheme') === 'light' ? 'light' : 'dark',
+    isDarkTheme: false,
     themeLoaded: false,
     app: {},
     isAuthenticated: false,
@@ -74,6 +75,9 @@ const store = createStore({
 
     getApps(state) {
       return state.apps;
+    },
+    getIsDarkTheme(state) {
+      return state.isDarkTheme;
     }
   },
 
@@ -207,10 +211,10 @@ const store = createStore({
       state.user = user
     },
 
-    setTheme(state, theme) {
+    /*setTheme(state, theme) {
       state.theme = theme
       localStorage.setItem('theme', theme)
-    },
+    },*/
 
     setDataSample(state, dataSample) {
       state.dataSample = dataSample
@@ -255,7 +259,11 @@ const store = createStore({
     },
     setOrgId(state, id) {
       state.orgId = id
-    }
+    },
+
+    setIsDarkTheme(state, value) {
+      state.isDarkTheme = value
+    },
   },
 
   actions: {
@@ -275,7 +283,7 @@ const store = createStore({
     async loadProfile({ commit, state }) {
       try {
         let data = await Session.apiCall('/profile')
-        commit('setTheme', data.user.color_theme)
+        //commit('setTheme', data.user.color_theme)
         commit('setUser', data.user)
         commit('initPermissions', data.user)
       } catch (e) {
@@ -506,6 +514,9 @@ const store = createStore({
     async selectOrgId({ commit, state }, id) {
       await commit('setOrgId', id)
     },
+    async getDarkTheme({ commit, state }, value) {
+      await commit('setIsDarkTheme', value)
+    }
   }
 
 })

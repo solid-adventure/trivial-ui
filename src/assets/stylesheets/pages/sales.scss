@@ -79,18 +79,6 @@
 	}
 
 	& .footer__col {
-		max-width: 100%;
-
-		& > div {
-			width: calc(100% / var(--cols));
-			/*max-width: 156px;*/
-			min-width: 120px;
-			text-align: right;
-		}
-
-		& > div:first-child {
-			text-align: inherit;
-		}
 
 		& .info__btn {
 			width: 16px;
