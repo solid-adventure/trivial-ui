@@ -1,5 +1,5 @@
 <template>
-	<Dialog v-model:visible="visible" :draggable="false" modal @hide="closeModal" header="Customize Gross Revenue" class="org-settings__dialog revenue__gross">
+	<Dialog v-model:visible="visible" :draggable="false" modal @hide="closeModal" header="Customize Revenue Walk" class="org-settings__dialog revenue__gross">
 
 		<h4 class="mt-5 font-normal font-semibold">Reporting Groups <span class="text-muted">{{ reportingGroupsCountTxt }}</span></h4>
 		<p class="mt-1 mb-5 text-muted text-sm">Use 3 empty slots in the list below to customize your table columns.</p>
@@ -65,18 +65,16 @@
 	import { Icon } from '@iconify/vue'
 	import { useToastNotifications } from '@/composable/toastNotification'
 
-	const props = defineProps(['visible'])
+	const props = defineProps(['visible', 'selected'])
 	const emit = defineEmits(['closeModal', 'saveSelected'])
 
 	const visible = ref(false),
 		{ showSuccessToast, showErrorToast, showInfoToast } = useToastNotifications(),
 		groupsColumn = ref([
-			{id: 1, name: 'Customer Type', values: ['Retail', 'Wholesale', 'Services'], type: 'String', selectedValues: ['Retail', 'Wholesale', 'Services']},
-			{id: 2, name: 'Location', values: ['Location 1', 'Location 2', 'Location 3'], type: 'String', selectedValues: ['Location 1', 'Location 2', 'Location 3']},
-			{id: 3, name: 'Example 1', values: ['Some value 1', 'Some value 2', 'Some value 3'], type: 'Strign', selectedValues: ['Some value 1', 'Some value 2', 'Some value 3']},
-			{id: 4, name: 'My Column 1', values: ['Some value 1', 'Some value 2', 'Some value 3'], type: 'String', selectedValues: ['Some value 1', 'Some value 2', 'Some value 3']},
-			{id: 5, name: 'My Column 2', values: ['Some value 1', 'Some value 2', 'Some value 3'], type: 'String', selectedValues: ['Some value 1', 'Some value 2', 'Some value 3']},
-			{id: 6, name: 'My Column 3', values: ['Some value 1', 'Some value 2', 'Some value 3'], type: 'Strign', selectedValues: ['Some value 1', 'Some value 2', 'Some value 3']}
+			{id: 1, name: 'Revenue Type', values: ['Gross Revenu', 'Refunds', 'Discount & Credits', 'Shipping', 'Sales Tax', 'Tip Wage'], type: 'Integer', selectedValues: ['Gross Revenu', 'Refunds', 'Discount & Credits', 'Shipping', 'Sales Tax', 'Tip Wage']},
+			{id: 2, name: 'My Column 1', values: ['Some value 1', 'Some value 2', 'Some value 3'], type: 'String', selectedValues: ['Some value 1', 'Some value 2', 'Some value 3']},
+			{id: 3, name: 'My Column 2', values: ['Some value 1', 'Some value 2', 'Some value 3'], type: 'String', selectedValues: ['Some value 1', 'Some value 2', 'Some value 3']},
+			{id: 4, name: 'My Column 3', values: ['Some value 1', 'Some value 2', 'Some value 3'], type: 'Strign', selectedValues: ['Some value 1', 'Some value 2', 'Some value 3']}
 		]),
 		reportingGroups = ref([]),
 		reportingGroupsLimit = 3

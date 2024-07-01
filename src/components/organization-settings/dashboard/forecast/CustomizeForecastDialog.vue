@@ -1,5 +1,5 @@
 <template>
-	<Dialog v-model:visible="visible" modal @hide="closeModal" header="Customize Forecast" class="org-settings__dialog">
+	<Dialog v-model:visible="visible" :draggable="false" modal @hide="closeModal" header="Customize Forecast" class="org-settings__dialog">
 
 		<h4 class="mb-5 font-normal">Available Data</h4>
 
@@ -12,7 +12,7 @@
 
 		<div class="flex justify-content-end gap-2">
 			<Button type="button" label="Cancel" text @click="closeModal" class="modal__cancel--btn" :pt="{label: {class: 'font-semibold'}}" />
-			<Button type="button" label="Save" class="modal__next--btn" @click="saveSelectedForecast" />
+			<Button type="button" label="Save" class="modal__next--btn" @click="saveSelected" />
 		</div>
 	</Dialog>
 </template>
@@ -21,8 +21,8 @@
 	import { ref, watch, onMounted, toRaw } from "vue"
 
 
-	const props = defineProps(['visible', 'selectedForecast'])
-	const emit = defineEmits(['closeForecastModal', 'saveSelectedForecast'])
+	const props = defineProps(['visible', 'selected'])
+	const emit = defineEmits(['closeModal', 'saveSelected'])
 
 	watch(props, newVal => visible.value = newVal.visible)
 
@@ -43,16 +43,16 @@
 
 	const closeModal = () => {
 		visible.value = false
-		emit('closeForecastModal')
+		emit('closeModal')
 	}
 
-	const setSelectedCategories = () => selectedCategories.value = props.selectedForecast
+	const setSelectedCategories = () => selectedCategories.value = props.selected
 
-	const saveSelectedForecast = () => {
+	const saveSelected = () => {
 		// Send data to the API and save to DB
 
 		// Update data to actual section (in memory)
-		emit('saveSelectedForecast', selectedCategories.value)
+		emit('saveSelected', selectedCategories.value)
 
 		closeModal()
 	}

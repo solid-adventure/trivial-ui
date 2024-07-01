@@ -83,7 +83,7 @@ $toggle-background-dark: #333 !default;
 // Typography
 //
 
-$font-family: string.unquote("'Lato', sans-serif") !default;
+//$font-family: string.unquote("'Lato', sans-serif") !default;
 $code-font: monospace !default;
 
 
@@ -175,7 +175,7 @@ $tool-tip-background: $background-high-contrast !default;
   --auth-border-color: #{$auth-border-color};
   --auth-button-gradient: #{$auth-button-gradient};
 
-  --font-family: #{$font-family};
+  //--font-family: #{$font-family};
   --code-font: #{$code-font};
 
   --table-head-border: #{$table-head-border};

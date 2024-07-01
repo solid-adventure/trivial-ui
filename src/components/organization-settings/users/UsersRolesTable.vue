@@ -3,7 +3,7 @@
 		<DataTable :value="usersRolesData.users" tableStyle="max-width: 100%" class="org-settings__table">
 			<template #header>
 				<div class="flex justify-content-between pb-5">
-					<h2 class="flex justify-content-between align-items-center m-0 gap-2">
+					<h2 class="flex justify-content-between align-items-center m-0 gap-2 font-semibold">
 						{{ usersRolesData.name }}
 
 						<Button type="button" icon="pi pi-info-circle" severity="secondary" size="small" text rounded outlined aria-label="Info" @click="toggleInfoPopup" class="info__btn p-0" />

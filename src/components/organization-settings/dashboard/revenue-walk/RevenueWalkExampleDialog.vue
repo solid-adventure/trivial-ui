@@ -1,18 +1,17 @@
 <template>
-	<Dialog v-model:visible="visible" :draggable="false" modal @hide="closeModal" header="Example of Gross Revenue" class="org-settings__dialog revenue__gross w-10">
+	<Dialog v-model:visible="visible" :draggable="false" modal @hide="closeModal" header="Example of Revenue Walk" class="org-settings__dialog revenue__gross w-10">
 		<Panel class="shadow-2">
-			<DataTable :value="data" scrollable rowGroupMode="rowspan" groupRowsBy="customerType" tableStyle="min-width: 120rem" class="revenue__gross__table">
+			<DataTable :value="data" scrollable rowGroupMode="rowspan" groupRowsBy="revenueType" tableStyle="min-width: 120rem" class="revenue__gross__table">
 				<template #header>
 					<div class="flex justify-content-between align-items-center">
-						<h2 class="font-semibold">Gross Revenue ($)</h2>
+						<h2 class="font-semibold">Revenue Walk($)</h2>
 
 						<Dropdown v-model="selectedQuarters" :options="quarters" optionLabel="name" placeholder="Select Quarter(s)" class="w-14rem" />
 					</div>
 				</template>
 				<ColumnGroup type="header">
 					<Row>
-						<Column header="Customer Type" :rowspan="3" headerStyle="vertical-align:top" />
-						<Column header="Location (Group)" :rowspan="3" headerStyle="vertical-align:top" />
+						<Column header="Revenue Type" :rowspan="3" headerStyle="vertical-align:top" />
 					</Row>
 					<Row>
 						<Column header="Q1 2024" :colspan="4" />
@@ -45,8 +44,7 @@
 					</Row>
 				</ColumnGroup>
 
-				<Column field="customerType" :rowspan="3" class="revenue__gross__table--rowspan-cell" />
-				<Column field="location" />
+				<Column field="revenueType" class="revenue__gross__table--rowspan-cell" />
 				<Column field="q1.january">
 					<template #body="slotProps">
 						{{useFormatCurrency(slotProps.data.q1.january)}} {{quarters.item}}
@@ -141,7 +139,7 @@
 				</Column>
 				<ColumnGroup type="footer" frozen>
 					<Row>
-						<Column footer="Grand Total" :colspan="2" footerStyle="text-align:left"/>
+						<Column footer="Grand Total" footerStyle="text-align:left"/>
 						<Column footer="$5,580" />
 						<Column footer="$5,517" />
 						<Column footer="$5,930" />
@@ -187,8 +185,7 @@
 				{name: 'Quarter Q4', item: 'q4'}
 			]),
 			data = ref([{
-		        customerType: 'Retail',
-		        location: 'Location 1',
+		        revenueType: 'Gross Revenue',
 		        q1: {
 		            january: 67491,
 		            february: 72907,
@@ -216,8 +213,7 @@
 		        grandTotal: 307435
 		    },
 		    {
-		        customerType: 'Retail',
-		        location: 'Location 2',
+		        revenueType: 'Gross Revenue',
 		        q1: {
 		            january: 52932,
 		            february: 54138,
@@ -245,37 +241,7 @@
 		        grandTotal: 234637
 		    },
 		    {
-		        customerType: 'Retail',
-		        location: 'Location 3',
-		        q1: {
-		            january: 21488,
-		            february: 17739,
-		            march: 16704,
-		            total: 57931
-		        },
-		        q2: {
-		            april: 19446,
-		            may: 2240,
-		            june: 4478,
-		            total: 21686
-		        },
-		        q3: {
-		            september: 8750,
-		            july: 2024,
-		            august: 3678,
-		            total: 87427
-		        },
-		        q4: {
-		            october: 3257,
-		            november: 9854,
-		            december: 6741,
-		            total: 75427
-		        },
-		        grandTotal: 79617
-		    },
-		    {
-		        customerType: 'Wholesale',
-		        location: 'Location 4',
+		        revenueType: 'Refunds',
 		        q1: {
 		            january: 35134,
 		            february: 34736,
@@ -303,8 +269,7 @@
 		        grandTotal: 152537
 		    },
 		    {
-		        customerType: 'Wholesale',
-		        location: 'Location 5',
+		        revenueType: 'Refunds',
 		        q1: {
 		            january: 20873,
 		            february: 17705,
@@ -332,8 +297,35 @@
 		        grandTotal: 89994
 		    },
 		    {
-		        customerType: 'Services',
-		        location: 'Location 6',
+		        revenueType: 'Discounts & Credits',
+		        q1: {
+		            january: 35134,
+		            february: 5965,
+		            march: 5930,
+		            total: 21493
+		        },
+		        q2: {
+		            april: 2560,
+		            may: 3122,
+		            june: 9687,
+		            total: 9185
+		        },
+		        q3: {
+		            september: 7864,
+		            july: 3574,
+		            august: 3954,
+		            total: 87427
+		        },
+		        q4: {
+		            october: 8670,
+		            november: 6851,
+		            december: 7852,
+		            total: 68727
+		        },
+		        grandTotal: 20035
+		    },
+		    {
+		       	revenueType: 'Shipping',
 		        q1: {
 		            january: 35134,
 		            february: 5965,

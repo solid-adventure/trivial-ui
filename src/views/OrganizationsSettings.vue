@@ -40,7 +40,8 @@
 
 	// TABS MENUS
 	const tabPanelPt = ref({
-		header: 'header-tabs',
-		content: 'content-tabs'
+		header: {
+			class: 'header__tabs'
+		}
 	})
 </script>

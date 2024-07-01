@@ -67,35 +67,38 @@
 						<div class="date">{{ useFormatDate(data.originated_at, dateOptions) }}</div>
 						<div class="time">{{ useFormatDate(data.originated_at, timeOptions) }} {{ useFormatDate(data.originated_at, timeZoneOptions).split(' ')[1] }}</div>
 					</span>
-					<span v-else-if="col.field == 'amount'">{{ Format.money(data[col.field], 2, data['units']) }}</span>
+					<span v-else-if="col.field == 'amount'">{{ useFormatCurrency(data[col.field], data['units'], 2) }}</span>
 					<span v-else>{{ data[col.field] }}</span>
 				</div>
 			</template>
 		</Column>
 
-		<template #footer>
-			<div class="flex justify-content-start footer__col">
-				<div v-for="(col, index) in columns" :key="index">
-					<div v-if="index == 0">
-						<h4 class="flex align-items-center m-0">
-							Totals
-							<Button type="button" icon="pi pi-info-circle" severity="secondary" size="small" text rounded outlined aria-label="Info" @click="toggleTotalInfoPopup" class="info__btn ml-2 p-0" />
-							<OverlayPanel ref="totalInfoPopup">
-								<p class="m-0">Total includes results from all pages, including those not displayed.</p>
-							</OverlayPanel>
-						</h4>
-					</div>
-					<span v-else-if="col.field === totalsColumns[col.field]">{{ totalAmount }}</span>
-				</div>
-			</div>
-		</template>
+		<ColumnGroup type="footer">
+			<Row>
+				<template v-for="(col, index) in columns" :key="index">
+					<Column v-if="index == 0">
+						<template #footer>
+							<div class="flex align-items-center footer__col">
+								<h4 class="m-0">Totals</h4>
+								<Button type="button" icon="pi pi-info-circle" severity="secondary" size="small" text rounded outlined aria-label="Info" @click="toggleTotalInfoPopup" class="info__btn ml-2 p-0" />
+								<OverlayPanel ref="totalInfoPopup">
+									<p class="m-0">Total includes results from all pages, including those not displayed.</p>
+								</OverlayPanel>
+							</div>
+						</template>
+					</Column>
+					<Column v-else-if="col.field === totalsColumns[col.field]" :footer="totalAmount" footerStyle="text-align:right" />
+					<Column v-else />
+				</template>
+			</Row>
+		</ColumnGroup>
 	</DataTable>
 </template>
 
 <script setup>
 	import { ref, onMounted, computed, watch, toRaw } from 'vue'
 	import { useStore } from 'vuex'
-	import Format from '@/lib/Format'
+	import { useFormatCurrency } from '@/composable/formatCurrency.js'
 	import { useFormatDate } from '@/composable/formatDate.js'
 	import { useIsNumeric } from '@/composable/isNumeric.js'
 	import { useDateTimeZoneOptions } from '@/composable/dateTimeZoneOptions.js'
@@ -173,7 +176,7 @@
 	const resetRegisters = () => registers.value = []
 	const resetTotalAmount = () => totalAmount.value = null
 	const isDisabledTooltip = data => data?.length < 14
-	const toggleTotalInfoPopup = event => totalInfoPopup.value.toggle(event)
+	const toggleTotalInfoPopup = event => totalInfoPopup.value[0].toggle(event)
 	const setFilterMatchModes = field => field === 'amount' ? numericFilterMatchModes : field === 'originated_at' ? dateFilterMatchModes : textFilterMatchModes
 
 	const getRegisters = async orgId => {
@@ -243,7 +246,7 @@
 
 		total = await store.state.Session.apiCall('/reports/item_sum', 'POST', { register_ids: regId, start_at: new Date(start_at).toISOString(), end_at: new Date(end_at).toISOString() })
 
-		totalAmount.value = Format.money(total.count)
+		totalAmount.value = useFormatCurrency(total.count, 'USD', 2)
 
 		resetDateFilter()
 	}

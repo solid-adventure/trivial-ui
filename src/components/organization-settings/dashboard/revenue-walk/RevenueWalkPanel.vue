@@ -4,11 +4,11 @@
 			<div class="flex flex-column">
 				<div class="flex justify-content-between align-items-center w-full">
 					<h2 class="flex justify-content-between align-items-center m-0 gap-2 font-semibold">
-						Gross Revenue ($)
+						Revenue Walk ($)
 
 						<Button type="button" icon="pi pi-info-circle" severity="secondary" size="small" text rounded outlined aria-label="Info" @click="toggleInfoPopup" class="info__btn p-0 w-1rem h-1rem" />
 						<OverlayPanel ref="infoPopup">
-							<p class="m-0">This is a Gross Revenue section.</p>
+							<p class="m-0">This is a Revenue Walk section.</p>
 						</OverlayPanel>
 					</h2>
 
@@ -43,8 +43,8 @@
 				<div v-if="reportingGroupsLength == 0" class="flex justify-content-center align-items-center mt-6 gap-3">
 					<Icon icon="lets-icons:folder-add-light" class="w-4rem text-muted" />
 					<div class="w-6">
-						<h3 class="m-0 font-semibold">Enhance Your Insights: Add Columns for Gross Revenue</h3>
-						<p class="mt-1 mb-0 text-sm text-muted">Tailor your data to your specific needs and leverage <br /> comprehensive insights to inform your decisions.</p>
+						<h3 class="m-0 font-semibold">Optimize Your Analysis with New Columns</h3>
+						<p class="mt-1 mb-0 text-sm text-muted">Adapt your data to fit your unique requirements.</p>
 					</div>
 				</div>
 			</div>
@@ -53,24 +53,24 @@
 			<div class="flex flex-column justify-content-end align-items-end">
 				<Button label="View Example" severity="info" text :pt="{label: {class: 'font-semibold'}}" @click="openExampleDialog" class="mb-2" />
 
-				<Image :src="thumbnailImgPreview" alt="Gross Revenue small preview" width="356" />
+				<Image :src="thumbnailImgPreview" alt="Revenue Walk small preview" width="356" />
 			</div>
 		</Panel>
 	</div>
 
-	<CustomizeRevenueGrossDialog :visible="isDialogOpen" :selected="selected" @saveSelected="updateSelected" @closeModal="closeDialog" />
+	<CustomizeRevenueWalkDialog :visible="isDialogOpen" :selected="selected" @saveSelected="updateSelected" @closeModal="closeDialog" />
 
-	<RevenueGrossExampleDialog :visible="isExampleDialogOpen" @closeExampleModal="closeExampleDialog" :selected="selected" />
+	<RevenueWalkExampleDialog :visible="isExampleDialogOpen" @closeExampleModal="closeExampleDialog" :selected="selected" />
 </template>
 
 <script setup>
 	import { ref, computed, watch, onMounted } from 'vue'
 	import { useStore } from 'vuex'
 	import { Icon } from '@iconify/vue'
-	import CustomizeRevenueGrossDialog from './CustomizeRevenueGrossDialog.vue'
-	import RevenueGrossExampleDialog from './RevenueGrossExampleDialog.vue'
-	import GrossRevenueLightImgPreview from '@/assets/images/organization-settings/light/gross-revenue-preview.svg'
-	import GrossRevenueDarkImgPreview from '@/assets/images/organization-settings/dark/gross-revenue-preview.svg'
+	import CustomizeRevenueWalkDialog from './CustomizeRevenueWalkDialog.vue'
+	import RevenueWalkExampleDialog from './RevenueWalkExampleDialog.vue'
+	import RevenueWalkLightImgPreview from '@/assets/images/organization-settings/light/revenue-walk-preview.svg'
+	import RevenueWalkDarkImgPreview from '@/assets/images/organization-settings/dark/revenue-walk-preview.svg'
 
 	const infoPopup = ref(),
 		isDialogOpen = ref(false),
@@ -100,11 +100,11 @@
 	const reportingGroupsCountTxt = computed(() => `(${reportingGroupsLength.value} of 3)`)
 
 	watch(() => store.getters.getIsDarkTheme, async (newVal, oldVal) => {
-		thumbnailImgPreview.value = newVal ? GrossRevenueDarkImgPreview : GrossRevenueLightImgPreview
+		thumbnailImgPreview.value = newVal ? RevenueWalkDarkImgPreview : RevenueWalkLightImgPreview
 	})
 
 	onMounted(async () => {
-		thumbnailImgPreview.value = await store.getters.getIsDarkTheme ? GrossRevenueDarkImgPreview : GrossRevenueLightImgPreview
+		thumbnailImgPreview.value = await store.getters.getIsDarkTheme ? RevenueWalkDarkImgPreview : RevenueWalkLightImgPreview
 	})
 
 	const toggleInfoPopup = event => infoPopup.value.toggle(event)

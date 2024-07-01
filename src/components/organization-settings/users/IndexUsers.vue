@@ -1,5 +1,5 @@
 <template>
-	<h2>Users and Roles</h2>
+	<h2 class="font-semibold">Users and Roles</h2>
 	
 	<!-- ************* Users TABLE *************** -->
 	<UsersRolesTable :organization="orgData" @openAddUserModal="openAddUserModal" @openDeleteUserModal="setDeletedUser" @openDeleteOrgModal="setDeleteOrg" />

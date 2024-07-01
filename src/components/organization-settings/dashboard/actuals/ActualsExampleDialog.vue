@@ -1,8 +1,8 @@
 <template>
-	<Dialog v-model:visible="visible" modal @hide="closeModal" header="Example of Actuals" class="org-settings__dialog w-10">
+	<Dialog v-model:visible="visible" :draggable="false" modal @hide="closeModal" header="Example of Actuals" class="org-settings__dialog w-8">
 		<Panel header="Actuals" class="shadow-2">
 			<div class="flex flex-wrap gap-5">
-				<div v-for="(item, index) in selectedActuals" :key="index" class="w-2 border-300" :class="{'border-right-1': index !== lastItem}">
+				<div v-for="(item, index) in selected" :key="index" class="w-2 border-300" :class="{'border-right-1': index !== lastItem}">
 					<p class="m-0 text-md text-muted">{{ item.name }}</p>
 					<div class="flex align-items-center gap-1 mt-1">
 						<p class="m-0 text-xl font-semibold">{{ item.value }}</p>
@@ -18,16 +18,16 @@
 	import { ref, watch, computed } from "vue"
 	import { Icon } from '@iconify/vue'
 
-	const props = defineProps(['visible', 'selectedActuals'])
-	const emit = defineEmits(['closeActualsExampleModal'])
+	const props = defineProps(['visible', 'selected'])
+	const emit = defineEmits(['closeExampleModal'])
 
 	const visible = ref(false)
 
 	watch(props, newVal => visible.value = newVal.visible)
 
-	const lastItem = computed(() => props.selectedActuals.length - 1)
+	const lastItem = computed(() => props.selected.length - 1)
 	const closeModal = () => {
 		visible.value = false
-		emit('closeActualsExampleModal')
+		emit('closeExampleModal')
 	}
 </script>

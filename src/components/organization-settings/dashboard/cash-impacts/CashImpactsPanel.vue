@@ -4,11 +4,11 @@
 			<div class="flex flex-column">
 				<div class="flex justify-content-between align-items-center w-full">
 					<h2 class="flex justify-content-between align-items-center m-0 gap-2 font-semibold">
-						Gross Revenue ($)
+						Other Cash Impacts ($)
 
 						<Button type="button" icon="pi pi-info-circle" severity="secondary" size="small" text rounded outlined aria-label="Info" @click="toggleInfoPopup" class="info__btn p-0 w-1rem h-1rem" />
 						<OverlayPanel ref="infoPopup">
-							<p class="m-0">This is a Gross Revenue section.</p>
+							<p class="m-0">This is a Other Cash Impacts section.</p>
 						</OverlayPanel>
 					</h2>
 
@@ -43,8 +43,8 @@
 				<div v-if="reportingGroupsLength == 0" class="flex justify-content-center align-items-center mt-6 gap-3">
 					<Icon icon="lets-icons:folder-add-light" class="w-4rem text-muted" />
 					<div class="w-6">
-						<h3 class="m-0 font-semibold">Enhance Your Insights: Add Columns for Gross Revenue</h3>
-						<p class="mt-1 mb-0 text-sm text-muted">Tailor your data to your specific needs and leverage <br /> comprehensive insights to inform your decisions.</p>
+						<h3 class="m-0 font-semibold">Refine Your Analysis: Add New Data Columns</h3>
+						<p class="mt-1 mb-0 text-sm text-muted">Utilize detailed insights to enhance your decision-making process.</p>
 					</div>
 				</div>
 			</div>
@@ -53,24 +53,24 @@
 			<div class="flex flex-column justify-content-end align-items-end">
 				<Button label="View Example" severity="info" text :pt="{label: {class: 'font-semibold'}}" @click="openExampleDialog" class="mb-2" />
 
-				<Image :src="thumbnailImgPreview" alt="Gross Revenue small preview" width="356" />
+				<Image :src="thumbnailImgPreview" alt="Revenue Walk small preview" width="356" />
 			</div>
 		</Panel>
 	</div>
 
-	<CustomizeRevenueGrossDialog :visible="isDialogOpen" :selected="selected" @saveSelected="updateSelected" @closeModal="closeDialog" />
+	<CustomizeCashImpactsDialog :visible="isDialogOpen" :selected="selected" @saveSelected="updateSelected" @closeModal="closeDialog" />
 
-	<RevenueGrossExampleDialog :visible="isExampleDialogOpen" @closeExampleModal="closeExampleDialog" :selected="selected" />
+	<CashImpactsExampleDialog :visible="isExampleDialogOpen" @closeExampleModal="closeExampleDialog" :selected="selected" />
 </template>
 
 <script setup>
 	import { ref, computed, watch, onMounted } from 'vue'
 	import { useStore } from 'vuex'
 	import { Icon } from '@iconify/vue'
-	import CustomizeRevenueGrossDialog from './CustomizeRevenueGrossDialog.vue'
-	import RevenueGrossExampleDialog from './RevenueGrossExampleDialog.vue'
-	import GrossRevenueLightImgPreview from '@/assets/images/organization-settings/light/gross-revenue-preview.svg'
-	import GrossRevenueDarkImgPreview from '@/assets/images/organization-settings/dark/gross-revenue-preview.svg'
+	import CustomizeCashImpactsDialog from './CustomizeCashImpactsDialog.vue'
+	import CashImpactsExampleDialog from './CashImpactsExampleDialog.vue'
+	import CashImpactsLightImgPreview from '@/assets/images/organization-settings/light/cash-impacts-preview.svg'
+	import CashImpactsDarkImgPreview from '@/assets/images/organization-settings/dark/cash-impacts-preview.svg'
 
 	const infoPopup = ref(),
 		isDialogOpen = ref(false),
@@ -96,15 +96,16 @@
 		selected = ref([]),
 		thumbnailImgPreview = ref(null)
 
+
 	const reportingGroupsLength = computed(() => selected.value.length)
 	const reportingGroupsCountTxt = computed(() => `(${reportingGroupsLength.value} of 3)`)
 
 	watch(() => store.getters.getIsDarkTheme, async (newVal, oldVal) => {
-		thumbnailImgPreview.value = newVal ? GrossRevenueDarkImgPreview : GrossRevenueLightImgPreview
+		thumbnailImgPreview.value = newVal ? CashImpactsDarkImgPreview : CashImpactsLightImgPreview
 	})
 
 	onMounted(async () => {
-		thumbnailImgPreview.value = await store.getters.getIsDarkTheme ? GrossRevenueDarkImgPreview : GrossRevenueLightImgPreview
+		thumbnailImgPreview.value = await store.getters.getIsDarkTheme ? CashImpactsDarkImgPreview : CashImpactsLightImgPreview
 	})
 
 	const toggleInfoPopup = event => infoPopup.value.toggle(event)

@@ -1,0 +1,1 @@
+export const useFormatCurrency = (value, currencyCode = 'USD', decimalPoints = 0) => parseFloat(value).toLocaleString('en-US', {style: 'currency', currency: currencyCode, maximumFractionDigits: decimalPoints})

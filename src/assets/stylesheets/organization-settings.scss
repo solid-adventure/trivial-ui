@@ -1,7 +1,7 @@
 .organization-settings {
 
 	& .p-tabview-nav {
-		& .header-tabs {
+		& .header__tabs {
 			& a {
 				font-weight: 500;
 				color: var(--primary);
@@ -152,7 +152,20 @@
 	}
 
 	&.revenue__gross {
-		width: 50%;
+		position: relative;
+		width: 40%;
+
+		& .revenue__gross__draggable {
+			min-height: 11rem;
+			background-image: url('/src/assets/images/organization-settings/dropzone-placeholder.svg');
+			background-repeat: no-repeat;
+			background-size: contain;
+			background-position: center;
+
+			&.bg-none {
+				background-image: unset;
+			}
+		}
 
 		& a {
 			padding-left: 0;
@@ -161,13 +174,26 @@
 		& .revenue__gross--icon {
 			color: var(--primary);
 
-			&.draggable {
+			&.draggable, &.number {
 				color: lightgray;
+			}
+
+			&.number {
+				justify-self: flex-start;
+				width: 1.2rem;
+				height: 1.2rem;
 			}
 		}
 
 		& .revenue__gross--title {
 			color: var(--on-surface)
+		}
+
+		& .revenue__gross__table {
+
+			& .revenue__gross__table--rowspan-cell {
+				vertical-align: top;
+			}
 		}
 	}
 
@@ -176,4 +202,15 @@
 			border-color: var(--primary) !important
 		}
 	}
+
+	& .p-accordion .p-accordion-header .p-accordion-header-link.revenue__gross__tab__action {
+		border-radius: 0px !important;
+	}
 }
+
+
+    .p-timeline-event {
+        .p-timeline-event-opposite {
+            display: none;
+        }
+    }

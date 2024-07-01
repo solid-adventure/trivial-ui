@@ -141,9 +141,11 @@
 		if (isDark.value) {
 			currentTheme = 'aura-light-green'
 			nextTheme = 'aura-dark-blue'
+			store.dispatch('getDarkTheme', isDark.value)
 		} else {
 			currentTheme = 'aura-dark-blue'
 			nextTheme = 'aura-light-green'
+			store.dispatch('getDarkTheme', isDark.value)
 		}
 
 		primeVue.changeTheme(currentTheme, nextTheme, 'theme-link')
