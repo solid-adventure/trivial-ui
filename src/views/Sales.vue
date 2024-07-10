@@ -244,7 +244,7 @@
 
 		total = await store.state.Session.apiCall('/reports/item_sum', 'POST', { register_ids: regId, start_at: new Date(start_at).toISOString(), end_at: new Date(end_at).toISOString() })
 
-		totalAmount.value = Format.money(total.count)
+		totalAmount.value = Format.money(total.count[0].value)
 
 		resetDateFilter()
 	}
