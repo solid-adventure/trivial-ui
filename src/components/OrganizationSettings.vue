@@ -1,4 +1,5 @@
 <template>
+  <!-- THIS FILE IS DEPRECATED -->
   <div class="page-container">
 
     <div class="page-inset">

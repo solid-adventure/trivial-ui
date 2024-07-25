@@ -13,11 +13,13 @@ import AccountLocked from "../components/AccountLocked.vue";
 import InstanceSettings from "../components/InstanceSettings.vue";
 import InstanceActivity from "../components/builderv2/InstanceActivity.vue";
 import Builder from "../components/builderv2/Builder.vue";
-import OrganizationSettings from "../components/OrganizationSettings.vue";
+//import OrganizationSettings from "../components/OrganizationSettings.vue";
 import OrganizationInviteUser from "../components/OrganizationInviteUser.vue";
 import Actions from "../components/Actions.vue";
 import FunctionWriter from "../components/FunctionWriter.vue";
-import Sales from "@/views/Sales.vue";
+import SalesView from "@/views/SalesView.vue";
+import DashboardView from "@/views/DashboardView.vue";
+import OrganizationSettingsView from "@/views/OrganizationsSettingsView.vue";
 import Session from "../models/Session.js";
 
 const routes = [
@@ -97,20 +99,34 @@ const routes = [
     redirect: "/settings",
     name: "Organizations",
   },
-  {
+  /*{ THIS IS DEPRICATED
     path: "/organizations/:id/edit",
     component: OrganizationSettings,
     name: "Edit",
-  },
+  },*/
   {
     path: "/organizations/:id/invitations/new",
     component: OrganizationInviteUser,
     name: "Invite User",
   },
   {
+    path: "/dashboard3",
+    component: DashboardView,
+    name: "Analytics and Real-Time Data",
+  },
+  {
+    path: "/organization-settings/:id",
+    component: OrganizationSettingsView,
+    name: "Organization Settings",
+  },
+  {
     path: "/sales",
-    component: Sales,
+    component: SalesView,
     name: "Sales",
+  },
+  {
+    path: "/organization-settings",
+    redirect: "/dashboard3",
   },
   {
     path: "/organizations/:pathMatch(.*)*",

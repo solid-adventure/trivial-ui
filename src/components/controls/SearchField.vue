@@ -28,7 +28,7 @@
 </template>
 
 <!-- Deliberately unscoped to allow icon overriddes -->
-<style lang="scss" >
+<style lang="scss" scoped>
 
 	.search-box {
 	    width: 30em;

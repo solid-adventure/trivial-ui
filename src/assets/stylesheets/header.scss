@@ -3,6 +3,7 @@ header.main__header {
     grid-template-rows: 2fr;
     padding-inline: 34px;
     padding-block: 10px;
+	box-shadow: 0 1px 10px rgba(0, 0, 0, .1);
     background-color: var(--surface);
 
     & .main__header__top {
@@ -58,4 +59,8 @@ header.main__header {
 			}
 		}
     }
+}
+
+.breadcrumb {
+	background: unset;
 }

@@ -18,13 +18,23 @@
 			</template>
 		</template>
 	</nav>
+
+	<nav class="aside__nav aside__nav--secundary">
+		<RouterLink :to="orgSettingsPath" class="aside__nav__link">
+			<div>
+				<Icon icon="fa6-solid:gear" />
+				<span>Settings</span>
+			</div>
+		</RouterLink>
+	</nav>
 </template>
 
 <script setup>
 	import { Icon } from '@iconify/vue';
 	import { RouterLink } from 'vue-router'
-	import { ref, computed } from 'vue'
+	import { ref, computed, onMounted } from 'vue'
 	import { useStore } from 'vuex'
+	import { useLocalStorage } from '@vueuse/core'
 
 	const menuItems = ref([
 		{ path: "/dashboard", title: 'Dashboard', icon: 'fa6-solid:house' },
@@ -53,10 +63,13 @@
 			]
 		},
 		//{ path: "/#", title: 'Transactions', icon: 'fa6-solid:book-open' },
-		//{ path: "/settings", title: 'Settings', icon: 'fa6-solid:gear' }
 	]),
 	store = useStore()
 
+	onMounted(() => {})
+
 	const isAppId = computed(() => store.state.app.name ? true : false)
 	const appName = computed(() => store.state.app.name)
+	const orgId = computed(() => useLocalStorage('orgId').value)
+	const orgSettingsPath = computed(() => `/organization-settings/${orgId.value}`)
 </script>

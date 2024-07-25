@@ -334,6 +334,12 @@ export default {
 </template>
 
 <style lang="scss" scoped>
+  input[type=button], button {
+    border: 0px none;
+    font-size: inherit;
+    font-weight: inherit;
+    margin: 0;
+  }
 .builder {
   /*padding-top: calc(80px + 3.625em + 1px + 1em);
   padding-right: 1em;

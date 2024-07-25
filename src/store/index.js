@@ -16,7 +16,8 @@ const store = createStore({
     currentPath: '/',
     route: null,
     user: {},
-    theme: localStorage.getItem('theme')?.toLowerCase() === 'dark' ? 'Dark' : 'Light',
+    //theme: localStorage.getItem('vueuse-color-scheme') === 'light' ? 'light' : 'dark',
+    isDarkTheme: false,
     themeLoaded: false,
     app: {},
     isAuthenticated: false,
@@ -45,7 +46,10 @@ const store = createStore({
     enableWebhookAppTrigger: import.meta.env.VITE_ENABLE_WEBHOOK_APP_TRIGGER,
     Session: Session,
     Permissions: null,
-    orgId: null
+    orgId: null,
+    registerColumns: null,
+    registerId: null,
+    staticRegisterCols: ["originated_at", "description", "amount", "units", "unique_key"]
   },
 
   getters: {
@@ -71,9 +75,20 @@ const store = createStore({
     getOrgId(state) {
       return state.orgId
     },
-
+    getRegisterId(state) {
+      return state.registerId
+    },
     getApps(state) {
       return state.apps;
+    },
+    getIsDarkTheme(state) {
+      return state.isDarkTheme;
+    },
+    getRegisterColumns(state) {
+      return state.registerColumns;
+    },
+    getStaticRegisterCols(state) {
+      return state.staticRegisterCols
     }
   },
 
@@ -207,10 +222,10 @@ const store = createStore({
       state.user = user
     },
 
-    setTheme(state, theme) {
+    /*setTheme(state, theme) {
       state.theme = theme
       localStorage.setItem('theme', theme)
-    },
+    },*/
 
     setDataSample(state, dataSample) {
       state.dataSample = dataSample
@@ -255,6 +270,16 @@ const store = createStore({
     },
     setOrgId(state, id) {
       state.orgId = id
+    },
+
+    setIsDarkTheme(state, value) {
+      state.isDarkTheme = value
+    },
+    setRegisterId(state, value) {
+      state.registerId = value
+    },
+    setRegisterColumns(state, value) {
+      state.registerColumns = value
     }
   },
 
@@ -266,6 +291,8 @@ const store = createStore({
         await dispatch('initApp', { appId })
         await dispatch('loadResources', { dispatch, router })
         await dispatch('checkURLState')
+        await dispatch('register')
+        //await dispatch('registerColumns')
       } catch (error) {
         console.error('[store][init] Error: ', error)
         notifications.error(`Failed to load apps: ${error.message}`)
@@ -275,7 +302,7 @@ const store = createStore({
     async loadProfile({ commit, state }) {
       try {
         let data = await Session.apiCall('/profile')
-        commit('setTheme', data.user.color_theme)
+        //commit('setTheme', data.user.color_theme)
         commit('setUser', data.user)
         commit('initPermissions', data.user)
       } catch (e) {
@@ -506,6 +533,19 @@ const store = createStore({
     async selectOrgId({ commit, state }, id) {
       await commit('setOrgId', id)
     },
+    async getDarkTheme({ commit, state }, value) {
+      await commit('setIsDarkTheme', value)
+    },
+    async register({ commit, state }) {
+      let registersNames = ['Sales', 'Income Account'],
+          allRegisters = await Session.apiCall('/registers'),
+          register = allRegisters.find(r => r.owner_type === 'Organization' && r.owner_id === state.orgId && registersNames.includes(r.name))
+      commit('setRegisterId', register.id)
+    },
+    async registerCols({ commit, state }) {
+      let regCols = await Session.apiCall(`/register_items/columns?register_id=${state.registerId}`)
+      commit('setRegisterColumns', regCols)
+    }
   }
 
 })
