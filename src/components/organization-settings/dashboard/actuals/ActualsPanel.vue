@@ -12,10 +12,10 @@
 						</OverlayPanel>
 					</h2>
 
-					<div class="card flex justify-content-center">
+					<!-- <div class="card flex justify-content-center">
 						<Button type="button" icon="pi pi-ellipsis-v" outlined severity="secondary" @click="toggleMenu" aria-haspopup="true" aria-controls="overlay_menu" />
 						<Menu ref="menu" id="overlay_menu" :model="menuItems" :popup="true" />
-					</div>
+					</div> -->
 				</div>
 
 				<ul class="flex flex-wrap gap-4 w-9 mt-5 p-0 actuals__list">
@@ -72,11 +72,11 @@
 						icon: 'pi pi-cog',
 						command: () => openDialog()
 					},
-					{
+					/*{
 						label: 'Audit Logs',
 						icon: 'pi pi-file',
 						command: () => openAuditLogs()
-					}
+					}*/
 				]
 			}
 		]),

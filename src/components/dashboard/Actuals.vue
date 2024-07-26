@@ -2,11 +2,11 @@
 	<Panel header="Actuals" :pt="{root: {class: 'shadow-2'}, header: {class: 'text-lg'}}">
 		<div class="flex flex-wrap justify-content-between align-items-center gap-3">
 			<template v-if="loading">
-				<Skeleton width="21rem" height="3rem"></Skeleton>
-				<Skeleton width="21rem" height="3rem"></Skeleton>
-				<Skeleton width="21rem" height="3rem"></Skeleton>
-				<Skeleton width="21rem" height="3rem"></Skeleton>
-				<Skeleton width="21rem" height="3rem"></Skeleton>
+				<Skeleton width="20rem" height="3rem"></Skeleton>
+				<Skeleton width="20rem" height="3rem"></Skeleton>
+				<Skeleton width="20rem" height="3rem"></Skeleton>
+				<Skeleton width="20rem" height="3rem"></Skeleton>
+				<Skeleton width="20rem" height="3rem"></Skeleton>
 			</template>
 			<template v-else>
 				<div v-for="(item, index) in selectedActuals" :key="index" class="actuals border-300" :class="{'border-right-1': index !== lastItem}">
