@@ -69,11 +69,11 @@
 						icon: 'pi pi-cog',
 						command: () => openDialog()
 					},
-					{
+					/*{
 						label: 'Audit Logs',
 						icon: 'pi pi-file',
 						command: () => console.log('Audit Logs')
-					}
+					}*/
 				]
 			}
 		]),

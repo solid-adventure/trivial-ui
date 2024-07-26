@@ -1,5 +1,5 @@
 <template>
-	<Dialog v-model:visible="visible" :draggable="false" modal @hide="closeModal" header="Example of Actuals" class="org-settings__dialog w-8">
+	<Dialog v-model:visible="visible" :draggable="false" modal @hide="closeModal" header="Example of Actuals" class="org-settings__dialog w-10">
 		<Actuals :selected="selected" />
 	</Dialog>
 </template>

@@ -32,10 +32,7 @@
 			{name: 'Last 7 Days Revenue', value: '$54,903', icon:'prime:arrow-down', class: 'down'},
 			{name: 'Last 30 Days Revenue', value: '$231,947', icon:'prime:arrow-up', class: 'up'},
 			{name: 'Last 90 Days Revenue', value: '$657,295', icon:'prime:arrow-up', class: 'up'},
-			{name: 'Year to Date Revenue', value: '$884,225', icon:'prime:arrow-down', class: 'down'},
-			{name: "Data Example 1", value: '$84,225', icon:'prime:arrow-down', class: 'down'},
-			{name: "Data Example 2", value: '$4,225', icon:'prime:arrow-up', class: 'up'},
-			{name: "Data Example 3", value: '$54,225', icon:'prime:arrow-down', class: 'down'}
+			{name: 'Year to Date Revenue', value: '$884,225', icon:'prime:arrow-down', class: 'down'}
 		]),
 		selectedCategories = ref([])
 

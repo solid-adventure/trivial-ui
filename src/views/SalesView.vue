@@ -67,7 +67,7 @@
 						<div class="date">{{ useFormatDate(data.originated_at, dateOptions) }}</div>
 						<div class="time">{{ useFormatDate(data.originated_at, timeOptions) }} {{ useFormatDate(data.originated_at, timeZoneOptions).split(' ')[1] }}</div>
 					</span>
-					<span v-else-if="col.field == 'amount'">{{ useFormatCurrency(data[col.field], data['units'], 2) }}</span>
+					<span v-else-if="col.field == 'amount'">{{ useFormatCurrency(data[col.field], 2, data['units']) }}</span>
 					<span v-else>{{ data[col.field] }}</span>
 				</div>
 			</template>
@@ -248,7 +248,7 @@
 
 		total = await store.state.Session.apiCall('/reports/item_sum', 'POST', { register_id: regId, start_at: dateToISOString(start_at), end_at: dateToISOString(end_at) })
 
-		totalAmount.value = useFormatCurrency(total.count[0].value, 'USD', 2)
+		totalAmount.value = useFormatCurrency(total.count[0].value, 2, 'USD')
 
 		resetDateFilter()
 	}
