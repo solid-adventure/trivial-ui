@@ -18,7 +18,7 @@
 			</template>
 			<ColumnGroup type="header">
 				<Row>
-					<Column v-for="col in groupBy" :key="col" :field="col" :header="col" sortable rowspan="3" class="capitalize" />
+					<Column v-for="col in groupBy" :key="col" :field="col" :header="col.replaceAll('_', ' ')" sortable rowspan="3" class="capitalize" />
 				</Row>
 				<Row>
 					<!-- Empty row -->
@@ -31,9 +31,7 @@
 				</Row>
 			</ColumnGroup>
 
-			<Column :field="groupBy[0]" class="w-12rem revenue__gross__table--rowspan-cell" />
-			<Column :field="groupBy[1]" class="w-12rem" />
-
+			<Column v-for="col in groupBy" :key="col" :field="col" />
 			<Column v-for="col in headerCols" :key="col" :field="col" class="text-right">
 				<template #body="slotProps">
 					{{useFormatCurrency(slotProps.data[col], 2)}}
@@ -47,7 +45,7 @@
 			</Column>
 			<ColumnGroup type="footer" frozen>
 				<Row>
-					<Column footer="Grand Total" footerStyle="text-align:left" colspan="2" />
+					<Column footer="Grand Total" footerStyle="text-align:left" :colspan="groupBy.length" />
 					<Column v-for="(item, index) in grandTotals" :key="index" :footer="useFormatCurrency(item, 2)" alignFrozen="right" :frozen="index === 'grandTotals'" class="text-right" :class="{ 'border-left-1 border-200': index === 'grandTotals' }" />
 				</Row>
 			</ColumnGroup>
@@ -82,11 +80,20 @@
 	let regId = null,
 		columns = ref([]),
 		groupBy = ref([]),
-		grandTotals = ref()
+		grandTotals = ref(),
+		dashboardChart = null,
+		dashboard = null,
+		allDashboards = null
 
 	const orgId = computed(() => store.getters.getOrgId)
 	watch(orgId, async (newVal, oldVal) => {
 		await getRegisters(newVal)
+
+		allDashboards = await getAllDashboards()
+		dashboard = getDashboard(allDashboards)
+		dashboardChart = getReportGroups(dashboard.charts)
+		setGroupBy(dashboardChart)
+
 		let grossRevenueRes = await getGrossRevenue()
 		formatGrossRevenueData(grossRevenueRes)
 	})
@@ -96,6 +103,12 @@
 
 		if (orgId.value) {
 			await getRegisters(orgId.value)
+
+			allDashboards = await getAllDashboards()
+			dashboard = getDashboard(allDashboards)
+			dashboardChart = getReportGroups(dashboard.charts)
+			setGroupBy(dashboardChart)
+
 			let grossRevenueRes = await getGrossRevenue()
 			formatGrossRevenueData(grossRevenueRes)
 			loading.value = false
@@ -121,27 +134,35 @@
 		}
 	}
 
-    const getRegisters = async orgId => {
+    const getRegisters = async organizationId => {
 		try {
 			let allRegisters = await store.state.Session.apiCall('/registers'),
-				register = allRegisters.find(r => r.owner_type === 'Organization' && r.owner_id === orgId && registersNames.includes(r.name))
+				register = allRegisters.find(r => r.owner_type === 'Organization' && r.owner_id === organizationId && registersNames.includes(r.name))
 
 			regId = register.id
-			setMetaColumns(register.meta)
+			//setMetaColumns(register.meta)
 		} catch (err) {
 			console.log(err)
 			showErrorToast('Error', 'Failed to fetch data.')
 		}
 	}
 
-    // Setting dynamic table columns headers - (register.meta)
-	const setMetaColumns = metaCols => {
-		for (let property in metaCols) {
-			columns.value.push({field: metaCols[property], header: metaCols[property].replaceAll('_', ' ')})
-		}
+	const getAllDashboards = async () => {
+		loading.value = true
 
-		groupBy.value = [columns.value[0].field, columns.value[1].field] // 1 and 2 dynamic col
+		try {
+			let res = await store.state.Session.apiCall('/dashboards')
+			loading.value = false
+			return res
+		} catch (err) {
+			console.log(err)
+			loading.value = false
+		}
+		
 	}
+	const getDashboard = data => data.dashboards.find(item => item.owner_type === 'Organization' && item.owner_id === orgId.value)
+	const getReportGroups = charts => charts.find(item => item.chart_type === 'gross_revenue')
+	const setGroupBy = data => groupBy.value = Object.keys(data.report_groups).filter(item => data.report_groups[item])
 
     const abbreviateMonth = month => {
         const months = {
@@ -159,6 +180,7 @@
 	    data?.count.forEach(item => {
 	        const dynamicColOne = item.group[0], // dynamic col first
 	        	dynamicColTwo = item.group[1], // dynamic col second
+	        	dynamicColTree = item.group[2], // dynamic col tree
 	        	month = item.period.split(" ")[0],
 	        	value = parseFloat(item.value)
 
@@ -174,6 +196,7 @@
 
 	            groupedData[dynamicColOne][dynamicColTwo][groupBy.value[0]] = dynamicColOne
 	            groupedData[dynamicColOne][dynamicColTwo][groupBy.value[1]] = dynamicColTwo
+	            groupedData[dynamicColOne][dynamicColTwo][groupBy.value[2]] = dynamicColTree
 	        }
 
 	        groupedData[dynamicColOne][dynamicColTwo].headers.push(abbreviateMonth(month))

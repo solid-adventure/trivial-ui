@@ -31,7 +31,7 @@
 
 		<draggable class="list-group" :list="groupsColumn" group="id" @change="log" itemKey="id">
 			<template #item="{ element, index }"> 
-				<Accordion class="border-top-1 border-200" :class="{'border-bottom-1': (index === groupsColumn.length - 1)}">
+				<Accordion class="border-top-1 border-200" :class="{'border-bottom-1': (index === groupsColumnArr.length - 1)}">
 					<AccordionTab :pt="{header: {class: 'revenue__gross'}}">
 						<template #header>
 							<div class="flex column-gap-2 align-items-center">
@@ -63,14 +63,11 @@
 	import draggable from "vuedraggable"
 	import { ref, watch, computed, onMounted, toRaw } from "vue"
 	import { Icon } from '@iconify/vue'
-	import { useToastNotifications } from '@/composable/toastNotification'
-	import { useStore } from 'vuex'
 
-	const props = defineProps(['visible'])
+	const props = defineProps(['visible', 'groupsColumnArr'])
 	const emit = defineEmits(['closeModal', 'saveSelected'])
 
 	const visible = ref(false),
-		{ showSuccessToast, showErrorToast, showInfoToast } = useToastNotifications(),
 		groupsColumn = ref([
 			/*{id: 1, name: 'Customer Type', values: ['Retail', 'Wholesale', 'Services'], type: 'String', selectedValues: ['Retail', 'Wholesale', 'Services']},
 			{id: 2, name: 'Location', values: ['Location 1', 'Location 2', 'Location 3'], type: 'String', selectedValues: ['Location 1', 'Location 2', 'Location 3']},
@@ -80,54 +77,44 @@
 			{id: 6, name: 'My Column 3', values: ['Some value 1', 'Some value 2', 'Some value 3'], type: 'Strign', selectedValues: ['Some value 1', 'Some value 2', 'Some value 3']}*/
 		]),
 		reportingGroups = ref([]),
-		reportingGroupsLimit = 3,
-		store = useStore()
+		reportingGroupsLimit = 3
 
 
-	watch(props, newVal => visible.value = newVal.visible)
+	watch(() => props.visible, newVal => visible.value = newVal)
+	watch(() => props.groupsColumnArr, newVal => groupsColumn.value = newVal)
 	const isDraggableDisabled = computed(() => reportingGroups.value.length === reportingGroupsLimit)
 	const reportingGroupsCountTxt = computed(() => `(${reportingGroupsLength.value} of 3)`)
 	const reportingGroupsLength = computed(() => reportingGroups.value.length)
-	const registerCols = computed(() => store.getters.getRegisterColumns)
-	const staticRegisterCols = computed(() => store.getters.getStaticRegisterCols)
 
 	onMounted(async () => {
 		//setSelectedReportingGropus()
-		await setGroupsColumn()
+		groupsColumn.value = props.groupsColumnArr
 	})
 
 	const setSelectedReportingGropus = () => {
 		reportingGroups.value = [...props.selected]
 	}
 
-	const setGroupsColumn = async () => {
-		await store.dispatch('register')
-		await store.dispatch('registerCols')
-
-		let dynamicRegisterCols = registerCols.value.filter(item => !staticRegisterCols.value.includes(item))
-
-		dynamicRegisterCols.forEach((item, index) => {
-			let tempGroupsCol = {id: '', name: '', values: ['Retail', 'Wholesale', 'Services'], type: 'String', selectedValues: ['Retail', 'Wholesale', 'Services']}
-			tempGroupsCol.id = index
-			tempGroupsCol.name = item.replaceAll('_', ' ')
-			groupsColumn.value.push(tempGroupsCol)
-		})
-	}
-
 	const saveSelected = () => {
-		// Send data to the API and save to DB
+		// Update data to gross revenue section (in memory)
 
-		// Update data to actual section (in memory)
-		emit('saveSelected', reportingGroups.value)
+
+		console.log('reportingGroups.value - ', reportingGroups.value)
+		console.log('groupsColumn.value - ', groupsColumn.value)
+
+		let selectedCols = []
+
+		reportingGroups.value.forEach(item => selectedCols.push({name: item.name, type: item.type, selectedValues: item.selectedValues, key: item.key, selected: true}))
+		groupsColumn.value.forEach(item => selectedCols.push({name: item.name, type: item.type, selectedValues: item.selectedValues, key: item.key, selected: false}))
+
+		emit('saveSelected', selectedCols)
 
 		closeModal()
+		selectedCols = []
 	}
 
 	const resetDraggableItems = () => {
-		let reportingGroupsSelected = toRaw(reportingGroups.value),
-			groupsColumnRemaining = toRaw(groupsColumn.value)
-
-		groupsColumn.value = [...reportingGroupsSelected, ...groupsColumnRemaining]
+		groupsColumn.value = [...reportingGroups.value, ...groupsColumn.value]
 		reportingGroups.value = []
 	}
 
