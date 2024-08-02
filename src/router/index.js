@@ -13,7 +13,7 @@ import AccountLocked from "../components/AccountLocked.vue";
 import InstanceSettings from "../components/InstanceSettings.vue";
 import InstanceActivity from "../components/builderv2/InstanceActivity.vue";
 import Builder from "../components/builderv2/Builder.vue";
-//import OrganizationSettings from "../components/OrganizationSettings.vue";
+import OrganizationSettings from "../components/OrganizationSettings.vue"; //THIS IS DEPRICATED FILE
 import OrganizationInviteUser from "../components/OrganizationInviteUser.vue";
 import Actions from "../components/Actions.vue";
 import FunctionWriter from "../components/FunctionWriter.vue";
@@ -99,11 +99,11 @@ const routes = [
     redirect: "/settings",
     name: "Organizations",
   },
-  /*{ THIS IS DEPRICATED
-    path: "/organizations/:id/edit",
+  { 
+    path: "/organizations/:id/edit", //THIS IS DEPRICATED ROUTE
     component: OrganizationSettings,
     name: "Edit",
-  },*/
+  },
   {
     path: "/organizations/:id/invitations/new",
     component: OrganizationInviteUser,

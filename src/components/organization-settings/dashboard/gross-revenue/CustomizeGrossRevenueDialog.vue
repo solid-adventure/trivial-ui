@@ -91,17 +91,9 @@
 		groupsColumn.value = props.groupsColumnArr
 	})
 
-	const setSelectedReportingGropus = () => {
-		reportingGroups.value = [...props.selected]
-	}
+	const setSelectedReportingGropus = () => reportingGroups.value = [...props.selected]
 
 	const saveSelected = () => {
-		// Update data to gross revenue section (in memory)
-
-
-		console.log('reportingGroups.value - ', reportingGroups.value)
-		console.log('groupsColumn.value - ', groupsColumn.value)
-
 		let selectedCols = []
 
 		reportingGroups.value.forEach(item => selectedCols.push({name: item.name, type: item.type, selectedValues: item.selectedValues, key: item.key, selected: true}))

@@ -1,6 +1,6 @@
 <template>
 	<div class="flex flex-column row-gap-4 dashboard">
-		<Actuals :selected="selectedActuals" />
+		<Actuals />
 		<!--<Forecast :selected="selectedForecast" /> -->
 
 		<Divider class="my-1" />
@@ -42,13 +42,6 @@
 	import RevenuePerHour from '@/components/dashboard/RevenuePerHour.vue'
 
 	const store = useStore(),
-	selectedActuals = ref([
-		{name: 'Last Day Revenue', value: '$6,885', icon:'prime:arrow-up', class: 'up'},
-		{name: 'Last 7 Days Revenue', value: '$54,903', icon:'prime:arrow-down', class: 'down'},
-		{name: 'Last 30 Days Revenue', value: '$231,947', icon:'prime:arrow-up', class: 'up'},
-		{name: 'Last 90 Days Revenue', value: '$657,295', icon:'prime:arrow-up', class: 'up'},
-		{name: 'Year to Date Revenue', value: '$884,225', icon:'prime:arrow-down', class: 'down'}
-	]),
 	selectedForecast = ref([
 		{name: 'Last 7 Days x 30 x 12 Fcst', value: '$54,903', icon:'prime:arrow-down', class: 'down'},
 		{name: 'Last 30 Days x 12 Fcst', value: '$231,947', icon:'prime:arrow-up', class: 'up'},
@@ -496,27 +489,4 @@
             }
         ]
     }
-
-
-    onMounted(() => {
-    	//getAllDashboardCharts()
-    })
-
-    /*const getGrossRevenue = () => {
-
-		try {
-			allRegisters = await store.state.Session.apiCall('/registers')
-			let register = allRegisters.find(r => r.owner_type === 'Organization' && r.owner_id === orgId && registersNames.includes(r.name))
-
-			if (!register) regId = register.id
-		} catch (err) {
-			console.log(err)
-    	}
-	}*/
-
-	const getAllDashboardCharts = async () => {
-		let res = await store.state.Session.apiCall('/dashboards/9/charts')
-
-		console.log('RES - ', res)
-	}
 </script>

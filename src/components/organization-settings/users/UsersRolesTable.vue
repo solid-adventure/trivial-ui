@@ -35,7 +35,7 @@
 			</Column>
 			<Column class="org-settings__table__action">
 				<template #body="{ data, field }">
-					<Button v-if="data.canBeRemoved" icon="pi pi-trash" severity="danger" @click="emit('openDeleteUserModal', data)" text rounded aria-label="Delete" />
+					<Button v-if="data.canBeRemoved" :disabled="lastAdmin" icon="pi pi-trash" severity="danger" @click="emit('openDeleteUserModal', data)" text rounded aria-label="Delete" />
 				</template>
 			</Column>
 
@@ -71,7 +71,7 @@
 	const organizationName = computed(() => usersRolesData.value.name)
     const isOrganizationDeletable = computed(() => usersRolesData.value.length === 1)
 	const lastAdmin = computed(() => usersRolesData.value.users.filter(user => user.role == 'admin').length == 1)
-	const currentUserRole = computed(() => usersRolesData.value.users.find(user => user.user_id === store.state.user.id)?.role)
+	const currentUserRole = computed(() => usersRolesData.value.users.find(user => user.id === store.state.user.id)?.role)
 	const isUsersRolesData = computed(() => !usersRolesData.value?.id)
 
 	watch(() => props.organization, (newVal, oldVal) => setUsersRolesData(newVal))

@@ -22,17 +22,17 @@
 
 				<h3 class="font-medium">Reporting Groups <span class="text-muted">{{ reportingGroupsCountTxt }}</span></h3>
 
-				<div v-if="reportingGroupsLength == 0" class="flex justify-content-center align-items-center mt-3 gap-3">
+				<div v-if="loading">
+					<Skeleton height="3.375rem" class="mb-2" borderRadius=".25rem" />
+					<Skeleton height="3.375rem" class="mb-2" borderRadius=".25rem" />
+					<Skeleton height="3.375rem" class="mb-2" borderRadius=".25rem" />
+				</div>
+				<div v-else-if="reportingGroupsLength == 0" class="flex justify-content-center align-items-center mt-5 gap-3">
 					<Icon icon="lets-icons:folder-add-light" class="w-4rem text-muted" />
 					<div class="w-6">
 						<h3 class="m-0 font-semibold">Enhance Your Insights: Add Columns for Gross Revenue</h3>
 						<p class="mt-1 mb-0 text-sm text-muted">Tailor your data to your specific needs and leverage <br /> comprehensive insights to inform your decisions.</p>
 					</div>
-				</div>
-				<div v-else-if="loading">
-					<Skeleton height="3.375rem" class="mb-2" borderRadius=".25rem" />
-					<Skeleton height="3.375rem" class="mb-2" borderRadius=".25rem" />
-					<Skeleton height="3.375rem" class="mb-2" borderRadius=".25rem" />
 				</div>
 				<Accordion v-else> <!-- :activeIndex="0" -->
 					<AccordionTab v-for="(tab, index) in selected" :key="index" :pt="{header: {class: 'revenue__gross'}}">
@@ -57,7 +57,8 @@
 			<div class="flex flex-column justify-content-end align-items-end">
 				<Button label="View Example" severity="info" text :pt="{label: {class: 'font-semibold'}}" @click="openExampleDialog" class="mb-2" />
 
-				<Image :src="thumbnailImgPreview" alt="Gross Revenue small preview" width="356" class="mx-auto" />
+				<Skeleton v-if="!thumbnailImgPreview" height="20rem" borderRadius=".25rem" />
+				<Image v-else :src="thumbnailImgPreview" alt="Gross Revenue small preview" width="356" class="mx-auto" />
 			</div>
 		</Panel>
 	</div>
@@ -69,6 +70,7 @@
 
 <script setup>
 	import { ref, computed, watch, onMounted } from 'vue'
+	import { useStorage } from '@vueuse/core'
 	import { useStore } from 'vuex'
 	import { Icon } from '@iconify/vue'
 	import { useToastNotifications } from '@/composable/toastNotification'
@@ -145,6 +147,12 @@
 	const updateSelectedRG = async data => {
 		selected.value = data.filter(item => item.selected)
 
+		let grColsOrder = []
+
+		selected.value.forEach(item => grColsOrder.push(item.name.replaceAll(' ', '_')))
+
+		localStorage.setItem('grColsOrder', JSON.stringify(grColsOrder))
+
 		data.forEach(item => reportGroupsChartObj.report_groups[item.key] = item.selected)
 
 		try {
@@ -176,7 +184,7 @@
 		let groupsColsArr = []
 
 		Object.keys(chart.report_groups).forEach((item, index) => {
-			let groupsCol = {id: '', name: '', values: ['Retail', 'Wholesale', 'Services'], type: 'String', selectedValues: ['Retail', 'Wholesale', 'Services']}
+			let groupsCol = {id: '', name: '', values: [], type: 'String', selectedValues: []}
 			groupsCol.id = index,
 			groupsCol.key = item,
 			groupsCol.name = item.replaceAll('_', ' ')
@@ -186,11 +194,17 @@
 		return groupsColsArr
 	}
 	const setSelectedRGCols = () => {
-		let selectedColsArr = []
+		const orderMap = {}
+		let selectedColsArr = [],
+			orderArray = JSON.parse(localStorage.getItem('grColsOrder'))
 
 		Object.keys(dashboardChart.report_groups).forEach(item => { 
-			if (dashboardChart.report_groups[item]) selectedColsArr.push({ name: item.replaceAll('_', ' ') })
+			if (dashboardChart.report_groups[item]) selectedColsArr.push({ key: item, name: item.replaceAll('_', ' ') })
 		})
+
+		orderArray.forEach((item, index) => orderMap[item] = index)
+
+		selectedColsArr.sort((a, b) => orderMap[a.key] - orderMap[b.key])
 
 		return selectedColsArr
 	}

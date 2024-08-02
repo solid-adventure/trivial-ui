@@ -54,8 +54,9 @@
 </template>
 
 <script setup>
-	import { ref, onMounted, computed, watch } from "vue"
+	import { ref, onMounted, computed, watch, toRaw } from "vue"
 	import { useStore } from 'vuex'
+	import { useStorage } from '@vueuse/core'
 	import { Icon } from '@iconify/vue'
 	import { useFormatCurrency } from '@/composable/formatCurrency.js'
 	import loadingImg from '@/assets/images/trivial-loading-optimized.webp'
@@ -140,7 +141,6 @@
 				register = allRegisters.find(r => r.owner_type === 'Organization' && r.owner_id === organizationId && registersNames.includes(r.name))
 
 			regId = register.id
-			//setMetaColumns(register.meta)
 		} catch (err) {
 			console.log(err)
 			showErrorToast('Error', 'Failed to fetch data.')
@@ -162,7 +162,13 @@
 	}
 	const getDashboard = data => data.dashboards.find(item => item.owner_type === 'Organization' && item.owner_id === orgId.value)
 	const getReportGroups = charts => charts.find(item => item.chart_type === 'gross_revenue')
-	const setGroupBy = data => groupBy.value = Object.keys(data.report_groups).filter(item => data.report_groups[item])
+	const setGroupBy = data => {
+		const orderMap = {}
+		let orderArray = JSON.parse(localStorage.getItem('grColsOrder'))
+		
+		orderArray.forEach((item, index) => orderMap[item] = index)
+		groupBy.value = Object.keys(data.report_groups).filter(item => data.report_groups[item]).sort((a, b) => orderMap[a] - orderMap[b])
+	}
 
     const abbreviateMonth = month => {
         const months = {
@@ -175,14 +181,17 @@
 
 	const formatGrossRevenueData = data => {
 	    let formattedData = [],
-	    	groupedData = {}
+	    	groupedData = {},
+	    	headers = []
 
 	    data?.count.forEach(item => {
-	        const dynamicColOne = item.group[0], // dynamic col first
-	        	dynamicColTwo = item.group[1], // dynamic col second
-	        	dynamicColTree = item.group[2], // dynamic col tree
-	        	month = item.period.split(" ")[0],
-	        	value = parseFloat(item.value)
+	        const dynamicColOne = item?.group[0], // dynamic col first
+	        	dynamicColTwo = item?.group[1], // dynamic col second
+	        	dynamicColTree = item?.group[2], // dynamic col tree
+	        	month = item?.period.split(" ")[0],
+	        	value = parseFloat(item?.value)
+	        
+	        if (!headers.includes(abbreviateMonth(month))) headers.push(abbreviateMonth(month))
 
 	        if (!groupedData[dynamicColOne]) {
 	            groupedData[dynamicColOne] = {}
@@ -194,15 +203,16 @@
 	                headers: []
 	            }
 
-	            groupedData[dynamicColOne][dynamicColTwo][groupBy.value[0]] = dynamicColOne
-	            groupedData[dynamicColOne][dynamicColTwo][groupBy.value[1]] = dynamicColTwo
-	            groupedData[dynamicColOne][dynamicColTwo][groupBy.value[2]] = dynamicColTree
+	            groupedData[dynamicColOne][dynamicColTwo][groupBy?.value[0]] = dynamicColOne
+	            groupedData[dynamicColOne][dynamicColTwo][groupBy?.value[1]] = dynamicColTwo
+	            groupedData[dynamicColOne][dynamicColTwo][groupBy?.value[2]] = dynamicColTree
 	        }
 
 	        groupedData[dynamicColOne][dynamicColTwo].headers.push(abbreviateMonth(month))
 
 	        groupedData[dynamicColOne][dynamicColTwo][abbreviateMonth(month)] = value
 	        groupedData[dynamicColOne][dynamicColTwo].grandTotal += value
+
 	    })
 
 	    Object.keys(groupedData).forEach(dynColOneItem => {
@@ -211,7 +221,8 @@
 	        })
 	    })
 
-	    headerCols.value = formattedData[0].headers
+	    //headerCols.value = [... new Set(formattedData[0].headers)]
+	    headerCols.value = headers
 	    calculateColumnTotals(formattedData)
 
 	    grossRevenue.value = formattedData
