@@ -1,6 +1,6 @@
 <template>
 	<div class="flex flex-column row-gap-4 dashboard">
-		<Actuals :selected="selectedActuals" />
+		<Actuals />
 		<!--<Forecast :selected="selectedForecast" /> -->
 
 		<Divider class="my-1" />
@@ -9,9 +9,9 @@
 		<!--<RevenueWalk :revenueWalk="rwData" />
 		<CashImpacts :cashImpacts="ciData" />-->
 
-		<!--<Divider class="my-1" />
+		<!--<Divider class="my-1" />-->
 
-		<div class="flex flex-wrap gap-3">
+		<!--<div class="flex flex-wrap gap-3">
 			<TheChart :headerTitle="'Revenue Over Time Location (Month)'" :chartDataSet="barChart1" :chartType="'bar'" :max="'200000'" :stepSize="'50000'" :width="'w-50'" />
 			<TheChart :headerTitle="'Revenue Over Time Location ($)'" :chartDataSet="lineChart" :chartType="'line'" :max="'10000'" :stepSize="'2000'" :width="'w-50'" />
 			<TheChart :headerTitle="'Revenue Over Time Type (Month)'" :chartDataSet="barChart2" :chartType="'bar'" :max="'200000'" :stepSize="'50000'" :width="'w-50'" />
@@ -21,9 +21,9 @@
 		<div class="flex flex-wrap gap-3">
 			<TheDoughnutChart :headerTitle="'Location Contributor Yeat to Date'" :chartDataSet="doughnutChart1" :chartType="'doughnut'" :width="'w-30'" />
 			<TheDoughnutChart :headerTitle="'Channel Contributor Yeat to Date'" :chartDataSet="doughnutChart2" :chartType="'doughnut'" :yTicks="'%'" :width="'w-30'" />
-		</div>
+		</div>-->
 
-		<Divider class="my-1" />
+		<!--<Divider class="my-1" />
 
 		<RevenuePerHour />-->
 	</div>
@@ -31,6 +31,7 @@
 
 <script setup>
 	import { ref, onMounted } from 'vue'
+	import { useStore } from 'vuex'
 	import Actuals from '@/components/dashboard/Actuals.vue'
 	import Forecast from '@/components/dashboard/Forecast.vue'
 	import GrossRevenue from '@/components/dashboard/GrossRevenue.vue'
@@ -40,13 +41,7 @@
 	import TheDoughnutChart from '@/components/dashboard/TheDoughnutChart.vue'
 	import RevenuePerHour from '@/components/dashboard/RevenuePerHour.vue'
 
-	const selectedActuals = ref([
-		{name: 'Last Day Revenue', value: '$6,885', icon:'prime:arrow-up', class: 'up'},
-		{name: 'Last 7 Days Revenue', value: '$54,903', icon:'prime:arrow-down', class: 'down'},
-		{name: 'Last 30 Days Revenue', value: '$231,947', icon:'prime:arrow-up', class: 'up'},
-		{name: 'Last 90 Days Revenue', value: '$657,295', icon:'prime:arrow-up', class: 'up'},
-		{name: 'Year to Date Revenue', value: '$884,225', icon:'prime:arrow-down', class: 'down'}
-	]),
+	const store = useStore(),
 	selectedForecast = ref([
 		{name: 'Last 7 Days x 30 x 12 Fcst', value: '$54,903', icon:'prime:arrow-down', class: 'down'},
 		{name: 'Last 30 Days x 12 Fcst', value: '$231,947', icon:'prime:arrow-up', class: 'up'},
@@ -494,21 +489,4 @@
             }
         ]
     }
-
-
-    onMounted(() => {
-
-    })
-
-    /*const getGrossRevenue = () => {
-
-		try {
-			allRegisters = await store.state.Session.apiCall('/registers')
-			let register = allRegisters.find(r => r.owner_type === 'Organization' && r.owner_id === orgId && registersNames.includes(r.name))
-
-			if (!register) regId = register.id
-		} catch (err) {
-			console.log(err)
-    	}
-	}*/
 </script>
