@@ -110,8 +110,8 @@
 
 	const deleteUser = async userData => {
 		try{
-			await store.state.Session.apiCall(`/organizations/${orgId.value}/delete_org_role?user_id=${userData.user_id}`, 'DELETE')
-			organization.value.users = toRaw(organization.value.users).filter(item => item.user_id != userData.user_id)
+			await store.state.Session.apiCall(`/organizations/${orgId.value}/delete_org_role?user_id=${userData.id}`, 'DELETE')
+			organization.value.users = toRaw(organization.value.users).filter(item => item.id != userData.id)
 			showSuccessToast('Success', 'Successfully deleted User.')
 		} catch(error){
 			showErrorToast('Error', `Failed to delete user: ${error.message}`)
