@@ -67,10 +67,7 @@
 			display: flex;
 			justify-content: center;
 			align-items: center;
-			max-width: 100%;
 			width: 100%;
-			min-height: 60px;
-			max-height: 230px;
 			padding: 6px;
 			box-sizing: border-box;
 			transition: all 600ms ease-in-out;
@@ -80,7 +77,6 @@
 				display: flex;
 				justify-content: center;
 				align-items: center;
-				width: 85%;
 
 				& img {
 					display: inline-block;

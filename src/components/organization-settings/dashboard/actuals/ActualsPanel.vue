@@ -81,11 +81,11 @@
 			}
 		]),
 		selected = ref([
-			{name: 'Last Day Revenue', value: '$6,885', icon:'prime:arrow-up', class: 'up'},
-			{name: 'Last 7 Days Revenue', value: '$54,903', icon:'prime:arrow-down', class: 'down'},
-			{name: 'Last 30 Days Revenue', value: '$231,947', icon:'prime:arrow-up', class: 'up'},
-			{name: 'Last 90 Days Revenue', value: '$657,295', icon:'prime:arrow-up', class: 'up'},
-			{name: 'Year to Date Revenue', value: '$884,225', icon:'prime:arrow-down', class: 'down'}
+			{ key: 'last1DayData', name: 'Last Day Revenue', value: null, icon: null, class: null },
+			{ key: 'last7DaysData', name: 'Last 7 Days Revenue', value: null, icon: null, class: null },
+			{ key: 'last1MonthsData', name: 'Last 30 Days Revenue', value: null, icon: null, class: null },
+			{ key: 'last3MonthsData', name: 'Last 90 Days Revenue', value: null, icon: null, class: null },
+			{ key: 'last1YearData', name: 'Year to Date Revenue', value: null, icon: null, class: null }
 		]),
 		store = useStore(),
 		thumbnailImgPreview = ref(null)
