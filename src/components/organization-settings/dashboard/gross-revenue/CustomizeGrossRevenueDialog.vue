@@ -29,7 +29,7 @@
 
 		<h4 class="my-5 font-normal font-semibold">My Groups</h4>
 
-		<draggable class="list-group" :list="groupsColumn" group="id" @change="log" itemKey="id">
+		<draggable v-if="groupsColumn" class="list-group" :list="groupsColumn" group="id" @change="log" itemKey="id">
 			<template #item="{ element, index }"> 
 				<Accordion class="border-top-1 border-200" :class="{'border-bottom-1': (index === groupsColumnArr.length - 1)}">
 					<AccordionTab :pt="{header: {class: 'revenue__gross'}}">
@@ -51,6 +51,9 @@
 				</Accordion>
 			</template>
 		</draggable>
+		<div v-else>
+			<h4 class="font-normal font-semibold">Please select organization.</h4>
+		</div>
 
 		<div class="flex justify-content-end gap-2 mt-5">
 			<Button type="button" label="Cancel" text @click="closeModal" class="modal__cancel--btn" :pt="{label: {class: 'font-semibold'}}" />
@@ -97,7 +100,10 @@
 		let selectedCols = []
 
 		reportingGroups.value.forEach(item => selectedCols.push({name: item.name, type: item.type, selectedValues: item.selectedValues, key: item.key, selected: true}))
-		groupsColumn.value.forEach(item => selectedCols.push({name: item.name, type: item.type, selectedValues: item.selectedValues, key: item.key, selected: false}))
+
+		if (groupsColumn.value) {
+			groupsColumn.value.forEach(item => selectedCols.push({name: item.name, type: item.type, selectedValues: item.selectedValues, key: item.key, selected: false}))
+		}
 
 		emit('saveSelected', selectedCols)
 
@@ -106,8 +112,10 @@
 	}
 
 	const resetDraggableItems = () => {
-		groupsColumn.value = [...reportingGroups.value, ...groupsColumn.value]
-		reportingGroups.value = []
+		if (groupsColumn.value) {
+			groupsColumn.value = [...reportingGroups?.value, ...groupsColumn?.value]
+			reportingGroups.value = []
+		}
 	}
 
 	const closeModal = () => {

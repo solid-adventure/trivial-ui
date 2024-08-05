@@ -10,15 +10,20 @@
 				</div>
 			</template>
 			<template #empty>
-				No revenues found.
+				<h4 class="font-medium">No Gross Revenue data found.</h4>
 			</template>
 			<template #loading>
 				<Image :src="loadingImg" alt="Loader" width="160" />
 				<h3>Loading ...</h3>
 			</template>
-			<ColumnGroup type="header">
+			<ColumnGroup type="header" v-if="grossRevenue.length">
 				<Row>
-					<Column v-for="col in groupBy" :key="col" :field="col" :header="col.replaceAll('_', ' ')" sortable rowspan="3" class="capitalize" />
+					<template v-if="groupBy.length">
+						<Column v-for="col in groupBy" :key="col" :field="col" :header="col.replaceAll('_', ' ')" sortable rowspan="3" class="capitalize" />
+					</template>
+					<template v-else>
+						<Column header="All" rowspan="3" />
+					</template>
 				</Row>
 				<Row>
 					<!-- Empty row -->
@@ -27,11 +32,17 @@
 				</Row>
 				<Row>
 					<Column v-for="col in headerCols" :key="col" :field="col" :header="col" sortable class="month__col capitalize" />
-					<Column header="Grand Total" frozen alignFrozen="right" sortable field="grandTotal" class="border-left-1 border-top-1 border-200 month__col" />
+					<Column v-if="grossRevenue.length" header="Grand Total" frozen alignFrozen="right" sortable field="grandTotal" class="border-left-1 border-top-1 border-200 month__col" />
 				</Row>
 			</ColumnGroup>
 
-			<Column v-for="col in groupBy" :key="col" :field="col" />
+			<template v-if="groupBy.length">
+				<Column v-for="col in groupBy" :key="col" :field="col" />
+			</template>
+			<template v-else>
+				<Column field="All" />
+			</template>
+
 			<Column v-for="col in headerCols" :key="col" :field="col" class="text-right">
 				<template #body="slotProps">
 					{{useFormatCurrency(slotProps.data[col], 2)}}
@@ -43,7 +54,7 @@
 					{{useFormatCurrency(slotProps.data.grandTotal, 2)}}
 				</template>
 			</Column>
-			<ColumnGroup type="footer" frozen>
+			<ColumnGroup v-if="grossRevenue.length" type="footer" frozen>
 				<Row>
 					<Column footer="Grand Total" footerStyle="text-align:left" :colspan="groupBy.length" />
 					<Column v-for="(item, index) in grandTotals" :key="index" :footer="useFormatCurrency(item, 2)" alignFrozen="right" :frozen="index === 'grandTotals'" class="text-right" :class="{ 'border-left-1 border-200': index === 'grandTotals' }" />
@@ -72,53 +83,55 @@
 			]),*/
 			loading = ref(false),
 			store = useStore(),
-			grossRevenue = ref([]),
 			registersNames = ['Sales', 'Income Account'],
 			selectOrgMsgInfo = 'Please, select an organization.',
 			{ showSuccessToast, showErrorToast, showInfoToast } = useToastNotifications(),
 			headerCols = ref([])
 
 	let regId = null,
-		columns = ref([]),
 		groupBy = ref([]),
 		grandTotals = ref(),
+		grossRevenue = ref([]),
 		dashboardChart = null,
 		dashboard = null,
 		allDashboards = null
 
 	const orgId = computed(() => store.getters.getOrgId)
-	watch(orgId, async (newVal, oldVal) => {
-		await getRegisters(newVal)
+	watch(orgId, (newVal, oldVal) => grossRevenueInit(newVal))
 
-		allDashboards = await getAllDashboards()
-		dashboard = getDashboard(allDashboards)
-		dashboardChart = getReportGroups(dashboard.charts)
-		setGroupBy(dashboardChart)
-
-		let grossRevenueRes = await getGrossRevenue()
-		formatGrossRevenueData(grossRevenueRes)
+	onMounted(() => {
+		grossRevenueInit(orgId.value)
 	})
 
-	onMounted(async () => {
+	const grossRevenueInit = async id => {
 		loading.value = true
+		
+		if (id === null) {
+			showInfoToast('Info', selectOrgMsgInfo, 3000)
+			grossRevenue.value = []
+			loading.value = false
+			return
+		}
 
-		if (orgId.value) {
-			await getRegisters(orgId.value)
+		if (id) {
+			await getRegisters(id)
 
 			allDashboards = await getAllDashboards()
 			dashboard = getDashboard(allDashboards)
-			dashboardChart = getReportGroups(dashboard.charts)
-			setGroupBy(dashboardChart)
 
-			let grossRevenueRes = await getGrossRevenue()
-			formatGrossRevenueData(grossRevenueRes)
+			if (dashboard) {
+				dashboardChart = getReportGroups(dashboard?.charts)
+				setGroupBy(dashboardChart)
+				await getGrossRevenue()
+			}
+
 			loading.value = false
 		}
-	})
+
+		loading.value = false
+	}
 
 	const getGrossRevenue = async () => {
-		loading.value = true
-
 		let total = null
 		const timezone = 'Etc/GMT+5', // Etc/GMT+5 -> Not support DST | 'America/Detroit' -> support DST | More info at https://appler.dev/time-zone-table
 			end_at = moment.tz(timezone).format(),
@@ -126,16 +139,17 @@
 			group_by_period = 'month'
 
 		try {
-			total = await store.state.Session.apiCall('/reports/item_sum', 'POST', { register_id: regId, start_at, end_at, group_by_period, timezone, group_by: groupBy.value })
-			return total
+			total = await store.state.Session.apiCall('/reports/item_sum', 'POST', { register_id: regId, start_at, end_at, group_by_period, timezone, group_by: toRaw(groupBy.value) })
+
+			formatGrossRevenueData(total)
 		} catch (err) {
 			console.log(err)
 		} finally {
-			loading.value = false
+			return
 		}
 	}
 
-    const getRegisters = async organizationId => {
+	const getRegisters = async organizationId => {
 		try {
 			let allRegisters = await store.state.Session.apiCall('/registers'),
 				register = allRegisters.find(r => r.owner_type === 'Organization' && r.owner_id === organizationId && registersNames.includes(r.name))
@@ -148,84 +162,83 @@
 	}
 
 	const getAllDashboards = async () => {
-		loading.value = true
-
 		try {
 			let res = await store.state.Session.apiCall('/dashboards')
-			loading.value = false
 			return res
 		} catch (err) {
 			console.log(err)
-			loading.value = false
 		}
 		
 	}
 	const getDashboard = data => data.dashboards.find(item => item.owner_type === 'Organization' && item.owner_id === orgId.value)
-	const getReportGroups = charts => charts.find(item => item.chart_type === 'gross_revenue')
+	const getReportGroups = charts => charts.find(item => item.chart_type === 'table') // gross_revenue
 	const setGroupBy = data => {
 		const orderMap = {}
-		let orderArray = JSON.parse(localStorage.getItem('grColsOrder'))
-		
+		let orderArray = JSON.parse(localStorage.getItem('grColsOrder')) || []
+
 		orderArray.forEach((item, index) => orderMap[item] = index)
 		groupBy.value = Object.keys(data.report_groups).filter(item => data.report_groups[item]).sort((a, b) => orderMap[a] - orderMap[b])
 	}
-
-    const abbreviateMonth = month => {
-        const months = {
-            "Jan": "jan", "Feb": "feb", "Mar": "mar", "Apr": "apr", 
-            "May": "may", "Jun": "jun", "Jul": "jul", "Aug": "aug", 
-            "Sep": "sep", "Oct": "oct", "Nov": "nov", "Dec": "dec"
-        }
-        return months[month]
-    }
+	const abbreviateMonth = month => {
+		const months = {
+			"Jan": "jan", "Feb": "feb", "Mar": "mar", "Apr": "apr", 
+			"May": "may", "Jun": "jun", "Jul": "jul", "Aug": "aug", 
+			"Sep": "sep", "Oct": "oct", "Nov": "nov", "Dec": "dec"
+		}
+		return months[month]
+	}
 
 	const formatGrossRevenueData = data => {
-	    let formattedData = [],
-	    	groupedData = {},
-	    	headers = []
+		let formattedData = [],
+			groupedData = {},
+			headers = []
 
-	    data?.count.forEach(item => {
-	        const dynamicColOne = item?.group[0], // dynamic col first
-	        	dynamicColTwo = item?.group[1], // dynamic col second
-	        	dynamicColTree = item?.group[2], // dynamic col tree
-	        	month = item?.period.split(" ")[0],
-	        	value = parseFloat(item?.value)
-	        
-	        if (!headers.includes(abbreviateMonth(month))) headers.push(abbreviateMonth(month))
+		data?.count.forEach(item => {
+			let dynamicColOne = null, // dynamic col first
+				dynamicColTwo = null, // dynamic col second
+				dynamicColTree = null, // dynamic col tree
+				month = item?.period.split(" ")[0],
+				value = parseFloat(item?.value)
 
-	        if (!groupedData[dynamicColOne]) {
-	            groupedData[dynamicColOne] = {}
-	        }
+			if (typeof item?.group !== 'string') {
+				dynamicColOne = item?.group[0]
+				dynamicColTwo = item?.group[1]
+				dynamicColTree = item?.group[2]
+			} else {
+				dynamicColOne = item?.group
+			}
 
-	        if (!groupedData[dynamicColOne][dynamicColTwo]) {
-	            groupedData[dynamicColOne][dynamicColTwo] = {
-	                grandTotal: 0,
-	                headers: []
-	            }
+			if (!headers.includes(abbreviateMonth(month))) headers.push(abbreviateMonth(month))
 
-	            groupedData[dynamicColOne][dynamicColTwo][groupBy?.value[0]] = dynamicColOne
-	            groupedData[dynamicColOne][dynamicColTwo][groupBy?.value[1]] = dynamicColTwo
-	            groupedData[dynamicColOne][dynamicColTwo][groupBy?.value[2]] = dynamicColTree
-	        }
+			if (!groupedData[dynamicColOne]) groupedData[dynamicColOne] = {}
 
-	        groupedData[dynamicColOne][dynamicColTwo].headers.push(abbreviateMonth(month))
+			if (!groupedData[dynamicColOne][dynamicColTwo]) {
+				groupedData[dynamicColOne][dynamicColTwo] = {
+					grandTotal: 0,
+					headers: []
+				}
 
-	        groupedData[dynamicColOne][dynamicColTwo][abbreviateMonth(month)] = value
-	        groupedData[dynamicColOne][dynamicColTwo].grandTotal += value
+				groupedData[dynamicColOne][dynamicColTwo][groupBy?.value[0]] = dynamicColOne
+				groupedData[dynamicColOne][dynamicColTwo][groupBy?.value[1]] = dynamicColTwo
+				groupedData[dynamicColOne][dynamicColTwo][groupBy?.value[2]] = dynamicColTree
+			}
 
-	    })
+			groupedData[dynamicColOne][dynamicColTwo].headers.push(abbreviateMonth(month))
+			groupedData[dynamicColOne][dynamicColTwo][abbreviateMonth(month)] = value
+			groupedData[dynamicColOne][dynamicColTwo].grandTotal += value
+		})
 
-	    Object.keys(groupedData).forEach(dynColOneItem => {
-	        Object.keys(groupedData[dynColOneItem]).forEach(dynColTwoItem => {
-	            formattedData.push(groupedData[dynColOneItem][dynColTwoItem])
-	        })
-	    })
+		Object.keys(groupedData).forEach(dynColOneItem => {
+			Object.keys(groupedData[dynColOneItem]).forEach(dynColTwoItem => {
+				formattedData.push(groupedData[dynColOneItem][dynColTwoItem])
+			})
+		})
 
-	    //headerCols.value = [... new Set(formattedData[0].headers)]
-	    headerCols.value = headers
-	    calculateColumnTotals(formattedData)
+		//headerCols.value = [... new Set(formattedData[0].headers)]
+		headerCols.value = headers
+		calculateColumnTotals(formattedData)
 
-	    grossRevenue.value = formattedData
+		grossRevenue.value = formattedData
 	}
 
 	const calculateColumnTotals = formattedDataArray =>{
@@ -233,15 +246,15 @@
 			total = null
 
 		formattedDataArray.forEach(data => {
-		    data.headers.forEach(month => {
-		        if (!columnTotals[month]) {
-		            columnTotals[month] = 0
-		        }
+			data.headers.forEach(month => {
+				if (!columnTotals[month]) {
+					columnTotals[month] = 0
+				}
 
-		        columnTotals[month] += data[month]
-		    })
+				columnTotals[month] += data[month]
+			})
 
-		  	total += data.grandTotal
+			total += data.grandTotal
 		})
 
 		columnTotals.grandTotals = total

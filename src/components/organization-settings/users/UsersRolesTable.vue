@@ -89,7 +89,7 @@
 
     const setOrgPermits = async () => {
 		for (const user of usersRolesData.value?.users || []) {
-			user.canBeRemoved = await store.state.Permissions.can('removeMember', 'Org', { memberRole: user.role, userRole: currentUserRole.value, lastAdmin: lastAdmin.value })
+			user.canBeRemoved = await store.state.Permissions?.can('removeMember', 'Org', { memberRole: user.role, userRole: currentUserRole.value, lastAdmin: lastAdmin.value })
 		}
 	}
 </script>
