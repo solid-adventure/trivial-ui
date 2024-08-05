@@ -57,7 +57,7 @@
 			<div class="flex flex-column justify-content-end align-items-end">
 				<Button label="View Example" severity="info" text :pt="{label: {class: 'font-semibold'}}" @click="openExampleDialog" class="mb-2" />
 
-				<Skeleton v-if="!thumbnailImgPreview" height="20rem" borderRadius=".25rem" />
+				<Skeleton v-if="isLoading" height="20rem" borderRadius=".25rem" />
 				<Image v-else :src="thumbnailImgPreview" alt="Gross Revenue small preview" width="356" class="mx-auto" />
 			</div>
 		</Panel>
@@ -70,7 +70,7 @@
 
 <script setup>
 	import { ref, computed, watch, onMounted } from 'vue'
-	import { useStorage } from '@vueuse/core'
+	import { useImage } from '@vueuse/core'
 	import { useStore } from 'vuex'
 	import { Icon } from '@iconify/vue'
 	import { useToastNotifications } from '@/composable/toastNotification'
@@ -104,7 +104,8 @@
 		]),
 		selected = ref([]),
 		thumbnailImgPreview = ref(null),
-		reportGroupsChartObj = { name: 'Gross Revenue', report_period: 'month', report_groups: {} }
+		reportGroupsChartObj = { name: 'Gross Revenue', report_period: 'month', report_groups: {} },
+		selectOrgMsgInfo = 'Please, select an organization.'
 
 	let reportGroups = ref(null),
 		dashboardChart = null,
@@ -114,25 +115,30 @@
 	const reportingGroupsLength = computed(() => selected.value.length)
 	const reportingGroupsCountTxt = computed(() => `(${reportingGroupsLength.value} of 3)`)
 	const orgId = computed(() => store.getters.getOrgId)
+	const { isLoading } = useImage({ src: thumbnailImgPreview.value }, { delay: 1000 })
 
 	watch(() => store.getters.getIsDarkTheme, async (newVal, oldVal) => {
 		thumbnailImgPreview.value = newVal ? GrossRevenueDarkImgPreview : GrossRevenueLightImgPreview
 	})
 
 	watch(orgId, async (newVal, oldVal) => {
-		allDashboards = await getAllDashboards()
+		/*allDashboards = await getAllDashboards()
 		dashboard = getDashboard(allDashboards)
 		dashboardChart = getReportGroups(dashboard.charts)
 		reportGroups.value = setReportGroups(dashboardChart)
-		selected.value = setSelectedRGCols()
+		selected.value = setSelectedRGCols()*/
+
+		grossRevenueInit(newVal)
 	})
 
 	onMounted(async () => {
-		allDashboards = await getAllDashboards()
+		/*allDashboards = await getAllDashboards()
 		dashboard = getDashboard(allDashboards)
-		dashboardChart = getReportGroups(dashboard.charts)
+		dashboardChart = getReportGroups(dashboard?.charts)
 		reportGroups.value = setReportGroups(dashboardChart)
-		selected.value = setSelectedRGCols()
+		selected.value = setSelectedRGCols()*/
+
+		grossRevenueInit(orgId.value)
 
 		thumbnailImgPreview.value = await store.getters.getIsDarkTheme ? GrossRevenueDarkImgPreview : GrossRevenueLightImgPreview
 	})
@@ -165,21 +171,43 @@
 
 	}
 
-	const getAllDashboards = async () => {
+	const grossRevenueInit = async id => {
 		loading.value = true
+		
+		if (id === null) {
+			//showInfoToast('Info', selectOrgMsgInfo, 6000)
+			loading.value = false
+			return
+		}
 
+		if (id) {
+			//await getRegisters(id)
+
+			allDashboards = await getAllDashboards()
+			dashboard = getDashboard(allDashboards)
+
+			if (dashboard) {
+				dashboardChart = getReportGroups(dashboard?.charts)
+				reportGroups.value = setReportGroups(dashboardChart)
+				selected.value = setSelectedRGCols()
+			}
+
+			loading.value = false
+		}
+
+		loading.value = false
+	}
+
+	const getAllDashboards = async () => {
 		try {
 			let res = await store.state.Session.apiCall('/dashboards')
-			loading.value = false
 			return res
 		} catch (err) {
 			console.log(err)
-			loading.value = false
 		}
-		
 	}
 	const getDashboard = data => data.dashboards.find(item => item.owner_type === 'Organization' && item.owner_id === orgId.value)
-	const getReportGroups = charts => charts.find(item => item.chart_type === 'gross_revenue')
+	const getReportGroups = charts => charts.find(item => item.chart_type === 'table')
 	const setReportGroups = chart => {
 		let groupsColsArr = []
 
@@ -196,7 +224,7 @@
 	const setSelectedRGCols = () => {
 		const orderMap = {}
 		let selectedColsArr = [],
-			orderArray = JSON.parse(localStorage.getItem('grColsOrder'))
+			orderArray = JSON.parse(localStorage.getItem('grColsOrder')) || []
 
 		Object.keys(dashboardChart.report_groups).forEach(item => { 
 			if (dashboardChart.report_groups[item]) selectedColsArr.push({ key: item, name: item.replaceAll('_', ' ') })

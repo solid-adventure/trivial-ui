@@ -530,8 +530,9 @@ const store = createStore({
       await Session.apiCall(`/credential_sets/${id}`, 'DELETE')
       commit('removeCredentialSet', { id })
     },
-    async selectOrgId({ commit, state }, id) {
+    async selectOrgId({ commit, state, dispatch }, id) {
       await commit('setOrgId', id)
+      await dispatch('register')
     },
     async getDarkTheme({ commit, state }, value) {
       await commit('setIsDarkTheme', value)
@@ -540,7 +541,8 @@ const store = createStore({
       let registersNames = ['Sales', 'Income Account'],
           allRegisters = await Session.apiCall('/registers'),
           register = allRegisters.find(r => r.owner_type === 'Organization' && r.owner_id === state.orgId && registersNames.includes(r.name))
-      commit('setRegisterId', register.id)
+      
+      commit('setRegisterId', register?.id)
     },
     async registerCols({ commit, state }) {
       let regCols = await Session.apiCall(`/register_items/columns?register_id=${state.registerId}`)

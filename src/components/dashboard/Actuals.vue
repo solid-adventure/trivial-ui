@@ -8,6 +8,9 @@
 				<Skeleton width="20rem" height="3rem"></Skeleton>
 				<Skeleton width="20rem" height="3rem"></Skeleton>
 			</template>
+			<template v-else-if="!getRegId">
+				<h4 class="font-medium">No Actuals data</h4>
+			</template>
 			<template v-else>
 				<div v-for="(item, index) in selectedActuals" :key="index" class="actuals border-300" :class="{'border-right-1': index !== lastItem}">
 					<p class="m-0 text-md text-muted">{{ item.name }}</p>
@@ -67,16 +70,18 @@
 
 	watch(() => store.getters.getRegisterId, async newVal => {
 		regId = newVal
-		await initActualsData()
+
+		if (regId) await initActualsData()
 	})
 
 	onMounted(async () => {
-		loading.value = true
 		regId = getRegId.value
 		if (regId) await initActualsData()
 	})
 
 	const initActualsData = async () => {
+		loading.value = true
+		
 		allActualsData = await getAllActuals()
 		if (allActualsData) formattingActualsData(allActualsData)
 
