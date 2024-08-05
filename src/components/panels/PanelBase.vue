@@ -235,7 +235,15 @@
       },
 
       preProcessResponse(response, status) {
-        return {statusCode: status, body: response}
+        let count = {}
+        for (let item of response.count) {
+          count[item.group] = item.value
+        }
+        let out = {
+          title: response.title,
+          count
+        }
+        return {statusCode: status, body: out}
       },
 
       fetchDataTrivialApp() {
