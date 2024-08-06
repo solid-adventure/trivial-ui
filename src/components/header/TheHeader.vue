@@ -176,5 +176,5 @@
 		}
 	}
 
-	const setCheckedTheme = () => checkedTheme.value = localStorage.getItem('vueuse-color-scheme') === 'dark' ? true : false
+	const setCheckedTheme = () => checkedTheme.value = localStorage.getItem('vueuse-color-scheme') === 'light' ? true : false
 </script>

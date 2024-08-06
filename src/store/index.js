@@ -9,7 +9,6 @@ import router from '../router'
 import Session from '../models/Session'
 import Permissions from '../models/Permissions'
 import { toRaw } from 'vue'
-import { useStorage } from '@vueuse/core'
 
 const store = createStore({
 
@@ -294,7 +293,6 @@ const store = createStore({
         await dispatch('checkURLState')
         await dispatch('register')
         //await dispatch('registerColumns')
-        useStorage('vueuse-color-scheme', 'light')
       } catch (error) {
         console.error('[store][init] Error: ', error)
         notifications.error(`Failed to load apps: ${error.message}`)
