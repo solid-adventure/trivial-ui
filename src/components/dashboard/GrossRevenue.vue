@@ -117,10 +117,13 @@
 			await getRegisters(id)
 
 			allDashboards = await getAllDashboards()
+			console.log('allDashboards - ', allDashboards)
 			dashboard = getDashboard(allDashboards)
+			console.log('dashboard - ', dashboard)
 
 			if (dashboard) {
-				dashboardChart = getReportGroups(dashboard?.charts)
+				dashboardChart = getReportGroups(dashboard?.id, dashboard?.charts)
+				console.log('dashboardChart ', dashboardChart)
 				setGroupBy(dashboardChart)
 				await getGrossRevenue()
 			}
@@ -171,7 +174,7 @@
 		
 	}
 	const getDashboard = data => data.dashboards.find(item => item.owner_type === 'Organization' && item.owner_id === orgId.value)
-	const getReportGroups = charts => charts.find(item => item.chart_type === 'table') // gross_revenue
+	const getReportGroups = (dashID, charts) => charts.find(item => item.dashboard_id === dashID && item.name === 'Gross Revenue')
 	const setGroupBy = data => {
 		const orderMap = {}
 		let orderArray = JSON.parse(localStorage.getItem('grColsOrder')) || []
