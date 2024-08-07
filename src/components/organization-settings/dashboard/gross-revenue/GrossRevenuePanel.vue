@@ -193,7 +193,7 @@
 		}
 	}
 	const getDashboard = data => data.dashboards.find(item => item.owner_type === 'Organization' && item.owner_id === orgId.value)
-	const getReportGroups = (dashID, charts) => charts.find(item => item.dashboard_id === dashID && item.name === 'Gross Revenue')
+	const getReportGroups = (dashID, charts) => charts.find(item => item.dashboard_id === dashID)
 	const setReportGroups = chart => {
 		let groupsColsArr = []
 
