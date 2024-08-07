@@ -159,10 +159,13 @@
 	})
 
 	onMounted(async () => {
+		console.log("orgId.value - ", orgId.value)
 		if (orgId.value) {
 			await getRegisters(orgId.value)
-		} else {
-			showInfoToast('Info', selectOrgMsgInfo, 6000)
+		}
+
+		if (localStorage.getItem('orgId') === 'null') {
+			showInfoToast('Info', selectOrgMsgInfo, 3000)
 		}
 	})
 
@@ -403,7 +406,8 @@
 	}
 
 	const updateQueryString = () => {
-		let queryString = `per_page=${rows.value}&page=${page}`
+		let queryString = `per_page=${rows.value}&page=${page}`,
+			dateIsNotOperators = [filterMatchModeMapping.lt, filterMatchModeMapping.gt]
 
 		if (sortField.value) {
 			queryString += `&order_by=${sortField.value}&ordering_direction=${sortOrder.value}`
@@ -415,13 +419,13 @@
 			const filter = filters.value[key]
 
 			if (filter.constraints && filter.constraints.length > 0) {
-				filter.constraints.forEach(constraint => {
+				filter.constraints.forEach((constraint, index) => {
 				
 					if (constraint.value) {
 						filtersArray.push({
 							c: key,
-							o: filterMatchModeMapping[constraint.matchMode],
-							p: constraint.value
+							o: filterMatchModeMapping[constraint.matchMode] !== filterMatchModeMapping.dateIsNot ? filterMatchModeMapping[constraint.matchMode] : dateIsNotOperators[index],
+							p: key !== 'originated_at' ? constraint.value : new Date(constraint.value).toISOString()
 						})
 					}
 				})
