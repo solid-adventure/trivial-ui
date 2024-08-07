@@ -163,8 +163,9 @@
 	onMounted(async () => {
 		if (orgId.value) {
 			await getRegisters(orgId.value)
-		} else {
-			showInfoToast('Info', selectOrgMsgInfo, 6000)
+		}
+		if (localStorage.getItem('orgId') === 'null') {
+			showInfoToast('Info', selectOrgMsgInfo, 3000)
 		}
 	})
 
@@ -409,23 +410,33 @@
 		}
 
 		const filtersArray = []
-
-		for (let key in filters.value) {
-			const filter = filters.value[key]
-
-			if (filter.constraints && filter.constraints.length > 0) {
-				filter.constraints.forEach(constraint => {
-				
-					if (constraint.value) {
+		Object.entries(filters.value).forEach(([column, filter]) => {
+			filter.constraints?.forEach(constraint => {
+				let value = constraint.value
+				if (value) {
+					if (column === 'originated_at' && filterMatchModeMapping[constraint.matchMode] === '=') {
+						let nextDay = new Date(value.getTime() + 24 * 60 * 60 * 1000) // add 24 hours in milliseconds
+						let selectedDate = {
+							c: column,
+							o: ">=",
+							p: value // midnight on the specified date
+						}
+						let tomorrowDate = {
+							c: column,
+							o: "<",
+							p: nextDay // midnight on the next day
+						}
+						filtersArray.push(selectedDate, tomorrowDate)
+					} else {
 						filtersArray.push({
-							c: key,
+							c: column,
 							o: filterMatchModeMapping[constraint.matchMode],
-							p: constraint.value
+							p: value
 						})
 					}
-				})
-			}
-		}
+				}
+			})
+		})
 
 		if (filtersArray.length > 0) {
 			queryString += `&search=${encodeURIComponent(JSON.stringify(filtersArray))}`

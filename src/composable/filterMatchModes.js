@@ -6,7 +6,7 @@ export const useFilterMatchModes = () => {
 		{ label: 'Date is', value: FilterMatchMode.DATE_IS },
 		{ label: 'Date is before', value: FilterMatchMode.DATE_BEFORE },
 		{ label: 'Date is after', value: FilterMatchMode.DATE_AFTER },
-		{ label: 'Date is not', value: FilterMatchMode.DATE_IS_NOT }
+		// { label: 'Date is not', value: FilterMatchMode.DATE_IS_NOT } // 1. Commented because API don't support it yet
 	],
 	// Define custom match modes for the int field
 	numericFilterMatchModes = [
@@ -36,7 +36,7 @@ export const useFilterMatchModes = () => {
 		dateAfter: '>',
 		dateBefore: '<',
 		dateIs: '=',
-		dateIsNot: '!=',
+		// dateIsNot: '!=', // 2. Commented because API don't support it yet
 		equals: '=',
 		gt: '>',
 		gte: '>=',
