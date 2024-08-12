@@ -1,7 +1,8 @@
-.actuals {
-	width: calc((100% - 5.250rem) / 5);
-	gap: 0 3rem;
-
+.actuals__wrapper {
+	& .actuals__wrapper__item {
+		width: calc((100% - 5.250rem) / 5);
+		gap: 0 3rem;
+	}
 }
 
 .text-muted {
@@ -128,5 +129,34 @@
 	.percentage-100 {
 		color: white;
 		background-color: #0077CC; // 90% - 100%
+	}
+}
+
+
+@media only screen and (max-width: 425px) {
+	.actuals__wrapper, .forecast__wrapper {
+		flex-direction: column;
+		//gap: unset !important;
+
+		& .actuals__wrapper__item, .forecast__wrapper__item {
+			width: 100%;
+			padding-top: 1rem;
+			border-right: unset;
+			border-top: 1px solid var(--surface);
+		}
+	}
+
+	.dashboard__carts {
+		flex-direction: column;
+
+		& > div {
+			width: 100%;
+		}
+	}
+
+	.revenue__per__hour__table {
+		& .revenue__per__hour__table__footer--percentage {
+			flex-wrap: wrap;
+		}
 	}
 }

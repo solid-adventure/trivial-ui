@@ -202,9 +202,94 @@
 	}
 }
 
+.p-timeline-event {
+	.p-timeline-event-opposite {
+		display: none;
+	}
+}
 
-    .p-timeline-event {
-        .p-timeline-event-opposite {
-            display: none;
-        }
-    }
+@media only screen and (max-width: 425px) {
+	.actuals__panels, .gross__revenue__panels, .forecast__panels,
+	.revenue__walk__panels, .cash__impact__panels {
+		flex-direction: column;
+
+		& .p-panel {
+			width: 100% !important;
+			border: unset;
+
+			& .p-panel-content {
+				padding-inline: 0;
+
+				& p {
+					width: 100% !important;
+				}
+
+				& .p-accordion {
+					border-bottom: 1px solid #e2e8f0;
+				}
+			}
+		}
+
+		& .actuals__panel, .gross__revenue__panel, .forecast__panel, .revenue__walk__panel, .cash__impact__panel {
+			border-bottom: 1px solid #e2e8f0;
+			border-radius: unset;
+
+			& .actuals__panel__example, .gross__revenue__panel__example, 
+			.forecast__panel__example, .revenue__walk__panel__example, .cash__impact__panel__example {
+				align-items: flex-start !important;
+
+				& button {
+					order: 1;
+				}
+			}
+		}
+
+		& .gross__revenue__panel__empty, .revenue__walk__panel__empty, .cash__impact__panel__empty {
+			flex-direction: column;
+
+			& > div {
+				width: 100% !important;
+				text-align: center;
+			}
+		}
+	}
+
+	.org-settings__dialog {
+		width: 96% !important;
+
+		& .p-dialog-content {
+			& h4 {
+				margin-block: 1rem !important;
+			}
+
+			& p {
+				margin-bottom: 0 !important;
+			}
+		}
+
+		& .revenue__gross__draggable {
+			background-size: 100% 84%;
+		}
+
+		& .revenue__gross__table {
+			& th.p-frozen-column {
+				width: 6%;
+			}
+		}
+	}
+
+	.organization-settings__users {
+
+		& .org-settings__table {
+			& .p-datatable-header > div {
+				flex-direction: column;
+
+				& h2 {
+					justify-content: flex-start !important;
+					gap: .5rem !important;
+					margin-bottom: 1rem !important;
+				}
+			}
+		}		
+	}
+}

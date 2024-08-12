@@ -3,6 +3,8 @@
 		<div class="main__header__top">
 			<h1>{{ title }}</h1>
 
+			<Button @click="openMobileMenu" icon="pi pi-bars" aria-label="Open aside menu" outlined severity="secondary" class="main__header__top__mobile__menu" />
+
 			<div class="main__header__top__content">
 				<Dropdown v-model="selectedOrg" :options="organisations" optionLabel="name" placeholder="Select Organization" class="main__header__top__content__dropdown" :change="handleSelected()" />
 
@@ -40,6 +42,8 @@
 			    </div>
 			</div>
 		</div>
+
+		<h1 class="main__header__mobile__title">{{ title }}</h1>
 
 		<Breadcrumb :breadcrumbs="breadcrumbs" />
 	</header>
@@ -151,7 +155,7 @@
 		primeVue.changeTheme(currentTheme, nextTheme, 'theme-link')
 	}
 
-	const toggleMenu = (event) => menu.value.toggle(event)
+	const toggleMenu = event => menu.value.toggle(event)
 
 	const handleSelected = () => store.dispatch('selectOrgId', selectedOrg.value?.id)
 	
@@ -177,4 +181,5 @@
 	}
 
 	const setCheckedTheme = () => checkedTheme.value = localStorage.getItem('vueuse-color-scheme') === 'light' ? true : false
+	const openMobileMenu = () => store.dispatch('mobileMenu', true)
 </script>

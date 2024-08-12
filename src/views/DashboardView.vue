@@ -1,29 +1,29 @@
 <template>
 	<div class="flex flex-column row-gap-4 dashboard">
 		<Actuals />
-		<!--<Forecast :selected="selectedForecast" /> -->
+		<!--<Forecast :selected="selectedForecast" />-->
 
 		<Divider class="my-1" />
 
 		<GrossRevenue />
 		<!--<RevenueWalk :revenueWalk="rwData" />
-		<CashImpacts :cashImpacts="ciData" />-->
+		<CashImpacts :cashImpacts="ciData" />
 
-		<!--<Divider class="my-1" />-->
+		<Divider class="my-1" />
 
-		<!--<div class="flex flex-wrap gap-3">
+		<div class="flex flex-wrap gap-3 dashboard__carts">
 			<TheChart :headerTitle="'Revenue Over Time Location (Month)'" :chartDataSet="barChart1" :chartType="'bar'" :max="'200000'" :stepSize="'50000'" :width="'w-50'" />
 			<TheChart :headerTitle="'Revenue Over Time Location ($)'" :chartDataSet="lineChart" :chartType="'line'" :max="'10000'" :stepSize="'2000'" :width="'w-50'" />
 			<TheChart :headerTitle="'Revenue Over Time Type (Month)'" :chartDataSet="barChart2" :chartType="'bar'" :max="'200000'" :stepSize="'50000'" :width="'w-50'" />
 			<TheChart :headerTitle="'Revenue Over Time Location PTC (Month)'" :chartDataSet="barChart3" :chartType="'bar'" :yTicks="'%'" :max="'100'" :stepSize="'20'" :width="'w-50'" />
 		</div>
 
-		<div class="flex flex-wrap gap-3">
+		<div class="flex flex-wrap gap-3 dashboard__carts">
 			<TheDoughnutChart :headerTitle="'Location Contributor Yeat to Date'" :chartDataSet="doughnutChart1" :chartType="'doughnut'" :width="'w-30'" />
 			<TheDoughnutChart :headerTitle="'Channel Contributor Yeat to Date'" :chartDataSet="doughnutChart2" :chartType="'doughnut'" :yTicks="'%'" :width="'w-30'" />
-		</div>-->
+		</div>
 
-		<!--<Divider class="my-1" />
+		<Divider class="my-1" />
 
 		<RevenuePerHour />-->
 	</div>
