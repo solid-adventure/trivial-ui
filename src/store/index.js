@@ -45,6 +45,8 @@ const store = createStore({
     enableBuildApps: import.meta.env.VITE_ENABLE_BUILD_APPS,
     enableWebhookAppTrigger: import.meta.env.VITE_ENABLE_WEBHOOK_APP_TRIGGER,
     Session: Session,
+    streamedLines: 0,
+    streamedLinesTotal: 1,
     Permissions: null,
     orgId: null,
     registerColumns: null,
@@ -308,6 +310,12 @@ const store = createStore({
     },
     setDashboards(state, value) {
       state.dashboards = value
+    },
+    setStreamedLines(state, value) {
+      state.streamedLines = value
+    },
+    setStreamedLinesTotal(state, value) {
+      state.streamedLinesTotal = value
     }
   },
 

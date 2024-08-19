@@ -32,6 +32,11 @@
 	    <template #header>
 	        <div class="flex justify-content-between py-5">
 	        	<h2 class="m-0">Revenue Detail</h2>
+
+	        	<!-- On click, call the fetchCSV method -->
+			<h3>Progress: {{ streamProgress }}%</h3>
+	        	<Button type="button" icon="pi pi-download" aria-label="Download CSV" @click="exportCSV" />
+
 	        	<!-- Global keyword search filed -->
 	            <!--<IconField iconPosition="right">
 	                <InputText v-model="defaultFilters['global'].value" placeholder="Keyword Search" />
@@ -150,6 +155,9 @@
 	const regId = computed(() => store.getters.getRegisterId)
 	const register = computed(() => store.getters.getRegister)
 	const registersItems = computed(() => registers.value)
+	const streamProgress = computed(() => {
+		return Math.floor((store.state.streamedLines / store.state.streamedLinesTotal) * 100)
+	})
 
 	watch(orgId, async (newVal, oldVal) => {
 		if (!newVal) {
@@ -402,6 +410,22 @@
 			showErrorToast('Error', 'There was an error.')
 			console.log(err)
 		}
+	}
+
+	const exportCSV = async () => {
+		let title = register.value.name
+		let queryString = updateQueryString()
+		let csvData = await store.state.Session.apiCall(`/register_items.csv?register_id=${regId.value}&${queryString}`, 'GET', undefined, 'csv', true)
+		// Create a CSV file and allow the user to download it
+		let blob = new Blob([csvData], { type: 'text/csv' });
+		let url = window.URL.createObjectURL(blob);
+		let a = document.createElement('a');
+		a.href = url;
+		a.download = `${title}.csv`;
+		document.body.appendChild(a);
+		a.click();
+		store.commit('setStreamedLines', 0)
+		store.commit('setStreamedLinesTotal', 1)
 	}
 
 	const updateQueryString = () => {

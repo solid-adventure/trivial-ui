@@ -10,7 +10,7 @@ export default class Session {
     return new URL(path, TRIVIAL_API_URL)
   }
 
-  static async apiCall(path, method='GET', data) {
+  static async apiCall(path, method='GET', data, format='json', stream=false) {
     const session = Session.current
 
     const options = {
@@ -27,17 +27,51 @@ export default class Session {
       options.body = JSON.stringify(data)
     }
     return fetch(this.apiUrl(path), options)
-    .then(response => Session.handleResponse(response))
+    .then(response => Session.handleResponse(response, format, stream))
   }
 
-  static async handleResponse(response) {
+  static async handleResponse(response, format, stream) {
+    if (format == 'csv' && stream == true) {
+      return this.handleCSVResponse(response)
+    } else {
+      return this.handleJSONResponse(response)
+    }
+  }
+
+  static async handleCSVResponse(response) {
+    let streamedLinesTotal = Number(response.headers.get('x-items-count'))
+    store.commit("setStreamedLinesTotal", streamedLinesTotal)
+    let csvLines = [];
+    const reader = response.body.getReader()
+    const decoder = new TextDecoder('utf-8')
+
+    let streamedLines = 0
+    let partialLine = ''
+    let done, value
+    while (!done) {
+      ({ done, value } = await reader.read())
+      if (value) {
+        let chunk = partialLine + decoder.decode(value)
+        const lines = chunk.split('\n')
+        partialLine = lines.pop()
+        streamedLines += lines.length
+        store.commit("setStreamedLines", streamedLines - 1)
+        csvLines.push(...lines)
+      }
+    }
+    return csvLines.join('\n')
+  }
+
+  static async handleJSONResponse(response) {
     let out = undefined
     // Catch an empty body, such as No Content after a delete
     const clonedResponse = response.clone()
     const text = await clonedResponse.text()
+
     if (text.replaceAll(' ','').length > 0) {
      out = await response.json()
     }
+
     if (response.ok) {
       return out
     } else if (out.error) {
