@@ -1,5 +1,11 @@
 <template>
-	<Panel :header="headerTitle" class="shadow-2" :class="width">
+	<Panel class="shadow-2" :class="width">
+		<template #header>
+			<div class="flex flex-column">
+				<h2 class="mt-0 mb-1">{{ headerTitle }}</h2>
+				<h4 class="mt-1 mb-3 text-sm text-500">{{ headerSubTitle }}</h4>
+			</div>
+		</template>
 		<Chart :type="chartType" :data="chartData" :options="chartOptions" responsive class="h-20rem" />
 	</Panel>
 </template>
@@ -8,7 +14,7 @@
 	import { ref, onMounted } from "vue"
 	import { useFormatCurrency } from '@/composable/formatCurrency.js'
 
-	const props = defineProps(['chartDataSet', 'headerTitle', 'chartType', 'yTicks', 'width'])
+	const props = defineProps(['chartDataSet', 'headerTitle', 'headerSubTitle', 'chartType', 'yTicks', 'width'])
 
 	const chartData = ref(),
 		chartOptions = ref()
@@ -53,7 +59,7 @@
 				},
 				legend: {
 					labels: {
-						padding: 40,
+						padding: 12,
 						color: textColor,
 						generateLabels: chart => {
 							const dataset = chart.data.datasets[0],
@@ -65,10 +71,10 @@
 								
 								return {
 									text: `${label} (${percentage})`,
-									fillStyle: dataset.backgroundColor[i],
-									strokeStyle: dataset.strokeStyle[i],
-									lineWidth: dataset.borderWidth,
-									hidden: isNaN(dataset.data[i]) || dataset.data[i] === null,
+									fillStyle: dataset?.backgroundColor ? dataset.backgroundColor[i] : '',
+									strokeStyle: dataset?.strokeStyle ? dataset.strokeStyle[i] : '',
+									lineWidth: dataset?.borderWidth ? dataset?.borderWidth : '',
+									hidden: isNaN(dataset.data[i]) || dataset?.data[i] === null,
 									index: i
 								}
 							})

@@ -65,14 +65,17 @@
 </template>
 
 <script setup>
-	import { ref, onMounted, computed, watch, toRaw } from "vue"
-	import { useStore } from 'vuex'
-	import { useStorage } from '@vueuse/core'
-	import { Icon } from '@iconify/vue'
+	import { ref, onMounted } from "vue"
 	import { useFormatCurrency } from '@/composable/formatCurrency.js'
 	import loadingImg from '@/assets/images/trivial-loading-optimized.webp'
-	import moment from 'moment-timezone'
-	import { useToastNotifications } from '@/composable/toastNotification'
+
+	const props = defineProps({
+		grData: {
+			type: Object,
+			required: true,
+			default: () => {}
+		}
+	})
 
 	const selectedQuarters = ref(),
 			/*quarters = ref([
@@ -82,103 +85,16 @@
 				{name: 'Quarter Q4', item: 'q4'}
 			]),*/
 			loading = ref(false),
-			store = useStore(),
-			registersNames = ['Sales', 'Income Account'],
-			selectOrgMsgInfo = 'Please, select an organization.',
-			{ showSuccessToast, showErrorToast, showInfoToast } = useToastNotifications(),
 			headerCols = ref([])
 
-	let regId = null,
-		groupBy = ref([]),
+	let groupBy = ref([]),
 		grandTotals = ref(),
-		grossRevenue = ref([]),
-		dashboardChart = null,
-		dashboard = null,
-		allDashboards = null
-
-	const orgId = computed(() => store.getters.getOrgId)
-	watch(orgId, (newVal, oldVal) => grossRevenueInit(newVal))
+		grossRevenue = ref([])
 
 	onMounted(() => {
-		grossRevenueInit(orgId.value)
+		formatGrossRevenueData(props.grData)
 	})
 
-	const grossRevenueInit = async id => {
-		loading.value = true
-		
-		if (id === null) {
-			showInfoToast('Info', selectOrgMsgInfo, 3000)
-			grossRevenue.value = []
-			loading.value = false
-			return
-		}
-
-		if (id) {
-			await getRegisters(id)
-
-			allDashboards = await getAllDashboards()
-			dashboard = getDashboard(allDashboards)
-
-			if (dashboard) {
-				dashboardChart = getReportGroups(dashboard?.charts)
-				setGroupBy(dashboardChart)
-				await getGrossRevenue()
-			}
-
-			loading.value = false
-		}
-
-		loading.value = false
-	}
-
-	const getGrossRevenue = async () => {
-		let total = null
-		const timezone = 'Etc/GMT+5', // Etc/GMT+5 -> Not support DST | 'America/Detroit' -> support DST | More info at https://appler.dev/time-zone-table
-			end_at = moment.tz(timezone).format(),
-			start_at = moment.tz(timezone).startOf('year').startOf('day').format(),
-			group_by_period = 'month'
-
-		try {
-			total = await store.state.Session.apiCall('/reports/item_sum', 'POST', { register_id: regId, start_at, end_at, group_by_period, timezone, group_by: toRaw(groupBy.value) })
-
-			formatGrossRevenueData(total)
-		} catch (err) {
-			console.log(err)
-		} finally {
-			return
-		}
-	}
-
-	const getRegisters = async organizationId => {
-		try {
-			let allRegisters = await store.state.Session.apiCall('/registers'),
-				register = allRegisters.find(r => r.owner_type === 'Organization' && r.owner_id === organizationId && registersNames.includes(r.name))
-
-			regId = register.id
-		} catch (err) {
-			console.log(err)
-			showErrorToast('Error', 'Failed to fetch data.')
-		}
-	}
-
-	const getAllDashboards = async () => {
-		try {
-			let res = await store.state.Session.apiCall('/dashboards')
-			return res
-		} catch (err) {
-			console.log(err)
-		}
-		
-	}
-	const getDashboard = data => data.dashboards.find(item => item.owner_type === 'Organization' && item.owner_id === orgId.value)
-	const getReportGroups = charts => charts.find(item => item.chart_type === 'table') // gross_revenue
-	const setGroupBy = data => {
-		const orderMap = {}
-		let orderArray = JSON.parse(localStorage.getItem('grColsOrder')) || []
-
-		orderArray.forEach((item, index) => orderMap[item] = index)
-		groupBy.value = Object.keys(data.report_groups).filter(item => data.report_groups[item]).sort((a, b) => orderMap[a] - orderMap[b])
-	}
 	const abbreviateMonth = month => {
 		const months = {
 			"Jan": "jan", "Feb": "feb", "Mar": "mar", "Apr": "apr", 
@@ -189,6 +105,9 @@
 	}
 
 	const formatGrossRevenueData = data => {
+		loading.value = true
+		groupBy.value = data.group // Set group by for table grouping
+
 		let formattedData = [],
 			groupedData = {},
 			headers = []
@@ -239,6 +158,7 @@
 		calculateColumnTotals(formattedData)
 
 		grossRevenue.value = formattedData
+		loading.value = false
 	}
 
 	const calculateColumnTotals = formattedDataArray =>{
