@@ -32,6 +32,10 @@
 	    <template #header>
 	        <div class="flex justify-content-between py-5">
 	        	<h2 class="m-0">Revenue Detail</h2>
+
+	        	<Button label="Export as CSV" aria-label="Download CSV" icon="pi pi-download" class="registers_table--csv-btn" @click="openCSVDialog" :disabled="registersItems.length === 0" />
+	        	<!--<Button label="Export as CSV" aria-label="Download CSV" icon="pi pi-download" class="registers_table--csv-btn" @click="exportCSV" />-->
+
 	        	<!-- Global keyword search filed -->
 	            <!--<IconField iconPosition="right">
 	                <InputText v-model="defaultFilters['global'].value" placeholder="Keyword Search" />
@@ -93,6 +97,8 @@
 			</Row>
 		</ColumnGroup>
 	</DataTable>
+
+	<CSVExportDialog :csvDialogVisible="csvDialogVisible" :regId="register?.id" :queryString="queryString" :registerName="register?.name" @closeCSVExportDialog="closeCSVDialog" />
 </template>
 
 <script setup>
@@ -106,33 +112,38 @@
 	import { useFilterMatchModes } from '@/composable/filterMatchModes.js'
 	import loadingImg from '@/assets/images/trivial-loading-optimized.webp'
 	import { useToastNotifications } from '@/composable/toastNotification'
+	import { Icon } from '@iconify/vue'
+	import CSVExportDialog from '@/components/sales/CSVExportDialog'
 
 	const loading = ref(false),
-			filters = ref({}),
-			registers = ref([]),
-			totalAmount = ref(null),
-			rows = ref(10), // per_page
-			totalRecords = ref(0),
-			first = ref(1),
-			totalInfoPopup = ref(),
-			sortField = ref(null),
-			sortOrder = ref(null),
-			rowsPerPageOpt = [10, 20, 50],
-			{dateOptions, timeOptions, timeZoneOptions} = useDateTimeZoneOptions(),
-			{
-				dateFilterMatchModes,
-				numericFilterMatchModes,
-				textFilterMatchModes,
-				filterMatchModeMapping,
-				defaultFilters,
-				defaultMatchMode,
-				globalFilterFields
-			} = useFilterMatchModes(),
-			{ showSuccessToast, showErrorToast, showInfoToast } = useToastNotifications(),
-			store = useStore(),
-			registersNames = ['Sales', 'Income Account'],
-			selectOrgMsgInfo = 'Please, select an organization.',
-			timezone = timeZoneOptions.timeZone
+		filters = ref({}),
+		registers = ref([]),
+		totalAmount = ref(null),
+		rows = ref(10), // per_page
+		totalRecords = ref(0),
+		first = ref(1),
+		totalInfoPopup = ref(),
+		sortField = ref(null),
+		sortOrder = ref(null),
+		rowsPerPageOpt = [10, 20, 50],
+		{dateOptions, timeOptions, timeZoneOptions} = useDateTimeZoneOptions(),
+		{
+			dateFilterMatchModes,
+			numericFilterMatchModes,
+			textFilterMatchModes,
+			filterMatchModeMapping,
+			defaultFilters,
+			defaultMatchMode,
+			globalFilterFields
+		} = useFilterMatchModes(),
+		{ showSuccessToast, showErrorToast, showInfoToast } = useToastNotifications(),
+		store = useStore(),
+		registersNames = ['Sales', 'Income Account'],
+		selectOrgMsgInfo = 'Please, select an organization.',
+        timezone = timeZoneOptions.timeZone,
+		csvDialogVisible = ref(false)
+		/*streamErrorMessage = ref(''),
+		cancelCSV = ref(false),*/
 
 	let columns = [],
 		defaultColumns = [
@@ -144,9 +155,11 @@
 		totalsColumns = { amount: 'amount' },
 		allRegisters = null,
 		filterDate = { end_at: null, start_at: null },
-		page = 1 // Default start page is from first
+		page = 1, // Default start page is from first,
+		storageOrgId = parseInt(localStorage.getItem('orgId')) || null
 
 	const orgId = computed(() => store.getters.getOrgId)
+	const queryString = computed(() => updateQueryString())
 	const regId = computed(() => store.getters.getRegisterId)
 	const register = computed(() => store.getters.getRegister)
 	const registersItems = computed(() => registers.value)
@@ -158,14 +171,16 @@
 			resetRegisters()
 			return
 		}
-
 		await getRegisters(newVal)
 	})
 
 	onMounted(async () => {
-		if (orgId.value) {
+		let organizationId = storageOrgId || orgId.value
+
+		if (organizationId) {
 			await getRegisters(orgId.value)
 		}
+
 		if (localStorage.getItem('orgId') === 'null') {
 			showInfoToast('Info', selectOrgMsgInfo, 3000)
 		}
@@ -183,8 +198,8 @@
 	const isDisabledTooltip = data => data?.length < 14
 	const toggleTotalInfoPopup = event => totalInfoPopup.value[0].toggle(event)
 	const setFilterMatchModes = field => field === 'amount' ? numericFilterMatchModes : field === 'originated_at' ? dateFilterMatchModes : textFilterMatchModes
-	const dateToISOString = date => new Date(date).toISOString()
-	const dateSetFullYear = date => new Date().setFullYear(date)
+	const openCSVDialog = () => csvDialogVisible.value = true
+	const closeCSVDialog = () => csvDialogVisible.value = false
 
 	const getRegisters = async orgId => {
 		loading.value = true
@@ -210,8 +225,7 @@
 			setCSSCustomProp()
 			await getSearchableCols()
 
-			let queryString = updateQueryString()
-			const { register_items, total_pages } = await getRegistersData(queryString)
+			const { register_items, total_pages } = await getRegistersData()
 			registers.value = register_items
 			totalRecords.value = totalPaginatorPages(total_pages, rows.value)
 
@@ -224,45 +238,25 @@
 		loading.value = false
 	}
 
-	const getRegistersData = async queryString => {
+	const getRegistersData = async () => {
 		try {
-			return await store.state.Session.apiCall(`/register_items?register_id=${regId.value}&${queryString}`)
+			return await store.state.Session.apiCall(
+				`/register_items?register_id=${regId.value}&${queryString.value}`
+			)
 		} catch (err) {
 			showErrorToast('Error', 'Failed to fetch data.')
 			console.error(err);
 		}
 	}
 
-
-	// Alternative way to update total amount col
-	/*const setTotalAmount = searchProp => {
-		let total = null
-
-		registers.value.forEach(item => total += parseInt(item[searchProp]))
-
-		return Format.money(total)
-	}*/
-
 	const getTotalAmount = async () => {
-		let end_at = filterDate.end_at || dateSetFullYear(2100),
-			start_at = filterDate.start_at || dateSetFullYear(2000),
-			total = null
-
-		total = await store.state.Session.apiCall('/reports/item_sum', 'POST', { register_id: regId.value, start_at: dateToISOString(start_at), end_at: dateToISOString(end_at) })
-
-		totalAmount.value = useFormatCurrency(total.count[0].value, 2, 'USD')
-
+		let col = 'amount'
+		let total = await store.state.Session.apiCall(
+			`/register_items/sum?register_id=${regId.value}&col=${col}&${queryString.value}`
+		)
+		totalAmount.value = useFormatCurrency(total.sum, 2, 'USD')
 		resetDateFilter()
 	}
-
-	// For date field filter
-	/*const getDateFilter = (date = {}) => {
-		if (date?.matchMode === 'dateAfter') {
-			filterDate.start_at = date.value
-		} else if (date?.matchMode === 'dateBefore') {
-			filterDate.end_at = date.value
-		}
-	}*/
 
 	const getSearchableCols = async () => {
 		// Get Searchable Columns
@@ -298,8 +292,7 @@
 		page = event?.page + 1
 
 		try {
-			const queryString = updateQueryString()
-			const { register_items } = await getRegistersData(queryString)
+			const { register_items } = await getRegistersData()
 			registers.value = register_items
 		} catch (err) {
 			loading.value = false
@@ -316,8 +309,7 @@
 		sortOrder.value = event?.sortOrder === 1 ? 'ASC' : 'DESC'
 
 		try {
-			const queryString = updateQueryString()
-			const { register_items } = await getRegistersData(queryString)
+			const { register_items } = await getRegistersData()
 			registers.value = register_items
 		} catch (err) {
 			loading.value = false
@@ -332,10 +324,8 @@
 		filters.value = event.filters
 
 		try {
-			const queryString = updateQueryString()
-
 			// Get registers data
-			const { register_items, total_pages, current_page } = await getRegistersData(queryString)
+			const { register_items, total_pages, current_page } = await getRegistersData()
 			
 			// Set paggination
 			totalRecords.value = totalPaginatorPages(total_pages, rows.value)
@@ -343,7 +333,7 @@
 			// Set table registers value
 			registers.value = register_items
 			
-			//await getTotalAmount()
+			await getTotalAmount()
 		} catch (err) {
 			loading.value = false
 			console.log(err)
@@ -361,10 +351,9 @@
 
 		try {
 			page = 1
-			const queryString = updateQueryString()
-			const { register_items } = await getRegistersData(queryString)
+			const { register_items } = await getRegistersData()
 			registers.value = register_items
-			// await getTotalAmount()
+			await getTotalAmount()
 			loading.value = false
 		} catch (err) {
 			console.error(err)
@@ -405,10 +394,10 @@
 	}
 
 	const updateQueryString = () => {
-		let queryString = `per_page=${rows.value}&page=${page}`
+		let query = `per_page=${rows.value}&page=${page}`
 
 		if (sortField.value) {
-			queryString += `&order_by=${sortField.value}&ordering_direction=${sortOrder.value}`
+			query += `&order_by=${sortField.value}&ordering_direction=${sortOrder.value}`
 		}
 
 		const filtersArray = []
@@ -441,9 +430,9 @@
 		})
 
 		if (filtersArray.length > 0) {
-			queryString += `&search=${encodeURIComponent(JSON.stringify(filtersArray))}`
+			query += `&search=${encodeURIComponent(JSON.stringify(filtersArray))}`
 		}
 
-		return queryString
+		return query
 	}
 </script>

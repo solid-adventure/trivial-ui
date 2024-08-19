@@ -10,7 +10,7 @@ export default class Session {
     return new URL(path, TRIVIAL_API_URL)
   }
 
-  static async apiCall(path, method='GET', data) {
+  static async apiCall(path, method='GET', data, format='json', stream=false) {
     const session = Session.current
 
     const options = {
@@ -27,20 +27,33 @@ export default class Session {
       options.body = JSON.stringify(data)
     }
     return fetch(this.apiUrl(path), options)
-    .then(response => Session.handleResponse(response))
+    .then(response => Session.handleResponse(response, format, stream))
   }
 
-  static async handleResponse(response) {
-    let out = undefined
-    // Catch an empty body, such as No Content after a delete
-    const clonedResponse = response.clone()
-    const text = await clonedResponse.text()
-    if (text.replaceAll(' ','').length > 0) {
-     out = await response.json()
+  static async handleResponse(response, format, stream) {
+    if (!response.ok) {
+      return this.handleErrorResponse(response)
+    } else if (format == 'csv' && stream == true) {
+      return this.handleCSVResponse(response)
+    } else {
+      return this.handleJSONResponse(response)
     }
-    if (response.ok) {
-      return out
-    } else if (out.error) {
+  }
+
+  static async handleErrorResponse(response) {
+    let clonedResponse = response.clone()
+
+    let out = {}
+    try {
+      out = await response.json()
+    } catch(err) {
+      error = await clonedResponse.text()
+      if (error.length > 0) {
+        out.error = error
+      }
+    }
+
+    if (out.error) {
       throw new Error(out.error)
     } else if (out.errors && Array.isArray(out.errors)) {
       throw new Error(out.errors.join(', '))
@@ -51,6 +64,47 @@ export default class Session {
     } else {
       throw new Error("Request failed")
     }
+  }
+
+  static async handleCSVResponse(response) {
+    const reader = response.body.getReader()
+    const decoder = new TextDecoder('utf-8')
+
+    let streamedLines = [];
+    let streamedLinesTotal = Number(response.headers.get('x-items-count'))
+    store.commit("setStreamedLinesTotal", streamedLinesTotal)
+    store.commit("setStreamStatus", 'open')
+
+    let partialLine = ''
+    let done, value
+    while (!done && store.getters.getStreamStatus === 'open') {
+      ({ done, value } = await reader.read())
+      if (value) {
+        let chunk = partialLine + decoder.decode(value)
+        const lines = chunk.split('\n')
+        partialLine = lines.pop()
+        streamedLines.push(...lines)
+        store.commit("setStreamedLines", streamedLines.length - 1)
+      }
+    }
+    if (store.getters.getStreamStatus === 'cancelling') {
+      reader.cancel()
+    } else {
+      return streamedLines.join('\n')
+    }
+  }
+
+  static async handleJSONResponse(response) {
+    let out = undefined
+    // Catch an empty body, such as No Content after a delete
+    const clonedResponse = response.clone()
+    const text = await clonedResponse.text()
+
+    if (text.replaceAll(' ','').length > 0) {
+     out = await response.json()
+    }
+
+    return out
   }
 
   static async create(email, password) {

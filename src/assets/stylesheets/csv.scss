@@ -1,0 +1,28 @@
+.csv__dialog {
+	min-width: 26rem;
+
+	.csv__dialog--progersbar {
+		& div.p-progressbar-value {
+			background-color: var(--primary);
+
+			& div.p-progressbar-label {
+				color: white;
+			}
+		}
+	}
+
+	.csv__dialog--streamed-lines {
+		display: inline-block;
+		min-width: 4rem;
+	}
+
+	.csv__dialog--cancel-btn {
+		color: var(--on-surface);
+	}
+
+	.csv__dialog--btn {
+		color: white;
+		border-color: var(--primary);
+		background-color: var(--primary);
+	}
+}
