@@ -2,11 +2,11 @@
 	<Panel header="Actuals" :pt="{root: {class: 'shadow-2'}, header: {class: 'text-lg'}}">
 		<div class="flex flex-wrap justify-content-between align-items-center gap-3">
 			<template v-if="loading">
-				<Skeleton width="20rem" height="3rem"></Skeleton>
-				<Skeleton width="20rem" height="3rem"></Skeleton>
-				<Skeleton width="20rem" height="3rem"></Skeleton>
-				<Skeleton width="20rem" height="3rem"></Skeleton>
-				<Skeleton width="20rem" height="3rem"></Skeleton>
+				<Skeleton width="18rem" height="3rem"></Skeleton>
+				<Skeleton width="18rem" height="3rem"></Skeleton>
+				<Skeleton width="18rem" height="3rem"></Skeleton>
+				<Skeleton width="18rem" height="3rem"></Skeleton>
+				<Skeleton width="18rem" height="3rem"></Skeleton>
 			</template>
 			<template v-else-if="!getRegId">
 				<h4 class="font-medium">No Actuals data</h4>
