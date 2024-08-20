@@ -82,9 +82,9 @@
 		{name: 'Last 90 Days x 4 Fcst', value: '$657,295', icon:'prime:arrow-up', class: 'up'},
 	])*/
 
-    const loading = ref(false),
-    	store = useStore(),
-    	registersNames = ['Sales', 'Income Account'],
+	const loading = ref(false),
+		store = useStore(),
+		registersNames = ['Sales', 'Income Account'],
 		selectOrgMsgInfo = 'Please, select an organization.',
 		{ showSuccessToast, showErrorToast, showInfoToast } = useToastNotifications(),
 		{ themes } = useColorScheme(),
@@ -224,7 +224,6 @@
 			total = await store.state.Session.apiCall('/reports/item_sum', 'POST', { register_id: regId, start_at, end_at, group_by_period, timezone, group_by: groupBy })
 
 			return total
-			//formatGrossRevenueData(total)
 		} catch (err) {
 			console.log(err)
 		}
