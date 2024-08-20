@@ -6,26 +6,29 @@
 	import { ref, computed, onMounted } from 'vue'
 	import { useStore } from 'vuex'
 
-	const store = useStore(),
-		contractsType = 'hourly'
+	const store = useStore()
 
-	let contracts = ref([])
+	let contracts = ref([]),
+		apps = []
 
-	const apps = computed(() => store.getters.getApps)
 	const orgId = computed(() => store.getters.getOrgId)
 
 	onMounted(async () => {
-		
-		let appsStats = await getContracts(contractsType)
-
-		console.log('appsStats - ', appsStats)
+		apps = await getApps()
+		setContracts()
 	})
 
-	const setContracts = () => {
-		contracts.value = apps.value.filter(item => item.owner_id === orgId.value && item.owner_type === 'Organization')
+	const getApps = async () => {
+		try {
+			return await store.state.Session.apiCall('/apps')
+		} catch (err) {
+			console.log(err)
+		}
 	}
 
-	const getContracts = async type => await store.state.Session.apiCall(`apps/stats/${type}`)
+	const setContracts = () => {
+		contracts.value = apps.filter(item => item.owner_id === orgId.value && item.owner_type === 'Organization' && item.panels.component === 'Contract')
+	}
 
-	setContracts()
+	//const getContracts = async type => await store.state.Session.apiCall(`apps/stats/${type}`)
 </script>
