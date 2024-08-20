@@ -49,7 +49,8 @@ const store = createStore({
     orgId: null,
     registerColumns: null,
     registerId: null,
-    staticRegisterCols: ["originated_at", "description", "amount", "units", "unique_key"]
+    staticRegisterCols: ["originated_at", "description", "amount", "units", "unique_key"],
+    openMobileMenu: false
   },
 
   getters: {
@@ -89,6 +90,9 @@ const store = createStore({
     },
     getStaticRegisterCols(state) {
       return state.staticRegisterCols
+    },
+    getOpenMobileMenu(state) {
+      return state.openMobileMenu
     }
   },
 
@@ -280,6 +284,9 @@ const store = createStore({
     },
     setRegisterColumns(state, value) {
       state.registerColumns = value
+    },
+    setOpenMobileMenu(state, value) {
+      state.openMobileMenu = value
     }
   },
 
@@ -547,6 +554,9 @@ const store = createStore({
     async registerCols({ commit, state }) {
       let regCols = await Session.apiCall(`/register_items/columns?register_id=${state.registerId}`)
       commit('setRegisterColumns', regCols)
+    },
+    mobileMenu({ commit, state }, value) {
+      commit('setOpenMobileMenu', value)
     }
   }
 

@@ -1,5 +1,5 @@
 <template>
-	<div class="flex">
+	<div class="flex forecast__panels">
 		<Panel class="w-9 border-noround-right pt-2" :pt="{header: {class: 'pb-0'}}">
 			<div class="flex flex-column">
 				<div class="flex justify-content-between align-items-center w-full">
@@ -33,8 +33,8 @@
 				</div>
 			</div>
 		</Panel>
-		<Panel class="w-3 border-left-none border-noround-left" :pt="{header: {class: 'pb-0'}}">
-			<div class="flex flex-column justify-content-end align-items-end">
+		<Panel class="w-3 border-left-none border-noround-left forecast__panel" :pt="{header: {class: 'pb-0'}}">
+			<div class="flex flex-column justify-content-end align-items-end forecast__panel__example">
 				<Button label="View Example" severity="info" text :pt="{label: {class: 'font-semibold'}}" @click="openExampleDialog" class="mb-2" />
 
 				<Image :src="thumbnailImgPreview" alt="Forecast small preview" width="356" class="mx-auto" />

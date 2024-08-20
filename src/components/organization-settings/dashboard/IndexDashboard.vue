@@ -4,10 +4,10 @@
 	
 	<div class="flex flex-column row-gap-5">
 		<ActualsPanel />
-		<!--<ForecastPanel /> -->
+		<!--<ForecastPanel />-->
 		<GrossRevenuePanel />
 		<!--<RevenueWalkPanel />
-		<CashImpactsPanel /> -->
+		<CashImpactsPanel />-->
 	</div>
 </template>
 

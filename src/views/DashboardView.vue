@@ -29,7 +29,7 @@
 			</div>
 		</template>
 		<template v-else>
-			<div class="flex flex-wrap gap-3">
+			<div class="flex flex-wrap gap-3 dashboard__carts">
 				<template v-for="(item, index) in chartsData" :key="index">
 					<template v-if="item.chartTypeAbbr === 'bar' || item.chartTypeAbbr === 'line'">
 						<TheChart :headerTitle="item.name" :headerSubTitle="item.title" :chartDataSet="item.chart" :chartType="item.chartTypeAbbr" class="w-50" />
@@ -47,7 +47,7 @@
 			</div>
 		</template>
 		<template v-else>
-			<div class="flex flex-wrap gap-3">
+			<div class="flex flex-wrap gap-3 dashboard__carts">
 				<template v-for="(item, index) in chartsData" :key="index">
 					<template v-if="item.chartTypeAbbr === 'doughnut'">
 						<TheDoughnutChart :headerTitle="item.name" :headerSubTitle="item.title" :chartDataSet="item.chart" :chartType="item.chartTypeAbbr" :width="'w-30'" />
@@ -82,9 +82,9 @@
 		{name: 'Last 90 Days x 4 Fcst', value: '$657,295', icon:'prime:arrow-up', class: 'up'},
 	])*/
 
-    const loading = ref(false),
-    	store = useStore(),
-    	registersNames = ['Sales', 'Income Account'],
+	const loading = ref(false),
+		store = useStore(),
+		registersNames = ['Sales', 'Income Account'],
 		selectOrgMsgInfo = 'Please, select an organization.',
 		{ showSuccessToast, showErrorToast, showInfoToast } = useToastNotifications(),
 		{ themes } = useColorScheme(),
@@ -224,7 +224,6 @@
 			total = await store.state.Session.apiCall('/reports/item_sum', 'POST', { register_id: regId, start_at, end_at, group_by_period, timezone, group_by: groupBy })
 
 			return total
-			//formatGrossRevenueData(total)
 		} catch (err) {
 			console.log(err)
 		}

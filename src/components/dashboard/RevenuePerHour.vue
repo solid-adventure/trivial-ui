@@ -58,7 +58,7 @@
             <template #footer>
                 <div class="flex flex-wrap align-items-center justify-content-between gap-2">
                     <span class="font-medium">Table Legend</span>
-                    <div class="flex w-4">
+                    <div class="flex w-4 revenue__per__hour__table__footer--percentage">
                         <div v-for="(value, index) in tableLegend" :key="index" class="col" :class="`percentage-${value}`">
                             <div class="text-center text-xs" >{{ value }}%</div>
                         </div>

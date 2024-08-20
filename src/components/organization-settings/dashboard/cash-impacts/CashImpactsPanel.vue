@@ -1,5 +1,5 @@
 <template>
-	<div class="flex">
+	<div class="flex cash__impact__panels">
 		<Panel class="w-9 border-noround-right pt-2" :pt="{header: {class: 'pb-0'}}">
 			<div class="flex flex-column">
 				<div class="flex justify-content-between align-items-center w-full">
@@ -40,7 +40,7 @@
 					</AccordionTab>
 				</Accordion>
 
-				<div v-if="reportingGroupsLength == 0" class="flex justify-content-center align-items-center mt-6 gap-3">
+				<div v-if="reportingGroupsLength == 0" class="flex justify-content-center align-items-center mt-6 gap-3 cash__impact__panel__empty">
 					<Icon icon="lets-icons:folder-add-light" class="w-4rem text-muted" />
 					<div class="w-6">
 						<h3 class="m-0 font-semibold">Refine Your Analysis: Add New Data Columns</h3>
@@ -49,8 +49,8 @@
 				</div>
 			</div>
 		</Panel>
-		<Panel class="w-3 border-left-none border-noround-left" :pt="{header: {class: 'pb-0'}}">
-			<div class="flex flex-column justify-content-end align-items-end">
+		<Panel class="w-3 border-left-none border-noround-left cash__impact__panel" :pt="{header: {class: 'pb-0'}}">
+			<div class="flex flex-column justify-content-end align-items-end cash__impact__panel__example">
 				<Button label="View Example" severity="info" text :pt="{label: {class: 'font-semibold'}}" @click="openExampleDialog" class="mb-2" />
 
 				<Image :src="thumbnailImgPreview" alt="Revenue Walk small preview" width="356" class="mx-auto" />
