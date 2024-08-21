@@ -104,7 +104,7 @@
 		]),
 		selected = ref([]),
 		thumbnailImgPreview = ref(null),
-		reportGroupsChartObj = { name: 'Gross Revenue', report_period: 'month', report_groups: {} },
+		reportGroupsChartObj = { name: 'Gross Revenue', report_period: 'month', report_groups: {}, invert_sign: false },
 		selectOrgMsgInfo = 'Please, select an organization.'
 
 	let reportGroups = ref(null),
@@ -151,7 +151,7 @@
 	const openExampleDialog = () => isExampleDialogOpen.value = true
 	const closeExampleDialog = () => isExampleDialogOpen.value = false
 	const updateSelectedRG = async data => {
-		selected.value = data.filter(item => item.selected)
+		selected.value = data?.selectedCols.filter(item => item.selected)
 
 		let grColsOrder = []
 
@@ -159,7 +159,8 @@
 
 		localStorage.setItem('grColsOrder', JSON.stringify(grColsOrder))
 
-		data.forEach(item => reportGroupsChartObj.report_groups[item.key] = item.selected)
+		reportGroupsChartObj.invert_sign = data?.invertSign
+		data?.selectedCols.forEach(item => reportGroupsChartObj.report_groups[item.key] = item.selected)
 
 		try {
 			let res = await store.state.Session.apiCall(`/dashboards/${dashboard.id}/charts/${dashboardChart.id}`, 'PUT', reportGroupsChartObj)
@@ -168,7 +169,6 @@
 			console.log(err)
 			showErrorToast('Error', 'Failed to update Reporting Groups.')
 		}
-
 	}
 
 	const grossRevenueInit = async id => {
