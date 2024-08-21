@@ -56,9 +56,9 @@
 		</div>
 
 		<div class="mt-5">
-			<div class="flex align-items-center">
+			<div class="flex align-items-center gap-2">
 				<Checkbox v-model="invertSign" inputId="invertSign" name="invertSign" :binary="true" />
-				<label for="invertSign" class="ml-2">Flip Sign</label>
+				<label for="invertSign">Flip Sign</label>
 			</div>
 			<p class="my-1 pl-4 text-sm text-500">Multiply all values by -1 for reporting</p>
 		</div>
@@ -116,7 +116,7 @@
 		if (groupsColumn.value) {
 			groupsColumn.value.forEach(item => customizeOptions.selectedCols.push({name: item.name, type: item.type, selectedValues: item.selectedValues, key: item.key, selected: false}))
 		}
-		
+
 		emit('saveSelected', JSON.parse(JSON.stringify(customizeOptions)))
 
 		closeModal()
