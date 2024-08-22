@@ -89,6 +89,9 @@ const store = createStore({
     },
     getStaticRegisterCols(state) {
       return state.staticRegisterCols
+    },
+    getUser(state) {
+      return state.user
     }
   },
 

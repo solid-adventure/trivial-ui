@@ -63,7 +63,7 @@
 			</Column>
 			<Column class="org-settings__table__action">
 				<template #body="{ data, field }">
-					<router-link :to="`/apps/${data.name}/builder2`" rel="noopener">
+					<router-link v-if="data.canUpdate" :to="`/apps/${data.name}/builder2`" rel="noopener">
 						<Button icon="pi pi-pencil" severity="secondary" text rounded aria-label="Edit" />
 					</router-link>
 				</template>
@@ -73,7 +73,7 @@
 </template>
 
 <script setup>
-	import { ref, computed, onMounted } from 'vue'
+	import { ref, computed, onMounted, toRaw } from 'vue'
 	import { useStore } from 'vuex'
 	import { useFormatCurrency } from '@/composable/formatCurrency.js'
 	import { useFormatDate } from '@/composable/formatDate.js'
@@ -90,7 +90,8 @@
 		selectOrgMsgInfo = 'Please, select an organization.',
 		columns = [
 			{ field: 'descriptive_name', header: 'Customer' },
-			{ field: 'created_at', header: 'Start Date' }
+			{ field: 'created_at', header: 'Start Date' },
+			{ field: 'errors', header: 'Errors' },
 		],
 		loading = ref(false),
 		rows = ref(10),
@@ -105,19 +106,25 @@
 		globalFilterFields = ['descriptive_name', 'created_at']
 
 	let contracts = ref([]),
-		apps = []
+		apps = [],
+		appsPermissions = [],
+		orgContracts = []
 
 	const orgId = computed(() => store.getters.getOrgId)
+	const currentUser = computed(() => store.getters.getUser)
 
 	onMounted(async () => {
-		initContracts()
+		await initContracts()
 	})
 
 	const initContracts = async () => {
 		loading.value = true
 		apps = await getApps()
-		setAppPermits(apps)
-		setContracts()
+		appsPermissions = await setAppPermits(apps)
+		orgContracts = await getOrgContracts(appsPermissions)
+		let x = await getAppActivity(orgContracts)
+
+		console.log('x - ', x)
 		totalRecords.value = totalPaginatorPages(contracts.value.length, rows.value)
 		loading.value = false
 	}
@@ -130,12 +137,47 @@
 		}
 	}
 
-	const setContracts = () => {
-		contracts.value = apps.filter(item => item.owner_id === orgId.value && item.owner_type === 'Organization' && item.panels.component === 'Contract')
+	const getOrgContracts = appsPerm => {
+		return appsPerm.filter(item => item.owner_id === orgId.value && item.owner_type === 'Organization' && item.panels.component === 'Contract')
 	}
 
-	const setAppPermits = apps => {
-		apps.map(app => store.state.Permissions.can('update', 'App', { appName: app.name }).then(res => { app.canUpdate = res }))
+	const setAppPermits = async apps => {
+		let tempArr = [],
+			appsPermissions
+
+		try {
+			appsPermissions = await store.state.Permissions.load()
+		} catch (err) {
+			console.log(err)
+		}
+
+		tempArr = apps.map(app => {
+			if(appsPermissions?.update?.app_names.includes(app?.name)) {
+				app.canUpdate = true
+				return app
+			}
+		})
+
+		return tempArr
+	}
+
+	const getAppActivity = apps => {
+		let tempArr = [],
+			stats = null
+
+		tempArr = apps.map(async app => {
+			try {
+				stats = await store.state.Session.apiCall(`/activity_entries/stats?app_id=${app.name}`)
+
+				app.stats = stats
+				return app
+			} catch (err) {
+				console.log(err)
+			}
+		})
+
+		console.log('tempArr stat - ', tempArr)
+		return tempArr
 	}
 
 	const totalPaginatorPages = (totalItems, itemsPerPage) => totalItems / itemsPerPage
