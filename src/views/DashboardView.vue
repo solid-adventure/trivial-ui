@@ -146,12 +146,11 @@
 		try {
 			let res = await store.state.Session.apiCall(`dashboards/${dashId}/charts`, 'POST', {
 				"register_id": regId,
-				"name": "Example 6",
-				"chart_type": "doughnut",
-				"color_scheme": "purple",
-				"report_period": "month",
+				"name": "Actuals",
+				"chart_type": "summary_group",
+				"color_scheme": "default",
+				"report_period": "year",
 				"report_groups": {
-					"income_account": true
 				}
 			})
 			
@@ -178,9 +177,9 @@
 		} catch (err) {
 			console.log(err)
 		}
-	}*/
+	}
 
-
+	*/
 
 	const getRegisters = async organizationId => {
 		try {
@@ -213,12 +212,12 @@
 		}
 	}
 
-	const getChartsData = async (groupBy, invertSign = false) => {
+	const getChartsData = async (groupBy, invertSign = false, chartType) => {
 		let total = null
 		const timezone = 'Etc/GMT+5', // Etc/GMT+5 -> Not support DST | 'America/Detroit' -> support DST | More info at https://appler.dev/time-zone-table
 			end_at = moment.tz(timezone).format(),
 			start_at = moment.tz(timezone).startOf('year').startOf('day').format(),
-			group_by_period = 'month'
+			group_by_period = chartType !== 'doughnut' ? 'month' : null
 
 		try {
 			total = await store.state.Session.apiCall('/reports/item_sum', 'POST', { register_id: regId, start_at, end_at, group_by_period, timezone, group_by: groupBy, invert_sign: invertSign })
@@ -256,7 +255,7 @@
 
 		groupBy = setGroupBy(data)
 
-		let res = await getChartsData(groupBy, data?.invert_sign)
+		let res = await getChartsData(groupBy, data?.invert_sign, chartTypeAbbr)
 
 		chartCount = res?.count || []
 

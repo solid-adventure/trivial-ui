@@ -57,7 +57,7 @@
 
 		<div class="mt-5">
 			<div class="flex align-items-center gap-2">
-				<Checkbox v-model="invertSign" inputId="invertSign" name="invertSign" :binary="true" />
+				<Checkbox v-model="invertSign" inputId="invertSign" name="invertSign" binary />
 				<label for="invertSign">Flip Sign</label>
 			</div>
 			<p class="my-1 pl-4 text-sm text-500">Multiply all values by -1 for reporting</p>
@@ -75,7 +75,7 @@
 	import { ref, watch, computed, onMounted, toRaw } from "vue"
 	import { Icon } from '@iconify/vue'
 
-	const props = defineProps(['visible', 'groupsColumnArr'])
+	const props = defineProps(['visible', 'groupsColumnArr', 'initInvertSign'])
 	const emit = defineEmits(['closeModal', 'saveSelected'])
 
 	const visible = ref(false),
@@ -91,7 +91,7 @@
 		reportingGroups = ref([]),
 		reportingGroupsLimit = 3
 
-
+	watch(() => props.initInvertSign, newVal => invertSign.value = newVal)
 	watch(() => props.visible, newVal => visible.value = newVal)
 	watch(() => props.groupsColumnArr, newVal => groupsColumn.value = newVal)
 	const isDraggableDisabled = computed(() => reportingGroups.value.length === reportingGroupsLimit)
@@ -121,8 +121,8 @@
 
 		closeModal()
 		customizeOptions.selectedCols = []
-		customizeOptions.invertSign = false
-		invertSign.value = false
+		//customizeOptions.invertSign = false
+		//invertSign.value = false
 	}
 
 	const resetDraggableItems = () => {

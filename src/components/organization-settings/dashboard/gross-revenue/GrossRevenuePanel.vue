@@ -63,7 +63,7 @@
 		</Panel>
 	</div>
 
-	<CustomizeGrossRevenueDialog :visible="isDialogOpen" :groupsColumnArr="reportGroups" :selected="selected" @saveSelected="updateSelectedRG" @closeModal="closeDialog" />
+	<CustomizeGrossRevenueDialog :visible="isDialogOpen" :groupsColumnArr="reportGroups" :selected="selected" @saveSelected="updateSelectedRG" @closeModal="closeDialog" :initInvertSign="invertSign" />
 
 	<GrossRevenueExampleDialog :visible="isExampleDialogOpen" @closeExampleModal="closeExampleDialog" :selected="selected" />
 </template>
@@ -105,7 +105,8 @@
 		selected = ref([]),
 		thumbnailImgPreview = ref(null),
 		reportGroupsChartObj = { name: 'Gross Revenue', report_period: 'month', report_groups: {}, invert_sign: false },
-		selectOrgMsgInfo = 'Please, select an organization.'
+		selectOrgMsgInfo = 'Please, select an organization.',
+		invertSign = ref(false)
 
 	let reportGroups = ref(null),
 		dashboardChart = null,
@@ -181,8 +182,6 @@
 		}
 
 		if (id) {
-			//await getRegisters(id)
-
 			allDashboards = await getAllDashboards()
 			dashboard = getDashboard(allDashboards)
 
@@ -190,6 +189,7 @@
 				dashboardChart = getReportGroups(dashboard?.charts)
 				reportGroups.value = setReportGroups(dashboardChart)
 				selected.value = setSelectedRGCols()
+				invertSign.value = dashboardChart?.invert_sign
 			}
 
 			loading.value = false
