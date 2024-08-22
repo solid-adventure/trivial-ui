@@ -103,7 +103,7 @@
 		}
 	}
 
-	const getChartsData = async groupBy => {
+	const getChartsData = async (groupBy, invertSign = false) => {
 		let total = null
 		const timezone = 'Etc/GMT+5', // Etc/GMT+5 -> Not support DST | 'America/Detroit' -> support DST | More info at https://appler.dev/time-zone-table
 			end_at = moment.tz(timezone).format(),
@@ -111,7 +111,7 @@
 			group_by_period = 'month'
 
 		try {
-			total = await store.state.Session.apiCall('/reports/item_sum', 'POST', { register_id: regId, start_at, end_at, group_by_period, timezone, group_by: groupBy })
+			total = await store.state.Session.apiCall('/reports/item_sum', 'POST', { register_id: regId, start_at, end_at, group_by_period, timezone, group_by: groupBy, invert_sign: invertSign })
 
 			return total
 		} catch (err) {
@@ -144,7 +144,7 @@
 
 		groupBy = setGroupBy(data)
 
-		let res = await getChartsData(groupBy)
+		let res = await getChartsData(groupBy, data?.invert_sign)
 
 		chartCount = res?.count || []
 

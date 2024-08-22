@@ -106,7 +106,7 @@
 
 	const formatGrossRevenueData = data => {
 		loading.value = true
-		groupBy.value = data.group // Set group by for table grouping
+		groupBy.value = data?.group // Set group by for table grouping
 
 		let formattedData = [],
 			groupedData = {},
