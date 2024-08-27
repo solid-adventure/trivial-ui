@@ -165,6 +165,6 @@
 		}
 	}
 
-	const getDashboard = data => data.dashboards.find(item => item.owner_type === 'Organization' && item.owner_id === orgId.value)
-	const getChart = data => data.charts.find(item => item.name === 'Actuals' && item.chart_type === 'summary_group')
+	const getDashboard = data => data?.dashboards.find(item => item.owner_type === 'Organization' && item.owner_id === orgId.value)
+	const getChart = data => data?.charts.find(item => item.name === 'Actuals' && item.chart_type === 'summary_group')
 </script>

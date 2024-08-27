@@ -8,14 +8,16 @@
 		<template v-if="loading">
 			<Skeleton height="33.75rem" borderRadius=".25rem" />
 		</template>
-		<template v-else>
-			<template v-for="(item, index) in chartsData" :key="index">
+		<template v-else-if="tableChartData !== null">
+			<!--<template v-for="(item, index) in chartsData" :key="index">
 				<template v-if="item.chartTypeAbbr === 'table'" >
 					<GrossRevenue :grData="item" /> 
 					<!--<RevenueWalk :revenueWalk="rwData" />
-					<CashImpacts :cashImpacts="ciData" />-->
+					<CashImpacts :cashImpacts="ciData" />--
 				</template>
-			</template>
+			</template>-->
+
+			<GrossRevenue :grData="tableChartData" />
 		</template>
 
 		<Divider class="my-1" />
@@ -94,13 +96,14 @@
 		dashboardChart = null,
 		dashboard = null,
 		allDashboards = null,
-		allCharts = null
+		allCharts = null,
+		tableChartData = ref(null)
 
 	const orgId = computed(() => store.getters.getOrgId)
-	watch(orgId, (newVal, oldVal) => dashboardInit(newVal))
+	watch(orgId, async (newVal, oldVal) => await dashboardInit(newVal))
 
-	onMounted(() => {
-		dashboardInit(orgId.value)
+	onMounted(async () => {
+		await dashboardInit(orgId.value)
 	})
 
 	const dashboardInit = async id => {
@@ -125,8 +128,6 @@
 				allCharts = await getAllCharts(dashboard.id)
 				allCharts.charts.forEach(async item => await formatAllChartsData(item))
 			}
-
-			loading.value = false
 		}
 
 		loading.value = false
@@ -266,6 +267,7 @@
 			chartObj.chart = formatBLPChartsData(chartTypeAbbr, colorScheme, chartCount)
 		} else {
 			chartObj.count = chartCount
+			tableChartData.value = chartObj
 		}
 
 		chartsData.value.push(chartObj)
