@@ -301,12 +301,6 @@ import { mapState } from 'vuex'
       return utc.toLocaleTimeString('en-us', options);
     },
 
-    payloadPreview(payload) {
-      let out = formatJSON(payload).replace(/\s+/g, ' ').trim()
-      out = (out == '') ? 'None' : out
-      return (out.length > 25) ? `${out.substring(0,25)}...` : out
-    },
-
     toggleExpanded(id) {
       this.expanded = {}
       this.expanded[id] = true;

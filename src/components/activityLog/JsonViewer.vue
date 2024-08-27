@@ -213,6 +213,7 @@
     data() {
       return {
         diagnostics: {},
+        payload: {},
         resendText: 'Re-Send'
       }
     },
@@ -224,7 +225,7 @@
       },
 
       payloadDisplay() {
-        return formatJSON(this.webhook.payload) || 'Empty payload'
+        return formatJSON(this.payload) || 'Empty payload'
       },
 
       diagnosticsFilters() {
@@ -269,7 +270,8 @@
       async fetchEntry() {
         try {
           let entry = await this.$store.state.Session.apiCall(`/activity_entries/${this.webhook.id}`)
-         this.diagnostics = entry.diagnostics
+          this.diagnostics = entry.diagnostics
+          this.payload = entry.payload
         } catch (e) {
           console.error('[WebhooksTable][fetchData] Error:', e)
           notifications.error(`Could not load webhook: ${e.message}`)

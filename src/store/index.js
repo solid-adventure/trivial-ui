@@ -471,9 +471,13 @@ const store = createStore({
     async requireDataSample({ state, commit }) {
       if (!state.dataSample) {
         try {
-          const data = await Session.apiCall(`/webhooks?app_id=${state.app.name}&limit=1`)
+          // The activity_entries index does not return the payload, so we need to fetch the first entry,
+          // and then fetch the full entry to get the payload
+          const data = await Session.apiCall(`/activity_entries?app_id=${state.app.name}&limit=1`)
           if (Array.isArray(data) && data.length > 0) {
-            commit('setDataSample', data[0])
+            const id = data[0].id
+            const entry = await Session.apiCall(`/activity_entries/${id}`)
+            commit('setDataSample', {payload: entry.payload})
           } else {
             commit('setDataSample', {payload: {}})
           }
