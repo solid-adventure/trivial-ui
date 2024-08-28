@@ -1,18 +1,18 @@
 <template>
 	<Panel header="Actuals" :pt="{root: {class: 'shadow-2'}, header: {class: 'text-lg'}}">
-		<div class="flex flex-wrap justify-content-between align-items-center gap-3">
+		<div class="flex flex-wrap justify-content-between align-items-center gap-3 actuals__wrapper">
 			<template v-if="loading">
-				<Skeleton width="20rem" height="3rem"></Skeleton>
-				<Skeleton width="20rem" height="3rem"></Skeleton>
-				<Skeleton width="20rem" height="3rem"></Skeleton>
-				<Skeleton width="20rem" height="3rem"></Skeleton>
-				<Skeleton width="20rem" height="3rem"></Skeleton>
+				<Skeleton width="18rem" height="3rem"></Skeleton>
+				<Skeleton width="18rem" height="3rem"></Skeleton>
+				<Skeleton width="18rem" height="3rem"></Skeleton>
+				<Skeleton width="18rem" height="3rem"></Skeleton>
+				<Skeleton width="18rem" height="3rem"></Skeleton>
 			</template>
 			<template v-else-if="!getRegId">
 				<h4 class="font-medium">No Actuals data</h4>
 			</template>
 			<template v-else>
-				<div v-for="(item, index) in selectedActuals" :key="index" class="actuals border-300" :class="{'border-right-1': index !== lastItem}">
+				<div v-for="(item, index) in selectedActuals" :key="index" class="actuals__wrapper__item border-300" :class="{'border-right-1': index !== lastItem}">
 					<p class="m-0 text-md text-muted">{{ item.name }}</p>
 					<div class="flex align-items-center gap-1 mt-1">
 						<p class="m-0 text-xl font-semibold">{{ useFormatCurrency(item.value) }}</p>
@@ -40,7 +40,8 @@
 			register_id: null,
 			start_at: null,
 			end_at: moment.tz(timezone).format(),
-			timezone: timezone
+			timezone: timezone,
+			invert_sign: false
 		},
 		selectedActuals = ref([
 			{ key: 'last1DayData', name: 'Last Day Revenue', value: null, icon: null, class: null },
@@ -63,10 +64,14 @@
 		last1YearOffset = moment(last1Year).tz(timezone).subtract({ months: 6 }).format()
 
 	let regId = null,
-		allActualsData = null
+		allActualsData = null,
+		dashboard = null,
+		allDashboards = null,
+		chart = null
 
 	const lastItem = computed(() => selectedActuals.value.length - 1),
-		getRegId = computed(() => store.getters.getRegisterId)
+		getRegId = computed(() => store.getters.getRegisterId),
+		orgId = computed(() => store.getters.getOrgId)
 
 	watch(() => store.getters.getRegisterId, async newVal => {
 		regId = newVal
@@ -75,6 +80,7 @@
 	})
 
 	onMounted(async () => {
+		await dashboardInit()
 		regId = getRegId.value
 		if (regId) await initActualsData()
 	})
@@ -91,6 +97,7 @@
 	const getActuals = async (options, datePeriod) => {
 		options.register_id = regId
 		options.start_at = datePeriod
+		options.invert_sign = chart?.invert_sign
 
 		try {
 			return await store.state.Session.apiCall('/reports/item_sum', 'POST', options)
@@ -142,4 +149,22 @@
 			}
 		})
 	}
+
+	const dashboardInit = async () => {
+		allDashboards = await getAllDashboards()
+		dashboard = getDashboard(allDashboards)
+		chart = getChart(dashboard)
+	}
+
+	const getAllDashboards = async () => {
+		try {
+			let res = await store.state.Session.apiCall('/dashboards')
+			return res
+		} catch (err) {
+			console.log(err)
+		}
+	}
+
+	const getDashboard = data => data?.dashboards.find(item => item.owner_type === 'Organization' && item.owner_id === orgId.value)
+	const getChart = data => data?.charts.find(item => item.name === 'Actuals' && item.chart_type === 'summary_group')
 </script>

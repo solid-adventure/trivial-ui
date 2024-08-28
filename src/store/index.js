@@ -49,7 +49,8 @@ const store = createStore({
     orgId: null,
     registerColumns: null,
     registerId: null,
-    staticRegisterCols: ["originated_at", "description", "amount", "units", "unique_key"]
+    staticRegisterCols: ["originated_at", "description", "amount", "units", "unique_key"],
+    openMobileMenu: false
   },
 
   getters: {
@@ -90,8 +91,8 @@ const store = createStore({
     getStaticRegisterCols(state) {
       return state.staticRegisterCols
     },
-    getUser(state) {
-      return state.user
+    getOpenMobileMenu(state) {
+      return state.openMobileMenu
     }
   },
 
@@ -283,6 +284,9 @@ const store = createStore({
     },
     setRegisterColumns(state, value) {
       state.registerColumns = value
+    },
+    setOpenMobileMenu(state, value) {
+      state.openMobileMenu = value
     }
   },
 
@@ -467,9 +471,13 @@ const store = createStore({
     async requireDataSample({ state, commit }) {
       if (!state.dataSample) {
         try {
-          const data = await Session.apiCall(`/webhooks?app_id=${state.app.name}&limit=1`)
+          // The activity_entries index does not return the payload, so we need to fetch the first entry,
+          // and then fetch the full entry to get the payload
+          const data = await Session.apiCall(`/activity_entries?app_id=${state.app.name}&limit=1`)
           if (Array.isArray(data) && data.length > 0) {
-            commit('setDataSample', data[0])
+            const id = data[0].id
+            const entry = await Session.apiCall(`/activity_entries/${id}`)
+            commit('setDataSample', {payload: entry.payload})
           } else {
             commit('setDataSample', {payload: {}})
           }
@@ -550,6 +558,9 @@ const store = createStore({
     async registerCols({ commit, state }) {
       let regCols = await Session.apiCall(`/register_items/columns?register_id=${state.registerId}`)
       commit('setRegisterColumns', regCols)
+    },
+    mobileMenu({ commit, state }, value) {
+      commit('setOpenMobileMenu', value)
     }
   }
 

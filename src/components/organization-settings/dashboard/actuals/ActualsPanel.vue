@@ -1,5 +1,5 @@
 <template>
-	<div class="flex">
+	<div class="flex actuals__panels">
 		<Panel class="w-9 border-noround-right pt-2" :pt="{header: {class: 'pb-0'}}">
 			<div class="flex flex-column">
 				<div class="flex justify-content-between align-items-center w-full">
@@ -12,10 +12,10 @@
 						</OverlayPanel>
 					</h2>
 
-					<!-- <div class="card flex justify-content-center">
+					<div class="card flex justify-content-center">
 						<Button type="button" icon="pi pi-ellipsis-v" outlined severity="secondary" @click="toggleMenu" aria-haspopup="true" aria-controls="overlay_menu" />
 						<Menu ref="menu" id="overlay_menu" :model="menuItems" :popup="true" />
-					</div> -->
+					</div>
 				</div>
 
 				<ul class="flex flex-wrap gap-4 w-9 mt-5 p-0 actuals__list">
@@ -33,8 +33,8 @@
 				</div>
 			</div>
 		</Panel>
-		<Panel class="w-3 border-left-none border-noround-left" :pt="{header: {class: 'pb-0'}}">
-			<div class="flex flex-column justify-content-end align-items-end">
+		<Panel class="w-3 border-left-none border-noround-left actuals__panel" :pt="{header: {class: 'pb-0'}}">
+			<div class="flex flex-column justify-content-end align-items-end actuals__panel__example">
 				<Button label="View Example" severity="info" text :pt="{label: {class: 'font-semibold'}}" @click="openExampleDialog" class="mb-2" />
 
 				<Image :src="thumbnailImgPreview" alt="Actuals small preview" width="356" class="mx-auto" />
@@ -42,7 +42,7 @@
 		</Panel>
 	</div>
 
-	<CustomizeActualsDialog :visible="isDialogOpen" :selected="selected" @saveSelected="updateSelected" @closeModal="closeDialog" />
+	<CustomizeActualsDialog :visible="isDialogOpen" :selected="selected" @saveSelected="updateSelected" @closeModal="closeDialog" :initInvertSign="invertSign" />
 
 	<ActualsExampleDialog :visible="isExampleDialogOpen" @closeExampleModal="closeExampleDialog" :selected="selected" />
 
@@ -53,6 +53,7 @@
 	import { ref, computed, watch, onMounted } from 'vue'
 	import { useStore } from 'vuex'
 	import { Icon } from '@iconify/vue'
+	import { useToastNotifications } from '@/composable/toastNotification'
 	import CustomizeActualsDialog from './CustomizeActualsDialog.vue'
 	import ActualsExampleDialog from './ActualsExampleDialog.vue'
 	import AuditLogs from './AuditLogs.vue'
@@ -88,15 +89,29 @@
 			{ key: 'last1YearData', name: 'Year to Date Revenue', value: null, icon: null, class: null }
 		]),
 		store = useStore(),
-		thumbnailImgPreview = ref(null)
+		thumbnailImgPreview = ref(null),
+		selectOrgMsgInfo = 'Please, select an organization.',
+		registersNames = ['Sales', 'Income Account'],
+		{ showSuccessToast, showErrorToast, showInfoToast } = useToastNotifications(),
+		loading = ref(false),
+		invertSign = ref(false)
 
+	let reportGroupsChartObj = { name: 'Actuals', chart_type: 'summary_group', invert_sign: false },
+		dashboard = null,
+		allDashboards = null,
+		chart = null
+
+	const orgId = computed(() => store.getters.getOrgId)
 	const selectedLength = computed(() => selected.value.length)
+
+	watch(orgId, (newVal, oldVal) => dashboardInit())
 
 	watch(() => store.getters.getIsDarkTheme, async (newVal, oldVal) => {
 		thumbnailImgPreview.value = newVal ? ActualsDarkImgPreview : ActualsLightImgPreview
 	})
 
 	onMounted(async () => {
+		await dashboardInit()
 		thumbnailImgPreview.value = await store.getters.getIsDarkTheme ? ActualsDarkImgPreview : ActualsLightImgPreview
 	})
 
@@ -109,5 +124,39 @@
 	const closeDialog = () => isDialogOpen.value = false
 	const openExampleDialog = () => isExampleDialogOpen.value = true
 	const closeExampleDialog = () => isExampleDialogOpen.value = false
-	const updateSelected = data => selected.value = data
+	const updateSelected = async data => {
+		reportGroupsChartObj.invert_sign = data?.invertSign
+
+		try {
+			let res = await store.state.Session.apiCall(`/dashboards/${dashboard.id}/charts/${chart.id}`, 'PUT', reportGroupsChartObj)
+			showSuccessToast('Success', 'Reporting Groups updated successfully.')
+		} catch (err) {
+			console.log(err)
+			showErrorToast('Error', 'Failed to update Reporting Groups.')
+		}
+
+	}
+
+	const dashboardInit = async () => {
+		loading.value = true
+
+		allDashboards = await getAllDashboards()
+		dashboard = getDashboard(allDashboards)
+		chart = getChart(dashboard)
+		invertSign.value = chart?.invert_sign
+
+		loading.value = false
+	}
+
+	const getAllDashboards = async () => {
+		try {
+			let res = await store.state.Session.apiCall('/dashboards')
+			return res
+		} catch (err) {
+			console.log(err)
+		}
+	}
+
+	const getDashboard = data => data.dashboards.find(item => item.owner_type === 'Organization' && item.owner_id === orgId.value)
+	const getChart = data => data.charts.find(item => item.name === 'Actuals' && item.chart_type === 'summary_group')
 </script>

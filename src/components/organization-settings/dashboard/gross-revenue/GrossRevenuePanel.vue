@@ -1,5 +1,5 @@
 <template>
-	<div class="flex">
+	<div class="flex gross__revenue__panels">
 		<Panel class="w-9 border-noround-right pt-2" :pt="{header: {class: 'pb-0'}}">
 			<div class="flex flex-column">
 				<div class="flex justify-content-between align-items-center w-full">
@@ -27,7 +27,7 @@
 					<Skeleton height="3.375rem" class="mb-2" borderRadius=".25rem" />
 					<Skeleton height="3.375rem" class="mb-2" borderRadius=".25rem" />
 				</div>
-				<div v-else-if="reportingGroupsLength == 0" class="flex justify-content-center align-items-center mt-5 gap-3">
+				<div v-else-if="reportingGroupsLength == 0" class="flex justify-content-center align-items-center mt-5 gap-3 gross__revenue__panel__empty">
 					<Icon icon="lets-icons:folder-add-light" class="w-4rem text-muted" />
 					<div class="w-6">
 						<h3 class="m-0 font-semibold">Enhance Your Insights: Add Columns for Gross Revenue</h3>
@@ -53,8 +53,8 @@
 				</Accordion>
 			</div>
 		</Panel>
-		<Panel class="w-3 border-left-none border-noround-left" :pt="{header: {class: 'pb-0'}}">
-			<div class="flex flex-column justify-content-end align-items-end">
+		<Panel class="w-3 border-left-none border-noround-left gross__revenue__panel" :pt="{header: {class: 'pb-0'}}">
+			<div class="flex flex-column justify-content-end align-items-end gross__revenue__panel__example">
 				<Button label="View Example" severity="info" text :pt="{label: {class: 'font-semibold'}}" @click="openExampleDialog" class="mb-2" />
 
 				<Skeleton v-if="isLoading" height="20rem" borderRadius=".25rem" />
@@ -63,7 +63,7 @@
 		</Panel>
 	</div>
 
-	<CustomizeGrossRevenueDialog :visible="isDialogOpen" :groupsColumnArr="reportGroups" :selected="selected" @saveSelected="updateSelectedRG" @closeModal="closeDialog" />
+	<CustomizeGrossRevenueDialog :visible="isDialogOpen" :groupsColumnArr="reportGroups" :selected="selected" @saveSelected="updateSelectedRG" @closeModal="closeDialog" :initInvertSign="invertSign" />
 
 	<GrossRevenueExampleDialog :visible="isExampleDialogOpen" @closeExampleModal="closeExampleDialog" :selected="selected" />
 </template>
@@ -104,8 +104,9 @@
 		]),
 		selected = ref([]),
 		thumbnailImgPreview = ref(null),
-		reportGroupsChartObj = { name: 'Gross Revenue', report_period: 'month', report_groups: {} },
-		selectOrgMsgInfo = 'Please, select an organization.'
+		reportGroupsChartObj = { name: 'Gross Revenue', report_period: 'month', report_groups: {}, invert_sign: false },
+		selectOrgMsgInfo = 'Please, select an organization.',
+		invertSign = ref(false)
 
 	let reportGroups = ref(null),
 		dashboardChart = null,
@@ -151,7 +152,7 @@
 	const openExampleDialog = () => isExampleDialogOpen.value = true
 	const closeExampleDialog = () => isExampleDialogOpen.value = false
 	const updateSelectedRG = async data => {
-		selected.value = data.filter(item => item.selected)
+		selected.value = data?.selectedCols.filter(item => item.selected)
 
 		let grColsOrder = []
 
@@ -159,7 +160,8 @@
 
 		localStorage.setItem('grColsOrder', JSON.stringify(grColsOrder))
 
-		data.forEach(item => reportGroupsChartObj.report_groups[item.key] = item.selected)
+		reportGroupsChartObj.invert_sign = data?.invertSign
+		data?.selectedCols.forEach(item => reportGroupsChartObj.report_groups[item.key] = item.selected)
 
 		try {
 			let res = await store.state.Session.apiCall(`/dashboards/${dashboard.id}/charts/${dashboardChart.id}`, 'PUT', reportGroupsChartObj)
@@ -168,7 +170,6 @@
 			console.log(err)
 			showErrorToast('Error', 'Failed to update Reporting Groups.')
 		}
-
 	}
 
 	const grossRevenueInit = async id => {
@@ -181,8 +182,6 @@
 		}
 
 		if (id) {
-			//await getRegisters(id)
-
 			allDashboards = await getAllDashboards()
 			dashboard = getDashboard(allDashboards)
 
@@ -190,6 +189,7 @@
 				dashboardChart = getReportGroups(dashboard?.charts)
 				reportGroups.value = setReportGroups(dashboardChart)
 				selected.value = setSelectedRGCols()
+				invertSign.value = dashboardChart?.invert_sign
 			}
 
 			loading.value = false

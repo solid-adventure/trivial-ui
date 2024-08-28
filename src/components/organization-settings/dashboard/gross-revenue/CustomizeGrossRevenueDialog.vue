@@ -55,6 +55,14 @@
 			<h4 class="font-normal font-semibold">Please select organization.</h4>
 		</div>
 
+		<div class="mt-5">
+			<div class="flex align-items-center gap-2">
+				<Checkbox v-model="invertSign" inputId="invertSign" name="invertSign" binary />
+				<label for="invertSign">Flip Sign</label>
+			</div>
+			<p class="my-1 pl-4 text-sm text-500">Multiply all values by -1 for reporting</p>
+		</div>
+
 		<div class="flex justify-content-end gap-2 mt-5">
 			<Button type="button" label="Cancel" text @click="closeModal" class="modal__cancel--btn" :pt="{label: {class: 'font-semibold'}}" />
 			<Button type="button" label="Save" class="modal__next--btn" @click="saveSelected" />
@@ -67,10 +75,11 @@
 	import { ref, watch, computed, onMounted, toRaw } from "vue"
 	import { Icon } from '@iconify/vue'
 
-	const props = defineProps(['visible', 'groupsColumnArr'])
+	const props = defineProps(['visible', 'groupsColumnArr', 'initInvertSign'])
 	const emit = defineEmits(['closeModal', 'saveSelected'])
 
 	const visible = ref(false),
+		invertSign = ref(false),
 		groupsColumn = ref([
 			/*{id: 1, name: 'Customer Type', values: ['Retail', 'Wholesale', 'Services'], type: 'String', selectedValues: ['Retail', 'Wholesale', 'Services']},
 			{id: 2, name: 'Location', values: ['Location 1', 'Location 2', 'Location 3'], type: 'String', selectedValues: ['Location 1', 'Location 2', 'Location 3']},
@@ -82,7 +91,7 @@
 		reportingGroups = ref([]),
 		reportingGroupsLimit = 3
 
-
+	watch(() => props.initInvertSign, newVal => invertSign.value = newVal)
 	watch(() => props.visible, newVal => visible.value = newVal)
 	watch(() => props.groupsColumnArr, newVal => groupsColumn.value = newVal)
 	const isDraggableDisabled = computed(() => reportingGroups.value.length === reportingGroupsLimit)
@@ -97,18 +106,23 @@
 	const setSelectedReportingGropus = () => reportingGroups.value = [...props.selected]
 
 	const saveSelected = () => {
-		let selectedCols = []
-
-		reportingGroups.value.forEach(item => selectedCols.push({name: item.name, type: item.type, selectedValues: item.selectedValues, key: item.key, selected: true}))
-
-		if (groupsColumn.value) {
-			groupsColumn.value.forEach(item => selectedCols.push({name: item.name, type: item.type, selectedValues: item.selectedValues, key: item.key, selected: false}))
+		let customizeOptions = {
+			selectedCols: [],
+			invertSign: invertSign.value
 		}
 
-		emit('saveSelected', selectedCols)
+		reportingGroups.value.forEach(item => customizeOptions.selectedCols.push({name: item.name, type: item.type, selectedValues: item.selectedValues, key: item.key, selected: true}))
+
+		if (groupsColumn.value) {
+			groupsColumn.value.forEach(item => customizeOptions.selectedCols.push({name: item.name, type: item.type, selectedValues: item.selectedValues, key: item.key, selected: false}))
+		}
+
+		emit('saveSelected', JSON.parse(JSON.stringify(customizeOptions)))
 
 		closeModal()
-		selectedCols = []
+		customizeOptions.selectedCols = []
+		//customizeOptions.invertSign = false
+		//invertSign.value = false
 	}
 
 	const resetDraggableItems = () => {
