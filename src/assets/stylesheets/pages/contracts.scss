@@ -1,0 +1,42 @@
+.popup__container {
+	position: relative;
+	display: flex;
+	justify-content: center;
+	align-content: center;
+	width: 24px;
+	height: 24px;
+	cursor: pointer;
+	transition: all .3s ease;
+	background: red;
+
+	&:hover {
+		.popup {
+			visibility: visible;
+			opacity: 1;
+		}
+	}
+
+	& > .popup {
+		position: absolute;
+		right: 44px;
+		z-index: 1000;
+		visibility: hidden;
+		display: flex;
+		width: 153px;
+		height: 123px;
+		padding: 12px;
+		border-radius: 4px;
+		box-shadow: 0 4px 10px 0 rgba(0, 0, 8, 0.1);
+		opacity: 0;
+		transition: all .3s ease;
+		background: #FFF;
+	}
+}
+
+.error-fill {
+	fill: #D85C57;
+}
+
+.success-fill {
+	fill: #61C746;
+}

@@ -30,7 +30,7 @@
 			</template>
 			<template #empty>
 				<h3 v-if="!orgId">{{ selectOrgMsgInfo }}</h3>
-				No revenues found.
+				No contracts found.
 			</template>
 			<template #loading>
 				<div class="flex align-content-center justify-content-center flex-column">
@@ -58,6 +58,69 @@
 						</router-link>
 					</span>
 					<span v-else-if="field === 'created_at'">{{ useFormatDate(data[field]) }}</span>
+					<span v-else-if="field === 'stats'">
+						<!--<ConfirmPopup group="templating" :pt="{ message: { class: 'bg-white' }, footer: { class: 'd-none' }}">
+							<template #message="slotProps">
+								<div class="flex flex-column align-items-center w-full gap-3 border-bottom-1 surface-border p-3 mb-3 pb-0">
+									<p>Hello World</p>
+								</div>
+							</template>
+						</ConfirmPopup>
+						<Button @click="showTemplate($event)" text icon="pi-chart-bar" />-->
+
+						<!--<div class="popup__container">
+							<i class="pi pi-chart-bar" />
+
+							<div class="popup">
+								<p>Lorem Ipsum</p>
+							</div> 
+						</div>-->
+
+						<Button type="button" link size="large" text aria-label="Chart Info" @click="toggleActivityPopup" class="p-2">
+							<div v-for="(item, index) in data.stats" :key="index"></div>
+							<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="20" width="26" class="chart">
+									<g class="bar" :class="{ 'error-fill': false, 'success-fill': true }" transform="translate(0,0)">
+										<rect height="10" y="10" width="2"></rect>
+									</g>
+									<g class="bar" :class="{ 'error-fill': true, 'success-fill': false }" transform="translate(3,0)">
+										<rect height="6" y="14" width="2"></rect>
+									</g>
+									<g class="bar" :class="{ 'error-fill': false, 'success-fill': true }" transform="translate(6,0)">
+										<rect height="20" y="4" width="2"></rect>
+									</g>
+									<g class="bar" :class="{ 'error-fill': false, 'success-fill': true }"transform="translate(9,0)">
+										<rect height="10" y="10" width="2"></rect>
+									</g>
+									<g class="bar" :class="{ 'error-fill': false, 'success-fill': true }" transform="translate(12,0)">
+										<rect height="9" y="11" width="2"></rect>
+									</g>
+									<g class="bar" :class="{ 'error-fill': false, 'success-fill': true }" transform="translate(15,0)">
+										<rect height="10" y="10" width="2"></rect>
+									</g>
+									<g class="bar" :class="{ 'error-fill': true, 'success-fill': false }" transform="translate(18,0)">
+										<rect height="17" y="6" width="2"></rect>
+									</g>
+
+									<!--<g v-for="(item, index) in data.stats" :key="index" class="bar mr-1" :class="{ 'error-fill': item.hasErros, 'success-fill': !item.hasErros }" :transform="`translate(${20 - item.errorsCount}, 0)`">
+										<rect :height="item.errorsCount" width="2" :y="20 - item.errorsCount" :x="index * 4" />
+									</g>-->
+							</svg>
+						</Button>
+						<OverlayPanel ref="activityPopup">
+							<div class="flex flex-column justify-content-start align-items-center w-10rem h-8rem">
+								<p class="w-full mt-1 mb-2 text-base text-500">Last {{ activityPeriod(data.stats) }} days</p>
+								<p class="w-full m-1">
+									<i class="pi mr-2" :class="{ 'pi-times-circle text-red-600': true, 'pi-check-circle text-primary-500': false }" /> 
+									<span class="text-lg font-semibold" :class="{ 'text-red-600': true, 'text-primary-500': false }">30 Erros</span>
+								</p>
+
+								<Divider />
+								<router-link :to="`/apps/${data.name}/activity`" rel="noopener" class="w-full flex justify-content-start align-items-center">
+									<Button label="View Activity" icon="pi pi-external-link" iconPos="right" link class="p-1 text-md font-medium text-blue-500" />
+								</router-link>
+							</div>
+						</OverlayPanel>
+					</span>
 					<span v-else>{{ data[field] }}</span>
 				</template>
 			</Column>
@@ -73,13 +136,15 @@
 </template>
 
 <script setup>
-	import { ref, computed, onMounted, toRaw } from 'vue'
+	import { ref, computed, watch, onMounted, toRaw } from 'vue'
 	import { useStore } from 'vuex'
 	import { useFormatCurrency } from '@/composable/formatCurrency.js'
 	import { useFormatDate } from '@/composable/formatDate.js'
 	import { useFilterMatchModes } from '@/composable/filterMatchModes.js'
 	import loadingImg from '@/assets/images/trivial-loading-optimized.webp'
 
+	// SEARCH ACTIVITYLINK ?search=[{"name":"status","key":null,"operator":"=","value":"500"}]
+	
 	const store = useStore(),
 		selectedContract = ref(),
 		dropdownContracts = ref([
@@ -91,7 +156,7 @@
 		columns = [
 			{ field: 'descriptive_name', header: 'Customer' },
 			{ field: 'created_at', header: 'Start Date' },
-			{ field: 'errors', header: 'Errors' },
+			{ field: 'stats', header: 'Errors' },
 		],
 		loading = ref(false),
 		rows = ref(10),
@@ -103,7 +168,8 @@
 			"descriptive_name": {"constraints": [{"value":null,"matchMode":"equals"}]}
 		}),
 		{ dateFilterMatchModes, textFilterMatchModes } = useFilterMatchModes(),
-		globalFilterFields = ['descriptive_name', 'created_at']
+		globalFilterFields = ['descriptive_name', 'created_at'],
+		activityPopup = ref()
 
 	let contracts = ref([]),
 		apps = [],
@@ -122,9 +188,7 @@
 		apps = await getApps()
 		appsPermissions = await setAppPermits(apps)
 		orgContracts = await getOrgContracts(appsPermissions)
-		let x = await getAppActivity(orgContracts)
-
-		console.log('x - ', x)
+		contracts.value = await getAppActivity(orgContracts)
 		totalRecords.value = totalPaginatorPages(contracts.value.length, rows.value)
 		loading.value = false
 	}
@@ -143,7 +207,7 @@
 
 	const setAppPermits = async apps => {
 		let tempArr = [],
-			appsPermissions
+			appsPermissions = null
 
 		try {
 			appsPermissions = await store.state.Permissions.load()
@@ -162,24 +226,25 @@
 	}
 
 	const getAppActivity = apps => {
-		let tempArr = [],
-			stats = null
-
-		tempArr = apps.map(async app => {
+		apps.forEach(async app => {
 			try {
-				stats = await store.state.Session.apiCall(`/activity_entries/stats?app_id=${app.name}`)
+				app.stats = await store.state.Session.apiCall(`/activity_entries/stats?app_id=${app.name}`)
 
-				app.stats = stats
-				return app
+				app.stats.forEach(item => {
+					item.hasErrors = Object.keys(item.count).length ? true : false
+					item.errorsCount = randomIntFromInterval(1, 20)
+				})
 			} catch (err) {
 				console.log(err)
 			}
 		})
 
-		console.log('tempArr stat - ', tempArr)
-		return tempArr
+		return apps
 	}
 
+	const randomIntFromInterval = (min, max) => Math.floor(Math.random() * (max - min + 1) + min)
+	const activityPeriod = item => item.length
+	const toggleActivityPopup = event => activityPopup.value[0].toggle(event)
 	const totalPaginatorPages = (totalItems, itemsPerPage) => totalItems / itemsPerPage
 	const setFilterMatchModes = field => field === 'created_at' ? dateFilterMatchModes : textFilterMatchModes
 	const onFilterClear = async field => {
