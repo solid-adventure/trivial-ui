@@ -75,7 +75,7 @@
 	import { ref, watch, computed, onMounted, toRaw } from "vue"
 	import { Icon } from '@iconify/vue'
 
-	const props = defineProps(['visible', 'groupsColumnArr', 'initInvertSign'])
+	const props = defineProps(['visible', 'groupsColumnArr', 'initInvertSign', 'selected'])
 	const emit = defineEmits(['closeModal', 'saveSelected'])
 
 	const visible = ref(false),
@@ -90,10 +90,15 @@
 		]),
 		reportingGroups = ref([]),
 		reportingGroupsLimit = 3
+	
+	let groupsColumnClone = null
 
 	watch(() => props.initInvertSign, newVal => invertSign.value = newVal)
 	watch(() => props.visible, newVal => visible.value = newVal)
-	watch(() => props.groupsColumnArr, newVal => groupsColumn.value = newVal)
+	watch(() => props.groupsColumnArr, newVal => { 
+		groupsColumn.value = newVal
+		groupsColumnClone = JSON.parse(JSON.stringify(newVal))
+	})
 	const isDraggableDisabled = computed(() => reportingGroups.value.length === reportingGroupsLimit)
 	const reportingGroupsCountTxt = computed(() => `(${reportingGroupsLength.value} of 3)`)
 	const reportingGroupsLength = computed(() => reportingGroups.value.length)
@@ -103,7 +108,7 @@
 		groupsColumn.value = props.groupsColumnArr
 	})
 
-	const setSelectedReportingGropus = () => reportingGroups.value = [...props.selected]
+	//const setSelectedReportingGropus = () => reportingGroups.value = [...props.selected]
 
 	const saveSelected = () => {
 		let customizeOptions = {
@@ -111,11 +116,15 @@
 			invertSign: invertSign.value
 		}
 
-		reportingGroups.value.forEach(item => customizeOptions.selectedCols.push({name: item.name, type: item.type, selectedValues: item.selectedValues, key: item.key, selected: true}))
+		let reportingGroupsTempArr = reportingGroups.value.length ? reportingGroups.value : props.selected
 
-		if (groupsColumn.value) {
-			groupsColumn.value.forEach(item => customizeOptions.selectedCols.push({name: item.name, type: item.type, selectedValues: item.selectedValues, key: item.key, selected: false}))
-		}
+		groupsColumnClone.forEach(item => {
+			if (reportingGroupsTempArr.some(selected => selected.key === item.key)) {
+				customizeOptions.selectedCols.push({name: item.name, type: item.type, selectedValues: item.selectedValues, key: item.key, selected: true})
+			} else {
+				customizeOptions.selectedCols.push({name: item.name, type: item.type, selectedValues: item.selectedValues, key: item.key, selected: false})
+			}
+		})
 
 		emit('saveSelected', JSON.parse(JSON.stringify(customizeOptions)))
 
