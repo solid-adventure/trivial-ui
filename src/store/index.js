@@ -93,6 +93,9 @@ const store = createStore({
     },
     getOpenMobileMenu(state) {
       return state.openMobileMenu
+    },
+    getUser(state) {
+      return state.user
     }
   },
 

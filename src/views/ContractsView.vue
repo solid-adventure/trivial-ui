@@ -115,7 +115,7 @@
 								</p>
 
 								<Divider />
-								<router-link :to="`/apps/${data.name}/activity`" rel="noopener" class="w-full flex justify-content-start align-items-center">
+								<router-link :to="`/apps/${data.name}/activity?search=${activityQueryStrEncoded}`" rel="noopener" class="w-full flex justify-content-start align-items-center">
 									<Button label="View Activity" icon="pi pi-external-link" iconPos="right" link class="p-1 text-md font-medium text-blue-500" />
 								</router-link>
 							</div>
@@ -142,8 +142,6 @@
 	import { useFormatDate } from '@/composable/formatDate.js'
 	import { useFilterMatchModes } from '@/composable/filterMatchModes.js'
 	import loadingImg from '@/assets/images/trivial-loading-optimized.webp'
-
-	// SEARCH ACTIVITYLINK ?search=[{"name":"status","key":null,"operator":"=","value":"500"}]
 	
 	const store = useStore(),
 		selectedContract = ref(),
@@ -169,7 +167,9 @@
 		}),
 		{ dateFilterMatchModes, textFilterMatchModes } = useFilterMatchModes(),
 		globalFilterFields = ['descriptive_name', 'created_at'],
-		activityPopup = ref()
+		activityPopup = ref(),
+		activityQueryStr = "[{'c':'status','o':'=','p':'500'}]",
+		activityQueryStrEncoded = encodeURIComponent(JSON.stringify(JSON.parse(activityQueryStr.replace(/'/g, '"'))))
 
 	let contracts = ref([]),
 		apps = [],
@@ -232,7 +232,7 @@
 
 				app.stats.forEach(item => {
 					item.hasErrors = Object.keys(item.count).length ? true : false
-					item.errorsCount = randomIntFromInterval(1, 20)
+					item.errorsCount = randomIntFromInterval(1, 20) // get errors from Object.keys(item.count).length
 				})
 			} catch (err) {
 				console.log(err)
