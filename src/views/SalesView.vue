@@ -141,12 +141,14 @@
 		],
 		totalsColumns = { amount: 'amount' },
 		allRegisters = null,
-		regId = null,
 		filterDate = { end_at: null, start_at: null },
 		page = 1 // Default start page is from first
 
 	const orgId = computed(() => store.getters.getOrgId)
+	const regId = computed(() => store.getters.getRegisterId)
+	const register = computed(() => store.getters.getRegister)
 	const registersItems = computed(() => registers.value)
+
 	watch(orgId, async (newVal, oldVal) => {
 		if (!newVal) {
 			resetColumns()
@@ -190,11 +192,8 @@
 			setColumns()
 			setFilters()
 
-			allRegisters = await store.state.Session.apiCall('/registers')
-			let register = allRegisters.find(r => r.owner_type === 'Organization' && r.owner_id === orgId && registersNames.includes(r.name))
-
 			// If regiester don't exists or don't have sales data for table
-			if (!register) {
+			if (!register.value) {
 				resetColumns()
 				resetFilters()
 				resetRegisters()
@@ -203,8 +202,8 @@
 				return
 			}
 
-			regId = register.id
-			setMetaColumns(register.meta)
+			//regId = register.id
+			setMetaColumns(register.value.meta)
 			setCSSCustomProp()
 			await getSearchableCols()
 
@@ -224,7 +223,7 @@
 
 	const getRegistersData = async queryString => {
 		try {
-			return await store.state.Session.apiCall(`/register_items?register_id=${regId}&${queryString}`)
+			return await store.state.Session.apiCall(`/register_items?register_id=${regId.value}&${queryString}`)
 		} catch (err) {
 			showErrorToast('Error', 'Failed to fetch data.')
 			console.error(err);
@@ -246,7 +245,7 @@
 			start_at = filterDate.start_at || dateSetFullYear(2000),
 			total = null
 
-		total = await store.state.Session.apiCall('/reports/item_sum', 'POST', { register_id: regId, start_at: dateToISOString(start_at), end_at: dateToISOString(end_at) })
+		total = await store.state.Session.apiCall('/reports/item_sum', 'POST', { register_id: regId.value, start_at: dateToISOString(start_at), end_at: dateToISOString(end_at) })
 
 		totalAmount.value = useFormatCurrency(total.count[0].value, 2, 'USD')
 
@@ -264,7 +263,7 @@
 
 	const getSearchableCols = async () => {
 		// Get Searchable Columns
-		let searchableColumns = await store.state.Session.apiCall(`/register_items/columns?register_id=${regId}`)
+		let searchableColumns = await store.state.Session.apiCall(`/register_items/columns?register_id=${regId.value}`)
 
 		// Settign filters dynamic fileds for search options
 		searchableColumns.forEach(item => {

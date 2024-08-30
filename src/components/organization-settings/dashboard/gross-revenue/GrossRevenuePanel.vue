@@ -116,29 +116,17 @@
 	const reportingGroupsLength = computed(() => selected.value.length)
 	const reportingGroupsCountTxt = computed(() => `(${reportingGroupsLength.value} of 3)`)
 	const orgId = computed(() => store.getters.getOrgId)
+	const dashboards = computed(() => store.getters.getDashboards)
 	const { isLoading } = useImage({ src: thumbnailImgPreview.value }, { delay: 1000 })
 
 	watch(() => store.getters.getIsDarkTheme, async (newVal, oldVal) => {
 		thumbnailImgPreview.value = newVal ? GrossRevenueDarkImgPreview : GrossRevenueLightImgPreview
 	})
 
-	watch(orgId, async (newVal, oldVal) => {
-		/*allDashboards = await getAllDashboards()
-		dashboard = getDashboard(allDashboards)
-		dashboardChart = getReportGroups(dashboard.charts)
-		reportGroups.value = setReportGroups(dashboardChart)
-		selected.value = setSelectedRGCols()*/
-
-		grossRevenueInit(newVal)
-	})
+	watch(orgId, async (newVal, oldVal) => grossRevenueInit(newVal))
+	watch(dashboards, (newVal, oldVal) => grossRevenueInit(orgId.value))
 
 	onMounted(async () => {
-		/*allDashboards = await getAllDashboards()
-		dashboard = getDashboard(allDashboards)
-		dashboardChart = getReportGroups(dashboard?.charts)
-		reportGroups.value = setReportGroups(dashboardChart)
-		selected.value = setSelectedRGCols()*/
-
 		grossRevenueInit(orgId.value)
 
 		thumbnailImgPreview.value = await store.getters.getIsDarkTheme ? GrossRevenueDarkImgPreview : GrossRevenueLightImgPreview
@@ -182,8 +170,7 @@
 		}
 
 		if (id) {
-			allDashboards = await getAllDashboards()
-			dashboard = getDashboard(allDashboards)
+			dashboard = getDashboard(dashboards.value)
 
 			if (dashboard) {
 				dashboardChart = getReportGroups(dashboard?.charts)
@@ -191,22 +178,12 @@
 				selected.value = setSelectedRGCols()
 				invertSign.value = dashboardChart?.invert_sign
 			}
-
-			loading.value = false
 		}
 
 		loading.value = false
 	}
 
-	const getAllDashboards = async () => {
-		try {
-			let res = await store.state.Session.apiCall('/dashboards')
-			return res
-		} catch (err) {
-			console.log(err)
-		}
-	}
-	const getDashboard = data => data.dashboards.find(item => item.owner_type === 'Organization' && item.owner_id === orgId.value)
+	const getDashboard = data => data.find(item => item.owner_type === 'Organization' && item.owner_id === orgId.value)
 	const getReportGroups = charts => charts.find(item => item.chart_type === 'table')
 	const setReportGroups = chart => {
 		let groupsColsArr = []
