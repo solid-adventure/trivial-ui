@@ -46,7 +46,7 @@
 
 	<ActualsExampleDialog :visible="isExampleDialogOpen" @closeExampleModal="closeExampleDialog" :selected="selected" />
 
-	<AuditLogs :visible="isAuditLogsOpen" @closeAuditLogsSidebar="closeAuditLogs" />
+	<!--<AuditLogs :visible="isAuditLogsOpen" @closeAuditLogsSidebar="closeAuditLogs" />-->
 </template>
 
 <script setup>
@@ -103,15 +103,17 @@
 
 	const orgId = computed(() => store.getters.getOrgId)
 	const selectedLength = computed(() => selected.value.length)
+	const dashboards = computed(() => store.getters.getDashboards)
 
 	watch(orgId, (newVal, oldVal) => dashboardInit())
+	watch(dashboards, (newVal, oldVal) => dashboardInit())
 
 	watch(() => store.getters.getIsDarkTheme, async (newVal, oldVal) => {
 		thumbnailImgPreview.value = newVal ? ActualsDarkImgPreview : ActualsLightImgPreview
 	})
 
 	onMounted(async () => {
-		await dashboardInit()
+		if (dashboards.value) dashboardInit()
 		thumbnailImgPreview.value = await store.getters.getIsDarkTheme ? ActualsDarkImgPreview : ActualsLightImgPreview
 	})
 
@@ -137,26 +139,14 @@
 
 	}
 
-	const dashboardInit = async () => {
+	const dashboardInit = () => {
 		loading.value = true
-
-		allDashboards = await getAllDashboards()
-		dashboard = getDashboard(allDashboards)
+		dashboard = getDashboard(dashboards.value)
 		chart = getChart(dashboard)
 		invertSign.value = chart?.invert_sign
-
 		loading.value = false
 	}
 
-	const getAllDashboards = async () => {
-		try {
-			let res = await store.state.Session.apiCall('/dashboards')
-			return res
-		} catch (err) {
-			console.log(err)
-		}
-	}
-
-	const getDashboard = data => data.dashboards.find(item => item.owner_type === 'Organization' && item.owner_id === orgId.value)
-	const getChart = data => data.charts.find(item => item.name === 'Actuals' && item.chart_type === 'summary_group')
+	const getDashboard = data => data.find(item => item.owner_type === 'Organization' && item.owner_id === orgId.value)
+	const getChart = data => data?.charts.find(item => item.name === 'Actuals' && item.chart_type === 'summary_group')
 </script>

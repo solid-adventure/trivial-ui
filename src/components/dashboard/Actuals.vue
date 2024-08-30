@@ -71,7 +71,8 @@
 
 	const lastItem = computed(() => selectedActuals.value.length - 1),
 		getRegId = computed(() => store.getters.getRegisterId),
-		orgId = computed(() => store.getters.getOrgId)
+		orgId = computed(() => store.getters.getOrgId),
+		dashboards = computed(() => store.getters.getDashboards)
 
 	watch(() => store.getters.getRegisterId, async newVal => {
 		regId = newVal
@@ -79,8 +80,10 @@
 		if (regId) await initActualsData()
 	})
 
+	watch(dashboards, (newVal, oldVal) => dashboardInit())
+
 	onMounted(async () => {
-		await dashboardInit()
+		if (dashboards.value) dashboardInit()
 		regId = getRegId.value
 		if (regId) await initActualsData()
 	})
@@ -150,21 +153,11 @@
 		})
 	}
 
-	const dashboardInit = async () => {
-		allDashboards = await getAllDashboards()
-		dashboard = getDashboard(allDashboards)
+	const dashboardInit = () => {
+		dashboard = getDashboard(dashboards.value)
 		chart = getChart(dashboard)
 	}
 
-	const getAllDashboards = async () => {
-		try {
-			let res = await store.state.Session.apiCall('/dashboards')
-			return res
-		} catch (err) {
-			console.log(err)
-		}
-	}
-
-	const getDashboard = data => data?.dashboards.find(item => item.owner_type === 'Organization' && item.owner_id === orgId.value)
+	const getDashboard = data => data?.find(item => item.owner_type === 'Organization' && item.owner_id === orgId.value)
 	const getChart = data => data?.charts.find(item => item.name === 'Actuals' && item.chart_type === 'summary_group')
 </script>

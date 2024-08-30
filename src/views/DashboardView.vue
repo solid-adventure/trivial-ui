@@ -92,18 +92,22 @@
 		{ themes } = useColorScheme(),
 		chartsData = ref([])
 
-	let regId = null,
-		dashboardChart = null,
+	let dashboardChart = null,
 		dashboard = null,
 		allDashboards = null,
 		allCharts = null,
 		tableChartData = ref(null)
 
 	const orgId = computed(() => store.getters.getOrgId)
+	const regId = computed(() => store.getters.getRegisterId)
+	const dashboards = computed(() => store.getters.getDashboards)
+
 	watch(orgId, async (newVal, oldVal) => await dashboardInit(newVal))
+	watch(regId, async (newVal, oldVal) => await dashboardInit(orgId.value))
+	watch(dashboards, async (newVal, oldVal) => await dashboardInit(orgId.value))
 
 	onMounted(async () => {
-		await dashboardInit(orgId.value)
+		if (orgId.value) await dashboardInit(orgId.value)
 	})
 
 	const dashboardInit = async id => {
@@ -116,10 +120,9 @@
 		}
 
 		if (id) {
-			await getRegisters(id)
-
-			allDashboards = await getAllDashboards()
-			dashboard = getDashboard(allDashboards)
+			if (dashboards.value) {
+				dashboard = getDashboard(dashboards.value)
+			}
 
 			if (dashboard) {
 				//createChart(dashboard.id)
@@ -182,27 +185,7 @@
 
 	*/
 
-	const getRegisters = async organizationId => {
-		try {
-			let allRegisters = await store.state.Session.apiCall('/registers'),
-				register = allRegisters.find(r => r.owner_type === 'Organization' && r.owner_id === organizationId && registersNames.includes(r.name))
-
-			regId = register.id
-		} catch (err) {
-			console.log(err)
-			showErrorToast('Error', 'Failed to fetch data.')
-		}
-	}
-
-	const getAllDashboards = async () => {
-		try {
-			let res = await store.state.Session.apiCall('/dashboards')
-			return res
-		} catch (err) {
-			console.log(err)
-		}
-	}
-	const getDashboard = data => data.dashboards.find(item => item.owner_type === 'Organization' && item.owner_id === orgId.value)
+	const getDashboard = data => data?.find(item => item.owner_type === 'Organization' && item.owner_id === orgId.value)
 
 	const getAllCharts = async dashId => {
 		try {
@@ -221,7 +204,7 @@
 			group_by_period = chartType !== 'doughnut' ? 'month' : null
 
 		try {
-			total = await store.state.Session.apiCall('/reports/item_sum', 'POST', { register_id: regId, start_at, end_at, group_by_period, timezone, group_by: groupBy, invert_sign: invertSign })
+			total = await store.state.Session.apiCall('/reports/item_sum', 'POST', { register_id: regId.value, start_at, end_at, group_by_period, timezone, group_by: groupBy, invert_sign: invertSign })
 
 			return total
 		} catch (err) {

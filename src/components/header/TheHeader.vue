@@ -115,21 +115,20 @@
 
 	const toggleDark = useToggle(isDark)
 
+	const getOrganizations = computed(() => store.getters.getOrganizations)
 	const user = computed(() => store.state.user)
-	const storedOrgId = computed(() => store.getters.getOrgId)
 
+	watch(getOrganizations, async (newVal, oldVal) => { 
+		organisations.value = newVal
+		organisations.value.unshift({name: 'None', id: null})
+		setSelectedOrg()
+	})
 	watch(selectedOrg, async (newVal, oldVal) => {
 		let org = newVal === undefined ? oldVal : newVal
 		localStorage.setItem('orgId', JSON.stringify(org.id))
 	})
 
-	watch(storedOrgId, async (newVal, oldVal) => {
-		await fetchData()
-		setSelectedOrg()
-	})
-
-	onMounted(async () => {
-		await fetchData()
+	onMounted(() => {
 		setSelectedOrg()
 		setCheckedTheme()
 		setPrimeVueTheme()
@@ -156,17 +155,7 @@
 	}
 
 	const toggleMenu = event => menu.value.toggle(event)
-
 	const handleSelected = () => store.dispatch('selectOrgId', selectedOrg.value?.id)
-	
-	const fetchData = async () => {
-		try {
-			organisations.value = await store.state.Session.apiCall('/organizations')
-			organisations.value.unshift({name: 'None', id: null})
-		} catch (err) {
-			showErrorToast('Error', `Failed to fetch data: ${err}`)
-		}
-	}
 
 	// Set the org. dropdown value if there is org. id in the localstorage when user refresh the page
 	const setSelectedOrg = () => {
