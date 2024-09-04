@@ -42,6 +42,14 @@
 			justify-content: flex-end;
 		}
 	}
+
+	& tbody {
+		& tr {
+			& td {
+				white-space: nowrap;
+			}
+		}
+	}
 }
 
 .revenue__per__hour__table {
