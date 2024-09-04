@@ -49,8 +49,11 @@ const store = createStore({
     orgId: null,
     registerColumns: null,
     registerId: null,
+    register: null,
     staticRegisterCols: ["originated_at", "description", "amount", "units", "unique_key"],
-    openMobileMenu: false
+    openMobileMenu: false,
+    organizations: [],
+    dashboards: []
   },
 
   getters: {
@@ -79,6 +82,9 @@ const store = createStore({
     getRegisterId(state) {
       return state.registerId
     },
+    getRegister(state) {
+      return state.register
+    },
     getApps(state) {
       return state.apps;
     },
@@ -93,6 +99,12 @@ const store = createStore({
     },
     getOpenMobileMenu(state) {
       return state.openMobileMenu
+    },
+    getOrganizations(state) {
+      return state.organizations
+    },
+    getDashboards(state) {
+      return state.dashboards
     }
   },
 
@@ -282,11 +294,20 @@ const store = createStore({
     setRegisterId(state, value) {
       state.registerId = value
     },
+    setRegister(state, value) {
+      state.register = value
+    },
     setRegisterColumns(state, value) {
       state.registerColumns = value
     },
     setOpenMobileMenu(state, value) {
       state.openMobileMenu = value
+    },
+    setOrganizations(state, value) {
+      state.organizations = value
+    },
+    setDashboards(state, value) {
+      state.dashboards = value
     }
   },
 
@@ -294,12 +315,14 @@ const store = createStore({
     async init({ commit, dispatch, state }, { appId }) {
       if (!state.isAuthenticated) { return }
       try {
+        await dispatch('organizations')
         await dispatch('loadProfile')
         await dispatch('initApp', { appId })
         await dispatch('loadResources', { dispatch, router })
         await dispatch('checkURLState')
         await dispatch('register')
-        //await dispatch('registerColumns')
+        await dispatch('dashboards')
+
       } catch (error) {
         console.error('[store][init] Error: ', error)
         notifications.error(`Failed to load apps: ${error.message}`)
@@ -543,16 +566,16 @@ const store = createStore({
     },
     async selectOrgId({ commit, state, dispatch }, id) {
       await commit('setOrgId', id)
-      await dispatch('register')
     },
     async getDarkTheme({ commit, state }, value) {
       await commit('setIsDarkTheme', value)
     },
     async register({ commit, state }) {
       let registersNames = ['Sales', 'Income Account'],
-          allRegisters = await Session.apiCall('/registers'),
-          register = allRegisters.find(r => r.owner_type === 'Organization' && r.owner_id === state.orgId && registersNames.includes(r.name))
-      
+        allRegisters = await Session.apiCall('/registers'),
+        register = allRegisters.find(r => r.owner_type === 'Organization' && r.owner_id === state.orgId && registersNames.includes(r.name))
+
+      commit('setRegister', register)
       commit('setRegisterId', register?.id)
     },
     async registerCols({ commit, state }) {
@@ -561,9 +584,16 @@ const store = createStore({
     },
     mobileMenu({ commit, state }, value) {
       commit('setOpenMobileMenu', value)
+    },
+    async organizations({ commit, store }) {
+      let res = await Session.apiCall('/organizations')
+      commit('setOrganizations', res)
+    },
+    async dashboards({ commit, store }) {
+      let res = await Session.apiCall('/dashboards')
+      commit('setDashboards', res.dashboards)
     }
   }
-
 })
 
 export default store
