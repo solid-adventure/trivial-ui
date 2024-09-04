@@ -228,11 +228,13 @@
 	const getAppActivity = apps => {
 		apps.forEach(async app => {
 			try {
-				app.stats = await store.state.Session.apiCall(`/activity_entries/stats?app_id=${app.name}`)
+				app.stats = await store.state.Session.apiCall(`/activity_entries/stats?app_id=985079e86fcc4e`) // Replace this '985079e86fcc4e' with ${app.name}
+
+				//app.stats = await store.state.Session.apiCall(`/activity_entries?app_id=985079e86fcc4e`) // Replace this '985079e86fcc4e' with ${app.name}
 
 				app.stats.forEach(item => {
 					item.hasErrors = Object.keys(item.count).length ? true : false
-					item.errorsCount = randomIntFromInterval(1, 20) // get errors from Object.keys(item.count).length
+					//item.errorsCount = randomIntFromInterval(1, 20) // get errors from Object.keys(item.count).length
 				})
 			} catch (err) {
 				console.log(err)
