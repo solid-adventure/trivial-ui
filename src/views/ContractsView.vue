@@ -261,8 +261,4 @@
 
     loading.value = false*/
   }
-
-  //const getContracts = async type => await store.state.Session.apiCall(`apps/stats/${type}`)
-
-  //{"created_at":{"operator":"and","constraints":[{"value":null,"matchMode":"dateIs"}]},"descriptive_name":{"constraints":[{"value":null,"matchMode":"equals"}]}}
 </script>
