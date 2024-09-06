@@ -57,7 +57,7 @@
               {{ data[field] }}
             </router-link>
           </span>
-          <span v-else-if="field === 'created_at'"><!-- {{ useFormatDate(data[field]) }} --></span>
+          <!--<span v-else-if="field === 'created_at'">{{ useFormatDate(data[field]) }}</span>-->
           <span v-else-if="field === 'stats'">
             <Button type="button" link size="large" text aria-label="Chart Info" @click="toggleActivityPopup(index, $event)" class="p-2">
               <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="20" width="26" class="chart">
@@ -137,7 +137,7 @@
     selectOrgMsgInfo = 'Please, select an organization.',
     columns = [
       { field: 'descriptive_name', header: 'Customer' },
-      { field: 'created_at', header: 'Start Date' },
+      //{ field: 'created_at', header: 'Start Date' },
       { field: 'stats', header: 'Errors' },
     ],
     loading = ref(false),
