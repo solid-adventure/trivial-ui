@@ -188,7 +188,7 @@
 			if (dashboard) {
 				dashboardChart = getReportGroups(dashboard?.charts)
 				reportGroups.value = setReportGroups(dashboardChart)
-				selected.value = setSelectedRGCols()
+				selected.value = setSelectedRGCols(dashboardChart)
 				invertSign.value = dashboardChart?.invert_sign
 			}
 
@@ -216,18 +216,24 @@
 			groupsCol.id = index,
 			groupsCol.key = item,
 			groupsCol.name = item.replaceAll('_', ' ')
-			groupsColsArr.push(groupsCol)
+
+			if (!chart.report_groups[item]) groupsColsArr.push(groupsCol)
 		})
 
 		return groupsColsArr
 	}
-	const setSelectedRGCols = () => {
+	const setSelectedRGCols = chart => {
 		const orderMap = {}
 		let selectedColsArr = [],
 			orderArray = JSON.parse(localStorage.getItem('grColsOrder')) || []
 
-		Object.keys(dashboardChart.report_groups).forEach(item => { 
-			if (dashboardChart.report_groups[item]) selectedColsArr.push({ key: item, name: item.replaceAll('_', ' ') })
+		Object.keys(chart.report_groups).forEach((item, index) => {
+			let groupsCol = {id: '', name: '', values: [], type: 'String', selectedValues: []}
+				groupsCol.id = index,
+				groupsCol.key = item,
+				groupsCol.name = item.replaceAll('_', ' ')
+
+			if (chart.report_groups[item]) selectedColsArr.push(groupsCol)
 		})
 
 		orderArray.forEach((item, index) => orderMap[item] = index)
