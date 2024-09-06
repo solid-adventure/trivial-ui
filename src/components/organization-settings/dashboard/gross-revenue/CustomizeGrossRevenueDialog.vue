@@ -94,7 +94,7 @@
 		reportingGroupsLimit = 3,
 		{ showSuccessToast, showErrorToast, showInfoToast } = useToastNotifications()
 	
-	let groupsColumnClone = null
+	let allGroupsColumnClone = []
 
 	const isDraggableDisabled = computed(() => reportingGroups.value.length > reportingGroupsLimit)
 	const reportingGroupsCountTxt = computed(() => `(${reportingGroupsLength.value} of 3)`)
@@ -102,13 +102,12 @@
 
 	watch(() => props.initInvertSign, newVal => invertSign.value = newVal)
 	watch(() => props.visible, newVal => visible.value = newVal)
-	watch(() => props.groupsColumnArr, newVal => { 
-		console.log(newVal)
-		groupsColumn.value = newVal
-		groupsColumnClone = JSON.parse(JSON.stringify(newVal))
-
-		reportingGroups.value = props.selected
+	watch(() => props.groupsColumnArr, newVal => {
+		groupsColumn.value = toRaw(newVal)
+		allGroupsColumnClone = [...props.selected, ...props.groupsColumnArr]
 	})
+
+	watch(() => props.selected, newVal => reportingGroups.value = toRaw(newVal))
 
 	watch(isDraggableDisabled, newVal => {
 		if (newVal) {
@@ -118,12 +117,14 @@
 		}
 	})
 
-	onMounted(async () => {
-		//setSelectedReportingGropus()
-		groupsColumn.value = props.groupsColumnArr
-	})
+	onMounted(async () => {})
 
-	const setSelectedReportingGropus = () => groupsColumnClone.filter(item => props.selected.some(selectedItem => item.key === selectedItem.key))
+	const initColumns = () => {
+		if (props.groupsColumnArr && props.selected) {
+			groupsColumn.value = props.groupsColumnArr
+			reportingGroups.value = props.selected
+		}
+	}
 
 	const saveSelected = () => {
 		let customizeOptions = {
@@ -133,7 +134,7 @@
 
 		let reportingGroupsTempArr = reportingGroups.value.length ? reportingGroups.value : props.selected
 
-		groupsColumn.value.forEach(item => {
+		allGroupsColumnClone.forEach(item => {
 			if (reportingGroupsTempArr.some(selected => selected.key === item.key)) {
 				customizeOptions.selectedCols.push({name: item.name, type: item.type, selectedValues: item.selectedValues, key: item.key, selected: true})
 			} else {
@@ -141,7 +142,6 @@
 			}
 		})
 
-		console.log(customizeOptions)
 		emit('saveSelected', JSON.parse(JSON.stringify(customizeOptions)))
 
 		closeModal()
@@ -150,28 +150,18 @@
 		//invertSign.value = false
 	}
 
-	const resetDraggableItems = () => {
+	/*const resetDraggableItems = () => {
 		if (groupsColumn.value) {
 			groupsColumn.value = [...reportingGroups?.value, ...groupsColumn?.value]
 			reportingGroups.value = []
 		}
-	}
+	}*/
 
 	const closeModal = () => {
-		resetDraggableItems()
+		//resetDraggableItems()
 		visible.value = false
 		emit('closeModal')
 	}
 
-	const log = event => {
-		console.log('drag - ', event?.added?.element)
-
-		/*reportingGroups.value.forEach(item => {
-			if (item.key === event?.added?.element?.key) {
-				reportingGroups.value.splice(event?.added?.newIndex, 1)
-			}
-		})*/
-
-		//groupsColumn.value.push(event?.added?.element)
-	}
+	const log = event => { /* console.log('drag - ', event) */ }
 </script>

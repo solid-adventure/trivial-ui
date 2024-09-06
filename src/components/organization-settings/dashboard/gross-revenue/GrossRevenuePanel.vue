@@ -123,22 +123,10 @@
 	})
 
 	watch(orgId, async (newVal, oldVal) => {
-		/*allDashboards = await getAllDashboards()
-		dashboard = getDashboard(allDashboards)
-		dashboardChart = getReportGroups(dashboard.charts)
-		reportGroups.value = setReportGroups(dashboardChart)
-		selected.value = setSelectedRGCols()*/
-
 		grossRevenueInit(newVal)
 	})
 
 	onMounted(async () => {
-		/*allDashboards = await getAllDashboards()
-		dashboard = getDashboard(allDashboards)
-		dashboardChart = getReportGroups(dashboard?.charts)
-		reportGroups.value = setReportGroups(dashboardChart)
-		selected.value = setSelectedRGCols()*/
-
 		grossRevenueInit(orgId.value)
 
 		thumbnailImgPreview.value = await store.getters.getIsDarkTheme ? GrossRevenueDarkImgPreview : GrossRevenueLightImgPreview
