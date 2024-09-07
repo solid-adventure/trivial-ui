@@ -116,15 +116,15 @@
 	const reportingGroupsLength = computed(() => selected.value.length)
 	const reportingGroupsCountTxt = computed(() => `(${reportingGroupsLength.value} of 3)`)
 	const orgId = computed(() => store.getters.getOrgId)
-	const dashboards = computed(() => store.getters.getDashboards)
 	const { isLoading } = useImage({ src: thumbnailImgPreview.value }, { delay: 1000 })
 
 	watch(() => store.getters.getIsDarkTheme, async (newVal, oldVal) => {
 		thumbnailImgPreview.value = newVal ? GrossRevenueDarkImgPreview : GrossRevenueLightImgPreview
 	})
 
-	watch(orgId, async (newVal, oldVal) => grossRevenueInit(newVal))
-	watch(dashboards, (newVal, oldVal) => grossRevenueInit(orgId.value))
+	watch(orgId, async (newVal, oldVal) => {
+		grossRevenueInit(newVal)
+	})
 
 	onMounted(async () => {
 		grossRevenueInit(orgId.value)
@@ -170,20 +170,31 @@
 		}
 
 		if (id) {
-			dashboard = getDashboard(dashboards.value)
+			allDashboards = await getAllDashboards()
+			dashboard = getDashboard(allDashboards)
 
 			if (dashboard) {
 				dashboardChart = getReportGroups(dashboard?.charts)
 				reportGroups.value = setReportGroups(dashboardChart)
-				selected.value = setSelectedRGCols()
+				selected.value = setSelectedRGCols(dashboardChart)
 				invertSign.value = dashboardChart?.invert_sign
 			}
+
+			loading.value = false
 		}
 
 		loading.value = false
 	}
 
-	const getDashboard = data => data.find(item => item.owner_type === 'Organization' && item.owner_id === orgId.value)
+	const getAllDashboards = async () => {
+		try {
+			let res = await store.state.Session.apiCall('/dashboards')
+			return res
+		} catch (err) {
+			console.log(err)
+		}
+	}
+	const getDashboard = data => data.dashboards.find(item => item.owner_type === 'Organization' && item.owner_id === orgId.value)
 	const getReportGroups = charts => charts.find(item => item.chart_type === 'table')
 	const setReportGroups = chart => {
 		let groupsColsArr = []
@@ -193,18 +204,24 @@
 			groupsCol.id = index,
 			groupsCol.key = item,
 			groupsCol.name = item.replaceAll('_', ' ')
-			groupsColsArr.push(groupsCol)
+
+			if (!chart.report_groups[item]) groupsColsArr.push(groupsCol)
 		})
 
 		return groupsColsArr
 	}
-	const setSelectedRGCols = () => {
+	const setSelectedRGCols = chart => {
 		const orderMap = {}
 		let selectedColsArr = [],
 			orderArray = JSON.parse(localStorage.getItem('grColsOrder')) || []
 
-		Object.keys(dashboardChart.report_groups).forEach(item => { 
-			if (dashboardChart.report_groups[item]) selectedColsArr.push({ key: item, name: item.replaceAll('_', ' ') })
+		Object.keys(chart.report_groups).forEach((item, index) => {
+			let groupsCol = {id: '', name: '', values: [], type: 'String', selectedValues: []}
+				groupsCol.id = index,
+				groupsCol.key = item,
+				groupsCol.name = item.replaceAll('_', ' ')
+
+			if (chart.report_groups[item]) selectedColsArr.push(groupsCol)
 		})
 
 		orderArray.forEach((item, index) => orderMap[item] = index)

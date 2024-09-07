@@ -4,7 +4,8 @@
 		<h4 class="mt-5 font-normal font-semibold">Reporting Groups <span class="text-muted">{{ reportingGroupsCountTxt }}</span></h4>
 		<p class="mt-1 mb-5 text-muted text-sm">Use 3 empty slots in the list below to customize your table columns.</p>
 
-		<draggable :list="reportingGroups" @change="log" group="id" item-key="id" :disabled="isDraggableDisabled" class="flex flex-column row-gap-1 revenue__gross__draggable" :class="{'bg-none': isDraggableDisabled}">
+		<!-- :disabled="isDraggableDisabled" -->
+		<draggable :list="reportingGroups" @change="log" group="id" item-key="id"  class="flex flex-column row-gap-1 revenue__gross__draggable" :class="{'bg-none': isDraggableDisabled}">
 			<template #item="{ element, index }">
 				<Accordion class="border-top-1 border-200" :class="{'border-bottom-1': (index === reportingGroups.length - 1)}">
 					<AccordionTab :pt="{header: {class: 'revenue__gross'}, headerAction: {class: 'revenue__gross__tab__action'}}">
@@ -72,10 +73,11 @@
 
 <script setup>
 	import draggable from "vuedraggable"
-	import { ref, watch, computed, onMounted, toRaw } from "vue"
+	import { ref, watch, computed, toRaw } from "vue"
 	import { Icon } from '@iconify/vue'
+	import { useToastNotifications } from '@/composable/toastNotification'
 
-	const props = defineProps(['visible', 'groupsColumnArr', 'initInvertSign'])
+	const props = defineProps(['visible', 'groupsColumnArr', 'initInvertSign', 'selected'])
 	const emit = defineEmits(['closeModal', 'saveSelected'])
 
 	const visible = ref(false),
@@ -89,21 +91,34 @@
 			{id: 6, name: 'My Column 3', values: ['Some value 1', 'Some value 2', 'Some value 3'], type: 'Strign', selectedValues: ['Some value 1', 'Some value 2', 'Some value 3']}*/
 		]),
 		reportingGroups = ref([]),
-		reportingGroupsLimit = 3
+		reportingGroupsLimit = 3,
+		{ showSuccessToast, showErrorToast, showInfoToast } = useToastNotifications()
+	
+	let allGroupsColumnClone = []
 
-	watch(() => props.initInvertSign, newVal => invertSign.value = newVal)
-	watch(() => props.visible, newVal => visible.value = newVal)
-	watch(() => props.groupsColumnArr, newVal => groupsColumn.value = newVal)
-	const isDraggableDisabled = computed(() => reportingGroups.value.length === reportingGroupsLimit)
+	const isDraggableDisabled = computed(() => reportingGroups.value.length > reportingGroupsLimit)
 	const reportingGroupsCountTxt = computed(() => `(${reportingGroupsLength.value} of 3)`)
 	const reportingGroupsLength = computed(() => reportingGroups.value.length)
 
-	onMounted(async () => {
-		//setSelectedReportingGropus()
-		groupsColumn.value = props.groupsColumnArr
+	watch(() => props.initInvertSign, newVal => invertSign.value = newVal)
+	watch(() => props.visible, newVal => visible.value = newVal)
+	watch(() => props.groupsColumnArr, newVal => groupsColumn.value = toRaw(newVal))
+	watch(() => props.selected, newVal => reportingGroups.value = toRaw(newVal))
+
+	watch(isDraggableDisabled, newVal => {
+		if (newVal) {
+			let popedEl = reportingGroups.value.pop()
+			groupsColumn.value.push(popedEl)
+			showInfoToast('Info', 'Maximum of selected reporting groups is 3')
+		}
 	})
 
-	const setSelectedReportingGropus = () => reportingGroups.value = [...props.selected]
+	const initColumns = () => {
+		if (props.groupsColumnArr && props.selected) {
+			groupsColumn.value = props.groupsColumnArr
+			reportingGroups.value = props.selected
+		}
+	}
 
 	const saveSelected = () => {
 		let customizeOptions = {
@@ -111,32 +126,28 @@
 			invertSign: invertSign.value
 		}
 
-		reportingGroups.value.forEach(item => customizeOptions.selectedCols.push({name: item.name, type: item.type, selectedValues: item.selectedValues, key: item.key, selected: true}))
+		reportingGroups.value.forEach((item, index) => customizeOptions.selectedCols.push({name: item.name, type: item.type, selectedValues: item.selectedValues, key: item.key, selected: true }))
 
-		if (groupsColumn.value) {
-			groupsColumn.value.forEach(item => customizeOptions.selectedCols.push({name: item.name, type: item.type, selectedValues: item.selectedValues, key: item.key, selected: false}))
-		}
+		groupsColumn.value.forEach(item => customizeOptions.selectedCols.push({name: item.name, type: item.type, selectedValues: item.selectedValues, key: item.key, selected: false }))
 
 		emit('saveSelected', JSON.parse(JSON.stringify(customizeOptions)))
 
 		closeModal()
 		customizeOptions.selectedCols = []
-		//customizeOptions.invertSign = false
-		//invertSign.value = false
 	}
 
-	const resetDraggableItems = () => {
+	/*const resetDraggableItems = () => {
 		if (groupsColumn.value) {
 			groupsColumn.value = [...reportingGroups?.value, ...groupsColumn?.value]
 			reportingGroups.value = []
 		}
-	}
+	}*/
 
 	const closeModal = () => {
-		resetDraggableItems()
+		//resetDraggableItems()
 		visible.value = false
 		emit('closeModal')
 	}
 
-	const log = event => console.log('drag - ', event)
+	const log = event => { /* console.log('drag - ', event) */ }
 </script>
