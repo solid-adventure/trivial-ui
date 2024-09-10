@@ -1,36 +1,21 @@
-.popup__container {
+.contract_tooltip {
 	position: relative;
-	display: flex;
-	justify-content: center;
-	align-content: center;
-	width: 24px;
-	height: 24px;
-	cursor: pointer;
-	transition: all .3s ease;
-	background: red;
+	width: 2rem;
+}
 
-	&:hover {
-		.popup {
-			visibility: visible;
-			opacity: 1;
-		}
-	}
+.contract_tooltip .tooltip_content {
+	position: absolute;
+	top: -50%;
+	right: 130%;
+	z-index: 999;
+	opacity: 0;
+	transition: all 800ms;
+	visibility: hidden;
+}
 
-	& > .popup {
-		position: absolute;
-		right: 44px;
-		z-index: 1000;
-		visibility: hidden;
-		display: flex;
-		width: 153px;
-		height: 123px;
-		padding: 12px;
-		border-radius: 4px;
-		box-shadow: 0 4px 10px 0 rgba(0, 0, 8, 0.1);
-		opacity: 0;
-		transition: all .3s ease;
-		background: #FFF;
-	}
+.contract_tooltip:hover .tooltip_content {
+	opacity: 1;
+	visibility: visible;
 }
 
 .error-fill {
