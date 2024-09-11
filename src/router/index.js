@@ -20,6 +20,7 @@ import FunctionWriter from "../components/FunctionWriter.vue";
 import SalesView from "@/views/SalesView.vue";
 import DashboardView from "@/views/DashboardView.vue";
 import OrganizationSettingsView from "@/views/OrganizationsSettingsView.vue";
+import ContractsView from "@/views/ContractsView.vue";
 import Session from "../models/Session.js";
 
 const routes = [
@@ -127,6 +128,11 @@ const routes = [
   {
     path: "/organization-settings",
     redirect: "/dashboard3",
+  },
+  {
+    path: "/contracts3",
+    component: ContractsView,
+    name: "Contracts",
   },
   {
     path: "/organizations/:pathMatch(.*)*",

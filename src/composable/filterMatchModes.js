@@ -52,7 +52,8 @@ export const useFilterMatchModes = () => {
 		description: { constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] }
 	},
 	defaultMatchMode = FilterMatchMode.EQUALS,
+	globalFilter = FilterMatchMode.CONTAINS,
 	globalFilterFields = []
 
-	return { dateFilterMatchModes, numericFilterMatchModes, textFilterMatchModes, filterMatchModeMapping, defaultFilters, defaultMatchMode, globalFilterFields }
+	return { dateFilterMatchModes, numericFilterMatchModes, textFilterMatchModes, filterMatchModeMapping, defaultFilters, defaultMatchMode, globalFilterFields, globalFilter }
 }
