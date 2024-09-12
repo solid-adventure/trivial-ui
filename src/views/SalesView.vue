@@ -170,6 +170,7 @@
 		storageOrgId = parseInt(localStorage.getItem('orgId')) || null
 
 	const orgId = computed(() => store.getters.getOrgId)
+	const queryString = computed(() => updateQueryString())
 	const regId = computed(() => store.getters.getRegisterId)
 	const register = computed(() => store.getters.getRegister)
 	const registersItems = computed(() => registers.value)
@@ -242,8 +243,7 @@
 			setCSSCustomProp()
 			await getSearchableCols()
 
-			let queryString = updateQueryString()
-			const { register_items, total_pages } = await getRegistersData(queryString)
+			const { register_items, total_pages } = await getRegistersData()
 			registers.value = register_items
 			totalRecords.value = totalPaginatorPages(total_pages, rows.value)
 
@@ -256,34 +256,23 @@
 		loading.value = false
 	}
 
-	const getRegistersData = async queryString => {
+	const getRegistersData = async () => {
 		try {
-			return await store.state.Session.apiCall(`/register_items?register_id=${regId.value}&${queryString}`)
+			return await store.state.Session.apiCall(
+				`/register_items?register_id=${regId.value}&${queryString.value}`
+			)
 		} catch (err) {
 			showErrorToast('Error', 'Failed to fetch data.')
 			console.error(err);
 		}
 	}
 
-
-	// Alternative way to update total amount col
-	/*const setTotalAmount = searchProp => {
-		let total = null
-
-		registers.value.forEach(item => total += parseInt(item[searchProp]))
-
-		return Format.money(total)
-	}*/
-
 	const getTotalAmount = async () => {
-		let end_at = filterDate.end_at || dateSetFullYear(2100),
-			start_at = filterDate.start_at || dateSetFullYear(2000),
-			total = null
-
-		total = await store.state.Session.apiCall('/reports/item_sum', 'POST', { register_id: regId.value, start_at: dateToISOString(start_at), end_at: dateToISOString(end_at) })
-
-		totalAmount.value = useFormatCurrency(total.count[0].value, 2, 'USD')
-
+		let col = 'amount'
+		let total = await store.state.Session.apiCall(
+			`/register_items/sum?register_id=${regId.value}&col=${col}&${queryString.value}`
+		)
+		totalAmount.value = useFormatCurrency(total.sum, 2, 'USD')
 		resetDateFilter()
 	}
 
@@ -330,8 +319,7 @@
 		page = event?.page + 1
 
 		try {
-			const queryString = updateQueryString()
-			const { register_items } = await getRegistersData(queryString)
+			const { register_items } = await getRegistersData()
 			registers.value = register_items
 		} catch (err) {
 			loading.value = false
@@ -348,8 +336,7 @@
 		sortOrder.value = event?.sortOrder === 1 ? 'ASC' : 'DESC'
 
 		try {
-			const queryString = updateQueryString()
-			const { register_items } = await getRegistersData(queryString)
+			const { register_items } = await getRegistersData()
 			registers.value = register_items
 		} catch (err) {
 			loading.value = false
@@ -364,10 +351,8 @@
 		filters.value = event.filters
 
 		try {
-			const queryString = updateQueryString()
-
 			// Get registers data
-			const { register_items, total_pages, current_page } = await getRegistersData(queryString)
+			const { register_items, total_pages, current_page } = await getRegistersData()
 			
 			// Set paggination
 			totalRecords.value = totalPaginatorPages(total_pages, rows.value)
@@ -375,7 +360,7 @@
 			// Set table registers value
 			registers.value = register_items
 			
-			//await getTotalAmount()
+			await getTotalAmount()
 		} catch (err) {
 			loading.value = false
 			console.log(err)
@@ -393,10 +378,9 @@
 
 		try {
 			page = 1
-			const queryString = updateQueryString()
-			const { register_items } = await getRegistersData(queryString)
+			const { register_items } = await getRegistersData()
 			registers.value = register_items
-			// await getTotalAmount()
+			await getTotalAmount()
 			loading.value = false
 		} catch (err) {
 			console.error(err)
@@ -437,10 +421,10 @@
 	}
 
 	const updateQueryString = () => {
-		let queryString = `per_page=${rows.value}&page=${page}`
+		let query = `per_page=${rows.value}&page=${page}`
 
 		if (sortField.value) {
-			queryString += `&order_by=${sortField.value}&ordering_direction=${sortOrder.value}`
+			query += `&order_by=${sortField.value}&ordering_direction=${sortOrder.value}`
 		}
 
 		const filtersArray = []
@@ -473,21 +457,25 @@
 		})
 
 		if (filtersArray.length > 0) {
-			queryString += `&search=${encodeURIComponent(JSON.stringify(filtersArray))}`
+			query += `&search=${encodeURIComponent(JSON.stringify(filtersArray))}`
 		}
 
-		return queryString
+		return query
 	}
 
 	const exportCSV = async () => {
 		openCSVDialog()
 
-		let queryString = updateQueryString(),
-			csvData = null
+		let csvData = null
 
 		try {
-			csvData = await store.state.Session.apiCall(`/register_items.csv?register_id=${regId.value}&${queryString}`, 'GET', undefined, 'csv', true)
-
+			csvData = await store.state.Session.apiCall(
+				`/register_items.csv?register_id=${regId.value}&${queryString.value}`,
+				'GET',
+				undefined,
+				'csv',
+				true
+			)
 			forceFileDownload(csvData, register.value.name)
 		} catch (err) {
 			console.log(err)
