@@ -107,6 +107,12 @@ const store = createStore({
     },
     getDashboards(state) {
       return state.dashboards
+    },
+    getStreamedLines(state) {
+      return state.streamedLines
+    },
+    getStreamedLinesTotal(state) {
+      return state.streamedLinesTotal
     }
   },
 
@@ -605,6 +611,10 @@ const store = createStore({
     async dashboards({ commit, store }) {
       let res = await Session.apiCall('/dashboards')
       commit('setDashboards', res.dashboards)
+    },
+    async resetStreamedLines({ commit, state }) {
+      commit('setStreamedLines', 0)
+      commit('setStreamedLinesTotal', 1)
     }
   }
 })

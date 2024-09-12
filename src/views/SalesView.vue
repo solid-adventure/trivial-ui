@@ -33,9 +33,7 @@
 	        <div class="flex justify-content-between py-5">
 	        	<h2 class="m-0">Revenue Detail</h2>
 
-	        	<!-- On click, call the fetchCSV method -->
-			<h3>Progress: {{ streamProgress }}%</h3>
-	        	<Button type="button" icon="pi pi-download" aria-label="Download CSV" @click="exportCSV" />
+	        	<Button label="Export as CSV" aria-label="Download CSV" icon="pi pi-download" @click="exportCSV" />
 
 	        	<!-- Global keyword search filed -->
 	            <!--<IconField iconPosition="right">
@@ -98,6 +96,24 @@
 			</Row>
 		</ColumnGroup>
 	</DataTable>
+
+	<Dialog v-model:visible="csvDialogVisible" modal :closable="false">
+		<div class="flex align-items-center justify-content-between gap-3 mb-3">
+			<h3 class="m-0 text-lg font-normal">Generating CSV...</h3>
+			<span class="text-lg font-normal text-600">{{ streamProgress }}%</span>
+		</div>
+		<div class="flex align-items-center justify-content-center mb-1">
+			<ProgressBar :value="streamProgress" aria-label="CSV Progress Download Status" class="w-full h-1rem" />
+		</div>
+		<div class="flex gap-2 align-items-center justify-content-end mb-3 text-sm text-600">
+			Generated <div class="w-4rem">{{ streamedLines.toLocaleString() }}</div> out of <div class="w-4rem">{{ streamedLinesTotal.toLocaleString() }}</div> rows
+		</div>
+		<div class="flex align-items-center justify-content-between gap-1">
+			<i class="pi pi-exclamation-triangle text-600" />
+			<p class="text-xs text-600">This might take some time. Closing this page will cancel the download.</p>
+			<Button type="button" label="Cancel" text class="text-gray-900" @click="closeCSVDialog()" />
+		</div>
+	</Dialog>
 </template>
 
 <script setup>
@@ -138,6 +154,7 @@
 			registersNames = ['Sales', 'Income Account'],
 			selectOrgMsgInfo = 'Please, select an organization.',
 			timezone = timeZoneOptions.timeZone
+			csvDialogVisible = ref(false)
 
 	let columns = [],
 		defaultColumns = [
@@ -149,15 +166,16 @@
 		totalsColumns = { amount: 'amount' },
 		allRegisters = null,
 		filterDate = { end_at: null, start_at: null },
-		page = 1 // Default start page is from first
+		page = 1, // Default start page is from first,
+		storageOrgId = parseInt(localStorage.getItem('orgId')) || null
 
 	const orgId = computed(() => store.getters.getOrgId)
 	const regId = computed(() => store.getters.getRegisterId)
 	const register = computed(() => store.getters.getRegister)
 	const registersItems = computed(() => registers.value)
-	const streamProgress = computed(() => {
-		return Math.floor((store.state.streamedLines / store.state.streamedLinesTotal) * 100)
-	})
+	const streamProgress = computed(() => Math.floor((store.getters.getStreamedLines / store.getters.getStreamedLinesTotal) * 100))
+	const streamedLines = computed(() => store.getters.getStreamedLines)
+	const streamedLinesTotal = computed(() => store.getters.getStreamedLinesTotal)
 
 	watch(orgId, async (newVal, oldVal) => {
 		if (!newVal) {
@@ -167,11 +185,15 @@
 			return
 		}
 
+		console.log('newVal - ', newVal)
 		await getRegisters(newVal)
 	})
 
 	onMounted(async () => {
-		if (orgId.value) {
+		let organizationId = storageOrgId || orgId.value
+
+		console.log('organizationId - ', organizationId)
+		if (organizationId) {
 			await getRegisters(orgId.value)
 		}
 		if (localStorage.getItem('orgId') === 'null') {
@@ -193,6 +215,8 @@
 	const setFilterMatchModes = field => field === 'amount' ? numericFilterMatchModes : field === 'originated_at' ? dateFilterMatchModes : textFilterMatchModes
 	const dateToISOString = date => new Date(date).toISOString()
 	const dateSetFullYear = date => new Date().setFullYear(date)
+	const closeCSVDialog = () => csvDialogVisible.value = false
+	const openCSVDialog = () => csvDialogVisible.value = true
 
 	const getRegisters = async orgId => {
 		loading.value = true
@@ -412,22 +436,6 @@
 		}
 	}
 
-	const exportCSV = async () => {
-		let title = register.value.name
-		let queryString = updateQueryString()
-		let csvData = await store.state.Session.apiCall(`/register_items.csv?register_id=${regId.value}&${queryString}`, 'GET', undefined, 'csv', true)
-		// Create a CSV file and allow the user to download it
-		let blob = new Blob([csvData], { type: 'text/csv' });
-		let url = window.URL.createObjectURL(blob);
-		let a = document.createElement('a');
-		a.href = url;
-		a.download = `${title}.csv`;
-		document.body.appendChild(a);
-		a.click();
-		store.commit('setStreamedLines', 0)
-		store.commit('setStreamedLinesTotal', 1)
-	}
-
 	const updateQueryString = () => {
 		let queryString = `per_page=${rows.value}&page=${page}`
 
@@ -469,5 +477,34 @@
 		}
 
 		return queryString
+	}
+
+	const exportCSV = async () => {
+		openCSVDialog()
+
+		let queryString = updateQueryString(),
+			csvData = null
+
+		try {
+			csvData = await store.state.Session.apiCall(`/register_items.csv?register_id=${regId.value}&${queryString}`, 'GET', undefined, 'csv', true)
+
+			forceFileDownload(csvData, register.value.name)
+		} catch (err) {
+			console.log(err)
+			closeCSVDialog()
+		}
+	}
+
+	const forceFileDownload = (response, title) => {
+		const url = window.URL.createObjectURL(new Blob([response]), {type: 'text/csv;charset=utf-8'}),
+			link = document.createElement('a')
+
+		link.href = url
+		link.setAttribute('download', `${title}.csv`)
+		document.body.appendChild(link)
+		link.click()
+
+		store.dispatch('resetStreamedLines')
+		closeCSVDialog()
 	}
 </script>
