@@ -45,6 +45,7 @@ const store = createStore({
     enableBuildApps: import.meta.env.VITE_ENABLE_BUILD_APPS,
     enableWebhookAppTrigger: import.meta.env.VITE_ENABLE_WEBHOOK_APP_TRIGGER,
     Session: Session,
+    streamStatus: 'pending',
     streamedLines: 0,
     streamedLinesTotal: 1,
     Permissions: null,
@@ -113,6 +114,9 @@ const store = createStore({
     },
     getStreamedLinesTotal(state) {
       return state.streamedLinesTotal
+    },
+    getStreamStatus(state) {
+      return state.streamStatus
     }
   },
 
@@ -322,6 +326,9 @@ const store = createStore({
     },
     setStreamedLinesTotal(state, value) {
       state.streamedLinesTotal = value
+    },
+    setStreamStatus(state, value) {
+      state.streamStatus = value
     }
   },
 
@@ -612,9 +619,10 @@ const store = createStore({
       let res = await Session.apiCall('/dashboards')
       commit('setDashboards', res.dashboards)
     },
-    async resetStreamedLines({ commit, state }) {
+    async resetStreamInfo({ commit, state }) {
       commit('setStreamedLines', 0)
       commit('setStreamedLinesTotal', 1)
+      commit('setStreamStatus', 'pending')
     }
   }
 })

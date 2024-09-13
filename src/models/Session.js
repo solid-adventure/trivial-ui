@@ -31,16 +31,45 @@ export default class Session {
   }
 
   static async handleResponse(response, format, stream) {
-    if (format == 'csv' && stream == true) {
+    if (!response.ok) {
+      return this.handleErrorResponse(response)
+    } else if (format == 'csv' && stream == true) {
       return this.handleCSVResponse(response)
     } else {
       return this.handleJSONResponse(response)
     }
   }
 
+  static async handleErrorResponse(response) {
+    let clonedResponse = response.clone()
+
+    let out = {}
+    try {
+      out = await response.json()
+    } catch(err) {
+      error = await clonedResponse.text()
+      if (error.length > 0) {
+        out.error = error
+      }
+    }
+
+    if (out.error) {
+      throw new Error(out.error)
+    } else if (out.errors && Array.isArray(out.errors)) {
+      throw new Error(out.errors.join(', '))
+    } else if (out.errors) {
+      throw new Error(out.errors)
+    } else if (response.statusText) {
+      throw new Error(response.statusText)
+    } else {
+      throw new Error("Request failed")
+    }
+  }
+
   static async handleCSVResponse(response) {
     let streamedLinesTotal = Number(response.headers.get('x-items-count'))
     store.commit("setStreamedLinesTotal", streamedLinesTotal)
+    store.commit("setStreamStatus", 'streaming')
     let csvLines = [];
     const reader = response.body.getReader()
     const decoder = new TextDecoder('utf-8')
@@ -48,7 +77,7 @@ export default class Session {
     let streamedLines = 0
     let partialLine = ''
     let done, value
-    while (!done) {
+    while (!done && store.getters.getStreamStatus === 'streaming') {
       ({ done, value } = await reader.read())
       if (value) {
         let chunk = partialLine + decoder.decode(value)
@@ -59,7 +88,12 @@ export default class Session {
         csvLines.push(...lines)
       }
     }
-    return csvLines.join('\n')
+    if (store.getters.getStreamStatus() === 'cancelling') {
+      reader.cancel()
+      store.commit("setStreamStatus", 'cancelled')
+    } else {
+      return csvLines.join('\n')
+    }
   }
 
   static async handleJSONResponse(response) {
@@ -72,19 +106,7 @@ export default class Session {
      out = await response.json()
     }
 
-    if (response.ok) {
-      return out
-    } else if (out.error) {
-      throw new Error(out.error)
-    } else if (out.errors && Array.isArray(out.errors)) {
-      throw new Error(out.errors.join(', '))
-    } else if (out.errors) {
-      throw new Error(out.errors)
-    } else if (response.statusText) {
-      throw new Error(response.statusText)
-    } else {
-      throw new Error("Request failed")
-    }
+    return out
   }
 
   static async create(email, password) {
