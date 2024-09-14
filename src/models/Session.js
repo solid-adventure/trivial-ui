@@ -67,32 +67,30 @@ export default class Session {
   }
 
   static async handleCSVResponse(response) {
-    let streamedLinesTotal = Number(response.headers.get('x-items-count'))
-    store.commit("setStreamedLinesTotal", streamedLinesTotal)
-    store.commit("setStreamStatus", 'streaming')
-    let csvLines = [];
     const reader = response.body.getReader()
     const decoder = new TextDecoder('utf-8')
 
-    let streamedLines = 0
+    let streamedLines = [];
+    let streamedLinesTotal = Number(response.headers.get('x-items-count'))
+    store.commit("setStreamedLinesTotal", streamedLinesTotal)
+    store.commit("setStreamStatus", 'open')
+
     let partialLine = ''
     let done, value
-    while (!done && store.getters.getStreamStatus === 'streaming') {
+    while (!done && store.getters.getStreamStatus === 'open') {
       ({ done, value } = await reader.read())
       if (value) {
         let chunk = partialLine + decoder.decode(value)
         const lines = chunk.split('\n')
         partialLine = lines.pop()
-        streamedLines += lines.length
-        store.commit("setStreamedLines", streamedLines - 1)
-        csvLines.push(...lines)
+        streamedLines.push(...lines)
+        store.commit("setStreamedLines", streamedLines.length - 1)
       }
     }
-    if (store.getters.getStreamStatus() === 'cancelling') {
+    if (store.getters.getStreamStatus === 'cancelling') {
       reader.cancel()
-      store.commit("setStreamStatus", 'cancelled')
     } else {
-      return csvLines.join('\n')
+      return streamedLines.join('\n')
     }
   }
 
