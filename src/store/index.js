@@ -435,7 +435,8 @@ const store = createStore({
       const appId = state?.app?.name ?? state?.route?.params?.id
       const all = await Session.apiCall(`/manifests?app_id=${appId}`)
       const manifest = all[0] || {content: '{}'}
-      manifest.content = new ManifestMigrator(JSON.parse(manifest.content)).migrate()
+      const content = typeof manifest.content == 'object' ? manifest.content : JSON.parse(manifest.content)
+      manifest.content = new ManifestMigrator(content).migrate()
       commit('setManifest', manifest)
       dispatch('notifyManifestLoaded')
       return manifest
@@ -462,8 +463,12 @@ const store = createStore({
     },
 
     async saveManifest({ commit, state, dispatch }) {
-      const manifest = await Session.apiCall(`/manifests/${state.manifest.id}`, 'PUT', {content: JSON.stringify(state.manifest.content)})
-      manifest.content = new ManifestMigrator(JSON.parse(manifest.content)).migrate()
+      const manifest = await Session.apiCall(
+        `/manifests/${state.manifest.id}`,
+        'PUT',
+        { content: state.manifest.content }
+      )
+      manifest.content = new ManifestMigrator(manifest.content).migrate()
       commit('setManifest', manifest)
       dispatch('notifyManifestLoaded')
       return manifest
