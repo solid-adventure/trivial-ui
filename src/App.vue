@@ -121,6 +121,12 @@ export default {
             if (displayName != "All") {
               displayName = `${displayName}s`;
             }
+
+            // Patch in route override
+            if (linkPath == "/contract") {
+              linkPath = "/contracts3"
+            }
+
           }
           return { display: displayName, link: linkPath };
         });
