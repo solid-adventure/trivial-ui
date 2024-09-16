@@ -132,7 +132,7 @@
 			store = useStore(),
 			registersNames = ['Sales', 'Income Account'],
 			selectOrgMsgInfo = 'Please, select an organization.',
-			timezone = 'Etc/GMT+5'
+			timezone = timeZoneOptions.timeZone
 
 	let columns = [],
 		defaultColumns = [
@@ -420,12 +420,12 @@
 						let selectedDate = {
 							c: column,
 							o: filterMatchModeMapping.gte, // ">=", 
-							p: moment(value).tz(timezone).startOf('day').format() // midnight on the specified date
+							p: moment(value).tz(timezone).startOf('day').utc().format() // midnight on the specified date
 						},
 						tomorrowDate = {
 							c: column,
 							o: filterMatchModeMapping.lt, // "<",
-							p: moment(value).tz(timezone).add({ days: 1 }).startOf('day').format() // midnight on the next day
+							p: moment(value).tz(timezone).add({ days: 1 }).startOf('day').utc().format() // midnight on the next day
 						}
 
 						filtersArray.push(selectedDate, tomorrowDate)
