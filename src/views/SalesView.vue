@@ -33,7 +33,8 @@
 	        <div class="flex justify-content-between py-5">
 	        	<h2 class="m-0">Revenue Detail</h2>
 
-	        	<Button label="Export as CSV" aria-label="Download CSV" icon="pi pi-download" class="registers_table--csv-btn" @click="exportCSV" />
+	        	<Button label="Export as CSV" aria-label="Download CSV" icon="pi pi-download" class="registers_table--csv-btn" @click="openCSVDialog" :disabled="registersItems.length === 0" />
+	        	<!--<Button label="Export as CSV" aria-label="Download CSV" icon="pi pi-download" class="registers_table--csv-btn" @click="exportCSV" />-->
 
 	        	<!-- Global keyword search filed -->
 	            <!--<IconField iconPosition="right">
@@ -97,9 +98,9 @@
 		</ColumnGroup>
 	</DataTable>
 
-	<Dialog v-model:visible="csvDialogVisible" modal :closable="false" class="csv__dialog">
+	<!--<Dialog v-model:visible="csvDialogVisible" modal :closable="false" class="csv__dialog">
 		<div class="flex align-items-center justify-content-between gap-3 mb-3">
-			<template v-if="(streamPending || streamOpen) && !cancelCSV"> <!-- streamPending || streamOpen-->
+			<template v-if="(streamPending || streamOpen) && !cancelCSV">
 				<h3 class="m-0 text-lg font-normal">Generating CSV...</h3>
 				<span class="text-lg font-normal text-600">{{ streamProgress }}%</span>
 			</template>
@@ -112,7 +113,7 @@
 				<h3 class="m-0 text-lg font-normal">Failed to Generate CSV</h3>
 			</template>
 		</div>
-		<div v-if="(streamPending || streamOpen) && !cancelCSV" class="flex align-items-center justify-content-center mb-2"> <!-- streamPending || streamOpen-->
+		<div v-if="(streamPending || streamOpen) && !cancelCSV" class="flex align-items-center justify-content-center mb-2">
 			<ProgressBar :value="streamProgress" aria-label="CSV Progress Download Status" class="w-full h-1rem csv__dialog--progersbar" />
 		</div>
 
@@ -121,7 +122,7 @@
 				<p class="m-0">Preparing your download now...</p>
 			</template>
 
-			<template v-if="streamOpen && !cancelCSV"> <!--streamOpen -->
+			<template v-if="streamOpen && !cancelCSV">
 				<p class="w-full m-0 text-right">Generated <span class="csv__dialog--streamed-lines">{{ streamedLines }}</span> out of {{ streamedLinesTotal }} rows</p>
 			</template>
 
@@ -135,7 +136,7 @@
 		</div>
 
 		<div class="flex align-items-center justify-content-between gap-1">
-			<template v-if="(streamPending || streamOpen) && !cancelCSV"> <!-- streamPending || streamOpen-->
+			<template v-if="(streamPending || streamOpen) && !cancelCSV">
 				<p class="text-xs text-600">
 					<i class="pi pi-exclamation-triangle text-600" />
 					This might take some time. Closing this page will cancel the download.
@@ -164,7 +165,9 @@
 
 			<Button type="button" label="OK" class="csv__dialog--btn" @click="resetStreamInfo(), closeCSVDialog()" />
 		</div>
-	</Dialog>
+	</Dialog>-->
+
+	<CSVExportDialog :csvDialogVisible="csvDialogVisible" :regId="register?.id" :queryString="queryString" :registerName="register?.name" @closeCSVExportDialog="closeCSVDialog" />
 </template>
 
 <script setup>
@@ -179,6 +182,7 @@
 	import loadingImg from '@/assets/images/trivial-loading-optimized.webp'
 	import { useToastNotifications } from '@/composable/toastNotification'
 	import { Icon } from '@iconify/vue'
+	import CSVExportDialog from '@/components/sales/CSVExportDialog'
 
 	const loading = ref(false),
 		filters = ref({}),
@@ -206,9 +210,9 @@
 		registersNames = ['Sales', 'Income Account'],
 		selectOrgMsgInfo = 'Please, select an organization.',
         timezone = timeZoneOptions.timeZone,
-		streamErrorMessage = ref(''),
-		cancelCSV = ref(false),
 		csvDialogVisible = ref(false)
+		/*streamErrorMessage = ref(''),
+		cancelCSV = ref(false),*/
 
 	let columns = [],
 		defaultColumns = [
@@ -228,14 +232,14 @@
 	const regId = computed(() => store.getters.getRegisterId)
 	const register = computed(() => store.getters.getRegister)
 	const registersItems = computed(() => registers.value)
-	const streamStatus = computed(() => store.getters.getStreamStatus)
+	/*const streamStatus = computed(() => store.getters.getStreamStatus)
 	const streamProgress = computed(() => parseInt(Math.floor((streamedLines.value / streamedLinesTotal.value) * 100)))
 	const streamedLines = computed(() => store.getters.getStreamedLines)
 	const streamedLinesTotal = computed(() => store.getters.getStreamedLinesTotal)
 	const streamPending = computed(() => streamStatus.value === 'pending')
 	const streamOpen = computed(() => streamStatus.value === 'open')
 	const streamClosed = computed(() => streamStatus.value === 'closed')
-	const streamFailed = computed(() => streamStatus.value === 'failed')
+	const streamFailed = computed(() => streamStatus.value === 'failed')*/
 	//const csvDialogVisible = computed(() => streamPending.value || streamOpen.value || streamFailed.value)
 
 	watch(orgId, async (newVal, oldVal) => {
@@ -274,14 +278,14 @@
 	const setFilterMatchModes = field => field === 'amount' ? numericFilterMatchModes : field === 'originated_at' ? dateFilterMatchModes : textFilterMatchModes
 	//const dateToISOString = date => new Date(date).toISOString()
 	//const dateSetFullYear = date => new Date().setFullYear(date)
-	const cancelStream = () => { 
+	/*const cancelStream = () => { 
 		store.commit('setStreamStatus', 'cancelling')
 		csvExportHide()
 		closeCSVDialog()
 	}
 	const resetStreamInfo = () => store.dispatch('resetStreamInfo')
 	const csvExportShow = () => cancelCSV.value = true
-	const csvExportHide = () => cancelCSV.value = false
+	const csvExportHide = () => cancelCSV.value = false*/
 	const openCSVDialog = () => csvDialogVisible.value = true
 	const closeCSVDialog = () => csvDialogVisible.value = false
 
@@ -529,7 +533,7 @@
 		return query
 	}
 
-	const exportCSV = async () => {
+	/*const exportCSV = async () => {
 		openCSVDialog()
 		store.commit('setStreamStatus', 'pending')
 
@@ -565,5 +569,5 @@
 		link.setAttribute('download', `${title}.csv`)
 		document.body.appendChild(link)
 		link.click()
-	}
+	}*/
 </script>

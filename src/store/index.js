@@ -45,7 +45,7 @@ const store = createStore({
     enableBuildApps: import.meta.env.VITE_ENABLE_BUILD_APPS,
     enableWebhookAppTrigger: import.meta.env.VITE_ENABLE_WEBHOOK_APP_TRIGGER,
     Session: Session,
-    streamStatus: 'closed',
+    streamStatus: '', // 'closed'
     streamedLines: 0,
     streamedLinesTotal: 1,
     Permissions: null,
@@ -623,6 +623,14 @@ const store = createStore({
       commit('setStreamedLines', 0)
       commit('setStreamedLinesTotal', 1)
       commit('setStreamStatus', 'closed')
+    },
+    async cancelStream({ commit, state }) {
+      commit('setStreamedLines', 0)
+      commit('setStreamedLinesTotal', 1)
+      commit('setStreamStatus', 'cancelling')
+    },
+    async setStreamValue({ commit, state }, status) {
+      commit('setStreamStatus', status)
     }
   }
 })
