@@ -1,9 +1,9 @@
 <template>
 	<Dialog v-model:visible="csvDialogOpen" modal :closable="false" class="csv__dialog">
 		<div class="flex align-items-center justify-content-between gap-3 mb-3">
-			<template v-if="(streamPending || streamOpen) && !cancelCSV">
-				<h3 class="m-0 text-lg font-normal">Generating CSV...</h3>
-				<span class="text-lg font-normal text-600">{{ streamProgress }}%</span>
+			<template v-if="(streamPending || streamOpen || streamClosed) && !cancelCSV">
+				<h3 class="m-0 text-lg font-normal">{{ csvDialogTitle }}</h3>
+				<span v-if="!streamClosed" class="text-lg font-normal text-600">{{ streamProgress }}%</span>
 			</template>
 
 			<template v-if="cancelCSV">
@@ -14,7 +14,8 @@
 				<h3 class="m-0 text-lg font-normal">Failed to Generate CSV</h3>
 			</template>
 		</div>
-		<div v-if="(streamPending || streamOpen) && !cancelCSV" class="flex align-items-center justify-content-center mb-2">
+
+		<div v-if="(streamPending || streamOpen || streamClosed) && !cancelCSV" class="flex align-items-center justify-content-center mb-2">
 			<ProgressBar :value="streamProgress" aria-label="CSV Progress Download Status" class="w-full h-1rem csv__dialog--progersbar" />
 		</div>
 
@@ -23,7 +24,7 @@
 				<p class="m-0">Preparing your download now...</p>
 			</template>
 
-			<template v-if="streamOpen && !cancelCSV">
+			<template v-if="(streamOpen || streamClosed) && !cancelCSV">
 				<p class="w-full m-0 text-right">Generated <span class="csv__dialog--streamed-lines">{{ streamedLines }}</span> out of {{ streamedLinesTotal }} rows</p>
 			</template>
 
@@ -37,34 +38,23 @@
 		</div>
 
 		<div class="flex align-items-center justify-content-between gap-1">
-			<template v-if="(streamPending || streamOpen) && !cancelCSV">
-				<p class="text-xs text-600">
-					<i class="pi pi-exclamation-triangle text-600" />
-					This might take some time. Closing this page will cancel the download.
+			<template v-if="(streamPending || streamOpen || streamClosed) && !cancelCSV">
+				<p class="flex align-items-center gap-1 text-xs text-600">
+					<i class="pi" :class="{ 'pi-exclamation-triangle text-yellow-500': !streamClosed, 'pi-check-circle text-green-500': streamClosed}" />
+					{{ csvDialogInfoMsg }}
 				</p>
-				<Button type="button" label="Cancel" text class="csv__dialog--cancel-btn" @click="csvExportShow()" />
+				<Button v-if="!streamClosed" type="button" label="Cancel" text severity="danger" @click="csvExportShow()" />
+				<Button v-else type="button" label="OK" class="csv__dialog--btn" @click="resetStreamInfo(), closeCSVDialog()" />
 			</template>
 
 			<template v-if="cancelCSV">
-				<Button type="button" label="Stop Export" text class="csv__dialog--cancel-btn" @click="cancelStream()" />
+				<Button type="button" label="Stop Export" text severity="danger" @click="cancelStream()" />
 				<Button type="button" label="Keep the Export Running" class="csv__dialog--btn" @click="csvExportHide()" />
 			</template>
 
 			<template v-if="streamFailed">
 				<Button type="button" label="OK" class="csv__dialog--btn" @click="resetStreamInfo(), closeCSVDialog()" />
 			</template>
-		</div>
-
-		<div v-if="streamClosed" class="flex flex-column align-items-center justify-content-center gap-2">
-			<Icon icon="fa6-solid:circle-check" class="w-3rem h-3rem text-primary" />
-			<h3 class="m-0 text-lg font-normal font-semibold">Success</h3>
-
-			<p class="flex align-items-center text-sm text-600 gap-1">
-				<i class="pi pi-check-circle text-green-500" />
-				CSV Export completed.
-			</p>
-
-			<Button type="button" label="OK" class="csv__dialog--btn" @click="resetStreamInfo(), closeCSVDialog()" />
 		</div>
 	</Dialog>
 </template>
@@ -73,7 +63,6 @@
 	import { ref, onMounted, computed, watch } from 'vue'
 	import { useStore } from 'vuex'
 	import { Icon } from '@iconify/vue'
-
 
 	const props = defineProps({
 		csvDialogVisible: {
@@ -105,7 +94,6 @@
 		cancelCSV = ref(false),
 		csvDialogOpen = ref(false)
 
-
 	const streamStatus = computed(() => store.getters.getStreamStatus)
 	const streamProgress = computed(() => parseInt(Math.floor((streamedLines.value / streamedLinesTotal.value) * 100)))
 	const streamedLines = computed(() => store.getters.getStreamedLines)
@@ -114,6 +102,8 @@
 	const streamOpen = computed(() => streamStatus.value === 'open')
 	const streamClosed = computed(() => streamStatus.value === 'closed')
 	const streamFailed = computed(() => streamStatus.value === 'failed')
+	const csvDialogTitle = computed(() => !streamClosed.value ? 'Generating CSV...' : 'Success')
+	const csvDialogInfoMsg = computed(() => !streamClosed.value ? 'This might take some time. Closing this page will cancel the download.' : 'Download of CSV file is completed.')
 
 	watch(props, newVal => {
 		if (newVal.csvDialogVisible) {
@@ -151,7 +141,7 @@
 				forceFileDownload(csvData)
 			}
 
-			resetStreamInfo()
+			store.dispatch('setStreamValue', 'closed')
 		} catch (err) {
 			console.log(err)
 			streamErrorMessage.value = err.message
