@@ -97,6 +97,7 @@
 
 <script setup>
 	import { ref, onMounted, computed, watch, toRaw } from 'vue'
+	import moment from 'moment-timezone'
 	import { useStore } from 'vuex'
 	import { useFormatCurrency } from '@/composable/formatCurrency.js'
 	import { useFormatDate } from '@/composable/formatDate.js'
@@ -130,7 +131,8 @@
 			{ showSuccessToast, showErrorToast, showInfoToast } = useToastNotifications(),
 			store = useStore(),
 			registersNames = ['Sales', 'Income Account'],
-			selectOrgMsgInfo = 'Please, select an organization.'
+			selectOrgMsgInfo = 'Please, select an organization.',
+			timezone = timeZoneOptions.timeZone
 
 	let columns = [],
 		defaultColumns = [
@@ -415,17 +417,17 @@
 				let value = constraint.value
 				if (value) {
 					if (column === 'originated_at' && filterMatchModeMapping[constraint.matchMode] === '=') {
-						let nextDay = new Date(value.getTime() + 24 * 60 * 60 * 1000) // add 24 hours in milliseconds
 						let selectedDate = {
 							c: column,
-							o: ">=",
-							p: value // midnight on the specified date
-						}
-						let tomorrowDate = {
+							o: filterMatchModeMapping.gte, // ">=", 
+							p: moment(value).tz(timezone).startOf('day').utc().format() // midnight on the specified date
+						},
+						tomorrowDate = {
 							c: column,
-							o: "<",
-							p: nextDay // midnight on the next day
+							o: filterMatchModeMapping.lt, // "<",
+							p: moment(value).tz(timezone).add({ days: 1 }).startOf('day').utc().format() // midnight on the next day
 						}
+
 						filtersArray.push(selectedDate, tomorrowDate)
 					} else {
 						filtersArray.push({
