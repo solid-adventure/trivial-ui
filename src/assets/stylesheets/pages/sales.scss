@@ -6,6 +6,12 @@
 		background-color: color-mix(in srgb, var(--background) 80%, transparent);
 	}
 
+	button.registers_table--csv-btn {
+		color: white;
+		border-color: var(--primary);
+		background-color: var(--primary);
+	}
+
 	& .calendar__search {
 		height: 2.125rem;
 	}

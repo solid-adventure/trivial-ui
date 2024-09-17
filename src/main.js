@@ -39,6 +39,7 @@ import Timeline from 'primevue/timeline'
 import Divider from 'primevue/divider'
 import Chart from 'primevue/chart'
 import ProgressSpinner from 'primevue/progressspinner'
+import ProgressBar from 'primevue/progressbar'
 import Skeleton from 'primevue/skeleton'
 import router from './router'
 import store from './store'
@@ -84,6 +85,7 @@ app.component('Timeline', Timeline)
 app.component('Divider', Divider)
 app.component('Chart', Chart)
 app.component('ProgressSpinner', ProgressSpinner)
+app.component('ProgressBar', ProgressBar)
 app.component('Skeleton', Skeleton)
 app.directive('ripple', Ripple)
 

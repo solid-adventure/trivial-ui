@@ -45,6 +45,9 @@ const store = createStore({
     enableBuildApps: import.meta.env.VITE_ENABLE_BUILD_APPS,
     enableWebhookAppTrigger: import.meta.env.VITE_ENABLE_WEBHOOK_APP_TRIGGER,
     Session: Session,
+    streamStatus: '', // 'closed'
+    streamedLines: 0,
+    streamedLinesTotal: 1,
     Permissions: null,
     orgId: null,
     registerColumns: null,
@@ -105,6 +108,15 @@ const store = createStore({
     },
     getDashboards(state) {
       return state.dashboards
+    },
+    getStreamedLines(state) {
+      return state.streamedLines
+    },
+    getStreamedLinesTotal(state) {
+      return state.streamedLinesTotal
+    },
+    getStreamStatus(state) {
+      return state.streamStatus
     }
   },
 
@@ -308,6 +320,15 @@ const store = createStore({
     },
     setDashboards(state, value) {
       state.dashboards = value
+    },
+    setStreamedLines(state, value) {
+      state.streamedLines = value
+    },
+    setStreamedLinesTotal(state, value) {
+      state.streamedLinesTotal = value
+    },
+    setStreamStatus(state, value) {
+      state.streamStatus = value
     }
   },
 
@@ -597,6 +618,19 @@ const store = createStore({
     async dashboards({ commit, store }) {
       let res = await Session.apiCall('/dashboards')
       commit('setDashboards', res.dashboards)
+    },
+    async resetStreamInfo({ commit, state }) {
+      commit('setStreamedLines', 0)
+      commit('setStreamedLinesTotal', 1)
+      commit('setStreamStatus', 'closed')
+    },
+    async cancelStream({ commit, state }) {
+      commit('setStreamedLines', 0)
+      commit('setStreamedLinesTotal', 1)
+      commit('setStreamStatus', 'cancelling')
+    },
+    async setStreamValue({ commit, state }, status) {
+      commit('setStreamStatus', status)
     }
   }
 })
