@@ -33,7 +33,7 @@
 			</template>
 
 			<template v-if="streamFailed">
-				<p class="m-0 text-base text-red-500">Error: {{ streamErrorMessage }}!</p>
+				<p class="m-0 text-base text-red-500">Error: {{ streamErrorMessage }}.</p>
 			</template>
 		</div>
 
