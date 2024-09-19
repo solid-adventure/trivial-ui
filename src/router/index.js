@@ -21,6 +21,7 @@ import SalesView from "@/views/SalesView.vue";
 import DashboardView from "@/views/DashboardView.vue";
 import OrganizationSettingsView from "@/views/OrganizationsSettingsView.vue";
 import ContractsView from "@/views/ContractsView.vue";
+import AuditLogsView from "@/views/AuditLogsView.vue";
 import Session from "../models/Session.js";
 
 const routes = [
@@ -133,6 +134,11 @@ const routes = [
     path: "/contracts3",
     component: ContractsView,
     name: "Contracts",
+  },
+  {
+    path: "/auditlogs",
+    component: AuditLogsView,
+    name: "AuditLogs",
   },
   {
     path: "/organizations/:pathMatch(.*)*",
