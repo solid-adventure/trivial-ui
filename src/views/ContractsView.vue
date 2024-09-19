@@ -92,7 +92,7 @@
             </div>-->
 
             <!-- PRIMEVUE CLICK VERSION (DEFAULT - WORKING) -->
-            <template v-if="data.totalErrors > 0 && data.stats && data.stats.length">
+            <template v-if="(data.totalErrors > 0 || data.totalSuccess > 0) && data.stats && data.stats.length">
               <div>
                 <Button type="button" severity="secondary" text @click="togglePopup(data.opIndex, $event)">
                   <svg version="1.1" xmlns="http://www.w3.org/2000/svg" height="20" width="26" class="chart">
@@ -259,9 +259,11 @@
           // Process each stat entry
           app.stats.forEach((item) => {
             const hasError = item?.count?.['500'] ?? false,
+              hasSuccess = item?.count?.['200'] ?? false,
               total = Object.values(item?.count).reduce((sum, value) => sum + value, 0)
 
             item.hasErrors = !!hasError // Check if there are errors
+            item.hasSuccess = !!hasSuccess
             totalErrors += hasError ? item?.count['500'] : 0 // Accumulate errors
             totalSuccess += item?.count.hasOwnProperty('200') ? item?.count['200'] : 0 // Accumulate success
             item.total = total // Total count for the item
@@ -269,7 +271,7 @@
           })
 
           // Set index only if there are errors
-          app.opIndex = totalErrors ? index : false
+          app.opIndex = (totalErrors || !!totalSuccess) ? index : false
           app.totalErrors = totalErrors
           app.totalSuccess = totalSuccess > 1000 ? (totalSuccess / 1000) + 'k' : totalSuccess
 
