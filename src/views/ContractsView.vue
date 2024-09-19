@@ -257,7 +257,7 @@
           }, 0)
 
           // Process each stat entry
-          app.stats.forEach((item) => {
+          app.stats.forEach(item => {
             const hasError = item?.count?.['500'] ?? false,
               hasSuccess = item?.count?.['200'] ?? false,
               total = Object.values(item?.count).reduce((sum, value) => sum + value, 0)
