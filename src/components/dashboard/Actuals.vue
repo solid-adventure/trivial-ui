@@ -31,15 +31,17 @@
 	import { useFormatCurrency } from '@/composable/formatCurrency.js';
 	import moment from 'moment-timezone';
 	import { useToastNotifications } from '@/composable/toastNotification';
+	import { useDateTimeZoneOptions } from '@/composable/dateTimeZoneOptions'
 
 	//const props = defineProps(['selected']);
 
 	const store = useStore(),
-		timezone = 'Etc/GMT+5',
+		{ timeZoneOptions } = useDateTimeZoneOptions(),
+		timezone = timeZoneOptions.timeZone,
 		apiOptionsObj = {
 			register_id: null,
 			start_at: null,
-			end_at: moment.tz(timezone).format(),
+			end_at: moment.tz(timezone).utc().format(),
 			timezone: timezone,
 			invert_sign: false
 		},
@@ -52,16 +54,16 @@
 		]),
 		loading = ref(false),
 		{ showSuccessToast, showErrorToast, showInfoToast } = useToastNotifications(),
-		last1Day = moment().tz(timezone).subtract({ days: 1 }).startOf('day').format(),
-		last1DayOffset = moment(last1Day).tz(timezone).subtract({ days: 1 }).format(),
-		last7Days =  moment().tz(timezone).subtract({ days: 7 }).startOf('day').format(),
-		last7DaysOffset = moment(last7Days).tz(timezone).subtract({ days: 7 }).format(),
-		last1Months =  moment().tz(timezone).subtract({ months: 1 }).startOf('day').format(),
-		last1MonthsOffset = moment(last1Months).tz(timezone).subtract({ months: 1 }).format(),
-		last3Months =  moment().tz(timezone).subtract({ months: 3 }).startOf('day').format(),
-		last3MonthsOffset = moment(last3Months).tz(timezone).subtract({ months: 3 }).format(),
-		last1Year =  moment().tz(timezone).startOf('year').startOf('day').format(),
-		last1YearOffset = moment(last1Year).tz(timezone).subtract({ months: 6 }).format()
+		last1Day = moment().tz(timezone).subtract({ days: 1 }).startOf('day').utc().format(),
+		last1DayOffset = moment(last1Day).tz(timezone).subtract({ days: 1 }).utc().format(),
+		last7Days =  moment().tz(timezone).subtract({ days: 7 }).startOf('day').utc().format(),
+		last7DaysOffset = moment(last7Days).tz(timezone).subtract({ days: 7 }).utc().format(),
+		last1Months =  moment().tz(timezone).subtract({ months: 1 }).startOf('day').utc().format(),
+		last1MonthsOffset = moment(last1Months).tz(timezone).subtract({ months: 1 }).utc().format(),
+		last3Months =  moment().tz(timezone).subtract({ months: 3 }).startOf('day').utc().format(),
+		last3MonthsOffset = moment(last3Months).tz(timezone).subtract({ months: 3 }).utc().format(),
+		last1Year =  moment().tz(timezone).startOf('year').startOf('day').utc().format(),
+		last1YearOffset = moment(last1Year).tz(timezone).subtract({ months: 6 }).utc().format()
 
 	let regId = null,
 		allActualsData = null,

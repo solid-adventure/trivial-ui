@@ -78,6 +78,7 @@
 	import RevenuePerHour from '@/components/dashboard/RevenuePerHour.vue'
 	import { useToastNotifications } from '@/composable/toastNotification'
 	import { useColorScheme } from '@/composable/colorScheme'
+	import { useDateTimeZoneOptions } from '@/composable/dateTimeZoneOptions'
 
 	/*const selectedForecast = {name: 'Last 7 Days x 30 x 12 Fcst', value: '$54,903', icon:'prime:arrow-down', class: 'down'},
 		{name: 'Last 30 Days x 12 Fcst', value: '$231,947', icon:'prime:arrow-up', class: 'up'},
@@ -89,8 +90,10 @@
 		registersNames = ['Sales', 'Income Account'],
 		selectOrgMsgInfo = 'Please, select an organization.',
 		{ showSuccessToast, showErrorToast, showInfoToast } = useToastNotifications(),
+		{ timeZoneOptions } = useDateTimeZoneOptions(),
 		{ themes } = useColorScheme(),
-		chartsData = ref([])
+		chartsData = ref([]),
+		timezone = timeZoneOptions.timeZone
 
 	let dashboardChart = null,
 		dashboard = null,
@@ -197,11 +200,13 @@
 	}
 
 	const getChartsData = async (groupBy, invertSign = false, chartType) => {
-		let total = null
-		const timezone = 'Etc/GMT+5', // Etc/GMT+5 -> Not support DST | 'America/Detroit' -> support DST | More info at https://appler.dev/time-zone-table
-			end_at = moment.tz(timezone).format(),
-			start_at = moment.tz(timezone).startOf('year').startOf('day').format(),
+		let total = null,
+			end_at = moment.tz(timezone).utc().parseZone().format(),
+			start_at = moment.tz(timezone).startOf('year').startOf('day').utc().parseZone().format(),
 			group_by_period = chartType !== 'doughnut' ? 'month' : null
+
+			console.log('END AT - ', end_at)
+			console.log('END AT - ', start_at)
 
 		try {
 			total = await store.state.Session.apiCall('/reports/item_sum', 'POST', { register_id: regId.value, start_at, end_at, group_by_period, timezone, group_by: groupBy, invert_sign: invertSign })

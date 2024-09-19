@@ -14,6 +14,7 @@
 	import moment from 'moment-timezone'
 	import { useStore } from 'vuex'
 	import { useToastNotifications } from '@/composable/toastNotification'
+	import { useDateTimeZoneOptions } from '@/composable/dateTimeZoneOptions'
 	import GrossRevenue from '@/components/dashboard/GrossRevenue.vue'
 
 	const props = defineProps(['visible'])
@@ -24,7 +25,9 @@
 		store = useStore(),
 		registersNames = ['Sales', 'Income Account'],
 		selectOrgMsgInfo = 'Please, select an organization.',
-		{ showSuccessToast, showErrorToast, showInfoToast } = useToastNotifications()
+		{ showSuccessToast, showErrorToast, showInfoToast } = useToastNotifications(),
+		{ timeZoneOptions } = useDateTimeZoneOptions(),
+		timezone = timeZoneOptions.timeZone
 
 	watch(props, newVal => visible.value = newVal.visible)
 
@@ -82,10 +85,9 @@
 	}
 
 	const getChartsData = async (groupBy, invertSign = false) => {
-		let total = null
-		const timezone = 'Etc/GMT+5', // Etc/GMT+5 -> Not support DST | 'America/Detroit' -> support DST | More info at https://appler.dev/time-zone-table
-			end_at = moment.tz(timezone).format(),
-			start_at = moment.tz(timezone).startOf('year').startOf('day').format(),
+		let total = null,
+			end_at = moment.tz(timezone).utc().format(),
+			start_at = moment.tz(timezone).startOf('year').startOf('day').utc().format(),
 			group_by_period = 'month'
 
 		try {
