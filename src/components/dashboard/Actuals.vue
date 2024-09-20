@@ -41,7 +41,7 @@
 		apiOptionsObj = {
 			register_id: null,
 			start_at: null,
-			end_at: moment.tz(timezone).utc().format(),
+			end_at: moment.tz(timezone).startOf('day').utc().format(),
 			timezone: timezone,
 			invert_sign: false
 		},
@@ -100,9 +100,12 @@
 	}
 
 	const getActuals = async (options, datePeriod) => {
+		console.log('datePeriod - ', datePeriod)
 		options.register_id = regId
 		options.start_at = datePeriod
 		options.invert_sign = chart?.invert_sign
+
+		console.log('options.start_at - ', options)
 
 		try {
 			return await store.state.Session.apiCall('/reports/item_sum', 'POST', options)
