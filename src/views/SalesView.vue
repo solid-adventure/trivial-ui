@@ -165,24 +165,35 @@
 	const registersItems = computed(() => registers.value)
 
 	watch(orgId, async (newVal, oldVal) => {
-		if (!newVal) {
-			resetColumns()
-			resetFilters()
-			resetRegisters()
+		if (newVal === null) {
+			resetSalesTableValues()
+			showInfoToast('Info', selectOrgMsgInfo, 3000)
 			return
 		}
-		await getRegisters(newVal)
+  		await store.dispatch('register')
+		await getRegisters()
+	})
+
+	watch(regId, async (newVal, oldVal) => {
+		if (newVal === null || newVal === undefined) {
+			resetSalesTableValues()
+			return
+		}
+
+		await getRegisters()
 	})
 
 	onMounted(async () => {
 		let organizationId = storageOrgId || orgId.value
 
-		if (organizationId) {
-			await getRegisters(orgId.value)
+		if (organizationId === null) {
+			showInfoToast('Info', selectOrgMsgInfo, 3000)
+		} else {
+			await store.dispatch('register')
 		}
 
-		if (localStorage.getItem('orgId') === 'null') {
-			showInfoToast('Info', selectOrgMsgInfo, 3000)
+		if (regId.value) {
+			await getRegisters()
 		}
 	})
 
@@ -200,8 +211,24 @@
 	const setFilterMatchModes = field => field === 'amount' ? numericFilterMatchModes : field === 'originated_at' ? dateFilterMatchModes : textFilterMatchModes
 	const openCSVDialog = () => csvDialogVisible.value = true
 	const closeCSVDialog = () => csvDialogVisible.value = false
+	const resetPagination = () => {
+		totalRecords.value = 0
+		first.value = 1
+		page = 1
+	}
 
-	const getRegisters = async orgId => {
+	const resetSalesTableValues = () => {
+		resetColumns()
+		resetFilters()
+		resetRegisters()
+		resetPagination()
+		resetTotalAmount()
+	}
+
+	const getRegisters = async () => {
+
+		if (loading.value) return
+
 		loading.value = true
 		resetColumns()
 		resetFilters()
@@ -212,10 +239,7 @@
 
 			// If regiester don't exists or don't have sales data for table
 			if (!register.value) {
-				resetColumns()
-				resetFilters()
-				resetRegisters()
-				resetTotalAmount()
+				resetSalesTableValues()
 				loading.value = false
 				return
 			}

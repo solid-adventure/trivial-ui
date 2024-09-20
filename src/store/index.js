@@ -341,7 +341,6 @@ const store = createStore({
         await dispatch('initApp', { appId })
         await dispatch('loadResources', { dispatch, router })
         await dispatch('checkURLState')
-        await dispatch('register')
         await dispatch('dashboards')
 
       } catch (error) {
