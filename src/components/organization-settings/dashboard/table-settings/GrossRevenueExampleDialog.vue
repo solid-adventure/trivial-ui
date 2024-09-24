@@ -4,7 +4,7 @@
 			<Skeleton height="33.75rem" borderRadius=".25rem" />
 		</template>
 		<template v-else>
-			<GrossRevenue :grData="grossRevenueData" /> 
+			<OrganizationSettingsTable :grData="tableData" />
 		</template>
 	</Dialog>
 </template>
@@ -14,7 +14,7 @@
 	import moment from 'moment-timezone'
 	import { useStore } from 'vuex'
 	import { useToastNotifications } from '@/composable/toastNotification'
-	import GrossRevenue from '@/components/dashboard/GrossRevenue.vue'
+	import OrganizationSettingsTable from '@/components/dashboard/OrganizationSettingsTable.vue'
 
 	const props = defineProps(['visible'])
 	const emit = defineEmits(['closeExampleModal'])
@@ -32,7 +32,7 @@
 		allDashboards = null,
 		allCharts = null,
 		groupBy = [],
-		grossRevenueData = ref(null)
+		tableData = ref(null)
 
 	const regId = computed(() => store.getters.getRegisterId)
 	const orgId = computed(() => store.getters.getOrgId)
@@ -61,7 +61,7 @@
 				allCharts = await getAllCharts(dashboard.id)
 				allCharts.charts.forEach(async item => {
 					if (item.chart_type === 'table') {
-						grossRevenueData.value = await formatAllChartsData(item)
+						tableData.value = await formatAllChartsData(item)
 					}
 				})
 			}

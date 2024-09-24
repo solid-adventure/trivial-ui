@@ -37,7 +37,7 @@
 			</ColumnGroup>
 
 			<template v-if="groupBy.length">
-				<Column v-for="col in groupBy" :key="col" :field="col" />
+				<Column v-for="col in groupBy" :key="col" :field="col" class="capitalize" />
 			</template>
 			<template v-else>
 				<Column field="All" />
@@ -65,7 +65,7 @@
 </template>
 
 <script setup>
-	import { ref, onMounted } from "vue"
+	import { ref, onMounted, watch } from "vue"
 	import { useFormatCurrency } from '@/composable/formatCurrency.js'
 	import loadingImg from '@/assets/images/trivial-loading-optimized.webp'
 
