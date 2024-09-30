@@ -5,7 +5,11 @@
 		paginator 
 		:rows="rows" 
 		:rowsPerPageOptions="rowsPerPageOpt"
+		:totalRecords="totalRecords"
+		:first="first"
+		@page="onPage"
 		tableStyle="max-width: 100%"
+		class="border-round-sm"
 	>
 		
 		<template #header>
@@ -18,8 +22,10 @@
 			No revenues found.
 		</template>
 		<template #loading>
-			<Image :src="loadingImg" alt="Loader" width="160" />
-			<h3>Loading ...</h3>
+			<div class="flex flex-column gap-1 justify-content-center">
+				<Image :src="loadingImg" alt="Loader" width="160" />
+				<h3>Loading ...</h3>
+			</div>
 		</template>
 
 		<Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header" sortable>
@@ -28,23 +34,26 @@
 					<Avatar :label="data.label" class="mr-2" shape="circle" :style="`background-color: ${data.bgColor}; color: #333`" />
 					{{ data[col.field] }}
 				</span>
-				<span v-else-if="col.field === 'action'">
+				<span v-else-if="col.field === 'action'" class="capitalize">
 					<i class="w-1rem mr-1 pi" :class="data.actionIcon" />
 					{{ data[col.field] }}
 				</span>
-				<span v-else>{{ data[col.field] }}</span>
+				<span v-else-if="col.field === 'description'">{{ data[col.field] }}</span>
+				<span v-else-if="col.field === 'timestamp'">{{ useFormatDate(data[col.field], dateOptions) }} at {{ useFormatDate(data[col.field], timeOptions) }}</span>
 			</template>
 		</Column>
 	</DataTable>
 </template>
 
 <script setup>
-	import { ref, onMounted, computed } from 'vue'
+	import { ref, onMounted, computed, watch } from 'vue'
 	import { useStore } from 'vuex'
+	import { useFormatDate } from '@/composable/formatDate.js'
+	import { useDateTimeZoneOptions } from '@/composable/dateTimeZoneOptions.js'
 	import loadingImg from '@/assets/images/trivial-loading-optimized.webp'
 
 	const auditLogs = ref([
-		  {
+		  /*{
 		    user: "Charles Brown",
 		    action: "Edit",
 		    description: "Renamed column GL Code to Income Account",
@@ -103,7 +112,7 @@
 		    action: "Edit",
 		    description: "Renamed column GL Code to Income Account",
 		    timestamp: "06/29/2024 12:11 AM PST"
-		  }
+		  }*/
 		]),
 		columns = [
 		    { field: 'user', header: 'User Name' },
@@ -111,38 +120,83 @@
 		    { field: 'description', header: 'Description' },
 		    { field: 'timestamp', header: 'Timestamp' }
 	    ],
+	    selectOrgMsgInfo = 'Please, select an organization.',
 		store = useStore(),
 		loading = ref(false),
 		rows = ref(10), // per_page
-		rowsPerPageOpt = [10, 20, 50]
+		rowsPerPageOpt = [10, 20, 50],
+		{dateOptions, timeOptions, timeZoneOptions} = useDateTimeZoneOptions(),
+		first = ref(1),
+		totalRecords = ref(0),
+		page = ref(1)
 
 	const orgId = computed(() => store.getters.getOrgId)
+	const queryString = computed(() => updateQueryString())
 
-	onMounted(async () => { 
+	onMounted(async () => await auditsInit())
+
+	const auditsInit = async () => {
+		loading.value = true
+
+		let apps = []
+
+		apps = await getApps()
+		apps = filteredOrgApps(apps) 
+
+		let auditPromises = apps.map(item => getAuditsLogs(item.id)),
+			allAudits = await Promise.all(auditPromises)
+
+		console.log('allAudits - ', allAudits)
+
+
+		allAudits.forEach(item => {
+			item?.audits.forEach(audit => {
+				let dataObj = {}
+
+				dataObj.user = audit?.user_id
+				dataObj.action = audit?.action
+				dataObj.description = audit?.audited_changes || 'No description'
+				dataObj.timestamp = audit?.created_at
+
+				auditLogs.value.push(dataObj)
+			})
+		})
+
+		totalRecords.value = auditLogs.value.length
 		formatAuditLogs(auditLogs.value)
 
-		let x = await getAudits()
-		consoel.log('x - ', x)
-	})
+		loading.value = false
+	}
 
-	const getAudits = async () => {
+	const getApps = async () => {
 		try {
-			return await store.state.Session.apiCall('/apps/audit')
+			return await store.state.Session.apiCall('/apps')
 		} catch (err) {
 			console.log(err)
 		}
 	}
 
-	const getNameInitials = name => name.match(/(\b\S)?/g).join("").toUpperCase()
+	const filteredOrgApps = apps => apps.filter(item => item.owner_id === orgId.value && item.owner_type === 'Organization')
+
+	const getAuditsLogs = async appId => {
+		try {
+			return await store.state.Session.apiCall(`/apps/${appId}/audits?${queryString.value}`)
+		} catch (err) {
+			console.log(err)
+		}
+	}
+
+	const getNameInitials = name => name.toString().match(/(\b\S)?/g).join("").toUpperCase()
+
 	const getActionIcon = action => {
 		switch(action) {
-			case 'Edit':
+			case 'update':
 				return 'pi-pencil'
 			break;
-			case 'Create':
+			case 'create':
 				return 'pi-plus'
 			break;
-			case 'Delete':
+			case 'delete':
 				return 'pi-times'
 			break;
 			default:
@@ -174,4 +228,23 @@
 		return auditLogs
 	}
 
+	const totalPaginatorPages = (totalPages, itemsPerPage) => totalPages * itemsPerPage
+	const updateQueryString = () => `per_page=${rows.value}&page=${page.value}`
+
+	const onPage = async event => {
+		loading.value = true
+
+		first.value = event?.first || 0
+		rows.value = event?.rows || 10
+		page.value = event?.page + 1
+
+		try {
+			await auditsInit()
+		} catch (err) {
+			loading.value = false
+			console.log(err)
+		}
+
+		loading.value = false
+	}
 </script>

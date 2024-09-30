@@ -246,3 +246,13 @@
 		}
 	}
 }
+
+.audits__logs__sidebar {
+	width: 28rem;
+
+	& .p-timeline-event {
+		& .p-timeline-event-content {
+			width: 100%;
+		}
+	}
+}
