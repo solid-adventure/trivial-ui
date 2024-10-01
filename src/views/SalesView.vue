@@ -54,7 +54,7 @@
 			<h3>Loading ...</h3>
 		</template>
 
-        <Column v-for="col in columns" :key="col.field" :field="col.field" :header="col.header" :filterField="col.field" sortable filter :filterMatchModeOptions="setFilterMatchModes(col.field)">
+        <Column v-for="col in columns" :key="col.field" :field="col.field" :header="col.header" :filterField="col.field" :sortable="col.field !== 'activity'" filter :filterMatchModeOptions="setFilterMatchModes(col.field)">
         	<template #filter="{ filterModel, filterCallback }" v-if="filters.hasOwnProperty(col.field)">
         		<Calendar v-if="col.field === 'originated_at'" v-model="filterModel.value" dateFormat="mm/dd/yy" placeholder="mm/dd/yyyy" mask="99/99/9999" />
 				<InputText v-else v-model="filterModel.value" type="text" @keydown.enter="filterCallback()" class="p-column-filter" />
@@ -62,7 +62,7 @@
 			<template #filterclear="{ filterCallback }">
 				<Button type="button" @click="() => { filterCallback(); onFilterClear(col.field); }" label="Clear" outlined class="clear-btn" />
 			</template>
-			<template #editor="{ data, field }">
+			<template v-if="col.field !== 'activity'" #editor="{ data, field }">
 				<InputText v-model="data[field]" autofocus />
 			</template>
 			<template #body="{ data }">
@@ -72,6 +72,9 @@
 						<div class="time">{{ useFormatDate(data.originated_at, timeOptions) }} {{ useFormatDate(data.originated_at, timeZoneOptions).split(' ')[1] }}</div>
 					</span>
 					<span v-else-if="col.field == 'amount'">{{ useFormatCurrency(data[col.field], 2, data['units']) }}</span>
+					<span v-else-if="col.field == 'activity'">
+						<Button type="button" text :severity="isActivityButtonState(data.id, 'disabled') ? 'danger' : 'secondary'" :icon="isActivityButtonState(data.id, 'disabled') ? 'pi pi-ban': 'pi pi-link'" :loading="isActivityButtonState(data.id, 'loading')" :disabled="isActivityButtonState(data.id, 'disabled')" @click="getActivityLink(data.id)" />
+					</span>
 					<span v-else>{{ data[col.field] }}</span>
 				</div>
 			</template>
@@ -103,6 +106,7 @@
 
 <script setup>
 	import { ref, onMounted, computed, watch, toRaw } from 'vue'
+	import { useRouter } from 'vue-router'
 	import moment from 'moment-timezone'
 	import { useStore } from 'vuex'
 	import { useFormatCurrency } from '@/composable/formatCurrency.js'
@@ -116,6 +120,7 @@
 	import CSVExportDialog from '@/components/sales/CSVExportDialog'
 
 	const loading = ref(false),
+		activityBtnState = ref([]),
 		filters = ref({}),
 		registers = ref([]),
 		totalAmount = ref(null),
@@ -141,9 +146,8 @@
 		registersNames = ['Sales', 'Income Account'],
 		selectOrgMsgInfo = 'Please, select an organization.',
         timezone = timeZoneOptions.timeZone,
-		csvDialogVisible = ref(false)
-		/*streamErrorMessage = ref(''),
-		cancelCSV = ref(false),*/
+		csvDialogVisible = ref(false),
+		router = useRouter()
 
 	let columns = [],
 		defaultColumns = [
@@ -152,6 +156,7 @@
 			{field: 'unique_key', header: 'Unique Key'},
 			{field: 'amount', header: 'Amount'}
 		],
+		activityColumn = { field: 'activity', header: 'Activity' },
 		totalsColumns = { amount: 'amount' },
 		allRegisters = null,
 		filterDate = { end_at: null, start_at: null },
@@ -199,13 +204,14 @@
 	const setCSSCustomProp = () => document.documentElement.style.setProperty('--cols', columns.length - 1)
 	const totalPaginatorPages = (totalPages, itemsPerPage) => totalPages * itemsPerPage
 	const setColumns = () => columns = [...defaultColumns] // Add fixed columns at the beginig of the table
+	const setActivityColumn = () => columns.push(activityColumn) // Add fixed columns at the end of the table
 	const setFilters = () => filters.value = defaultFilters
 	const resetColumns = () => columns = [] // Reset columns before new set of columns from API call
 	const resetFilters = () => filters.value = {} // Reset filters before new set of dynamic filters
 	const resetDateFilter = () => filterDate = {end_at: null, start_at: null}
 	const resetRegisters = () => registers.value = []
 	const resetTotalAmount = () => totalAmount.value = null
-	const isDisabledTooltip = data => data?.length < 14
+	const isDisabledTooltip = data => data?.length < 14 || data === undefined
 	const toggleTotalInfoPopup = event => totalInfoPopup.value[0].toggle(event)
 	const setFilterMatchModes = field => field === 'amount' ? numericFilterMatchModes : field === 'originated_at' ? dateFilterMatchModes : textFilterMatchModes
 	const openCSVDialog = () => csvDialogVisible.value = true
@@ -245,6 +251,7 @@
 
 			//regId = register.id
 			setMetaColumns(register.value.meta)
+			setActivityColumn()
 			setCSSCustomProp()
 			await getSearchableCols()
 
@@ -290,6 +297,44 @@
 			globalFilterFields.push(item) // Search dynamic fields
 			setDefaultFilters(item)
 		})
+	}
+
+	// Create activity link and redirect
+	const getActivityLink = async regItemId => {
+		try {
+			if (!getActivityButton(regItemId)) {
+				activityBtnState.value.push({ id: regItemId, loading: false, disabled: false })
+			}
+
+			const activityBtn = getActivityButton(regItemId)
+			activityBtn.loading = true
+
+			const activityEntriesSearch = JSON.stringify([{ c: 'register_item_id', o: '=', p: regItemId }])
+			const activitySearch = JSON.stringify([{ name: 'register_item_id', key: null, operator: '=', value: regItemId.toString() }])
+
+			const activityEntriesApp = await store.state.Session.apiCall(`activity_entries?search=${activityEntriesSearch}`)
+
+			activityBtn.disabled = !activityEntriesApp.length
+
+			if (activityEntriesApp.length) {
+				router.push(`/apps/${activityEntriesApp[0].app_id}/activity?search=${activitySearch}`)
+			}
+		} catch (error) {
+			console.error('Error fetching activity link: ', error);
+		} finally {
+			const activityBtn = getActivityButton(regItemId)
+			if (activityBtn) {
+				activityBtn.loading = false
+			}
+		}
+	}
+
+	const getActivityButton = regItemId => activityBtnState.value.find(item => item.id === regItemId)
+
+	// Check if the button is in loading state or disabled
+	const isActivityButtonState = (regItemId, prop) => {
+		const button = getActivityButton(regItemId)
+		return button ? button[prop] : false
 	}
 
 	// Setting dynamic table columns headers - (register.meta)
