@@ -432,6 +432,7 @@
 				let value = constraint.value
 				if (value) {
 					if (column === 'originated_at' && filterMatchModeMapping[constraint.matchMode] === '=') {
+						// Date filter 'Date is'
 						let selectedDate = {
 							c: column,
 							o: filterMatchModeMapping.gte, // ">=", 
@@ -444,6 +445,20 @@
 						}
 
 						filtersArray.push(selectedDate, tomorrowDate)
+					} else if (column === 'originated_at' && filterMatchModeMapping[constraint.matchMode] === '>') {
+						// Date filter 'Date is on or after'
+						filtersArray.push({
+							c: column,
+							o: filterMatchModeMapping[constraint.matchMode],
+							p: moment(value).tz(timezone).startOf('day').utc().format()
+						})
+					} else if (column === 'originated_at' && filterMatchModeMapping[constraint.matchMode] === '<') {
+						// Date filter 'Date is on or before'
+						filtersArray.push({
+							c: column,
+							o: filterMatchModeMapping[constraint.matchMode],
+							p: moment(value).tz(timezone).endOf('day').utc().format()
+						})
 					} else {
 						filtersArray.push({
 							c: column,
