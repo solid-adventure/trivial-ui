@@ -42,7 +42,6 @@
       <template #loading>
         <div class="flex align-content-center justify-content-center flex-column">
           <Image :src="loadingImg" alt="Loader" width="160" />
-          <h3 class="text-center">Loading ...</h3>
         </div>
       </template>
 
@@ -92,7 +91,12 @@
             </div>-->
 
             <!-- PRIMEVUE CLICK VERSION (DEFAULT - WORKING) -->
-            <template v-if="(data.totalErrors > 0 || data.totalSuccess > 0) && data.stats && data.stats.length">
+            <template v-if="data.stats.loading === true">
+              <div class="flex align-content-center justify-content-center flex-column">
+                <Image :src="loadingImg" alt="Loader" width="40" />
+              </div>
+            </template>
+            <template v-else-if="(data.totalErrors > 0 || data.totalSuccess > 0) && data.stats && data.stats.length">
               <div>
                 <Button type="button" severity="secondary" text @click="togglePopup(data.opIndex, $event)">
                   <svg version="1.1" xmlns="http://www.w3.org/2000/svg" height="20" width="26" class="chart">
@@ -145,37 +149,36 @@
 </template>
 
 <script setup>
-  import { ref, computed, watch, onMounted } from 'vue'
+  import { ref, reactive, computed, watch, onMounted } from 'vue'
   import { useStore } from 'vuex'
   import loadingImg from '@/assets/images/trivial-loading-optimized.webp'
   import { useFilterMatchModes } from '@/composable/filterMatchModes.js'
 
   const store = useStore(),
-    selectedContract = ref(null),
-    selectOrgMsgInfo = 'Please, select an organization.',
+    { dateFilterMatchModes, textFilterMatchModes, defaultMatchMode, globalFilter } = useFilterMatchModes(),
+    activityPopup = ref([]),
+    activityQueryStr200 = "[{'name':'status','operator':'=','value':'200'}]",
+    activityQueryStr200Encoded = ref(''),
+    activityQueryStr500 = "[{'name':'status','operator':'=','value':'500'}]",
+    activityQueryStr500Encoded = ref(''),
     columns = [
       { field: 'descriptive_name', header: 'Contract Name' },
       { field: 'stats', header: 'Activity' },
     ],
-    loading = ref(false),
-    rows = ref(50),
-    rowsPerPageOpt = [10, 20, 50],
-    first = ref(0),
-    totalRecords = ref(0),
-    { dateFilterMatchModes, textFilterMatchModes, defaultMatchMode, globalFilter } = useFilterMatchModes(),
+    contracts = ref([]),
     filters = ref({
       global: { value: null, matchMode: globalFilter },
       descriptive_name: { value: null, matchMode: defaultMatchMode },
     }),
+    first = ref(0),
     globalFilterFields = ['descriptive_name'],
-    activityPopup = ref([]),
-    activityQueryStr500 = "[{'name':'status','operator':'=','value':'500'}]",
-    activityQueryStr200 = "[{'name':'status','operator':'=','value':'200'}]",
-    activityQueryStr500Encoded = ref(''),
-    activityQueryStr200Encoded = ref(''),
-    op = ref([])
-
-  let contracts = ref([])
+    loading = ref(false),
+    op = ref([]),
+    rows = ref(50),
+    rowsPerPageOpt = [10, 20, 50],
+    selectedContract = ref(null),
+    selectOrgMsgInfo = 'Please, select an organization.',
+    totalRecords = ref(0)
 
   const orgId = computed(() => store.getters.getOrgId)
   const currentUser = computed(() => store.state.user)
@@ -187,11 +190,16 @@
     }
   })
 
+  watch(contracts, async (newContracts) => {
+    if(newContracts.length > 0) {
+      getActivity()
+    }
+  })
+
   onMounted(async () => {
     if (currentUser.value?.id) {
       await initContracts(currentUser.value.id)
     }
-
     activityQueryStr500Encoded.value = encodeURIComponentStr(activityQueryStr500)
     activityQueryStr200Encoded.value = encodeURIComponentStr(activityQueryStr200)
   })
@@ -206,9 +214,7 @@
     try {
       const apps = await getApps()
       if (apps) {
-        const appsPermissions = await setAppPermits(apps, userId)
-        const orgContracts = getOrgContracts(appsPermissions)
-        contracts.value = await getAppActivity(orgContracts)
+        contracts.value = filterAndInitContracts(apps)
         totalRecords.value = Math.ceil(contracts.value.length / rows.value)
       }
     } catch (err) {
@@ -226,60 +232,45 @@
     }
   }
 
-  const getOrgContracts = appsPerm => appsPerm.filter(item => item.owner_id === orgId.value && item.owner_type === 'Organization' && item.panels.component === 'Contract')
-
-  const setAppPermits = async (apps, id) => {
-    try {
-      const appsPermissions = await store.state.Session.apiCall(`/users/${id}/permissions`)
-
-      return apps.map(app => ({ ...app, ...appsPermissions?.update?.app_names.find(item => app.name === item.app) }))
-    } catch (err) {
-      console.log(err)
-    }
+  const filterAndInitContracts = (apps) => {
+    return apps.reduce((contracts, app) => {
+      if (app.owner_id === orgId.value && app.owner_type === 'Organization' && app.panels.component === 'Contract') {
+        contracts.push({ ...app, canUpdate: true, stats: reactive({ loading: true }) })
+      }
+      return contracts
+    }, [])
   }
 
-  const getAppActivity = async contracts => {
+  const getActivity = async () => {
     try {
-      const appActivity = await Promise.all(
-        contracts.map(async (app, index) => {
-          // Initialize error count and flag for updating
-          let totalErrors = 0,
-            totalSuccess = 0
-          app.canUpdate = true
+      contracts.value.forEach(async (app, index) => {
+        // Fetch app stats
+        let stats = await store.state.Session.apiCall(`/activity_entries/stats?app_id=${app.name}`)
 
-          // Fetch app stats
-          app.stats = await store.state.Session.apiCall(`/activity_entries/stats?app_id=${app.name}`)
+        // Process each stat entry
+        let maxTotal = 1
+        let totalSuccess = 0
+        let totalErrors = 0
+        stats.forEach(item => {
+          const successes = item.count['200'] ?? 0
+          const errors = item.count['500'] ?? 0
 
-          // Calculate maximum total count from stats
-          const maxTotal = app?.stats.reduce((max, item) => {
-            const total = Object.values(item?.count).reduce((sum, value) => sum + value, 0)
-            return Math.max(max, total)
-          }, 0)
+          item.hasSuccess = successes > 0
+          item.hasErrors = errors > 0
+          item.total = successes + errors
+          maxTotal = Math.max(maxTotal, item.total)
 
-          // Process each stat entry
-          app.stats.forEach(item => {
-            const hasError = item?.count?.['500'] ?? false,
-              hasSuccess = item?.count?.['200'] ?? false,
-              total = Object.values(item?.count).reduce((sum, value) => sum + value, 0)
-
-            item.hasErrors = !!hasError // Check if there are errors
-            item.hasSuccess = !!hasSuccess
-            totalErrors += hasError ? item?.count['500'] : 0 // Accumulate errors
-            totalSuccess += item?.count.hasOwnProperty('200') ? item?.count['200'] : 0 // Accumulate success
-            item.total = total // Total count for the item
-            item.proportionalHeight = Math.round((item.total / maxTotal) * 20) || 1 // Proportional height for the item
-          })
-
-          // Set index only if there are errors
-          app.opIndex = (totalErrors || !!totalSuccess) ? index : false
-          app.totalErrors = totalErrors
-          app.totalSuccess = totalSuccess > 1000 ? (totalSuccess / 1000) + 'k' : totalSuccess
-
-          return app
+          totalErrors += errors
+          totalSuccess += successes
         })
-      )
+        stats.forEach(item => item.proportionalHeight = Math.round((item.total / maxTotal) * 20) || 1)
 
-      return appActivity
+        // Set index only if there are errors
+        app.opIndex = index
+        app.totalErrors = totalErrors
+        app.totalSuccess = totalSuccess > 1000 ? (totalSuccess / 1000).floor + 'k' : totalSuccess
+        app.stats = { ...stats, loading: false }
+      })
     } catch (error) {
       console.error('Error fetching app activity:', error)
     }
