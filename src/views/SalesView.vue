@@ -155,11 +155,10 @@
 		totalsColumns = { amount: 'amount' },
 		allRegisters = null,
 		filterDate = { end_at: null, start_at: null },
-		page = 1, // Default start page is from first,
+		page = ref(1), // Default start page is from first,
 		storageOrgId = parseInt(localStorage.getItem('orgId')) || null
 
 	const orgId = computed(() => store.getters.getOrgId)
-	const queryString = computed(() => updateQueryString())
 	const regId = computed(() => store.getters.getRegisterId)
 	const register = computed(() => store.getters.getRegister)
 	const registersItems = computed(() => registers.value)
@@ -214,7 +213,7 @@
 	const resetPagination = () => {
 		totalRecords.value = 0
 		first.value = 1
-		page = 1
+		page.value = 1
 	}
 
 	const resetSalesTableValues = () => {
@@ -309,11 +308,12 @@
 	}
 
 	const onPage = async event => {
+
 		loading.value = true
 
 		first.value = event?.first || 0
 		rows.value = event?.rows || 10
-		page = event?.page + 1
+		page.value = event?.page + 1
 
 		try {
 			const { register_items } = await getRegistersData()
@@ -346,6 +346,8 @@
 	const onFilter = async event => {
 		loading.value = true
 		filters.value = event.filters
+		page.value = 1
+		first.value = 1
 
 		try {
 			// Get registers data
@@ -374,7 +376,7 @@
 		}
 
 		try {
-			page = 1
+			page.value = 1
 			const { register_items } = await getRegistersData()
 			registers.value = register_items
 			await getTotalAmount()
@@ -417,8 +419,8 @@
 		}
 	}
 
-	const updateQueryString = () => {
-		let query = `per_page=${rows.value}&page=${page}`
+	const queryString = computed(() => {
+		let query = `per_page=${rows.value}&page=${page.value}`
 
 		if (sortField.value) {
 			query += `&order_by=${sortField.value}&ordering_direction=${sortOrder.value}`
@@ -458,5 +460,5 @@
 		}
 
 		return query
-	}
+	})
 </script>
