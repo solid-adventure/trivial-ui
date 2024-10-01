@@ -1,5 +1,5 @@
 <template>
-	<Panel header="Actuals" :pt="{root: {class: 'shadow-2'}, header: {class: 'text-lg'}}">
+	<Panel header="Actuals" :pt="{root: {class: 'shadow-2'}, header: {class: 'text-lg'}}" class="w-full">
 		<div class="flex flex-wrap justify-content-between align-items-center gap-3 actuals__wrapper">
 			<template v-if="loading">
 				<Skeleton width="18rem" height="3rem"></Skeleton>
@@ -13,15 +13,22 @@
 			</template>
 			<template v-else>
 				<div v-for="(item, index) in selectedActuals" :key="index" class="actuals__wrapper__item border-300" :class="{'border-right-1': index !== lastItem}">
-					<p class="m-0 text-md text-muted">{{ item.name }}</p>
-					<div class="flex align-items-center gap-1 mt-1">
-						<p class="m-0 text-xl font-semibold">{{ useFormatCurrency(item.value) }}</p>
-						<Icon :icon="item.icon" class="indicator__icon text-xl" :class="item.class"/>
-					</div>
+
+					<template v-if="item.value">
+						<p class="m-0 text-md text-muted">{{ item.name }}</p>
+						<div class="flex align-items-center gap-1 mt-1">
+							<p class="m-0 text-xl font-semibold">{{ useFormatCurrency(item.value) }}</p>
+							<Icon :icon="item.icon" class="indicator__icon text-xl" :class="item.class"/>
+						</div>
+					</template>
+					<template v-else>
+						<i class="pi pi-minus text-500" />
+					</template>
 				</div>
 			</template>
 		</div>
 	</Panel>
+	<Divider class="my-1" />
 </template>
 
 <script setup>
