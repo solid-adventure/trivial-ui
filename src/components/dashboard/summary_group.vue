@@ -1,28 +1,21 @@
 <template>
 	<Panel header="Actuals" :pt="{root: {class: 'shadow-2'}, header: {class: 'text-lg'}}" class="w-full">
-		<div class="flex flex-wrap justify-content-between align-items-center gap-3 actuals__wrapper">
-			<template v-if="loading">
-				<Skeleton width="18rem" height="3rem"></Skeleton>
-				<Skeleton width="18rem" height="3rem"></Skeleton>
-				<Skeleton width="18rem" height="3rem"></Skeleton>
-				<Skeleton width="18rem" height="3rem"></Skeleton>
-				<Skeleton width="18rem" height="3rem"></Skeleton>
-			</template>
-			<template v-else-if="!getRegId">
+		<div class="flex flex-wrap justify-content-between align-items-center actuals__wrapper">
+			<template v-if="!getRegId">
 				<h4 class="font-medium">No Actuals data</h4>
 			</template>
 			<template v-else>
-				<div v-for="(item, index) in selectedActuals" :key="index" class="actuals__wrapper__item border-300" :class="{'border-right-1': index !== lastItem}">
-
-					<template v-if="item.value">
-						<p class="m-0 text-md text-muted">{{ item.name }}</p>
+				<div v-for="(item, index) in selectedActuals" :key="index" class="actuals__wrapper__item border-300" :class="{'border-right-1': index !== lastItem && !loading}">
+					<p class="m-0 text-md text-muted">{{ item.name }}</p>
+					<Skeleton v-if="loading" height="2rem"></Skeleton>
+					<template v-else-if="item.value">
 						<div class="flex align-items-center gap-1 mt-1">
 							<p class="m-0 text-xl font-semibold">{{ useFormatCurrency(item.value) }}</p>
 							<Icon :icon="item.icon" class="indicator__icon text-xl" :class="item.class"/>
 						</div>
 					</template>
 					<template v-else>
-						<i class="pi pi-minus text-500" />
+						<p class="m-0 text-xl font-semibold">Not Available</p>
 					</template>
 				</div>
 			</template>
@@ -38,17 +31,18 @@
 	import { useFormatCurrency } from '@/composable/formatCurrency.js';
 	import moment from 'moment-timezone';
 	import { useToastNotifications } from '@/composable/toastNotification';
-
+	import { useDateTimeZoneOptions } from '@/composable/dateTimeZoneOptions';
 	//const props = defineProps(['selected']);
 
 	const store = useStore(),
-		timezone = 'Etc/GMT+5',
+		{ timeZoneOptions } = useDateTimeZoneOptions(),
+		timezone = timeZoneOptions.timeZone,
 		apiOptionsObj = {
 			register_id: null,
 			start_at: null,
-			end_at: moment.tz(timezone).format(),
-			timezone: timezone,
-			invert_sign: false
+			end_at: moment.tz(timezone).endOf('day').format(),
+ 			timezone: timezone,
+ 			invert_sign: false
 		},
 		selectedActuals = ref([
 			{ key: 'last1DayData', name: 'Last Day Revenue', value: null, icon: null, class: null },
@@ -59,16 +53,21 @@
 		]),
 		loading = ref(false),
 		{ showSuccessToast, showErrorToast, showInfoToast } = useToastNotifications(),
-		last1Day = moment().tz(timezone).subtract({ days: 1 }).startOf('day').format(),
-		last1DayOffset = moment(last1Day).tz(timezone).subtract({ days: 1 }).format(),
-		last7Days =  moment().tz(timezone).subtract({ days: 7 }).startOf('day').format(),
-		last7DaysOffset = moment(last7Days).tz(timezone).subtract({ days: 7 }).format(),
-		last1Months =  moment().tz(timezone).subtract({ months: 1 }).startOf('day').format(),
-		last1MonthsOffset = moment(last1Months).tz(timezone).subtract({ months: 1 }).format(),
-		last3Months =  moment().tz(timezone).subtract({ months: 3 }).startOf('day').format(),
-		last3MonthsOffset = moment(last3Months).tz(timezone).subtract({ months: 3 }).format(),
-		last1Year =  moment().tz(timezone).startOf('year').startOf('day').format(),
-		last1YearOffset = moment(last1Year).tz(timezone).subtract({ months: 6 }).format()
+		last1Day =     moment().tz(timezone),
+		last7Days =    moment().tz(timezone).subtract({ days: 7 }),
+		last1Months =  moment().tz(timezone).subtract({ months: 1 }),
+		last3Months =  moment().tz(timezone).subtract({ months: 3 }),
+		last1Year =    moment().tz(timezone).startOf('year')
+
+		// TODO: These offsets are not conceptually what we're trying to achieve
+		//        They need a full refactor to reflect a period of the same length as the
+		//        period they are comparing, stepped back by the same amount of time
+
+		// last1DayOffset = moment(last1Day).tz(timezone).subtract({ days: 1 }),
+		// last7DaysOffset = moment(last7Days).tz(timezone).subtract({ days: 7 }),
+		// last1MonthsOffset = moment(last1Months).tz(timezone).subtract({ months: 1 }),
+		// last3MonthsOffset = moment(last3Months).tz(timezone).subtract({ months: 3 }),
+		// last1YearOffset = moment(last1Year).tz(timezone).subtract({ months: 6 })
 
 	let regId = null,
 		allActualsData = null,
@@ -106,9 +105,8 @@
 
 	const getActuals = async (options, datePeriod) => {
 		options.register_id = regId
-		options.start_at = datePeriod
+		options.start_at = datePeriod.startOf('day').format()
 		options.invert_sign = chart?.invert_sign
-
 		try {
 			return await store.state.Session.apiCall('/reports/item_sum', 'POST', options)
 		} catch (err) {
@@ -121,23 +119,21 @@
 		loading.value = true
 
 		try {
-			// Last day
 			const last1DayData = await getActuals(apiOptionsObj, last1Day),
-				last1DayDataOffset = await getActuals(apiOptionsObj, last1DayOffset),
-				// Last 7 days
 				last7DaysData = await getActuals(apiOptionsObj, last7Days),
-				last7DaysDataOffset = await getActuals(apiOptionsObj, last7DaysOffset),
-				// Last month
 				last1MonthsData = await getActuals(apiOptionsObj, last1Months),
-				last1MonthsDataOffset = await getActuals(apiOptionsObj, last1MonthsOffset),
-				// Last 3 month
 				last3MonthsData = await getActuals(apiOptionsObj, last3Months),
-				last3MonthsDataOffset = await getActuals(apiOptionsObj, last3MonthsOffset),
-				// Last year
-				last1YearData = await getActuals(apiOptionsObj, last1Year),
-				last1YearDataOffset = await getActuals(apiOptionsObj, last1YearOffset)
+				last1YearData = await getActuals(apiOptionsObj, last1Year)
+			return {last1DayData, last7DaysData, last3MonthsData, last1MonthsData, last1YearData}
 
-			return {last1DayData, last1DayDataOffset, last7DaysData, last7DaysDataOffset, last3MonthsData, last3MonthsDataOffset, last1MonthsData, last1MonthsDataOffset, last1YearData, last1YearDataOffset}
+				// TODO  Re-enable when the offset logic is correct
+				// last1DayDataOffset = await getActuals(apiOptionsObj, last1DayOffset),
+				// last7DaysDataOffset = await getActuals(apiOptionsObj, last7DaysOffset),
+				// last1MonthsDataOffset = await getActuals(apiOptionsObj, last1MonthsOffset),
+				// last3MonthsDataOffset = await getActuals(apiOptionsObj, last3MonthsOffset),
+				// last1YearDataOffset = await getActuals(apiOptionsObj, last1YearOffset)
+
+			// return {last1DayData, last1DayDataOffset, last7DaysData, last7DaysDataOffset, last3MonthsData, last3MonthsDataOffset, last1MonthsData, last1MonthsDataOffset, last1YearData, last1YearDataOffset}
 		} catch (err) {
 			console.error(err)
 			return []
@@ -150,12 +146,15 @@
 		selectedActuals.value.forEach(item => {
 			item.value = data[item.key]?.count[0]?.value
 
-			if (data[item.key] > data[`${item.key}Offset`]) {
+			if (data[item.key] < data[`${item.key}Offset`]) {
+				item.class = 'down'
+				item.icon = 'prime:arrow-down'
+			} else if ((data[item.key] > data[`${item.key}Offset`])){
 				item.class = 'up'
 				item.icon = 'prime:arrow-up'
 			} else {
-				item.class = 'down'
-				item.icon = 'prime:arrow-down'
+				item.class = ''
+				item.icon = ''
 			}
 		})
 	}
