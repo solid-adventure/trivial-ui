@@ -23,6 +23,7 @@ const store = createStore({
     app: {},
     isAuthenticated: false,
     showSuperBar: false,
+    app: {},
     apps: [],
     manifest: {
       id: null,
@@ -339,7 +340,6 @@ const store = createStore({
       try {
         await dispatch('organizations')
         await dispatch('loadProfile')
-        await dispatch('initApp', { appId })
         await dispatch('loadResources', { dispatch, router })
         await dispatch('checkURLState')
         await dispatch('dashboards')
@@ -392,13 +392,6 @@ const store = createStore({
             app.canUpdate = res;
           });
       });
-    },
-    
-    initApp({state, commit}, {appId}) {
-      if(state.app !== {}){
-        state.app = {}
-      }
-      commit('setAppId', appId)
     },
 
     async setCurrentPath({state, commit}, {currentPath, route}) {
