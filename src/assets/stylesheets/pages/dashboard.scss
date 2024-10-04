@@ -1,7 +1,31 @@
 .actuals__wrapper {
+	& :hover {
+		cursor: pointer;
+		background-color: var(--surface-100);
+	}
+
 	& .actuals__wrapper__item {
 		width: calc((100% - 5.250rem) / 5);
 		gap: 0 3rem;
+	}
+}
+
+.actuals__wrapper__item__info {
+	& .actuals__wrapper__item__info--title {
+		& .actuals__wrapper__item__info--title-tag {
+
+			&.up {
+				border-color: #ABE8A0;
+				color: #397528;
+				background-color: #E5FAE1;
+			}
+
+			&.down {
+				border-color: #F7CECD;
+				color: #96261F;
+				background-color: #FCE6E6;
+			}
+		}
 	}
 }
 
