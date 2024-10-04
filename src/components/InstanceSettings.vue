@@ -377,7 +377,6 @@
         this.descriptive_name = this.app.descriptive_name
         this.panels = this.app.panels
         this.schedule = this.app.schedule
-        window.document.title = `Settings: ${this.app.descriptive_name}`
       },
 
       async loadManifest() {

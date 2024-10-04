@@ -114,7 +114,7 @@ const routes = [
   {
     path: "/dashboard3",
     component: DashboardView,
-    name: "Analytics and Real-Time Data",
+    name: "Dashboard",
   },
   {
     path: "/organization-settings/:id",
