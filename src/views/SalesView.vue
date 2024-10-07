@@ -106,7 +106,7 @@
 
 <script setup>
 	import { ref, onMounted, computed, watch, toRaw } from 'vue'
-	import { useRouter } from 'vue-router'
+	import { useRouter, useRoute } from 'vue-router'
 	import moment from 'moment-timezone'
 	import { useStore } from 'vuex'
 	import { useFormatCurrency } from '@/composable/formatCurrency.js'
@@ -147,7 +147,8 @@
 		selectOrgMsgInfo = 'Please, select an organization.',
         timezone = timeZoneOptions.timeZone,
 		csvDialogVisible = ref(false),
-		router = useRouter()
+		router = useRouter(),
+		route = useRoute()
 
 	let columns = [],
 		defaultColumns = [
@@ -161,7 +162,8 @@
 		allRegisters = null,
 		filterDate = { end_at: null, start_at: null },
 		page = ref(1), // Default start page is from first,
-		storageOrgId = parseInt(localStorage.getItem('orgId')) || null
+		storageOrgId = parseInt(localStorage.getItem('orgId')) || null,
+		filtersArray = ref([])
 
 	const orgId = computed(() => store.getters.getOrgId)
 	const regId = computed(() => store.getters.getRegisterId)
@@ -196,7 +198,12 @@
 			await store.dispatch('register')
 		}
 
-		if (regId.value) {
+		if (regId.value && Object.keys(route.query).length === 0) {
+			await getRegisters()
+		}
+
+		if (regId.value && Object.keys(route.query).length !== 0) {
+			await routeQuery(route.query)
 			await getRegisters()
 		}
 	})
@@ -353,6 +360,7 @@
 	}
 
 	const onPage = async event => {
+		console.log(event)
 
 		loading.value = true
 
@@ -471,7 +479,7 @@
 			query += `&order_by=${sortField.value}&ordering_direction=${sortOrder.value}`
 		}
 
-		const filtersArray = []
+		//const filtersArray = []
 		Object.entries(filters.value).forEach(([column, filter]) => {
 			filter.constraints?.forEach(constraint => {
 				let value = constraint.value
@@ -489,23 +497,23 @@
 							p: moment(value).tz(timezone).add({ days: 1 }).startOf('day').utc().format() // midnight on the next day
 						}
 
-						filtersArray.push(selectedDate, tomorrowDate)
+						filtersArray.value.push(selectedDate, tomorrowDate)
 					} else if (column === 'originated_at' && filterMatchModeMapping[constraint.matchMode] === '>') {
 						// Date filter 'Date is on or after'
-						filtersArray.push({
+						filtersArray.value.push({
 							c: column,
 							o: filterMatchModeMapping[constraint.matchMode],
 							p: moment(value).tz(timezone).startOf('day').utc().format()
 						})
 					} else if (column === 'originated_at' && filterMatchModeMapping[constraint.matchMode] === '<') {
 						// Date filter 'Date is on or before'
-						filtersArray.push({
+						filtersArray.value.push({
 							c: column,
 							o: filterMatchModeMapping[constraint.matchMode],
 							p: moment(value).tz(timezone).endOf('day').utc().format()
 						})
 					} else {
-						filtersArray.push({
+						filtersArray.value.push({
 							c: column,
 							o: filterMatchModeMapping[constraint.matchMode],
 							p: value
@@ -515,10 +523,25 @@
 			})
 		})
 
-		if (filtersArray.length > 0) {
-			query += `&search=${encodeURIComponent(JSON.stringify(filtersArray))}`
+		if (filtersArray.value.length > 0) {
+			query += `&search=${encodeURIComponent(JSON.stringify(filtersArray.value))}`
 		}
 
 		return query
 	})
+
+	const routeQuery = async query => {
+		rows.value = parseInt(query?.per_page) || 10
+		page.value = parseInt(query?.page) || 1
+		sortField.value = query?.order_by || null
+		sortOrder.value = query?.ordering_direction || null
+
+		if (query?.search) {
+			try {
+				filtersArray.value = JSON.parse(query?.search)
+			} catch (error) {
+				console.error('Error parsing search parameter:', error)
+			}
+		}
+	}
 </script>
