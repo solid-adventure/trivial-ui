@@ -360,8 +360,6 @@
 	}
 
 	const onPage = async event => {
-		console.log(event)
-
 		loading.value = true
 
 		first.value = event?.first || 0
@@ -479,7 +477,6 @@
 			query += `&order_by=${sortField.value}&ordering_direction=${sortOrder.value}`
 		}
 
-		//const filtersArray = []
 		Object.entries(filters.value).forEach(([column, filter]) => {
 			filter.constraints?.forEach(constraint => {
 				let value = constraint.value
