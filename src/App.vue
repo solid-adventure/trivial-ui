@@ -44,12 +44,36 @@ export default {
 
     currentHeaderTitle() {
       return this.$route.params.paneltype || this.$route.name;
+    },
+
+    pageTitle() {
+      const baseTitle = 'Trivial'
+
+      let panelTypeOverride = null
+      if (this.$route.name === 'PanelType') {
+        panelTypeOverride = this.$route.params.paneltype
+        // So gross, but this whole concept is on its way out
+        panelTypeOverride = panelTypeOverride.charAt(0).toUpperCase() + panelTypeOverride.slice(1) + 's';
+      }
+      const routeTitle = panelTypeOverride ? panelTypeOverride : this.$route.name || ''
+      const dynamicData = store.state.app?.descriptive_name || ''
+
+      return `${routeTitle} ${dynamicData ? `- ${dynamicData}` : ''} | ${baseTitle}`.trim()
     }
+
   },
   provide() {
     return { ...(this.lastVars ?? {}) };
   },
   watch: {
+
+    pageTitle: {
+      immediate: true,
+      handler(newVal) {
+        document.title = newVal
+      }
+    },
+
     async currentRouteName(newVal) {
       store.dispatch("setCurrentPath", {
         currentPath: newVal,

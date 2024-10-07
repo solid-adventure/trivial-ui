@@ -215,11 +215,6 @@ import { mapState } from 'vuex'
     setTimeout(this.fetchData, 500)
 
   },
-  watch: {
-    async app(newApp) {
-      window.document.title = `Activity: ${newApp.descriptive_name}`
-    }
-  },
   computed: {
     appId() {
       return this.$route.params.id;
