@@ -1,21 +1,12 @@
 <template>
 	<Panel class="w-full shadow-2">
 		<template v-if="loading">
-			<Skeleton height="2.813rem" borderRadius=".25rem" class="mb-2" />
-			<Skeleton height="2.813rem" borderRadius=".25rem" class="mb-2" />
-			<Skeleton height="2.813rem" borderRadius=".25rem" class="mb-2" />
-			<Skeleton height="2.813rem" borderRadius=".25rem" class="mb-2" />
-			<Skeleton height="2.813rem" borderRadius=".25rem" class="mb-2" />
-			<Skeleton height="2.813rem" borderRadius=".25rem" class="mb-2" />
-			<Skeleton height="2.813rem" borderRadius=".25rem" class="mb-2" />
-			<Skeleton height="2.813rem" borderRadius=".25rem" class="mb-2" />
-			<Skeleton height="2.813rem" borderRadius=".25rem" class="mb-2" />
-			<Skeleton height="2.813rem" borderRadius=".25rem" class="mb-2" />
+			<Skeleton v-for="(item, index) in 10" :key="index" height="2.813rem" borderRadius=".25rem" class="mb-2" />
 		</template>
 		<DataTable v-else :value="grossRevenue" :loading="loading" scrollable rowGroupMode="rowspan" :groupRowsBy="groupBy[0]" tableStyle="min-width: 120rem" class="revenue__gross__table">
 			<template #header>
 				<div class="flex justify-content-between align-items-center">
-					<h2 class="font-semibold">Gross Revenue ($)</h2>
+					<h2 class="font-semibold">{{ chart.name }}</h2>
 
 					<!-- SELECT QUARTERS-->
 					<!--<Dropdown v-model="selectedQuarters" :options="quarters" optionLabel="name" placeholder="Select Quarter(s)" class="w-14rem" />-->
