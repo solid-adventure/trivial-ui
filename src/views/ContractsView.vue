@@ -254,12 +254,12 @@
         totalErrors: 0,
         totalSuccess: 0
       }))
-      // TODO Once we have a batch endpoint, we'll switch this to make the API call first
-      //      and then do this same iteration, but dig the stats off that single API
-      //      response instead of call fetchAppStats per item
+      const app_names = contracts.value.map(contract => contract.name)
+      const allStats = await store.state.Session.apiCall(`apps/activity_stats?app_names=${app_names}`)
       contracts.value.forEach(async (contract, index) => {
         try {
-          const stats = await fetchAppStats(contract.name)
+          // NOTE: We're a little inconsistent around app_id vs app.name; this lookup is correct
+          const stats = allStats.find(app => app.app_id === contract.name)?.stats || []
           const maxTotal = calculateMaxTotal(stats)
           contracts.value[index].stats = formatAppStats(stats, maxTotal)
           contracts.value[index].totalErrors = stats.reduce((acc, item) => acc + item.count['500'] ||  0, 0)
@@ -274,10 +274,6 @@
       console.error('Error in getAppActivity:', error)
     }
     return contracts
-  }
-
-  const fetchAppStats = async (appName) => {
-    return await store.state.Session.apiCall(`/activity_entries/stats?app_id=${appName}`)
   }
 
   // Function to calculate maximum total count from stats
