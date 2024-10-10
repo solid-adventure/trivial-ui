@@ -10,7 +10,7 @@
 					<Skeleton v-if="loading" height="3rem"></Skeleton>
 					<template v-else-if="item.value">
 						<div class="flex align-items-center gap-1 mt-1">
-							<p class="m-0 text-xl font-semibold">{{ useFormatCurrency(item.value) }}</p>
+							<p class="m-0 text-xl font-semibold">{{ useFormatCurrency(item.value, 2) }}</p>
 							<Icon :icon="item.icon" class="indicator__icon text-xl" :class="item.class"/>
 						</div>
 					</template>
@@ -31,7 +31,8 @@
 									<p v-if="item.dayOffset === 1" class="my-1 text-sm text-500">{{ formatDate(item.date, item.dayOffset) }}</p>
 									<p v-else class="my-1 text-sm text-500">{{ formatDate(item.date, item.dayOffset) }} - {{ formatDate(item.date) }}</p> 
 
-									<p class="text-md font-bold">{{ useFormatCurrency(actualsOffsets[index].value) }}</p>
+									<p v-if="item.value" class="text-md font-bold">{{ useFormatCurrency(item.value)}}</p>
+									<p v-else class="m-0 text-xl font-semibold">Not Available</p>
 								</div>-->
 								<div class="flex flex-column">
 									<h4 class="my-0 text-base font-normal">Current Value</h4>
@@ -39,8 +40,10 @@
 									<p v-else class="my-1 text-sm text-500">{{ formatDate(item.date, item.dayOffset) }} - {{ formatDate(item.date) }}</p>
 
 									<div class="flex gap-2">
-										<p class="text-md font-bold">{{ useFormatCurrency(item.value) }}</p>
+										<p v-if="item.value" class="text-md font-bold">{{ useFormatCurrency(item.value, 2)}}</p>
+										<p v-else class="m-0 text-xl font-semibold">Not Available</p>
 										<Icon :icon="item.icon" class="indicator__icon text-xl" :class="item.class" />
+										<pre>{{ item.link }}</pre>
 									</div>
 								</div>
 							</div>
@@ -69,6 +72,14 @@
 	import { useDateTimeZoneOptions } from '@/composable/dateTimeZoneOptions';
 	//const props = defineProps(['selected']);
 
+	const props = defineProps({
+		chart: {
+			type: Object,
+			required: true,
+			default: {}
+		}
+	})
+
 	const store = useStore(),
 		op = ref([]),
 		{ timeZoneOptions } = useDateTimeZoneOptions(),
@@ -82,18 +93,18 @@
 		},
 		selectedActuals = ref([
 			{ key: 'last1DayData', name: 'Last Day Revenue', value: null, icon: null, class: null, dayOffset: 1 },
-			{ key: 'last7DaysData', name: 'Last 7 Days Revenue', value: null, icon: null, class: null, dayOffset: 7 },
-			{ key: 'last1MonthsData', name: 'Last 30 Days Revenue', value: null, icon: null, class: null, dayOffset: 30 },
-			{ key: 'last3MonthsData', name: 'Last 90 Days Revenue', value: null, icon: null, class: null, dayOffset: 90 },
-			{ key: 'last1YearData', name: 'Year to Date Revenue', value: null, icon: null, class: null, dayOffset: 365 }
+			{ key: 'last7DaysData', name: 'Last 7 Days Revenue', value: null, icon: null, class: null, dayOffset: 8 },
+			{ key: 'last1MonthsData', name: 'Last 30 Days Revenue', value: null, icon: null, class: null, dayOffset: 31 },
+			{ key: 'last3MonthsData', name: 'Last 90 Days Revenue', value: null, icon: null, class: null, dayOffset: 93 },
+			{ key: 'last1YearData', name: 'Year to Date Revenue', value: null, icon: null, class: null, dayOffset: 367 }
 		]),
 		loading = ref(false),
 		{ showSuccessToast, showErrorToast, showInfoToast } = useToastNotifications(),
 		last1Day =     moment().tz(timezone),
-		last7Days =    moment().tz(timezone).subtract({ days: 7 }),
-		last1Months =  moment().tz(timezone).subtract({ months: 1 }),
-		last3Months =  moment().tz(timezone).subtract({ months: 3 }),
-		last1Year =    moment().tz(timezone).startOf('year')
+		last7Days =    moment().tz(timezone).subtract({ days: selectedActuals.value[1].dayOffset }),
+		last1Months =  moment().tz(timezone).subtract({ days: selectedActuals.value[2].dayOffset }),
+		last3Months =  moment().tz(timezone).subtract({ days: selectedActuals.value[3].dayOffset }),
+		last1Year =    moment().tz(timezone).subtract({ days: selectedActuals.value[4].dayOffset })
 
 		// TODO: These offsets are not conceptually what we're trying to achieve
 		//        They need a full refactor to reflect a period of the same length as the
@@ -108,8 +119,7 @@
 	let regId = null,
 		allActualsData = null,
 		dashboard = null,
-		allDashboards = null,
-		chart = null
+		allDashboards = null
 
 	const lastItem = computed(() => selectedActuals.value.length - 1),
 		getRegId = computed(() => store.getters.getRegisterId),
@@ -181,9 +191,7 @@
 	const formattingActualsData = data => {
 		selectedActuals.value.forEach(item => {
 
-			let perviousDate = moment(item.date).tz(timezone).subtract({ days: item.dayOffset }).format(),
-				currentDate = moment(item.date).tz(timezone).format(),
-				filter = []
+			let currentDate = moment(item.date).tz(timezone).startOf('day').utc().format()
 
 			item.value = data[item.key]?.count[0]?.value
 
@@ -199,22 +207,22 @@
 			}
 
 			if (item.dayOffset !== 1) {
-				filter = [{c: "originated_at", o: "<", p: currentDate}, {c: "originated_at", o:">", p: perviousDate}]
-			} else {
-				filter = [{c: "originated_at", o : ">=", p : perviousDate}, {c: "originated_at", o: "<", p: currentDate}]
-			}
+				let perviousDate = moment(item.date).tz(timezone).subtract({ days: (item.dayOffset) }).startOf('day').utc().format()
 
-			item.link = `/sales?search=${JSON.stringify(filter)}` 
+				item.link = `/sales?search=${JSON.stringify([{c: "originated_at", o: "<", p: currentDate },{c: "originated_at", o:">", p: perviousDate}])}` 
+			} else {
+				let perviousDate = moment(item.date).tz(timezone).subtract({ days: item.dayOffset }).startOf('day').utc().format()
+
+				item.link = `/sales?search=${JSON.stringify([{c: "originated_at", o : ">=", p : perviousDate}, {c: "originated_at", o: "<", p: currentDate}])}` 
+			}
 		})
 	}
 
 	const dashboardInit = () => {
 		dashboard = getDashboard(dashboards.value)
-		chart = getChart(dashboard)
 	}
 
 	const getDashboard = data => data?.find(item => item.owner_type === 'Organization' && item.owner_id === orgId.value)
-	const getChart = data => data?.charts.find(item => item.name === 'Actuals' && item.chart_type === 'summary_group')
 	const togglePopup = (index, event) => op.value[index]?.toggle(event)
 
 	const calcPercentage = (x, y) => {
