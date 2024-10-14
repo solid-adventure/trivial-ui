@@ -556,8 +556,8 @@
 			try {
 				filtersArray = JSON.parse(query?.search)
 
-				let dateBefore = { value: moment(filtersArray[0].p).tz(timezone).utc().format('L'), matchMode: 'dateBefore'},
-					dateAfter = { value: moment(filtersArray[1].p).tz(timezone).utc().format('L'), matchMode: 'dateAfter'}
+				let dateBefore = { value: moment(filtersArray[0].p).tz(timezone).format('L LT'), matchMode: 'dateBefore'},
+					dateAfter = { value: moment(filtersArray[1].p).tz(timezone).format('L LT'), matchMode: 'dateAfter'}
 
 				queryFilters.value.push(dateBefore)
 				queryFilters.value.push(dateAfter)

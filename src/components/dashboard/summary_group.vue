@@ -189,8 +189,8 @@
 	const formattingActualsData = data => {
 		selectedActuals.value.forEach(item => {
 
-			let currentDate = moment().tz(timezone).startOf('day').utc().format(),
-				perviousDate = moment().tz(timezone).subtract(item.datetimeOffset).endOf('day').utc().format()
+			let currentDate = moment().tz(timezone).startOf('day').format(),
+				perviousDate = moment().tz(timezone).subtract(item.datetimeOffset).endOf('day').format()
 
 			item.value = data[item.key]?.count[0]?.value
 
