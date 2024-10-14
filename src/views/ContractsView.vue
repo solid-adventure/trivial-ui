@@ -262,7 +262,7 @@
           const stats = allStats.find(app => app.app_id === contract.name)?.stats || []
           const maxTotal = calculateMaxTotal(stats)
           contracts.value[index].stats = formatAppStats(stats, maxTotal)
-          contracts.value[index].totalErrors = stats.reduce((acc, item) => acc + item.count['500'] ||  0, 0)
+          contracts.value[index].totalErrors = stats.reduce((acc, item) => acc + (item.count['500'] || 0), 0)
           contracts.value[index].totalSuccess = stats.reduce((acc, item) => acc + (item.count['200'] || 0), 0)
 
         } catch (error) {
