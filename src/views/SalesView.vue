@@ -24,7 +24,7 @@
 		:pt="{
 				column: {
 					bodycell: ({ state }) => ({ class: [{ 'pt-0 pb-0': state['d_editing'] }] }),
-					//columnFilter: ({ props }) => ({ class: [{ 'active__col--filter': toRaw(filters[props.field]) && toRaw(filters[props.field]).constraints[0].value }] })
+					columnFilter: ({ props }) => ({ class: [{ 'active__col--filter': toRaw(filters[props.field]) && toRaw(filters[props.field]).constraints[0].value }] })
 				}
 			}"
 		>
