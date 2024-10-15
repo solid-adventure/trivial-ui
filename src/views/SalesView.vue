@@ -163,7 +163,7 @@
 		filterDate = { end_at: null, start_at: null },
 		page = ref(1), // Default start page is from first,
 		storageOrgId = parseInt(localStorage.getItem('orgId')) || null,
-		filtersArray = ref([])
+		queryFilters = ref([])
 
 	const orgId = computed(() => store.getters.getOrgId)
 	const regId = computed(() => store.getters.getRegisterId)
@@ -203,7 +203,7 @@
 		}
 
 		if (regId.value && Object.keys(route.query).length !== 0) {
-			await routeQuery(route.query)
+			getQueryFilters(route.query)
 			await getRegisters()
 		}
 	})
@@ -223,6 +223,8 @@
 	const setFilterMatchModes = field => field === 'amount' ? numericFilterMatchModes : field === 'originated_at' ? dateFilterMatchModes : textFilterMatchModes
 	const openCSVDialog = () => csvDialogVisible.value = true
 	const closeCSVDialog = () => csvDialogVisible.value = false
+	const clearQueryParams = () => router.replace({ path: route.path, query: {} })
+	const resetQueryFilters = () => queryFilters.value = []
 	const resetPagination = () => {
 		totalRecords.value = 0
 		first.value = 1
@@ -232,9 +234,16 @@
 	const resetSalesTableValues = () => {
 		resetColumns()
 		resetFilters()
+		resetQueryFilters()
 		resetRegisters()
 		resetPagination()
 		resetTotalAmount()
+	}
+
+	const setQueryFilters = () => {
+		if (Object.keys(route.query).length !== 0) {
+			filters.value['originated_at'] = { constraints: toRaw(queryFilters.value), operator: 'and' }
+		}
 	}
 
 	const getRegisters = async () => {
@@ -261,6 +270,7 @@
 			setActivityColumn()
 			setCSSCustomProp()
 			await getSearchableCols()
+			setQueryFilters()
 
 			const { register_items, total_pages } = await getRegistersData()
 			registers.value = register_items
@@ -422,6 +432,11 @@
 	const onFilterClear = async field => {
 		loading.value = true
 
+		if (filters.value.hasOwnProperty(field) && field === 'originated_at') {
+			resetQueryFilters()
+			clearQueryParams()
+		}
+
 		if (filters.value.hasOwnProperty(field)) {
 			setDefaultFilters(field)
 		}
@@ -471,7 +486,8 @@
 	}
 
 	const queryString = computed(() => {
-		let query = `per_page=${rows.value}&page=${page.value}`
+		let query = `per_page=${rows.value}&page=${page.value}`,
+			filtersArray = []
 
 		if (sortField.value) {
 			query += `&order_by=${sortField.value}&ordering_direction=${sortOrder.value}`
@@ -480,6 +496,7 @@
 		Object.entries(filters.value).forEach(([column, filter]) => {
 			filter.constraints?.forEach(constraint => {
 				let value = constraint.value
+
 				if (value) {
 					if (column === 'originated_at' && filterMatchModeMapping[constraint.matchMode] === '=') {
 						// Date filter 'Date is'
@@ -494,23 +511,23 @@
 							p: moment(value).tz(timezone).add({ days: 1 }).startOf('day').utc().format() // midnight on the next day
 						}
 
-						filtersArray.value.push(selectedDate, tomorrowDate)
+						filtersArray.push(selectedDate, tomorrowDate)
 					} else if (column === 'originated_at' && filterMatchModeMapping[constraint.matchMode] === '>') {
 						// Date filter 'Date is on or after'
-						filtersArray.value.push({
+						filtersArray.push({
 							c: column,
 							o: filterMatchModeMapping[constraint.matchMode],
 							p: moment(value).tz(timezone).startOf('day').utc().format()
 						})
 					} else if (column === 'originated_at' && filterMatchModeMapping[constraint.matchMode] === '<') {
 						// Date filter 'Date is on or before'
-						filtersArray.value.push({
+						filtersArray.push({
 							c: column,
 							o: filterMatchModeMapping[constraint.matchMode],
 							p: moment(value).tz(timezone).endOf('day').utc().format()
 						})
 					} else {
-						filtersArray.value.push({
+						filtersArray.push({
 							c: column,
 							o: filterMatchModeMapping[constraint.matchMode],
 							p: value
@@ -520,14 +537,16 @@
 			})
 		})
 
-		if (filtersArray.value.length > 0) {
-			query += `&search=${encodeURIComponent(JSON.stringify(filtersArray.value))}`
+		if (filtersArray.length > 0) {
+			query += `&search=${encodeURIComponent(JSON.stringify(filtersArray))}`
 		}
 
 		return query
 	})
 
-	const routeQuery = async query => {
+	const getQueryFilters = async query => {
+		let filtersArray = []
+
 		rows.value = parseInt(query?.per_page) || 10
 		page.value = parseInt(query?.page) || 1
 		sortField.value = query?.order_by || null
@@ -535,7 +554,13 @@
 
 		if (query?.search) {
 			try {
-				filtersArray.value = JSON.parse(query?.search)
+				filtersArray = JSON.parse(query?.search)
+
+				let dateBefore = { value: moment(filtersArray[0].p).tz(timezone).format('L'), matchMode: 'dateBefore'},
+					dateAfter = { value: moment(filtersArray[1].p).tz(timezone).format('L'), matchMode: 'dateAfter'}
+
+				queryFilters.value.push(dateBefore)
+				queryFilters.value.push(dateAfter)
 			} catch (error) {
 				console.error('Error parsing search parameter:', error)
 			}
