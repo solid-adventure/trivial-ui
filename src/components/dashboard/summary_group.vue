@@ -190,7 +190,7 @@
 		selectedActuals.value.forEach(item => {
 
 			let currentDate = moment().tz(timezone).startOf('day').format(),
-				perviousDate = moment().tz(timezone).subtract(item.datetimeOffset).endOf('day').format()
+				previousDate = moment().tz(timezone).subtract(item.datetimeOffset).endOf('day').format()
 
 			item.value = data[item.key]?.count[0]?.value
 
@@ -206,9 +206,9 @@
 			}
 
 			if (item?.datetimeOffset?.days !== 1) {
-				item.link = `/sales?search=${JSON.stringify([{c: "originated_at", o: "<", p: currentDate },{c: "originated_at", o:">", p: perviousDate}])}` 
+				item.link = `/sales?search=${JSON.stringify([{c: "originated_at", o: "<", p: currentDate },{c: "originated_at", o:">", p: previousDate}])}`
 			} else {
-				item.link = `/sales?search=${JSON.stringify([{c: "originated_at", o : ">=", p : perviousDate},{c: "originated_at", o: "<", p: currentDate}])}` 
+				item.link = `/sales?search=${JSON.stringify([{c: "originated_at", o : ">=", p : previousDate},{c: "originated_at", o: "<", p: currentDate}])}`
 			}
 		})
 	}
