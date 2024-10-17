@@ -6,12 +6,12 @@
 					<IndexDashboard />
 				</div>
 			</TabPanel>
-			<!--<TabPanel header="Sales" :disabled="true" :pt="tabPanelPt">
+			<TabPanel header="Sales" :pt="tabPanelPt">
 				<div class="organization-settings__sales">
 					<IndexSales />
 				</div>
 			</TabPanel>
-			<TabPanel header="Contracts" :disabled="true" :pt="tabPanelPt">
+			<!--<TabPanel header="Contracts" :disabled="true" :pt="tabPanelPt">
 				<div class="organization-settings__contracts">
 					<IndexContracts />
 				</div>
@@ -21,11 +21,11 @@
 					<IndexUsers />
 				</div>
 			</TabPanel>
-			<!-- <TabPanel header="API Keys" :pt="tabPanelPt" :disabled="true" >
+			<!--<TabPanel header="API Keys" :pt="tabPanelPt"  >
 				<div class="organization-settings__apikeys">
 					<IndexApiKeys />
 				</div>
-			</TabPanel> -->
+			</TabPanel>-->
 		</TabView>
 	</Panel>
 </template>
