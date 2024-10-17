@@ -19,7 +19,7 @@
 		</template>
 		<template #empty>
 			<h3 v-if="!orgId">{{ selectOrgMsgInfo }}</h3>
-			No revenues found.
+			No audits found.
 		</template>
 		<template #loading>
 			<div class="flex flex-column gap-1 justify-content-center">
@@ -30,16 +30,25 @@
 
 		<Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header" sortable>
 			<template #body="{ data }">
-				<span v-if="col.field === 'user'">
-					<Avatar :label="data.label" class="mr-2" shape="circle" :style="`background-color: ${data.bgColor}; color: #333`" />
-					{{ data[col.field] }}
+				<span>
+					<Avatar v-if="col.field === 'user'" :label="data.label" class="mr-2" shape="circle" :style="`background-color: ${data.bgColor}; color: #333`" />
+					<i v-if="col.field === 'action' "class="w-1rem mr-1 pi" :class="data.actionIcon" />
+
+
+					<template v-if="col.field === 'description'">
+						<ul>
+							<li v-for="item in data[col.field]">{{ item.attribute }} to <strong>{{ item.new_value || '<blank>' }}</strong> from {{ item.old_value || '<blank>' }}</li>
+						</ul>
+
+					</template>
+					<template v-else>
+						{{ formattedValue(data[col.field], col.field) }}
+					</template>
+
+
+
+
 				</span>
-				<span v-else-if="col.field === 'action'" class="capitalize">
-					<i class="w-1rem mr-1 pi" :class="data.actionIcon" />
-					{{ data[col.field] }}
-				</span>
-				<span v-else-if="col.field === 'description'">{{ data[col.field] }}</span>
-				<span v-else-if="col.field === 'timestamp'">{{ useFormatDate(data[col.field], dateOptions) }} at {{ useFormatDate(data[col.field], timeOptions) }}</span>
 			</template>
 		</Column>
 	</DataTable>
@@ -52,71 +61,14 @@
 	import { useDateTimeZoneOptions } from '@/composable/dateTimeZoneOptions.js'
 	import loadingImg from '@/assets/images/trivial-loading-optimized.webp'
 
-	const auditLogs = ref([
-		  /*{
-		    user: "Charles Brown",
-		    action: "Edit",
-		    description: "Renamed column GL Code to Income Account",
-		    timestamp: "07/01/2024 12:11 AM PST"
-		  },
-		  {
-		    user: "Charles Brown",
-		    action: "Create",
-		    description: "Added column GL Code",
-		    timestamp: "07/01/2024 10:10 AM PST"
-		  },
-		  {
-		    user: "Charles Brown",
-		    action: "Create",
-		    description: "Created Register Sales",
-		    timestamp: "07/01/2024 09:00 AM PST"
-		  },
-		  {
-		    user: "Kurt Preston",
-		    action: "Create",
-		    description: "Added column Location ID",
-		    timestamp: "07/01/2024 08:56 AM PST"
-		  },
-		  {
-		    user: "Chris Thorpe",
-		    action: "Create",
-		    description: "Added column Customer Type",
-		    timestamp: "06/30/2024 04:11 PM PST"
-		  },
-		  {
-		    user: "Edwin Brown",
-		    action: "Delete",
-		    description: "Deleted column Location",
-		    timestamp: "06/30/2024 02:11 PM PST"
-		  },
-		  {
-		    user: "Alonzo White",
-		    action: "Edit",
-		    description: "Renamed column GL Code to Income Account",
-		    timestamp: "06/30/2024 01:09 PM PST"
-		  },
-		  {
-		    user: "Albert Bell",
-		    action: "Edit",
-		    description: "Renamed column GL Code to Income Account",
-		    timestamp: "06/30/2024 12:11 PM PST"
-		  },
-		  {
-		    user: "John Rose",
-		    action: "Delete",
-		    description: "Deleted column Revenue Type",
-		    timestamp: "06/30/2024 10:11 AM PST"
-		  },
-		  {
-		    user: "John Rose",
-		    action: "Edit",
-		    description: "Renamed column GL Code to Income Account",
-		    timestamp: "06/29/2024 12:11 AM PST"
-		  }*/
-		]),
+	const auditLogs = ref([]),
 		columns = [
-		    { field: 'user', header: 'User Name' },
+		    { field: 'id', header: 'ID' },
+		    { field: 'user_name', header: 'User Name' },
+		    { field: 'associated_name', header: 'Name' },
 		    { field: 'action', header: 'Activity' },
+		    // { field: 'associated_type', header: 'Model' },
+		    // { field: 'associated_id', header: 'Model ID' },
 		    { field: 'description', header: 'Description' },
 		    { field: 'timestamp', header: 'Timestamp' }
 	    ],
@@ -135,13 +87,37 @@
 
 	onMounted(async () => await auditsInit())
 
+	const formattedValue = (value, column) => {
+		switch(column) {
+			case 'timestamp':
+				return useFormatDate(value, dateOptions) + ' at ' + useFormatDate(value, timeOptions)
+				break;
+			default:
+				return value
+		}
+	}
+
+	const appNameFromAudit = (audit) => {
+
+		if (audit.associated_type === 'App') {
+			return store.state.apps.find(app => app.id === audit.associated_id)?.descriptive_name
+		}
+
+		if (audit.auditable_type === 'App') {
+			return store.state.apps.find(app => app.id === audit.auditable_id)?.descriptive_name
+		}
+
+		return 'Unknown'
+
+	}
+
 	const auditsInit = async () => {
 		loading.value = true
 
-		let apps = []
+		// let apps = []
 
-		apps = await getApps()
-		apps = filteredOrgApps(apps) 
+		let apps = await getApps()
+		apps = filteredOrgApps(apps)
 
 		let auditPromises = apps.map(item => getAuditsLogs(item.id)),
 			allAudits = await Promise.all(auditPromises)
@@ -151,10 +127,16 @@
 
 		allAudits.forEach(item => {
 			item?.audits.forEach(audit => {
-				let dataObj = {}
 
-				dataObj.user = audit?.user_id
+
+				let dataObj = {}
+				dataObj.id = audit?.id
+				dataObj.user_id = audit?.user_id
+				dataObj.user_name = audit?.user_name
 				dataObj.action = audit?.action
+				dataObj.associated_type = audit?.associated_type
+				dataObj.associated_id = audit?.associated_id
+				dataObj.associated_name = appNameFromAudit(audit)
 				dataObj.description = audit?.audited_changes || 'No description'
 				dataObj.timestamp = audit?.created_at
 
@@ -186,7 +168,7 @@
 		}
 	}
 
-	const getNameInitials = name => name.toString().match(/(\b\S)?/g).join("").toUpperCase()
+	const getNameInitials = name => name?.toString().match(/(\b\S)?/g).join("").toUpperCase()
 
 	const getActionIcon = action => {
 		switch(action) {
