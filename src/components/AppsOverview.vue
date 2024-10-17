@@ -227,7 +227,7 @@
       } else {
         this.panelTypeFilter = this.$route.params.paneltype;
       }
-      this.loadStats(this.chartType)
+      this.setStats(this.chartType)
     },
 
     computed: {
@@ -259,8 +259,8 @@
         const sorts = {
           name: (app) => app.descriptive_name,
           panelType: (app) => (app.panels || {}).component || 'Unset',
-          lastRun: (app) => (this.appInfo(app) || {}).last_run,
-          status: (app) => ((this.appInfo(app) || {}).stats || []).reduce((s,info) => s + info.failures, 0)
+          lastRun: (app) => null,
+          status: (app) => 0
         }
         const sortField = sorts[this.sortBy]
 
@@ -324,36 +324,10 @@
         }
       },
 
-      async loadStats(type) {
-        if ('hourly' === type) {
-          await this.loadHourlyStats()
-        } else if ('daily' === type) {
-          await this.loadDailyStats()
-        } else if ('weekly' === type) {
-          await this.loadWeeklyStats()
-        }
-      },
-
-      async loadHourlyStats() {
-        this.setStats(await this.$store.state.Session.apiCall('apps/stats/hourly'))
-      },
-
-      async loadDailyStats() {
-        this.setStats(await this.$store.state.Session.apiCall('apps/stats/daily'))
-      },
-
-      async loadWeeklyStats() {
-        this.setStats(await this.$store.state.Session.apiCall('apps/stats/weekly'))
-      },
-
-      setStats(data) {
-        this.stats = data.stats
-        this.startRange = data.start_range
-        this.endRange = data.end_range
-      },
-
-      appInfo(app) {
-        return this.stats.find(s => s.id === app.id)
+      setStats() {
+        this.stats = []
+        this.startRange = ''
+        this.endRange = ''
       },
 
       panelType(app) {
@@ -361,11 +335,11 @@
       },
 
       lastRun(app) {
-        return this.dateFormat((this.appInfo(app) || {}).last_run)
+        return null
       },
 
       statsFor(app) {
-        return ((this.appInfo(app) || {}).stats || [])
+        return []
       },
 
       dateFormat(str) {
@@ -382,8 +356,7 @@
       },
 
       async setChartType(type) {
-        this.stats = []
-        await this.loadStats(type)
+        this.setStats()
         this.chartType = type
       },
 
