@@ -3,7 +3,7 @@
 		<VForm v-slot="{ meta }">
 			<div class="flex flex-column gap-1 my-2">
 				<label for="name" class="mb-1">Column Name</label>
-				<VField id="name" name="name" :rules="{ required, min: 4 }" v-slot="{ field, errors }">
+				<VField id="name" name="name" :rules="{ required, min: 2 }" v-slot="{ field, errors }">
 					<InputText v-model="userFormData.name" v-bind="field" class="flex-auto capitalize" :class="{'p-invalid': errors.length}" autocomplete="off" placeholder="ex. Location" :value="userFormData.name" />
 					<span v-if="errors.length" class="p-error text-xs mt-1">{{ errors[0] }}</span>
 				</VField>

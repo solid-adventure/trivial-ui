@@ -33,12 +33,11 @@
 	watch(register, newVal => { metaColumns.value = newVal?.meta || {} }, { deep: true })
 
 	onMounted(() => {
-		if (register.value) {
-			metaColumns.value = register?.meta || {}
-		}
+		metaColumnsInit()
 	})
 
-	// Sales Columns delete modal
+	const metaColumnsInit = () => metaColumns.value = register.value?.meta || {}
+	// Sales Columns modals
 	const openDeleteSalesColsModal = () => visibleDelSalesColumnModal.value = true
 	const closeDeleteSalesColsModal = () => visibleDelSalesColumnModal.value = false
 	const openAddEditSalesColsModal = () => visibleAddSalesColumnModal.value = true
