@@ -35,10 +35,24 @@
 					<i v-if="col.field === 'action' "class="w-1rem mr-1 pi" :class="data.actionIcon" />
 
 
-					<template v-if="col.field === 'description'">
-						<ul>
-							<li v-for="item in data[col.field]">{{ item.attribute }} to <strong>{{ item.new_value || '<blank>' }}</strong> from {{ item.old_value || '<blank>' }}</li>
-						</ul>
+					<template v-if="col.field === 'audited_changes'">
+							<p v-for="item in data[col.field]">
+								<template v-if="item.patch">
+									<!-- Iterate over the lines in the patch so we can apply styles -->
+									<span class="patch-diff">
+										<template v-for="line in item.patch.split('\n')">
+											<span v-if="line.startsWith('+')" class="text-added">{{ line }}</span>
+											<span v-else-if="line.startsWith('-')" class="text-removed">{{ line }}</span>
+											<span v-else>{{ line }}</span>
+										</template>
+									</span>
+
+
+								</template>
+								<template v-else>
+									{{ item.attribute }} to <strong>{{ item.new_value || '<blank>' }}</strong> from {{ item.old_value || '<blank>' }}
+								</template>
+							</p>
 
 					</template>
 					<template v-else>
@@ -69,7 +83,7 @@
 		    { field: 'action', header: 'Activity' },
 		    // { field: 'associated_type', header: 'Model' },
 		    // { field: 'associated_id', header: 'Model ID' },
-		    { field: 'description', header: 'Description' },
+		    { field: 'audited_changes', header: 'Description' },
 		    { field: 'timestamp', header: 'Timestamp' }
 	    ],
 	    selectOrgMsgInfo = 'Please, select an organization.',
@@ -137,7 +151,7 @@
 				dataObj.associated_type = audit?.associated_type
 				dataObj.associated_id = audit?.associated_id
 				dataObj.associated_name = appNameFromAudit(audit)
-				dataObj.description = audit?.audited_changes || 'No description'
+				dataObj.audited_changes = audit?.audited_changes || 'No audited_changes'
 				dataObj.timestamp = audit?.created_at
 
 				auditLogs.value.push(dataObj)
@@ -230,3 +244,27 @@
 		loading.value = false
 	}
 </script>
+
+<style scoped>
+	.patch-diff {
+		font-family: monospace;
+		font-size: 0.9rem;
+		white-space: pre-wrap;
+
+
+		span {
+			display: block;
+		}
+
+		.text-added {
+			background-color: rgb(209, 248, 217);;
+			color: rgb(10, 48, 105);
+		}
+
+		.text-removed {
+			background-color: rgb(255, 206, 203);
+			color: rgb(10, 48, 105);
+		}
+
+	}
+</style>
