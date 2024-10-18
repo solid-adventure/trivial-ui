@@ -1,39 +1,30 @@
-.contract_tooltip {
-	position: relative;
-	width: 2rem;
-}
+.contracts__table {
 
-.contract_tooltip .tooltip_content {
-	position: absolute;
-	top: -60px;
-	right: 40px;
-	z-index: 999;
-	opacity: 0;
-	transition: all 800ms;
-	visibility: hidden;
-}
+	svg {
+		fill: var(--on-surface-secondary); /* Default bar color */
+	}
 
-.contract_tooltip:hover .tooltip_content {
-	opacity: 1;
-	visibility: visible;
-}
+	.mixed-fill {
+		fill: #F08447;
+	}
 
-.error-fill {
-	fill: #D85C57;
-}
+	.error-fill {
+		fill: #D85C57;
+	}
 
-.success-fill {
-	fill: #61C746;
-}
+	.success-fill {
+		fill: #61C746;
+	}
 
-.contract__add--btn {
-	border-color: var(--primary);
-	color: var(--on-primary);
-	background: var(--primary);
-}
+	.contract__add--btn {
+		border-color: var(--primary);
+		color: var(--on-primary);
+		background: var(--primary);
+	}
 
-.contracts__search:focus {
-	outline-color: var(--primary);
+	.contracts__search:focus {
+		outline-color: var(--primary);
+	}
 }
 
 .activity__success--link {

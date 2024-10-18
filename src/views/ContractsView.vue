@@ -14,6 +14,7 @@
       filterDisplay="menu"
       scrollable
       :globalFilterFields="globalFilterFields"
+      class="contracts__table"
     >
       <template #header>
         <div class="flex justify-content-between gap-5 py-5">
@@ -63,35 +64,6 @@
               {{ data[field] }}
           </span>
           <span v-else-if="field === 'stats'">
-              <!-- CUSTOM HOVER ELEMENT -->
-              <!--<div class="contract_tooltip">
-              <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="20" width="26" class="chart">
-                <g v-for="(item, index) in data.stats" :key="index">
-                  <rect
-                    :x="index * 4"
-                    :y="20 - item.proportionalHeight"
-                    width="2"
-                    :height="item.proportionalHeight"
-                    :class="{ 'error-fill': item.hasErrors, 'success-fill': !item.hasErrors }"
-                  />
-                </g>
-              </svg>
-
-              <div class="flex flex-column justify-content-start align-items-center w-11rem h-9rem p-3 shadow-2 border-round-sm bg-white tooltip_content">
-                <p class="w-full mt-1 mb-2 text-base text-500">Last {{ activityPeriod(data.stats) }} days</p>
-                <router-link :to="`/apps/${data.name}/activity?search=${activityQueryStrEncoded}`" rel="noopener" class="w-full m-1">
-                  <i class="pi mr-2" :class="{ 'pi-times-circle text-red-600': data.totalErrors > 0, 'pi-check-circle text-primary-500': data.totalErrors == 0 }" /> 
-                  <span class="text-lg font-semibold" :class="{ 'text-red-600': data.totalErrors > 0, 'text-primary-500': data.totalErrors == 0 }">{{ data.totalErrors }} Errors</span>
-                </router-link>
-
-                <Divider />
-                <router-link :to="`/apps/${data.name}/activity`" rel="noopener" class="w-full flex justify-content-start align-items-center">
-                  <Button label="View Activity" icon="pi pi-external-link" iconPos="right" link class="p-1 text-md font-medium text-blue-500" />
-                </router-link>
-              </div>
-            </div>-->
-
-            <!-- PRIMEVUE CLICK VERSION (DEFAULT - WORKING) -->
             <template v-if="(data.totalErrors > 0 || data.totalSuccess > 0) && data.stats && data.stats.length">
               <div>
                 <Button type="button" severity="secondary" text @click="togglePopup(data.id, $event)">
@@ -102,7 +74,7 @@
                         :y="20 - item.proportionalHeight"
                         width="2"
                         :height="item.proportionalHeight"
-                        :class="{ 'error-fill': item.hasErrors, 'success-fill': !item.hasErrors }"
+                        :class="{ 'mixed-fill': item.hasErrors && item.hasSuccess, 'error-fill': item.hasErrors && !item.hasSuccess, 'success-fill': !item.hasErrors && item.hasSuccess }"
                       />
                     </g>
                   </svg>
@@ -289,6 +261,7 @@
       const hasError = item?.count?.['500'] ?? false
       const hasSuccess = item?.count?.['200'] ?? false
       const total = Object.values(item?.count).reduce((sum, value) => sum + value, 0)
+
       return {
         ...item,
         hasErrors: !!hasError,
