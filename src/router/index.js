@@ -137,11 +137,6 @@ const routes = [
     name: "Contracts",
   },
   {
-    path: "/auditlogs",
-    component: AuditLogsView,
-    name: "AuditLogs",
-  },
-  {
     path: "/organizations/:pathMatch(.*)*",
     redirect: "/settings",
   },

@@ -26,12 +26,18 @@
 					<IndexApiKeys />
 				</div>
 			</TabPanel> -->
+			<TabPanel header="Audit Logs" :pt="tabPanelPt">
+				<div class="organization-settings__audit_logs">
+					<AuditLogsView />
+				</div>
+			</TabPanel>
 		</TabView>
 	</Panel>
 </template>
 
 <script setup>
 	import { ref } from 'vue'
+	import AuditLogsView from "@/views/AuditLogsView.vue";
 	import IndexDashboard from '@/components/organization-settings/dashboard/IndexDashboard.vue'
 	import IndexSales from '@/components/organization-settings/sales/IndexSales.vue'
 	import IndexContracts from '@/components/organization-settings/contracts/IndexContracts.vue'
