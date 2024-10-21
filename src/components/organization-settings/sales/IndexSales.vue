@@ -1,6 +1,6 @@
 <template>
 	<h2 class="mb-0">Sales</h2>
-	<p class="mt-2 mb-5">The column names and types displayed on the Sales page can be customized here.</p>
+	<p class="mt-2 mb-5 text-muted">The columns displayed on the Sales page can be customized here.</p>
 
 	<SalesColumnsLists @openDeleteSalesColsModal="setDeleteSalesCols" @openAddEditSalesColModal="openAddEditSalesColsDialog" :metaCols="metaColumns" />
 
@@ -68,12 +68,12 @@
 	}
 
 	const registerAPICall = async (data, msg) => {
-		let metaColumnsLenght = Object.keys(metaColumns.value).length,
+		let metaColumnsLength = Object.keys(metaColumns.value).length,
 			bodyObj = {meta: {}}
 
-		if (metaColumnsLenght <= 9) {
-			let key = data?.key === undefined ? `meta${metaColumnsLenght}` : data?.key
-			
+		if (metaColumnsLength <= 9) {
+			let key = data?.key === undefined ? `meta${metaColumnsLength}` : data?.key
+
 			data.field !== null ? metaColumns.value[key] = data.field : delete metaColumns.value[key]
 
 			bodyObj.meta = {...metaColumns.value}

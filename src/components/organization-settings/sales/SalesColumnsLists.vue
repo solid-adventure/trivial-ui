@@ -5,11 +5,12 @@
 			<DataView :value="customizableColumns" class="w-50" :pt="{ footer: { class: 'border-0' } }">
 				<template #header>
 					<h3 class="flex align-items-center m-0 gap-2 font-semibold">
-						Customizable Columns
+						Editable Columns
 
 						<Button type="button" icon="pi pi-info-circle" severity="secondary" size="small" text rounded outlined aria-label="Info" @click="toggleInfoPopupCustomColumns" class="info__btn p-0" />
 						<OverlayPanel ref="infoPopupCustomColumns">
-							<p class="m-0">Customizable columns can be edited, deleted or added. <br /> Customization will affect the table on the Sales page</p>
+							<p class="w-25rem">Editable columns can be added, edited, or deleted. <br /><br />
+							Note: Renaming columns <strong>does not affect table data</strong>. Changing the purpose of a column (the type of data stored) may produce unexpected results.</p>
 						</OverlayPanel>
 					</h3>
 				</template>
@@ -48,11 +49,11 @@
 			<DataView :value="nonCustomizableColumns" class="w-50">
 				<template #header>
 					<h3 class="flex align-items-center m-0 pl-0 gap-2 font-semibold">
-						Non-Customizable Columns
+						Locked Columns
 
 						<Button type="button" icon="pi pi-info-circle" severity="secondary" size="small" text rounded outlined aria-label="Info" @click="toggleInfoPopupNonCustomColumns" class="info__btn p-0" />
 						<OverlayPanel ref="infoPopupNonCustomColumns">
-							<p class="m-0">Non-Customizable columns are always visible in the table on the Sales page.</p>
+							<p class="w-25rem">These columns are always available on the register, and cannot be edited or deleted.</p>
 						</OverlayPanel>
 					</h3>
 				</template>
