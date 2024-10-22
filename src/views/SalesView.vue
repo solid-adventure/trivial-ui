@@ -54,7 +54,7 @@
 			<h3>Loading ...</h3>
 		</template>
 
-        <Column v-for="col in columns" :key="col.field" :field="col.field" :header="col.header" :filterField="col.field" sortable filter :filterMatchModeOptions="setFilterMatchModes(col.field)">
+        <Column v-for="col in columns" :key="col.field" :field="col.field" :header="col.header" :filterField="col.field" :sortable="col.field !== 'activity'" filter :filterMatchModeOptions="setFilterMatchModes(col.field)">
         	<template #filter="{ filterModel, filterCallback }" v-if="filters.hasOwnProperty(col.field)">
         		<Calendar v-if="col.field === 'originated_at'" v-model="filterModel.value" dateFormat="mm/dd/yy" placeholder="mm/dd/yyyy" mask="99/99/9999" />
 				<InputText v-else v-model="filterModel.value" type="text" @keydown.enter="filterCallback()" class="p-column-filter" />
@@ -62,7 +62,7 @@
 			<template #filterclear="{ filterCallback }">
 				<Button type="button" @click="() => { filterCallback(); onFilterClear(col.field); }" label="Clear" outlined class="clear-btn" />
 			</template>
-			<template #editor="{ data, field }">
+			<template v-if="col.field !== 'activity'" #editor="{ data, field }">
 				<InputText v-model="data[field]" autofocus />
 			</template>
 			<template #body="{ data }">
@@ -72,6 +72,9 @@
 						<div class="time">{{ useFormatDate(data.originated_at, timeOptions) }} {{ useFormatDate(data.originated_at, timeZoneOptions).split(' ')[1] }}</div>
 					</span>
 					<span v-else-if="col.field == 'amount'">{{ useFormatCurrency(data[col.field], 2, data['units']) }}</span>
+					<span v-else-if="col.field == 'activity'">
+						<Button type="button" text :severity="isActivityButtonState(data.id, 'disabled') ? 'danger' : 'secondary'" :icon="isActivityButtonState(data.id, 'disabled') ? 'pi pi-ban': 'pi pi-link'" :loading="isActivityButtonState(data.id, 'loading')" :disabled="isActivityButtonState(data.id, 'disabled')" @click="getActivityLink(data.id)" />
+					</span>
 					<span v-else>{{ data[col.field] }}</span>
 				</div>
 			</template>
@@ -103,6 +106,7 @@
 
 <script setup>
 	import { ref, onMounted, computed, watch, toRaw } from 'vue'
+	import { useRouter, useRoute } from 'vue-router'
 	import moment from 'moment-timezone'
 	import { useStore } from 'vuex'
 	import { useFormatCurrency } from '@/composable/formatCurrency.js'
@@ -116,6 +120,7 @@
 	import CSVExportDialog from '@/components/sales/CSVExportDialog'
 
 	const loading = ref(false),
+		activityBtnState = ref([]),
 		filters = ref({}),
 		registers = ref([]),
 		totalAmount = ref(null),
@@ -141,9 +146,9 @@
 		registersNames = ['Sales', 'Income Account'],
 		selectOrgMsgInfo = 'Please, select an organization.',
         timezone = timeZoneOptions.timeZone,
-		csvDialogVisible = ref(false)
-		/*streamErrorMessage = ref(''),
-		cancelCSV = ref(false),*/
+		csvDialogVisible = ref(false),
+		router = useRouter(),
+		route = useRoute()
 
 	let columns = [],
 		defaultColumns = [
@@ -152,56 +157,99 @@
 			{field: 'unique_key', header: 'Unique Key'},
 			{field: 'amount', header: 'Amount'}
 		],
+		activityColumn = { field: 'activity', header: 'Activity' },
 		totalsColumns = { amount: 'amount' },
 		allRegisters = null,
 		filterDate = { end_at: null, start_at: null },
-		page = 1, // Default start page is from first,
-		storageOrgId = parseInt(localStorage.getItem('orgId')) || null
+		page = ref(1), // Default start page is from first,
+		storageOrgId = parseInt(localStorage.getItem('orgId')) || null,
+		queryFilters = ref([])
 
 	const orgId = computed(() => store.getters.getOrgId)
-	const queryString = computed(() => updateQueryString())
 	const regId = computed(() => store.getters.getRegisterId)
 	const register = computed(() => store.getters.getRegister)
 	const registersItems = computed(() => registers.value)
 
 	watch(orgId, async (newVal, oldVal) => {
-		if (!newVal) {
-			resetColumns()
-			resetFilters()
-			resetRegisters()
+		if (newVal === null) {
+			resetSalesTableValues()
+			showInfoToast('Info', selectOrgMsgInfo, 3000)
 			return
 		}
-		await getRegisters(newVal)
+  		await store.dispatch('register')
+		await getRegisters()
+	})
+
+	watch(regId, async (newVal, oldVal) => {
+		if (newVal === null || newVal === undefined) {
+			resetSalesTableValues()
+			return
+		}
+
+		await getRegisters()
 	})
 
 	onMounted(async () => {
 		let organizationId = storageOrgId || orgId.value
 
-		if (organizationId) {
-			await getRegisters(orgId.value)
+		if (organizationId === null) {
+			showInfoToast('Info', selectOrgMsgInfo, 3000)
+		} else {
+			await store.dispatch('register')
 		}
 
-		if (localStorage.getItem('orgId') === 'null') {
-			showInfoToast('Info', selectOrgMsgInfo, 3000)
+		if (regId.value && Object.keys(route.query).length === 0) {
+			await getRegisters()
+		}
+
+		if (regId.value && Object.keys(route.query).length !== 0) {
+			getQueryFilters(route.query)
+			await getRegisters()
 		}
 	})
 
 	const setCSSCustomProp = () => document.documentElement.style.setProperty('--cols', columns.length - 1)
 	const totalPaginatorPages = (totalPages, itemsPerPage) => totalPages * itemsPerPage
 	const setColumns = () => columns = [...defaultColumns] // Add fixed columns at the beginig of the table
+	const setActivityColumn = () => columns.push(activityColumn) // Add fixed columns at the end of the table
 	const setFilters = () => filters.value = defaultFilters
 	const resetColumns = () => columns = [] // Reset columns before new set of columns from API call
 	const resetFilters = () => filters.value = {} // Reset filters before new set of dynamic filters
 	const resetDateFilter = () => filterDate = {end_at: null, start_at: null}
 	const resetRegisters = () => registers.value = []
 	const resetTotalAmount = () => totalAmount.value = null
-	const isDisabledTooltip = data => data?.length < 14
+	const isDisabledTooltip = data => data?.length < 14 || data === undefined
 	const toggleTotalInfoPopup = event => totalInfoPopup.value[0].toggle(event)
 	const setFilterMatchModes = field => field === 'amount' ? numericFilterMatchModes : field === 'originated_at' ? dateFilterMatchModes : textFilterMatchModes
 	const openCSVDialog = () => csvDialogVisible.value = true
 	const closeCSVDialog = () => csvDialogVisible.value = false
+	const clearQueryParams = () => router.replace({ path: route.path, query: {} })
+	const resetQueryFilters = () => queryFilters.value = []
+	const resetPagination = () => {
+		totalRecords.value = 0
+		first.value = 1
+		page.value = 1
+	}
 
-	const getRegisters = async orgId => {
+	const resetSalesTableValues = () => {
+		resetColumns()
+		resetFilters()
+		resetQueryFilters()
+		resetRegisters()
+		resetPagination()
+		resetTotalAmount()
+	}
+
+	const setQueryFilters = () => {
+		if (Object.keys(route.query).length !== 0) {
+			filters.value['originated_at'] = { constraints: toRaw(queryFilters.value), operator: 'and' }
+		}
+	}
+
+	const getRegisters = async () => {
+
+		if (loading.value) return
+
 		loading.value = true
 		resetColumns()
 		resetFilters()
@@ -212,18 +260,17 @@
 
 			// If regiester don't exists or don't have sales data for table
 			if (!register.value) {
-				resetColumns()
-				resetFilters()
-				resetRegisters()
-				resetTotalAmount()
+				resetSalesTableValues()
 				loading.value = false
 				return
 			}
 
 			//regId = register.id
 			setMetaColumns(register.value.meta)
+			setActivityColumn()
 			setCSSCustomProp()
 			await getSearchableCols()
+			setQueryFilters()
 
 			const { register_items, total_pages } = await getRegistersData()
 			registers.value = register_items
@@ -269,6 +316,44 @@
 		})
 	}
 
+	// Create activity link and redirect
+	const getActivityLink = async regItemId => {
+		try {
+			if (!getActivityButton(regItemId)) {
+				activityBtnState.value.push({ id: regItemId, loading: false, disabled: false })
+			}
+
+			const activityBtn = getActivityButton(regItemId)
+			activityBtn.loading = true
+
+			const activityEntriesSearch = JSON.stringify([{ c: 'register_item_id', o: '=', p: regItemId }])
+			const activitySearch = JSON.stringify([{ name: 'register_item_id', key: null, operator: '=', value: regItemId.toString() }])
+
+			const activityEntriesApp = await store.state.Session.apiCall(`activity_entries?search=${activityEntriesSearch}`)
+
+			activityBtn.disabled = !activityEntriesApp.length
+
+			if (activityEntriesApp.length) {
+				router.push(`/apps/${activityEntriesApp[0].app_id}/activity?search=${activitySearch}`)
+			}
+		} catch (error) {
+			console.error('Error fetching activity link: ', error);
+		} finally {
+			const activityBtn = getActivityButton(regItemId)
+			if (activityBtn) {
+				activityBtn.loading = false
+			}
+		}
+	}
+
+	const getActivityButton = regItemId => activityBtnState.value.find(item => item.id === regItemId)
+
+	// Check if the button is in loading state or disabled
+	const isActivityButtonState = (regItemId, prop) => {
+		const button = getActivityButton(regItemId)
+		return button ? button[prop] : false
+	}
+
 	// Setting dynamic table columns headers - (register.meta)
 	const setMetaColumns = metaCols => {
 		for (let property in metaCols) {
@@ -289,7 +374,7 @@
 
 		first.value = event?.first || 0
 		rows.value = event?.rows || 10
-		page = event?.page + 1
+		page.value = event?.page + 1
 
 		try {
 			const { register_items } = await getRegistersData()
@@ -322,6 +407,8 @@
 	const onFilter = async event => {
 		loading.value = true
 		filters.value = event.filters
+		page.value = 1
+		first.value = 1
 
 		try {
 			// Get registers data
@@ -345,12 +432,17 @@
 	const onFilterClear = async field => {
 		loading.value = true
 
+		if (filters.value.hasOwnProperty(field) && field === 'originated_at') {
+			resetQueryFilters()
+			clearQueryParams()
+		}
+
 		if (filters.value.hasOwnProperty(field)) {
 			setDefaultFilters(field)
 		}
 
 		try {
-			page = 1
+			page.value = 1
 			const { register_items } = await getRegistersData()
 			registers.value = register_items
 			await getTotalAmount()
@@ -393,19 +485,21 @@
 		}
 	}
 
-	const updateQueryString = () => {
-		let query = `per_page=${rows.value}&page=${page}`
+	const queryString = computed(() => {
+		let query = `per_page=${rows.value}&page=${page.value}`,
+			filtersArray = []
 
 		if (sortField.value) {
 			query += `&order_by=${sortField.value}&ordering_direction=${sortOrder.value}`
 		}
 
-		const filtersArray = []
 		Object.entries(filters.value).forEach(([column, filter]) => {
 			filter.constraints?.forEach(constraint => {
 				let value = constraint.value
+
 				if (value) {
 					if (column === 'originated_at' && filterMatchModeMapping[constraint.matchMode] === '=') {
+						// Date filter 'Date is'
 						let selectedDate = {
 							c: column,
 							o: filterMatchModeMapping.gte, // ">=", 
@@ -418,6 +512,20 @@
 						}
 
 						filtersArray.push(selectedDate, tomorrowDate)
+					} else if (column === 'originated_at' && filterMatchModeMapping[constraint.matchMode] === '>') {
+						// Date filter 'Date is on or after'
+						filtersArray.push({
+							c: column,
+							o: filterMatchModeMapping[constraint.matchMode],
+							p: moment(value).tz(timezone).startOf('day').utc().format()
+						})
+					} else if (column === 'originated_at' && filterMatchModeMapping[constraint.matchMode] === '<') {
+						// Date filter 'Date is on or before'
+						filtersArray.push({
+							c: column,
+							o: filterMatchModeMapping[constraint.matchMode],
+							p: moment(value).tz(timezone).endOf('day').utc().format()
+						})
 					} else {
 						filtersArray.push({
 							c: column,
@@ -434,5 +542,28 @@
 		}
 
 		return query
+	})
+
+	const getQueryFilters = async query => {
+		let filtersArray = []
+
+		rows.value = parseInt(query?.per_page) || 10
+		page.value = parseInt(query?.page) || 1
+		sortField.value = query?.order_by || null
+		sortOrder.value = query?.ordering_direction || null
+
+		if (query?.search) {
+			try {
+				filtersArray = JSON.parse(query?.search)
+
+				let dateBefore = { value: moment(filtersArray[0].p).tz(timezone).format('L'), matchMode: 'dateBefore'},
+					dateAfter = { value: moment(filtersArray[1].p).tz(timezone).format('L'), matchMode: 'dateAfter'}
+
+				queryFilters.value.push(dateBefore)
+				queryFilters.value.push(dateAfter)
+			} catch (error) {
+				console.error('Error parsing search parameter:', error)
+			}
+		}
 	}
 </script>

@@ -1,17 +1,18 @@
 <template>
 	<DataTable
-		:value="auditLogs"
+		:value="auditRows"
 		:loading="loading" 
 		paginator 
 		:rows="rows" 
 		:rowsPerPageOptions="rowsPerPageOpt"
 		:totalRecords="totalRecords"
 		:first="first"
+		size="small"
 		@page="onPage"
 		tableStyle="max-width: 100%"
 		class="border-round-sm"
 	>
-		
+
 		<template #header>
 			<div class="flex justify-content-between py-5">
 				<h2 class="m-0">User Activites and System Changes</h2>
@@ -19,7 +20,7 @@
 		</template>
 		<template #empty>
 			<h3 v-if="!orgId">{{ selectOrgMsgInfo }}</h3>
-			No revenues found.
+			No audits found.
 		</template>
 		<template #loading>
 			<div class="flex flex-column gap-1 justify-content-center">
@@ -28,18 +29,36 @@
 			</div>
 		</template>
 
-		<Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header" sortable>
+		<Column v-for="col of columns" :key="col.field" :field="col.field" sortable>
+	    <template #header>
+	      <span class="whitespace-nowrap">
+	        {{ col.header }}
+	      </span>
+			</template>
+
 			<template #body="{ data }">
-				<span v-if="col.field === 'user'">
-					<Avatar :label="data.label" class="mr-2" shape="circle" :style="`background-color: ${data.bgColor}; color: #333`" />
-					{{ data[col.field] }}
+				<span :class="{ 'whitespace-nowrap': col.field !== 'description' }">
+					<template v-if="col.field === 'audited_changes'">
+							<p v-for="item in data[col.field]">
+								<template v-if="item.patch">
+									<!-- Iterate over the lines in the patch so we can apply styles -->
+									<span class="patch-diff">
+										<template v-for="line in item.patch.split('\n')">
+											<span v-if="line.startsWith('+')" class="text-added">{{ line }}</span>
+											<span v-else-if="line.startsWith('-')" class="text-removed">{{ line }}</span>
+											<span v-else>{{ line }}</span>
+										</template>
+									</span>
+								</template>
+								<template v-else>
+									Patch not found
+								</template>
+							</p>
+					</template>
+					<template v-else>
+						{{ formattedValue(data[col.field], col.field) }}
+					</template>
 				</span>
-				<span v-else-if="col.field === 'action'" class="capitalize">
-					<i class="w-1rem mr-1 pi" :class="data.actionIcon" />
-					{{ data[col.field] }}
-				</span>
-				<span v-else-if="col.field === 'description'">{{ data[col.field] }}</span>
-				<span v-else-if="col.field === 'timestamp'">{{ useFormatDate(data[col.field], dateOptions) }} at {{ useFormatDate(data[col.field], timeOptions) }}</span>
 			</template>
 		</Column>
 	</DataTable>
@@ -52,141 +71,73 @@
 	import { useDateTimeZoneOptions } from '@/composable/dateTimeZoneOptions.js'
 	import loadingImg from '@/assets/images/trivial-loading-optimized.webp'
 
-	const auditLogs = ref([
-		  /*{
-		    user: "Charles Brown",
-		    action: "Edit",
-		    description: "Renamed column GL Code to Income Account",
-		    timestamp: "07/01/2024 12:11 AM PST"
-		  },
-		  {
-		    user: "Charles Brown",
-		    action: "Create",
-		    description: "Added column GL Code",
-		    timestamp: "07/01/2024 10:10 AM PST"
-		  },
-		  {
-		    user: "Charles Brown",
-		    action: "Create",
-		    description: "Created Register Sales",
-		    timestamp: "07/01/2024 09:00 AM PST"
-		  },
-		  {
-		    user: "Kurt Preston",
-		    action: "Create",
-		    description: "Added column Location ID",
-		    timestamp: "07/01/2024 08:56 AM PST"
-		  },
-		  {
-		    user: "Chris Thorpe",
-		    action: "Create",
-		    description: "Added column Customer Type",
-		    timestamp: "06/30/2024 04:11 PM PST"
-		  },
-		  {
-		    user: "Edwin Brown",
-		    action: "Delete",
-		    description: "Deleted column Location",
-		    timestamp: "06/30/2024 02:11 PM PST"
-		  },
-		  {
-		    user: "Alonzo White",
-		    action: "Edit",
-		    description: "Renamed column GL Code to Income Account",
-		    timestamp: "06/30/2024 01:09 PM PST"
-		  },
-		  {
-		    user: "Albert Bell",
-		    action: "Edit",
-		    description: "Renamed column GL Code to Income Account",
-		    timestamp: "06/30/2024 12:11 PM PST"
-		  },
-		  {
-		    user: "John Rose",
-		    action: "Delete",
-		    description: "Deleted column Revenue Type",
-		    timestamp: "06/30/2024 10:11 AM PST"
-		  },
-		  {
-		    user: "John Rose",
-		    action: "Edit",
-		    description: "Renamed column GL Code to Income Account",
-		    timestamp: "06/29/2024 12:11 AM PST"
-		  }*/
-		]),
+	const auditRows = ref([]),
 		columns = [
-		    { field: 'user', header: 'User Name' },
-		    { field: 'action', header: 'Activity' },
-		    { field: 'description', header: 'Description' },
-		    { field: 'timestamp', header: 'Timestamp' }
+		    { field: 'id', header: 'Audit ID' },
+		    { field: 'user_id', header: 'User ID' },
+		    { field: 'user_name', header: 'User' },
+		    { field: 'reference_type', header: 'Object' },
+		    { field: 'reference_id', header: 'ID' },
+		    { field: 'reference_name', header: 'Name' },
+		    { field: 'audited_changes', header: 'Description' },
+		    { field: 'created_at', header: 'Timestamp' }
 	    ],
 	    selectOrgMsgInfo = 'Please, select an organization.',
 		store = useStore(),
 		loading = ref(false),
-		rows = ref(10), // per_page
+		rows = ref(50), // per_page
 		rowsPerPageOpt = [10, 20, 50],
 		{dateOptions, timeOptions, timeZoneOptions} = useDateTimeZoneOptions(),
-		first = ref(1),
+		first = ref(0),
 		totalRecords = ref(0),
 		page = ref(1)
 
 	const orgId = computed(() => store.getters.getOrgId)
-	const queryString = computed(() => updateQueryString())
+	const queryString = computed(() => `per_page=${rows.value}&page=${page.value}`)
 
-	onMounted(async () => await auditsInit())
+	onMounted(async () => {
+		auditsInit()
+	})
+
+	watch(orgId, async (newVal, oldVal) => {
+		if (!newVal || newVal == null) {
+			auditRows.value.length = 0
+		} else if (newVal) {
+			auditsInit()
+		}
+	})
+
+	const formattedValue = (value, column) => {
+		switch(column) {
+			case 'timestamp':
+				return useFormatDate(value, dateOptions) + ' at ' + useFormatDate(value, timeOptions)
+				break;
+			default:
+				return value
+		}
+	}
 
 	const auditsInit = async () => {
+		if (!orgId.value) { return }
 		loading.value = true
+		auditRows.value.length = 0
 
-		let apps = []
-
-		apps = await getApps()
-		apps = filteredOrgApps(apps) 
-
-		let auditPromises = apps.map(item => getAuditsLogs(item.id)),
-			allAudits = await Promise.all(auditPromises)
-
-		console.log('allAudits - ', allAudits)
-
-
-		allAudits.forEach(item => {
-			item?.audits.forEach(audit => {
-				let dataObj = {}
-
-				dataObj.user = audit?.user_id
-				dataObj.action = audit?.action
-				dataObj.description = audit?.audited_changes || 'No description'
-				dataObj.timestamp = audit?.created_at
-
-				auditLogs.value.push(dataObj)
+		try {
+			const response = await store.state.Session.apiCall(`/organizations/${orgId.value}/audits?${queryString.value}`)
+			const audits = response?.audits || []
+			response.audits.forEach(audit => {
+				auditRows.value.push(audit)
 			})
-		})
+			totalRecords.value = (response?.total_pages || 0) * parseInt(rows.value) // per_page
+			console.log(`totalRecords: ${totalRecords.value}`)
 
-		totalRecords.value = auditLogs.value.length
-		formatAuditLogs(auditLogs.value)
-
+		}
+		catch (err) {
+			loading.value = false
+			console.log(err)
+		}
 		loading.value = false
 	}
-
-	const getApps = async () => {
-		try {
-			return await store.state.Session.apiCall('/apps')
-		} catch (err) {
-			console.log(err)
-		}
-	}
-
-	const filteredOrgApps = apps => apps.filter(item => item.owner_id === orgId.value && item.owner_type === 'Organization')
-
-	const getAuditsLogs = async appId => {
-		try {
-			return await store.state.Session.apiCall(`/apps/${appId}/audits?${queryString.value}`)
-		} catch (err) {
-			console.log(err)
-		}
-	}
-
-	const getNameInitials = name => name.toString().match(/(\b\S)?/g).join("").toUpperCase()
 
 	const getActionIcon = action => {
 		switch(action) {
@@ -204,33 +155,6 @@
 		}
 	}
 
-	const generatePastelColor = () => {
-		const r = Math.floor((Math.random() * 127) + 127), // values between 127 and 255
-			g = Math.floor((Math.random() * 127) + 127),
-			b = Math.floor((Math.random() * 127) + 127)
-
-		return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}` // Convert to hex
-	}
-
-	const formatAuditLogs = auditLogs => {
-		const userColors = {}
-
-		auditLogs.forEach(log => {
-			if (!userColors[log.user]) {
-				userColors[log.user] = generatePastelColor();
-			}
-
-			log.bgColor = userColors[log.user] // Add the color to the log
-			log.label = getNameInitials(log.user)
-			log.actionIcon = getActionIcon(log.action)
-		})
-
-		return auditLogs
-	}
-
-	const totalPaginatorPages = (totalPages, itemsPerPage) => totalPages * itemsPerPage
-	const updateQueryString = () => `per_page=${rows.value}&page=${page.value}`
-
 	const onPage = async event => {
 		loading.value = true
 
@@ -239,7 +163,7 @@
 		page.value = event?.page + 1
 
 		try {
-			await auditsInit()
+			auditsInit()
 		} catch (err) {
 			loading.value = false
 			console.log(err)
@@ -248,3 +172,31 @@
 		loading.value = false
 	}
 </script>
+
+<style scoped>
+
+	.whitespace-nowrap {
+	  white-space: nowrap;
+	}
+
+	.patch-diff {
+		font-family: monospace;
+		font-size: 0.9rem;
+		white-space: pre-wrap;
+
+		span {
+			display: block;
+		}
+
+		.text-added {
+			background-color: rgb(209, 248, 217);;
+			color: rgb(10, 48, 105);
+		}
+
+		.text-removed {
+			background-color: rgb(255, 206, 203);
+			color: rgb(10, 48, 105);
+		}
+
+	}
+</style>

@@ -377,7 +377,6 @@
         this.descriptive_name = this.app.descriptive_name
         this.panels = this.app.panels
         this.schedule = this.app.schedule
-        window.document.title = `Settings: ${this.app.descriptive_name}`
       },
 
       async loadManifest() {
@@ -385,8 +384,8 @@
           this.errorMessage = null
           let manifests = await this.$store.state.Session.apiCall(`/manifests?app_id=${this.app.name}`)
           this.manifest = manifests[0]
-          this.manifestContent =
-            new ManifestMigrator(JSON.parse(this.manifest.content)).migrate()
+          const content = typeof this.manifest.content == 'object' ? this.manifest.content : JSON.parse(this.manifest.content)
+          this.manifestContent = new ManifestMigrator(content).migrate()
           this.loading = false
         } catch (error) {
           this.loading = false

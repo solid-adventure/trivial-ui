@@ -46,7 +46,7 @@
 
 	<ActualsExampleDialog :visible="isExampleDialogOpen" @closeExampleModal="closeExampleDialog" :selected="selected" />
 
-	<AuditLogs :visible="isAuditLogsOpen" @closeAuditLogsSidebar="closeAuditLogs" />
+	<!-- <AuditLogs :visible="isAuditLogsOpen" @closeAuditLogsSidebar="closeAuditLogs" /> -->
 </template>
 
 <script setup>
@@ -58,7 +58,7 @@
 	import ActualsExampleDialog from './ActualsExampleDialog.vue'
 	import ActualsLightImgPreview from '@/assets/images/organization-settings/light/actuals-preview.svg'
 	import ActualsDarkImgPreview from '@/assets/images/organization-settings/dark/actuals-preview.svg'
-	import AuditLogs from '@/components/audit-logs/AuditLogs'
+	// import AuditLogs from '@/components/audit-logs/AuditLogs'
 
 	const infoPopup = ref(),
 		isDialogOpen = ref(false),

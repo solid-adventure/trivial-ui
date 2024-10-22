@@ -1,5 +1,5 @@
 <template>
-    <Panel header="Revenue Per Hour" class="shadow-2">
+    <Panel header="Revenue Per Hour" class="shadow-2 w-full">
         <DataTable :value="revenuePerHourPercentData" scrollable tableStyle="min-width: 50rem" class="revenue__per__hour__table border-top-1 border-top-1 border-200" :pt="{
                 column: {
                     bodycell: data => {

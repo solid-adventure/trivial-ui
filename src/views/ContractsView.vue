@@ -2,7 +2,7 @@
   <Panel class="border-round-lg shadow-2">
     <DataTable
       v-model:filters="filters"
-      :value="computedContracts" 
+      :value="contracts"
       :loading="loading"
       :rows="rows" 
       :first="first"
@@ -92,9 +92,9 @@
             </div>-->
 
             <!-- PRIMEVUE CLICK VERSION (DEFAULT - WORKING) -->
-            <template v-if="data.totalErrors > 0 && data.stats && data.stats.length">
+            <template v-if="(data.totalErrors > 0 || data.totalSuccess > 0) && data.stats && data.stats.length">
               <div>
-                <Button type="button" severity="secondary" text @click="togglePopup(data.opIndex, $event)">
+                <Button type="button" severity="secondary" text @click="togglePopup(data.id, $event)">
                   <svg version="1.1" xmlns="http://www.w3.org/2000/svg" height="20" width="26" class="chart">
                     <g v-for="(item, idx) in data.stats" :key="idx">
                       <rect
@@ -107,7 +107,7 @@
                     </g>
                   </svg>
                 </Button>
-                <OverlayPanel ref="op">
+                <OverlayPanel :ref="el => { if (el) overlayPanelRefs[data.id] = el }">
                   <div class="flex flex-column justify-content-start align-items-center">
                     <p class="w-full mt-1 mb-2 text-base text-500">Last {{ activityPeriod(data.stats) }} days</p>
                     <router-link :to="`/apps/${data.name}/activity?search=${activityQueryStr500Encoded}`" rel="noopener" class="w-full m-1">
@@ -145,7 +145,7 @@
 </template>
 
 <script setup>
-  import { ref, computed, watch, onMounted } from 'vue'
+  import { ref, computed, watch, onMounted, reactive } from 'vue'
   import { useStore } from 'vuex'
   import loadingImg from '@/assets/images/trivial-loading-optimized.webp'
   import { useFilterMatchModes } from '@/composable/filterMatchModes.js'
@@ -169,22 +169,28 @@
     }),
     globalFilterFields = ['descriptive_name'],
     activityPopup = ref([]),
+
+    activityQueryStr = "",
     activityQueryStr500 = "[{'name':'status','operator':'=','value':'500'}]",
     activityQueryStr200 = "[{'name':'status','operator':'=','value':'200'}]",
+    activityQueryStrEncoded = ref(''),
     activityQueryStr500Encoded = ref(''),
     activityQueryStr200Encoded = ref(''),
-    op = ref([])
+    overlayPanelRefs = reactive({})
 
   let contracts = ref([])
 
   const orgId = computed(() => store.getters.getOrgId)
   const currentUser = computed(() => store.state.user)
-  const computedContracts = computed(() => contracts.value)
 
   watch(currentUser, async newVal => {
     if (newVal) {
       await initContracts(newVal.id)
     }
+  })
+
+  watch(orgId, async newVal => {
+    await initContracts(currentUser.value.id)
   })
 
   onMounted(async () => {
@@ -196,19 +202,20 @@
     activityQueryStr200Encoded.value = encodeURIComponentStr(activityQueryStr200)
   })
 
-  const togglePopup = (index, event) => op.value[index]?.toggle(event)
+  const togglePopup = (id, event) => overlayPanelRefs[id].toggle(event)
   const activityPeriod = item => item.length
   const setFilterMatchModes = field => field === 'created_at' ? dateFilterMatchModes : textFilterMatchModes
   const encodeURIComponentStr = str => encodeURIComponent(JSON.stringify(JSON.parse(str.replace(/'/g, '"'))))
 
   const initContracts = async (userId) => {
     loading.value = true
+    contracts.value = []
     try {
       const apps = await getApps()
       if (apps) {
         const appsPermissions = await setAppPermits(apps, userId)
-        const orgContracts = getOrgContracts(appsPermissions)
-        contracts.value = await getAppActivity(orgContracts)
+        contracts.value = getOrgContracts(appsPermissions)
+        getAppActivity()
         totalRecords.value = Math.ceil(contracts.value.length / rows.value)
       }
     } catch (err) {
@@ -238,48 +245,59 @@
     }
   }
 
-  const getAppActivity = async contracts => {
+  const getAppActivity = async () => {
     try {
-      const appActivity = await Promise.all(
-        contracts.map(async (app, index) => {
-          // Initialize error count and flag for updating
-          let totalErrors = 0,
-            totalSuccess = 0
-          app.canUpdate = true
+      contracts.value = contracts.value.map(contract => ({
+        ...contract,
+        canUpdate: true,
+        stats: [],
+        totalErrors: 0,
+        totalSuccess: 0
+      }))
+      const app_names = contracts.value.map(contract => contract.name)
+      const allStats = await store.state.Session.apiCall(`apps/activity_stats?app_names=${app_names}`)
+      contracts.value.forEach(async (contract, index) => {
+        try {
+          // NOTE: We're a little inconsistent around app_id vs app.name; this lookup is correct
+          const stats = allStats.find(app => app.app_id === contract.name)?.stats || []
+          const maxTotal = calculateMaxTotal(stats)
+          contracts.value[index].stats = formatAppStats(stats, maxTotal)
+          contracts.value[index].totalErrors = stats.reduce((acc, item) => acc + (item.count['500'] || 0), 0)
+          contracts.value[index].totalSuccess = stats.reduce((acc, item) => acc + (item.count['200'] || 0), 0)
 
-          // Fetch app stats
-          app.stats = await store.state.Session.apiCall(`/activity_entries/stats?app_id=${app.name}`)
-
-          // Calculate maximum total count from stats
-          const maxTotal = app?.stats.reduce((max, item) => {
-            const total = Object.values(item?.count).reduce((sum, value) => sum + value, 0)
-            return Math.max(max, total)
-          }, 0)
-
-          // Process each stat entry
-          app.stats.forEach((item) => {
-            const hasError = item?.count?.['500'] ?? false,
-              total = Object.values(item?.count).reduce((sum, value) => sum + value, 0)
-
-            item.hasErrors = !!hasError // Check if there are errors
-            totalErrors += hasError ? item?.count['500'] : 0 // Accumulate errors
-            totalSuccess += item?.count.hasOwnProperty('200') ? item?.count['200'] : 0 // Accumulate success
-            item.total = total // Total count for the item
-            item.proportionalHeight = Math.round((item.total / maxTotal) * 20) || 1 // Proportional height for the item
-          })
-
-          // Set index only if there are errors
-          app.opIndex = totalErrors ? index : false
-          app.totalErrors = totalErrors
-          app.totalSuccess = totalSuccess > 1000 ? (totalSuccess / 1000) + 'k' : totalSuccess
-
-          return app
-        })
-      )
-
-      return appActivity
+        } catch (error) {
+          console.error(`Error processing app ${contract.name}:`, error)
+          contracts.value[index].stats = 'Failed to fetch stats'
+        }
+      })
     } catch (error) {
-      console.error('Error fetching app activity:', error)
+      console.error('Error in getAppActivity:', error)
     }
+    return contracts
   }
+
+  // Function to calculate maximum total count from stats
+  const calculateMaxTotal = (stats) => {
+    return stats.reduce((max, item) => {
+      const total = Object.values(item?.count).reduce((sum, value) => sum + value, 0)
+      return Math.max(max, total)
+    }, 0)
+  }
+
+  const formatAppStats = (stats, maxTotal) => {
+    return stats.map(item => {
+      const hasError = item?.count?.['500'] ?? false
+      const hasSuccess = item?.count?.['200'] ?? false
+      const total = Object.values(item?.count).reduce((sum, value) => sum + value, 0)
+      return {
+        ...item,
+        hasErrors: !!hasError,
+        hasSuccess: !!hasSuccess,
+        total,
+        proportionalHeight: Math.round((total / maxTotal) * 20) || 1
+      }
+    })
+  }
+
+
 </script>

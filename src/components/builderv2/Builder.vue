@@ -90,11 +90,6 @@ export default {
       },
       deep: true,
     },
-    async app(newApp) {
-      if (newApp) {
-        window.document.title = `Edit: ${newApp.descriptive_name}`;
-      }
-    },
   },
 
   computed: {

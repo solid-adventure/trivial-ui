@@ -23,6 +23,7 @@ import OrganizationSettingsView from "@/views/OrganizationsSettingsView.vue";
 import ContractsView from "@/views/ContractsView.vue";
 import AuditLogsView from "@/views/AuditLogsView.vue";
 import Session from "../models/Session.js";
+import { useStore } from 'vuex';
 
 const routes = [
   { path: "/",
@@ -114,7 +115,7 @@ const routes = [
   {
     path: "/dashboard3",
     component: DashboardView,
-    name: "Analytics and Real-Time Data",
+    name: "Dashboard",
   },
   {
     path: "/organization-settings/:id",
@@ -162,6 +163,7 @@ const redirectToSignIn = (to, loggedIn) => {
 }
 
 router.beforeEach(async (to, from) => {
+  const store = useStore();
   let loggedIn = await Session.validate();
   if (redirectToSignIn(to, loggedIn)) {
     return {
@@ -173,6 +175,12 @@ router.beforeEach(async (to, from) => {
       path: "/"
     }
   }
+
+  // Unset app if the destination route does not start with '/apps/:id'
+  if (!to.path.match(/^\/apps\/\w+/)) {
+    store.commit('setApp', {});
+  }
+
 })
 
 export default router;

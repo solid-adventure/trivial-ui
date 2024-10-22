@@ -44,6 +44,7 @@ export default class Session {
     let clonedResponse = response.clone()
 
     let out = {}
+    let error = null
     try {
       out = await response.json()
     } catch(err) {

@@ -7,9 +7,9 @@
 			</div>
 		</RouterLink>
 
-		<template v-if="isAppId">
+		<template v-if="app.id">
 			<template v-for="(value, index) in menuItems">
-				<RouterLink v-for="(sublink, index) in value?.sublinks" :key="index" :to="`/apps/${appName}${sublink.path}`" class="aside__nav__link aside__nav__link--sublink">
+				<RouterLink v-for="(sublink, index) in value?.sublinks" :key="index" :to="`/apps/${app.name}${sublink.path}`" class="aside__nav__link aside__nav__link--sublink">
 					<div>
 						<Icon :icon="sublink.icon" />
 						<span>{{ sublink.title }}</span>
@@ -47,7 +47,7 @@
 		{ path: "/sales", title: 'Sales', icon: 'fa6-solid:sack-dollar' },
 		//{ path: "/#", title: 'Inventory', icon: 'fa6-solid:shirt' },
 		{ 
-			path: "/contracts3",
+			path: "/contract",
 			title: 'Contracts', 
 			icon: 'fa6-solid:file-pen',
 			sublinks: [
@@ -74,8 +74,8 @@
 
 	onMounted(() => {})
 
-	const isAppId = computed(() => store.state.app.name ? true : false)
-	const appName = computed(() => store.state.app.name)
+	const app = computed(() => store.state.app)
 	const orgId = computed(() => useLocalStorage('orgId').value)
 	const orgSettingsPath = computed(() => `/organization-settings/${orgId.value}`)
+
 </script>

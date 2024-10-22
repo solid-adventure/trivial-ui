@@ -9,6 +9,7 @@ import router from '../router'
 import Session from '../models/Session'
 import Permissions from '../models/Permissions'
 import { toRaw } from 'vue'
+import moment from 'moment-timezone'
 
 const store = createStore({
 
@@ -22,6 +23,7 @@ const store = createStore({
     app: {},
     isAuthenticated: false,
     showSuperBar: false,
+    app: {},
     apps: [],
     manifest: {
       id: null,
@@ -338,10 +340,8 @@ const store = createStore({
       try {
         await dispatch('organizations')
         await dispatch('loadProfile')
-        await dispatch('initApp', { appId })
         await dispatch('loadResources', { dispatch, router })
         await dispatch('checkURLState')
-        await dispatch('register')
         await dispatch('dashboards')
 
       } catch (error) {
@@ -364,7 +364,7 @@ const store = createStore({
 
     async loadResources({ commit }, { dispatch, router }) {
       const routeName = router.currentRoute.value.name
-      if ( ['PanelType', 'Show App'].includes(routeName) ) {
+      if ( ['PanelType', 'Show App', 'Sales', 'Dashboard'].includes(routeName) ) {
         await dispatch('loadApps', {dispatch})
       }
 
@@ -392,13 +392,6 @@ const store = createStore({
             app.canUpdate = res;
           });
       });
-    },
-    
-    initApp({state, commit}, {appId}) {
-      if(state.app !== {}){
-        state.app = {}
-      }
-      commit('setAppId', appId)
     },
 
     async setCurrentPath({state, commit}, {currentPath, route}) {
@@ -631,6 +624,28 @@ const store = createStore({
     },
     async setStreamValue({ commit, state }, status) {
       commit('setStreamStatus', status)
+    },
+    async getChartsData({ commit, state }, params) {
+      let total = null
+      const timezone = 'Etc/GMT+5', // Etc/GMT+5 -> Not support DST | 'America/Detroit' -> support DST | More info at https://appler.dev/time-zone-table
+        end_at = moment.tz(timezone).format(),
+        start_at = moment.tz(timezone).startOf('year').startOf('day').format(),
+        group_by_period = params.chartType !== 'doughnut' ? 'month' : null
+
+      try {
+        total = await Session.apiCall('/reports/item_sum', 'POST', { register_id: state.registerId, start_at, end_at, group_by_period, timezone, group_by: params.groupBy, invert_sign: params.invertSign })
+
+        return total
+      } catch (err) {
+        console.log(err)
+      }
+    },
+    setGroupBy({ commit, state }, data) {
+      const orderMap = {}
+      let orderArray = JSON.parse(localStorage.getItem('grColsOrder')) || []
+
+      orderArray.forEach((item, index) => orderMap[item] = index)
+      return Object.keys(data.report_groups).filter(item => data.report_groups[item]).sort((a, b) => orderMap[a] - orderMap[b])
     }
   }
 })
