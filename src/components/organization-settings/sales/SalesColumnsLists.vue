@@ -107,7 +107,7 @@
 
 	const orgId = computed(() => store.getters.getOrgId)
 	const customizableColumns = computed(() => customColumns.value)
-	const customColumnsLength = computed(() => customColumns.value.length >= 9)
+	const customColumnsLength = computed(() => customColumns.value.length >= 10)
 
 	watch(props, newVal => initColumns())
 
@@ -123,7 +123,7 @@
 		customColumns.value = getMetaColumns()
 		loading.value = false
 
-		if (customColumns.value.length >= 9) showErrorToast('Error', 'Maximum number of meta columns reached.')
+		if (customColumns.value.length >= 10) showErrorToast('Error', 'Maximum number of meta columns reached.')
 	}
 
 	const getMetaColumns = () => {
