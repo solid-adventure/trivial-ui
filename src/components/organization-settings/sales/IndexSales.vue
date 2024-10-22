@@ -71,18 +71,14 @@
 		let metaColumnsLength = Object.keys(metaColumns.value).length,
 			bodyObj = {meta: {}}
 
-		if (metaColumnsLength <= 9) {
-			let key = data?.key === undefined ? `meta${metaColumnsLength}` : data?.key
+		let key = data?.key === undefined ? `meta${metaColumnsLength}` : data?.key
 
-			data.field !== null ? metaColumns.value[key] = data.field : delete metaColumns.value[key]
+		data.field !== null ? metaColumns.value[key] = data.field : delete metaColumns.value[key]
 
-			bodyObj.meta = {...metaColumns.value}
+		bodyObj.meta = {...metaColumns.value}
 
-			await store.state.Session.apiCall(`/registers/${regId.value}`, 'PUT', bodyObj)
-			showSuccessToast('Success', 'Successfully added or edited Sales column.')
-		} else {
-			showErrorToast('Error', 'Max number of meta columns has reached.')
-		}
+		await store.state.Session.apiCall(`/registers/${regId.value}`, 'PUT', bodyObj)
+		showSuccessToast('Success', msg)
 	}
 
 	const setDeleteSalesCols = payload => {

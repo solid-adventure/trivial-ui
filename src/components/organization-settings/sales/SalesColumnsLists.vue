@@ -41,7 +41,7 @@
 				</template>
 
 				<template #footer>
-					<Button label="Add new Column" text icon="pi pi-plus" @click="openAddEditColDialog"/>
+					<Button label="Add new Column" text icon="pi pi-plus" :disabled="customColumnsLength" @click="openAddEditColDialog"/>
 				</template>
 			</DataView>
 
@@ -79,6 +79,7 @@
 <script setup>
 	import { ref, toRaw, computed, watch, onMounted } from 'vue'
 	import { useStore } from 'vuex'
+	import { useToastNotifications } from '@/composable/toastNotification'
 
 	const props = defineProps({
 		metaCols: {
@@ -101,10 +102,12 @@
 			{name: 'Originated at', field: 'originated_at', type: 'Datetime', key: ''}
 		]),
 		customColumns = ref([]),
-		loading = ref(false)
+		loading = ref(false),
+		{ showSuccessToast, showErrorToast } = useToastNotifications()
 
 	const orgId = computed(() => store.getters.getOrgId)
 	const customizableColumns = computed(() => customColumns.value)
+	const customColumnsLength = computed(() => customColumns.value.length >= 9)
 
 	watch(props, newVal => initColumns())
 
@@ -119,6 +122,8 @@
 		loading.value = true
 		customColumns.value = getMetaColumns()
 		loading.value = false
+
+		if (customColumns.value.length >= 9) showErrorToast('Error', 'Maximum number of meta columns reached.')
 	}
 
 	const getMetaColumns = () => {
