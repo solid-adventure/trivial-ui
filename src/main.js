@@ -41,6 +41,7 @@ import Chart from 'primevue/chart'
 import ProgressSpinner from 'primevue/progressspinner'
 import ProgressBar from 'primevue/progressbar'
 import Skeleton from 'primevue/skeleton'
+import DataView from 'primevue/dataview'
 import router from './router'
 import store from './store'
 import FloatingVue from 'floating-vue'
@@ -87,6 +88,7 @@ app.component('Chart', Chart)
 app.component('ProgressSpinner', ProgressSpinner)
 app.component('ProgressBar', ProgressBar)
 app.component('Skeleton', Skeleton)
+app.component('DataView', DataView)
 app.directive('ripple', Ripple)
 
 app.mount('#app')
