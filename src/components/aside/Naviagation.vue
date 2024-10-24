@@ -41,7 +41,7 @@
 		{ path: "/sales", title: 'Sales', icon: 'fa6-solid:sack-dollar' },
 		//{ path: "/#", title: 'Inventory', icon: 'fa6-solid:shirt' },
 		{ 
-			path: "/contract",
+			path: "/contracts",
 			title: 'Contracts', 
 			icon: 'fa6-solid:file-pen',
 			sublinks: [

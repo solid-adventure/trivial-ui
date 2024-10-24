@@ -131,7 +131,7 @@ const routes = [
     redirect: "/dashboard3",
   },
   {
-    path: "/contracts3",
+    path: "/contracts",
     component: ContractsView,
     name: "Contracts",
   },
