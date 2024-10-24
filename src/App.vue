@@ -145,6 +145,9 @@ export default {
             if (displayName != "All") {
               displayName = `${displayName}s`;
             }
+            if (displayName == 'Contracts') {
+              linkPath = '/contracts'
+            }
           }
           return { display: displayName, link: linkPath };
         });

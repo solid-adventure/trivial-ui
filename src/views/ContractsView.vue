@@ -58,13 +58,18 @@
         <template #filterapply="{ filterCallback }">
           <Button type="button" @click="filterCallback()" label="Apply" severity="success" class="clear-btn" />
         </template>
-
         <template #body="{ data, field, index }">
           <span v-if="field === 'descriptive_name'">
               {{ data[field] }}
           </span>
-          <span v-else-if="field === 'stats'">
-            <template v-if="(data.totalErrors > 0 || data.totalSuccess > 0) && data.stats && data.stats.length">
+          <span v-if="field === 'stats'">
+
+
+            <template v-if="activityLoading">
+              <Skeleton width="3rem" height="2.5rem" />
+            </template>
+
+            <template v-else-if="(data.totalErrors > 0 || data.totalSuccess > 0) && data.stats && data.stats.length">
               <div>
                 <Button type="button" severity="secondary" text @click="togglePopup(data.id, $event)">
                   <svg version="1.1" xmlns="http://www.w3.org/2000/svg" height="20" width="26" class="chart">
@@ -141,7 +146,7 @@
     }),
     globalFilterFields = ['descriptive_name'],
     activityPopup = ref([]),
-
+    activityLoading = ref(false),
     activityQueryStr = "",
     activityQueryStr500 = "[{'name':'status','operator':'=','value':'500'}]",
     activityQueryStr200 = "[{'name':'status','operator':'=','value':'200'}]",
@@ -218,6 +223,7 @@
   }
 
   const getAppActivity = async () => {
+    activityLoading.value = true
     try {
       contracts.value = contracts.value.map(contract => ({
         ...contract,
@@ -243,8 +249,10 @@
         }
       })
     } catch (error) {
+      activityLoading.value = false
       console.error('Error in getAppActivity:', error)
     }
+    activityLoading.value = false
     return contracts
   }
 
