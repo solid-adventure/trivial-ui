@@ -1,0 +1,24 @@
+.whitespace-nowrap {
+	white-space: nowrap;
+}
+
+.patch-diff {
+	display: inline-block;
+	font-size: .9rem;
+	font-family: monospace;
+	white-space: pre-wrap;
+
+	span {
+		display: block;
+	}
+
+	.text-added {
+		color: rgb(10, 48, 105);
+		background-color: rgb(209, 248, 217);
+	}
+
+	.text-removed {
+		color: rgb(10, 48, 105);
+		background-color: rgb(255, 206, 203);
+	}
+}
