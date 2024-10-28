@@ -41,8 +41,8 @@
 				</template>
 
 				<template #footer>
-					<Button label="Add new Column" text icon="pi pi-plus" :disabled="customColumnsLength" @click="openAddEditColDialog"/>
-					<p v-if="customColumnsLength" class="mt-1 text-xs font-normal text-500">
+					<Button label="Add new Column" text icon="pi pi-plus" :disabled="maxColumnsReached" @click="openAddEditColDialog"/>
+					<p v-if="maxColumnsReached" class="mt-1 text-xs font-normal text-500">
 						<i class="text-xs pi pi-exclamation-triangle"></i>
 						Maximum number of columns reached.
 					</p>
@@ -111,7 +111,8 @@
 
 	const orgId = computed(() => store.getters.getOrgId)
 	const customizableColumns = computed(() => customColumns.value)
-	const customColumnsLength = computed(() => customColumns.value.length >= 9)
+	const maxCustomColumns = 10
+	const maxColumnsReached = computed(() => customColumns.value.length >= maxCustomColumns)
 
 	watch(props, newVal => initColumns())
 
