@@ -45,8 +45,9 @@
 
 	const deleteSalesCols = async payload => {
 		try {
-			let msg = 'Successfully deleted Sales column.'
-			await registerAPICall(payload, msg)
+			let msg = 'Successfully deleted Sales column.',
+				data = formatColObjData(payload)
+			await registerAPICall(data, msg)
 		}
 		catch (error) {
 			showErrorToast('Error', error)
@@ -57,8 +58,9 @@
 
 	const addEditSalesCol = async payload => {
 		try {
-			let msg = 'Successfully added or edited Sales column.'
-			await registerAPICall(payload, msg)
+			let msg = 'Successfully added or edited Sales column.',
+				data = formatColObjData(payload)
+			await registerAPICall(data, msg)
 		}
 		catch (error) {
 			showErrorToast('Error', error)
@@ -67,17 +69,29 @@
 		closeDeleteSalesColsModal()
 	}
 
+	const formatColObjData = data => {
+		// Get the values of the original object
+		const values = Object.values(metaColumns.value),
+			modifiedObject = {} // Create a new object with sequential meta keys based on array length
+
+		for (let i = 0; i < values.length; i++) {
+			modifiedObject[`meta${i}`] = values[i]
+		}
+
+		// Determine the key to use, defaulting to `meta` + current length
+		const metaColumnsLength = Object.keys(modifiedObject).length,
+			key = data?.key === undefined ? `meta${metaColumnsLength}` : data.key
+
+		// If field is not null, add/update the key; if null, delete it
+		data.field !== null ? modifiedObject[key] = data.field : delete modifiedObject[key]
+
+		// Update `metaColumns.value` and return formated data for API
+		metaColumns.value = modifiedObject
+		return { meta: { ...metaColumns.value } }
+	}
+
 	const registerAPICall = async (data, msg) => {
-		let metaColumnsLength = Object.keys(metaColumns.value).length,
-			bodyObj = {meta: {}}
-
-		let key = data?.key === undefined ? `meta${metaColumnsLength}` : data?.key
-
-		data.field !== null ? metaColumns.value[key] = data.field : delete metaColumns.value[key]
-
-		bodyObj.meta = {...metaColumns.value}
-
-		await store.state.Session.apiCall(`/registers/${regId.value}`, 'PUT', bodyObj)
+		await store.state.Session.apiCall(`/registers/${regId.value}`, 'PUT', data)
 		showSuccessToast('Success', msg)
 	}
 

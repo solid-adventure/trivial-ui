@@ -42,6 +42,10 @@
 
 				<template #footer>
 					<Button label="Add new Column" text icon="pi pi-plus" :disabled="customColumnsLength" @click="openAddEditColDialog"/>
+					<p v-if="customColumnsLength" class="mt-1 text-xs font-normal text-500">
+						<i class="text-xs pi pi-exclamation-triangle"></i>
+						Maximum number of columns reached.
+					</p>
 				</template>
 			</DataView>
 
@@ -107,7 +111,7 @@
 
 	const orgId = computed(() => store.getters.getOrgId)
 	const customizableColumns = computed(() => customColumns.value)
-	const customColumnsLength = computed(() => customColumns.value.length >= 10)
+	const customColumnsLength = computed(() => customColumns.value.length >= 9)
 
 	watch(props, newVal => initColumns())
 
@@ -122,8 +126,6 @@
 		loading.value = true
 		customColumns.value = getMetaColumns()
 		loading.value = false
-
-		if (customColumns.value.length >= 10) showErrorToast('Error', 'Maximum number of meta columns reached.')
 	}
 
 	const getMetaColumns = () => {
