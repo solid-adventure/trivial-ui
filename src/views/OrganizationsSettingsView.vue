@@ -76,9 +76,12 @@
 		//if (savedIndex !== null) activeTab.value = parseInt(savedIndex) // Set saved tab index on load
 
 		//activeTab.value = getHashIndex()
+
+		getUrlQuery()
+		//getUrlHash()
 	})
 
-	const changeTab = (index, urlHash) => {
+	/*const changeTab = (index, urlHash) => {
 		//activeTab.value = index // Programmatically change the active tab
 		//setActiveTabStorage(index)
 	}
@@ -87,5 +90,45 @@
 	const getHashIndex = () => {
 		//const hash = window.location.hash.replace('#', '')
 		//return parseInt(hash) || 0
+	}*/
+
+	const changeTab = (index, tabName) => {
+		activeTab.value = index // Programmatically change the active tab
+		router.replace({ query: { tab: tabName} })
+		//router.replace({ hash: `#${tabName}` })
+	}
+
+	const getUrlQuery = () => {
+		console.log('route.query - ', route)
+		switch(route.query) {
+			case 'dashboard':
+				activeTab.value = 0
+			break
+			case 'users':
+				activeTab.value = 1
+			break
+			case 'audit-logs':
+				activeTab.value = 2
+			break
+			default:
+				activeTab.value = 0
+		}
+	}
+
+	const getUrlHash = () => {
+		console.log('route.query - ', route)
+		switch(route.query) {
+			case '#dashboard':
+				activeTab.value = 0
+			break
+			case '#users':
+				activeTab.value = 1
+			break
+			case '#audit-logs':
+				activeTab.value = 2
+			break
+			default:
+				activeTab.value = 0
+		}
 	}
 </script>
