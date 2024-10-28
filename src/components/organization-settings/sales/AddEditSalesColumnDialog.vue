@@ -2,6 +2,9 @@
 	<Dialog v-model:visible="visible" modal @hide="closeModal" :header="`${typeFormTxt[0]} Column`" class="org-settings__dialog">
 		<VForm v-slot="{ meta }">
 			<div class="flex flex-column gap-1 my-2">
+
+				<p class="mt-1"><strong>Note:</strong> Any contracts that use this column will need to be manually updated.</p>
+
 				<label for="name" class="mb-1">Column Name</label>
 				<VField id="name" name="name" :rules="{ required, min: 2 }" v-slot="{ field, errors }">
 					<InputText v-model="userFormData.name" v-bind="field" class="flex-auto capitalize" :class="{'p-invalid': errors.length}" autocomplete="off" placeholder="ex. Location" :value="userFormData.name" />
