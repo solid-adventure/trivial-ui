@@ -339,6 +339,7 @@ const store = createStore({
       if (!state.isAuthenticated) { return }
       try {
         await dispatch('organizations')
+        await dispatch('register')
         await dispatch('loadProfile')
         await dispatch('loadResources', { dispatch, router })
         await dispatch('checkURLState')
