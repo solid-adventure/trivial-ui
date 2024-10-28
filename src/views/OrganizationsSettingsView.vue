@@ -1,12 +1,12 @@
 <template>
 	<Panel class="organization-settings">
-		<TabView v-model:activeIndex="activeTab">
+    <TabView v-if="activeTab !== undefined" v-model:activeIndex="activeTab">
 			<TabPanel :pt="tabPanelPt">
 				<template #header>
-					<div @click="changeTab(0, 'dashboard')">Dashboard</div>
+					<div @click="changeTab('dashboard')">Dashboard</div>
 				</template>
 				<div class="organization-settings__dashboard">
-					<IndexDashboard />
+          <IndexDashboard v-if="isActive('dashboard')" />
 				</div>
 			</TabPanel>
 			<!--<TabPanel header="Sales" :disabled="true" :pt="tabPanelPt">
@@ -21,10 +21,10 @@
 			</TabPanel>-->
 			<TabPanel :pt="tabPanelPt">
 				<template #header>
-					<div @click="changeTab(1, 'users')">Users</div>
+					<div @click="changeTab('users')">Users</div>
 				</template>
 				<div class="organization-settings__users">
-					<IndexUsers />
+          <IndexUsers v-if="isActive( 'users')" />
 				</div>
 			</TabPanel>
 			<!-- <TabPanel header="API Keys" :pt="tabPanelPt" :disabled="true" >
@@ -34,10 +34,10 @@
 			</TabPanel> -->
 			<TabPanel :pt="tabPanelPt">
 				<template #header>
-					<div @click="changeTab(2, 'audit-logs')">Audit Logs</div>
+					<div @click="changeTab('audit-logs')">Audit Logs</div>
 				</template>
 				<div class="organization-settings__audit_logs">
-					<AuditLogsView />
+          <AuditLogsView v-if="isActive('audit-logs')" />
 				</div>
 			</TabPanel>
 		</TabView>
@@ -61,74 +61,40 @@
 		}
 	})
 
-	const localStorageKey = 'activeTabIndex',
-		router = useRouter(),
-		route = useRoute()
+  const router = useRouter(),
+        route = useRoute(),
+        activeTab = ref(undefined)
 
-	let activeTab = ref(0)
+  onMounted(() => {
+    // Set initial tab based on current hash
+    setTabFromHash(route.hash)
+  })
 
-	// Watch the activeTab value and update the URL hash when it changes
-    //watch(activeTab, newIndex => window.location.hash = `#${newIndex}`)
+  // Watch for route changes to set active tab
+  watch(() => route.hash, (newHash) => {
+    setTabFromHash(newHash)
+  })
 
-	// On mounted, check localStorage for saved active tab index
-	onMounted(() => {
-		//const savedIndex = localStorage.getItem(localStorageKey)
-		//if (savedIndex !== null) activeTab.value = parseInt(savedIndex) // Set saved tab index on load
+  const isActive = (tabName) => {
+    if (route.hash === '' && tabName === 'dashboard') {
+      return true
+    }
+    return route.hash === `#${tabName}`
+  }
 
-		//activeTab.value = getHashIndex()
+  const tabs = ['dashboard', 'users', 'audit-logs']
 
-		getUrlQuery()
-		//getUrlHash()
-	})
+  const changeTab = (tabName) => {
+    const tabIndex = tabs.indexOf(tabName)
+    if (tabIndex !== -1) {
+      activeTab.value = tabIndex
+      router.replace({ hash: `#${tabName}` })
+    }
+  }
 
-	/*const changeTab = (index, urlHash) => {
-		//activeTab.value = index // Programmatically change the active tab
-		//setActiveTabStorage(index)
-	}
-
-	const setActiveTabStorage = index => localStorage.setItem(localStorageKey, index)
-	const getHashIndex = () => {
-		//const hash = window.location.hash.replace('#', '')
-		//return parseInt(hash) || 0
-	}*/
-
-	const changeTab = (index, tabName) => {
-		activeTab.value = index // Programmatically change the active tab
-		router.replace({ query: { tab: tabName} })
-		//router.replace({ hash: `#${tabName}` })
-	}
-
-	const getUrlQuery = () => {
-		console.log('route.query - ', route)
-		switch(route.query) {
-			case 'dashboard':
-				activeTab.value = 0
-			break
-			case 'users':
-				activeTab.value = 1
-			break
-			case 'audit-logs':
-				activeTab.value = 2
-			break
-			default:
-				activeTab.value = 0
-		}
-	}
-
-	const getUrlHash = () => {
-		console.log('route.query - ', route)
-		switch(route.query) {
-			case '#dashboard':
-				activeTab.value = 0
-			break
-			case '#users':
-				activeTab.value = 1
-			break
-			case '#audit-logs':
-				activeTab.value = 2
-			break
-			default:
-				activeTab.value = 0
-		}
-	}
+  const setTabFromHash = (hash) => {
+    const cleanHash = hash.replace('#', '')
+    const tabIndex = tabs.indexOf(cleanHash)
+    activeTab.value = tabIndex !== -1 ? tabIndex : 0
+  }
 </script>
