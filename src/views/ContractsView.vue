@@ -63,8 +63,6 @@
               {{ data[field] }}
           </span>
           <span v-if="field === 'stats'">
-
-
             <template v-if="activityLoading">
               <Skeleton width="3rem" height="2.5rem" />
             </template>
@@ -240,9 +238,8 @@
           const stats = allStats.find(app => app.app_id === contract.name)?.stats || []
           const maxTotal = calculateMaxTotal(stats)
           contracts.value[index].stats = formatAppStats(stats, maxTotal)
-          contracts.value[index].totalErrors = stats.reduce((acc, item) => acc + (item.count['500'] || 0), 0)
-          contracts.value[index].totalSuccess = stats.reduce((acc, item) => acc + (item.count['200'] || 0), 0)
-
+          contracts.value[index].totalErrors = humanizeNumber(stats.reduce((acc, item) => acc + (item.count['500'] || 0), 0))
+          contracts.value[index].totalSuccess = humanizeNumber(stats.reduce((acc, item) => acc + (item.count['200'] || 0), 0))
         } catch (error) {
           console.error(`Error processing app ${contract.name}:`, error)
           contracts.value[index].stats = 'Failed to fetch stats'
@@ -280,5 +277,13 @@
     })
   }
 
+  const humanizeNumber = num => {
+    if (num < 1000) return num.toString()
 
+    const units = ['K', 'M', 'B'],
+      unit = Math.floor(Math.log10(num) / 3),
+      value = (num / Math.pow(1000, unit)).toFixed(1).replace(/\.0$/, '')
+
+    return value + units[unit]
+  }
 </script>
