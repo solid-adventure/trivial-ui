@@ -87,11 +87,11 @@
                     <p class="w-full mt-1 mb-2 text-base text-500">Last {{ activityPeriod(data.stats) }} days</p>
                     <router-link :to="`/apps/${data.name}/activity?search=${activityQueryStr500Encoded}`" rel="noopener" class="w-full m-1">
                       <i class="pi pi-times-circle text-red-600" />
-                      <span class="ml-2 text-lg font-semibold text-red-600">{{ data.totalErrors }} Errors</span>
+                      <span class="ml-2 text-lg font-semibold text-red-600">{{ humanizeNumber(data.totalErrors) }} Errors</span>
                     </router-link>
                     <router-link :to="`/apps/${data.name}/activity?search=${activityQueryStr200Encoded}`" rel="noopener" class="w-full m-1 activity__success--link">
                       <i class="pi pi-check-circle" />
-                      <span class="ml-2 text-lg font-semibold">{{ data.totalSuccess }} Success</span>
+                      <span class="ml-2 text-lg font-semibold">{{ humanizeNumber(data.totalSuccess) }} Success</span>
                     </router-link>
                     <Divider />
                     <router-link :to="`/apps/${data.name}/activity`" rel="noopener" class="w-full flex justify-content-start align-items-center">
@@ -238,8 +238,9 @@
           const stats = allStats.find(app => app.app_id === contract.name)?.stats || []
           const maxTotal = calculateMaxTotal(stats)
           contracts.value[index].stats = formatAppStats(stats, maxTotal)
-          contracts.value[index].totalErrors = humanizeNumber(stats.reduce((acc, item) => acc + (item.count['500'] || 0), 0))
-          contracts.value[index].totalSuccess = humanizeNumber(stats.reduce((acc, item) => acc + (item.count['200'] || 0), 0))
+          contracts.value[index].totalErrors = stats.reduce((acc, item) => acc + (item.count['500'] || 0), 0)
+          contracts.value[index].totalSuccess = stats.reduce((acc, item) => acc + (item.count['200'] || 0), 0)
+
         } catch (error) {
           console.error(`Error processing app ${contract.name}:`, error)
           contracts.value[index].stats = 'Failed to fetch stats'
@@ -280,7 +281,7 @@
   const humanizeNumber = num => {
     if (num < 1000) return num.toString()
 
-    const units = ['K', 'M', 'B'],
+    const units = ['', 'K', 'M', 'B'],
       unit = Math.floor(Math.log10(num) / 3),
       value = (num / Math.pow(1000, unit)).toFixed(1).replace(/\.0$/, '')
 
