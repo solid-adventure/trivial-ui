@@ -70,7 +70,7 @@
             <template v-else-if="(data.totalErrors > 0 || data.totalSuccess > 0) && data.stats && data.stats.length">
               <div>
                 <Button type="button" severity="secondary" text @click="togglePopup(data.id, $event)">
-                  <svg version="1.1" xmlns="http://www.w3.org/2000/svg" height="20" width="26" class="chart">
+                  <svg version="1.1" xmlns="http://www.w3.org/2000/svg" height="20" :width="data.stats.length * 4" class="chart">
                     <g v-for="(item, idx) in data.stats" :key="idx">
                       <rect
                         :x="idx * 4"
