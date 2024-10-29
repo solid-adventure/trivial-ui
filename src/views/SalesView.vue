@@ -297,12 +297,24 @@
 	}
 
 	const getTotalAmount = async () => {
-		let col = 'amount'
-		let total = await store.state.Session.apiCall(
-			`/register_items/sum?register_id=${regId.value}&col=${col}&${queryString.value}`
-		)
-		totalAmount.value = useFormatCurrency(total.sum, 2, 'USD')
-		resetDateFilter()
+		//Setting time/date 24h range
+		const today = moment().tz(timezone).startOf('day').utc().format(),
+			tomorrow = moment().tz(timezone).add(1, 'day').startOf('day').utc().format(),
+			datetimeFilter = [
+				{ c: 'originated_at', o: filterMatchModeMapping.gte, p: today },
+				{ c: 'originated_at', o: filterMatchModeMapping.lt, p: tomorrow }
+			],
+			search = route.query.hasOwnProperty('search') ? '' : `search=${encodeURIComponent(JSON.stringify(datetimeFilter))}`,
+			apiEndpoint = `/register_items/sum?register_id=${regId.value}&col=amount&${queryString.value}&${search}`
+
+		try {
+			const total = await store.state.Session.apiCall(apiEndpoint)
+			totalAmount.value = useFormatCurrency(total.sum, 2, 'USD')
+		} catch (error) {
+			console.error('Error fetching total amount:', error)
+		} finally {
+			resetDateFilter()
+		}
 	}
 
 	const getSearchableCols = async () => {
