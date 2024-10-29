@@ -63,8 +63,6 @@
               {{ data[field] }}
           </span>
           <span v-if="field === 'stats'">
-
-
             <template v-if="activityLoading">
               <Skeleton width="3rem" height="2.5rem" />
             </template>
@@ -72,7 +70,7 @@
             <template v-else-if="(data.totalErrors > 0 || data.totalSuccess > 0) && data.stats && data.stats.length">
               <div>
                 <Button type="button" severity="secondary" text @click="togglePopup(data.id, $event)">
-                  <svg version="1.1" xmlns="http://www.w3.org/2000/svg" height="20" width="26" class="chart">
+                  <svg version="1.1" xmlns="http://www.w3.org/2000/svg" height="20" :width="data.stats.length * 4" class="chart">
                     <g v-for="(item, idx) in data.stats" :key="idx">
                       <rect
                         :x="idx * 4"
@@ -89,11 +87,11 @@
                     <p class="w-full mt-1 mb-2 text-base text-500">Last {{ activityPeriod(data.stats) }} days</p>
                     <router-link :to="`/apps/${data.name}/activity?search=${activityQueryStr500Encoded}`" rel="noopener" class="w-full m-1">
                       <i class="pi pi-times-circle text-red-600" />
-                      <span class="ml-2 text-lg font-semibold text-red-600">{{ data.totalErrors }} Errors</span>
+                      <span class="ml-2 text-lg font-semibold text-red-600">{{ humanizeNumber(data.totalErrors) }} Errors</span>
                     </router-link>
                     <router-link :to="`/apps/${data.name}/activity?search=${activityQueryStr200Encoded}`" rel="noopener" class="w-full m-1 activity__success--link">
                       <i class="pi pi-check-circle" />
-                      <span class="ml-2 text-lg font-semibold">{{ data.totalSuccess }} Success</span>
+                      <span class="ml-2 text-lg font-semibold">{{ humanizeNumber(data.totalSuccess) }} Success</span>
                     </router-link>
                     <Divider />
                     <router-link :to="`/apps/${data.name}/activity`" rel="noopener" class="w-full flex justify-content-start align-items-center">
@@ -280,5 +278,13 @@
     })
   }
 
+  const humanizeNumber = num => {
+    if (num < 1000) return num.toString()
 
+    const units = ['', 'K', 'M', 'B'],
+      unit = Math.floor(Math.log10(num) / 3),
+      value = (num / Math.pow(1000, unit)).toFixed(1).replace(/\.0$/, '')
+
+    return value + units[unit]
+  }
 </script>
