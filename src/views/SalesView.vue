@@ -169,6 +169,7 @@
 	const regId = computed(() => store.getters.getRegisterId)
 	const register = computed(() => store.getters.getRegister)
 	const registersItems = computed(() => registers.value)
+	const isRouteQuery = computed(() => !!Object.keys(route.query).length)
 
 	watch(orgId, async (newVal, oldVal) => {
 		if (newVal === null) {
@@ -198,11 +199,13 @@
 			await store.dispatch('register')
 		}
 
-		if (regId.value && Object.keys(route.query).length === 0) {
+		if (regId.value && !isRouteQuery.value) {
+			console.log('mali je usao 0')
 			await getRegisters()
 		}
 
-		if (regId.value && Object.keys(route.query).length !== 0) {
+		if (regId.value && isRouteQuery.value) {
+			console.log('mali je usao 1')
 			getQueryFilters(route.query)
 			await getRegisters()
 		}
@@ -241,7 +244,7 @@
 	}
 
 	const setQueryFilters = () => {
-		if (Object.keys(route.query).length !== 0) {
+		if (isRouteQuery.value) {
 			filters.value['originated_at'] = { constraints: toRaw(queryFilters.value), operator: 'and' }
 		}
 	}
@@ -297,18 +300,10 @@
 	}
 
 	const getTotalAmount = async () => {
-		//Setting time/date 24h range
-		const today = moment().tz(timezone).startOf('day').utc().format(),
-			tomorrow = moment().tz(timezone).add(1, 'day').startOf('day').utc().format(),
-			datetimeFilter = [
-				{ c: 'originated_at', o: filterMatchModeMapping.gte, p: today },
-				{ c: 'originated_at', o: filterMatchModeMapping.lt, p: tomorrow }
-			],
-			search = route.query.hasOwnProperty('search') ? '' : `search=${encodeURIComponent(JSON.stringify(datetimeFilter))}`,
-			apiEndpoint = `/register_items/sum?register_id=${regId.value}&col=amount&${queryString.value}&${search}`
-
 		try {
-			const total = await store.state.Session.apiCall(apiEndpoint)
+			let total = await store.state.Session.apiCall(
+				`/register_items/sum?register_id=${regId.value}&col=amount&${queryString.value}`
+			)
 			totalAmount.value = useFormatCurrency(total.sum, 2, 'USD')
 		} catch (error) {
 			console.error('Error fetching total amount:', error)
@@ -373,10 +368,18 @@
 		}
 	}
 
+	const setDateIsFilter = () => {
+		//If route query is false then set default table sales filter for 'originated_at' to current day
+		if (!isRouteQuery.value) {
+			defaultFilters.originated_at.constraints[0].value = moment().tz(timezone).startOf('day').utc().format('L')
+		}
+	}
+
 	const setDefaultFilters = field => {
 		if (field !== 'originated_at') {
 			filters.value[field] = { constraints: [{ value: null, matchMode: defaultMatchMode }] }
 		} else {
+			setDateIsFilter()
 			filters.value[field] = defaultFilters.originated_at
 		}
 	}
