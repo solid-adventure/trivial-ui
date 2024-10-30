@@ -169,7 +169,7 @@
 	const regId = computed(() => store.getters.getRegisterId)
 	const register = computed(() => store.getters.getRegister)
 	const registersItems = computed(() => registers.value)
-	const isRouteQuery = computed(() => !!Object.keys(route.query).length)
+	const hasRouteQuery = computed(() => Object.keys(route.query).length)
 
 	watch(orgId, async (newVal, oldVal) => {
 		if (newVal === null) {
@@ -199,13 +199,11 @@
 			await store.dispatch('register')
 		}
 
-		if (regId.value && !isRouteQuery.value) {
-			console.log('mali je usao 0')
+		if (regId.value && !hasRouteQuery.value) {
 			await getRegisters()
 		}
 
-		if (regId.value && isRouteQuery.value) {
-			console.log('mali je usao 1')
+		if (regId.value && hasRouteQuery.value) {
 			getQueryFilters(route.query)
 			await getRegisters()
 		}
@@ -244,7 +242,7 @@
 	}
 
 	const setQueryFilters = () => {
-		if (isRouteQuery.value) {
+		if (hasRouteQuery.value) {
 			filters.value['originated_at'] = { constraints: toRaw(queryFilters.value), operator: 'and' }
 		}
 	}
@@ -368,19 +366,14 @@
 		}
 	}
 
-	const setDateIsFilter = () => {
-		//If route query is false then set default table sales filter for 'originated_at' to current day
-		if (!isRouteQuery.value) {
-			defaultFilters.originated_at.constraints[0].value = moment().tz(timezone).startOf('day').utc().format('L')
-		}
-	}
-
 	const setDefaultFilters = field => {
-		if (field !== 'originated_at') {
-			filters.value[field] = { constraints: [{ value: null, matchMode: defaultMatchMode }] }
+		if (field == 'originated_at') {
+				filters.value[field] = { constraints: [
+					{ value: moment().tz(timezone).startOf('month').utc().format('L'), matchMode: 'dateAfter' }
+				]
+			}
 		} else {
-			setDateIsFilter()
-			filters.value[field] = defaultFilters.originated_at
+			filters.value[field] = { constraints: [{ value: null, matchMode: defaultMatchMode }] }
 		}
 	}
 
