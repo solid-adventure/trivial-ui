@@ -169,6 +169,7 @@
 	const regId = computed(() => store.getters.getRegisterId)
 	const register = computed(() => store.getters.getRegister)
 	const registersItems = computed(() => registers.value)
+	const hasRouteQuery = computed(() => Object.keys(route.query).length)
 
 	watch(orgId, async (newVal, oldVal) => {
 		if (newVal === null) {
@@ -198,11 +199,11 @@
 			await store.dispatch('register')
 		}
 
-		if (regId.value && Object.keys(route.query).length === 0) {
+		if (regId.value && !hasRouteQuery.value) {
 			await getRegisters()
 		}
 
-		if (regId.value && Object.keys(route.query).length !== 0) {
+		if (regId.value && hasRouteQuery.value) {
 			getQueryFilters(route.query)
 			await getRegisters()
 		}
@@ -241,7 +242,7 @@
 	}
 
 	const setQueryFilters = () => {
-		if (Object.keys(route.query).length !== 0) {
+		if (hasRouteQuery.value) {
 			filters.value['originated_at'] = { constraints: toRaw(queryFilters.value), operator: 'and' }
 		}
 	}
@@ -297,12 +298,16 @@
 	}
 
 	const getTotalAmount = async () => {
-		let col = 'amount'
-		let total = await store.state.Session.apiCall(
-			`/register_items/sum?register_id=${regId.value}&col=${col}&${queryString.value}`
-		)
-		totalAmount.value = useFormatCurrency(total.sum, 2, 'USD')
-		resetDateFilter()
+		try {
+			let total = await store.state.Session.apiCall(
+				`/register_items/sum?register_id=${regId.value}&col=amount&${queryString.value}`
+			)
+			totalAmount.value = useFormatCurrency(total.sum, 2, 'USD')
+		} catch (error) {
+			console.error('Error fetching total amount:', error)
+		} finally {
+			resetDateFilter()
+		}
 	}
 
 	const getSearchableCols = async () => {
@@ -362,10 +367,13 @@
 	}
 
 	const setDefaultFilters = field => {
-		if (field !== 'originated_at') {
-			filters.value[field] = { constraints: [{ value: null, matchMode: defaultMatchMode }] }
+		if (field == 'originated_at') {
+				filters.value[field] = { constraints: [
+					{ value: moment().tz(timezone).startOf('month').utc().format('L'), matchMode: 'dateAfter' }
+				]
+			}
 		} else {
-			filters.value[field] = defaultFilters.originated_at
+			filters.value[field] = { constraints: [{ value: null, matchMode: defaultMatchMode }] }
 		}
 	}
 
