@@ -41,6 +41,7 @@
 <script>
 import TrackingService from '../../lib/TrackingService';
 import store from '../store'
+import { useRouter } from 'vue-router';
 
 TrackingService.identifyLandingReferer();
 export default {
@@ -50,7 +51,8 @@ export default {
             errorMessage: null,
             sign_in_clicked: false,
             email: '',
-            password:''
+            password:'',
+            router: useRouter()
         }
     },
     methods: {
@@ -68,7 +70,10 @@ export default {
                 }
                 TrackingService.identify(identity)
                 TrackingService.track('User Signin', identity)
-                window.location.href = '/' // Full reload to re-init state w/user present
+
+                const redirectPath = sessionStorage.getItem('redirectPath') || '/';
+                sessionStorage.removeItem('redirectPath'); // Clear the saved path
+                window.location.href = redirectPath
             } catch(e) {
                 this.handleSignInError(e)
             }

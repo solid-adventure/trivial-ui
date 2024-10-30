@@ -159,11 +159,15 @@ const redirectToSignIn = (to, loggedIn) => {
 router.beforeEach(async (to, from) => {
   const store = useStore();
   let loggedIn = await Session.validate();
+
   if (redirectToSignIn(to, loggedIn)) {
+    sessionStorage.setItem('redirectPath', to.fullPath); // Save intended route
+
     return {
       path: "/signin"
     }
   }
+
   if (loggedIn && to.path === "/signin") {
     return {
       path: "/"
