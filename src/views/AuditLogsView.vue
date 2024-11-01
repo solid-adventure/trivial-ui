@@ -109,7 +109,6 @@
         sortOrder = ref(null),
         queryFilters = ref([]),
         filters = ref({
-          id: { constraints: [{ value: null, matchMode: 'equals' }] },
           user_id: { constraints: [{ value: null, matchMode: 'equals' }] },
           created_at: { operator: 'and', constraints: [{ value: null, matchMode: 'dateIs' }] }
         }),
