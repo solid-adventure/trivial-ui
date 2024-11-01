@@ -4,7 +4,8 @@
         :globalFilterFields="globalFilterFields"
         :value="auditRows"
         :loading="loading" 
-        paginator 
+        paginator
+        lazy
         :rows="rows" 
         :rowsPerPageOptions="rowsPerPageOpt"
         :totalRecords="totalRecords"
@@ -56,20 +57,24 @@
 
             <template #body="{ data }">
                 <template v-if="col.field === 'audited_changes'">
-                    <p v-for="item in data[col.field]">
+                    <p v-for="(item, index) in data[col.field]" :key="index" class="flex flex-column max-w-24rem m-0" :class="{'text-hidden': index > 9}">
                         <template v-if="item.patch">
                             <!-- Iterate over the lines in the patch so we can apply styles -->
-                            <span class="patch-diff">
-                                <template v-for="line in item.patch.split('\n')">
-                                    <span v-if="line.startsWith('+')" class="text-added">{{ line }}</span>
-                                    <span v-else-if="line.startsWith('-')" class="text-removed">{{ line }}</span>
-                                    <span v-else>{{ line }}</span>
+                            <div class="patch-diff" :class="{'text-ellipsis': item?.patch.split('\n').length > 10}">
+                                <template v-for="(line, index) in item?.patch.split('\n')" :key="index">
+                                    <div v-if="line.startsWith('+')" class="text-added">{{ line }}</div>
+                                    <div v-else-if="line.startsWith('-')" class="text-removed">{{ line }}</div>
+                                    <div v-else>{{ line }}</div>
                                 </template>
-                            </span>
+                            </div>
                         </template>
                         <template v-else>
                             Patch not found
                         </template>
+
+                        <router-link v-if="index === 9 || item?.patch.split('\n').length > 10" :to="`/audits/${data.id}`" rel="noopener" class="w-5 inline-block details__link">
+                            <Button label="View Details" link class="text-sm" icon="pi pi-link" iconPos="right" />
+                        </router-link>
                     </p>
                 </template>
                 <template v-else>
@@ -98,7 +103,6 @@
         rows = ref(50),
         first = ref(0),
         totalRecords = ref(0),
-        page = ref(1),
         rowsPerPageOpt = [10, 20, 50],
         csvDialogVisible = ref(false),
         sortField = ref(null),
@@ -127,6 +131,8 @@
         { dateOptions, timeOptions, timeZoneOptions } = useDateTimeZoneOptions(),
         timezone = timeZoneOptions.timeZone,
         { dateFilterMatchModes, textFilterMatchModes, filterMatchModeMapping, globalFilterFields } = useFilterMatchModes()
+
+    let page = ref(1) // Default start page is from first,
 
     const orgId = computed(() => store.getters.getOrgId)
     const register = computed(() => store.getters.getRegister)
@@ -270,23 +276,19 @@
     }
 
     const onFilter = async event => {
-        // Check if the filters have actually changed
-        if (JSON.stringify(event.filters) !== JSON.stringify(filters.value)) {
-            filters.value = event.filters // Update the filters with the new values
+        filters.value = event.filters // Update the filters with the new values
 
-            // Reset pagination when filters are applied
-            page.value = 1
-            first.value = 1
+        // Reset pagination when filters are applied
+        page.value = 1
+        first.value = 1
 
-            try {
-                // Reload data with the new filters
-                await loadAuditData()
-            } catch (err) {
-                console.error('Error during filtering:', err)
-            }
+        try {
+            // Reload data with the new filters
+            await loadAuditData()
+        } catch (err) {
+            console.error('Error during filtering:', err)
         }
     }
-
 
     const onFilterClear = async field => {
         // Reset filters and query parameters specific to 'created_at' or other fields
