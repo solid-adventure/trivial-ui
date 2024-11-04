@@ -13,7 +13,7 @@
 </template>
 
 <script setup>
-	import { ref, onMounted, toRaw } from "vue"
+	import { ref, onMounted, toRaw, watch } from "vue"
 	import { useFormatCurrency } from '@/composable/formatCurrency.js'
 	import { useColorScheme } from '@/composable/colorScheme'
 	import { useStore } from 'vuex'
@@ -188,8 +188,7 @@
 
 	// Format props data and prepere for fetching chart data
 	const formatChartData = async data => {
-		let groupByChart = [],
-			chartTypeAbbr = data?.chart_type.split('_')[0] || '',
+		let chartTypeAbbr = data?.chart_type.split('_')[0] || '',
 			chartOrderIndex = data?.chart_type !== 'doughnut' ? 1 : 0,
 			colorScheme = data?.color_scheme || 'default',
 			chartObj = {
@@ -203,21 +202,11 @@
 				chart: {}
 			}
 
-		groupByChart = await store.dispatch('setGroupBy', data)
-
-		const paramObj = {
-			groupBy: groupByChart,
-			invertSign: data?.invert_sign,
-			chartType: data?.chart_type
-		}
-
 		try {
-			let res = await store.dispatch('getChartsData', paramObj)
-
-			if (res) {
-				chartObj.title = res?.title || ''
-				chartObj.group = groupByChart || ''
-				const chartCount = res?.count || []
+			if (data?.chart_data) {
+				chartObj.title = data?.chart_data?.title || ''
+				chartObj.group = data?.chart_data?.group_by || []
+				const chartCount = data?.chart_data?.count || []
 
 				chartObj.chart = formatBLPChartsData(chartTypeAbbr, colorScheme, chartCount)
 
