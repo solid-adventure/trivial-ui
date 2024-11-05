@@ -48,7 +48,7 @@
 		if (orgId.value) await dashboardInit(orgId.value)
 	})
 
-	const dashboardInit = async id => {
+	/*const dashboardInit = async id => {
 		await store.dispatch('register')
 
 		if (id === null) {
@@ -72,6 +72,38 @@
 					sortedCharts.map(async item => item.chart_data = await getChartsData(item))
 				)
 
+				allCharts.value = sortedCharts
+			}
+		}
+	}*/
+
+	const dashboardInit = async id => {
+		await store.dispatch('register')
+
+		if (id === null) {
+			showInfoToast('Info', selectOrgMsgInfo, 3000)
+			loading.value = false
+			return
+		}
+
+		if (id) {
+			if (dashboards.value) {
+				dashboard = getDashboard(dashboards.value)
+			}
+
+			if (dashboard) {
+				// Step 1: Fetch all charts first
+				const res = await getAllCharts(dashboard.id)
+
+				// Step 2: Fetch data for each chart one by one
+				for (const item of res.charts) {
+					if (item !== null) item.chart_data = await getChartsData(item)
+				}
+
+				// Step 3: Filter and sort the charts
+				const sortedCharts = res.charts.filter(chart => chart !== null).sort((a, b) => sortChartsByType(a.chart_type, b.chart_type))
+
+				// Step 4: Update allCharts.value after all data is set
 				allCharts.value = sortedCharts
 			}
 		}

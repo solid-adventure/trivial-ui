@@ -67,7 +67,7 @@
 	import { useFormatCurrency } from '@/composable/formatCurrency.js';
 	import moment from 'moment-timezone';
 	import { useToastNotifications } from '@/composable/toastNotification';
-	import { useDateTimeZoneOptions } from '@/composable/dateTimeZoneOptions';
+
 	//const props = defineProps(['selected']);
 
 	const props = defineProps({
@@ -80,14 +80,13 @@
 
 	const store = useStore(),
 		op = ref([]),
-		{ timeZoneOptions } = useDateTimeZoneOptions(),
-		timezone = timeZoneOptions.timeZone,
+		timezone = props.chart?.default_timezones[0],
 		apiOptionsObj = {
-			register_id: null,
+			register_id: props.chart?.register_id,
 			start_at: null,
 			end_at: moment.tz(timezone).endOf('day').format(),
  			timezone: timezone,
- 			invert_sign: false
+ 			invert_sign: props.chart?.invert_sign
 		},
 		selectedActuals = ref([
 			{ key: 'last1DayData', name: 'Last Day Revenue', value: null, icon: null, class: null, datetimeOffset: { days: 1 } },
@@ -114,8 +113,7 @@
 		// last3MonthsOffset = moment(last3Months).tz(timezone).subtract({ months: 3 }),
 		// last1YearOffset = moment(last1Year).tz(timezone).subtract({ months: 6 })
 
-	let regId = null,
-		allActualsData = null,
+	let allActualsData = null,
 		dashboard = null,
 		allDashboards = null
 
@@ -125,17 +123,15 @@
 		dashboards = computed(() => store.getters.getDashboards)
 
 	watch(() => store.getters.getRegisterId, async newVal => {
-		regId = newVal
-
-		if (regId) await initActualsData()
+		if (newVal) await initActualsData()
 	})
 
 	watch(dashboards, (newVal, oldVal) => dashboardInit())
 
 	onMounted(async () => {
 		if (dashboards.value) dashboardInit()
-		regId = getRegId.value
-		if (regId) await initActualsData()
+
+		if (getRegId.value) await initActualsData()
 	})
 
 	const initActualsData = async () => {
@@ -148,9 +144,8 @@
 	}
 
 	const getActuals = async (options, datePeriod) => {
-		options.register_id = regId
 		options.start_at = datePeriod.startOf('day').format()
-		options.invert_sign = props.chart?.invert_sign
+
 		try {
 			return await store.state.Session.apiCall('/reports/item_sum', 'POST', options)
 		} catch (err) {
