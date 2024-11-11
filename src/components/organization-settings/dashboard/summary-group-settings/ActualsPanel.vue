@@ -1,14 +1,14 @@
 <template>
-	<div class="flex actuals__panels">
+	<div class="flex w-full actuals__panels">
 		<Panel class="w-9 border-noround-right pt-2" :pt="{header: {class: 'pb-0'}}">
 			<div class="flex flex-column">
 				<div class="flex justify-content-between align-items-center w-full">
 					<h2 class="flex justify-content-between align-items-center m-0 gap-2 font-semibold">
-						Actuals
+						{{ props.chart.name }}
 
 						<Button type="button" icon="pi pi-info-circle" severity="secondary" size="small" text rounded outlined aria-label="Info" @click="toggleInfoPopup" class="info__btn p-0 w-1rem h-1rem" />
 						<OverlayPanel ref="infoPopup">
-							<p class="m-0">This is a Actuals section.</p>
+							<p class="m-0">This is a {{ props.chart.name }} section.</p>
 						</OverlayPanel>
 					</h2>
 
@@ -45,8 +45,6 @@
 	<CustomizeActualsDialog :visible="isDialogOpen" :selected="selected" @saveSelected="updateSelected" @closeModal="closeDialog" :initInvertSign="invertSign" />
 
 	<ActualsExampleDialog :visible="isExampleDialogOpen" @closeExampleModal="closeExampleDialog" :selected="selected" />
-
-	<!--<AuditLogs :visible="isAuditLogsOpen" @closeAuditLogsSidebar="closeAuditLogs" />-->
 </template>
 
 <script setup>
@@ -56,9 +54,16 @@
 	import { useToastNotifications } from '@/composable/toastNotification'
 	import CustomizeActualsDialog from './CustomizeActualsDialog.vue'
 	import ActualsExampleDialog from './ActualsExampleDialog.vue'
-	import AuditLogs from './AuditLogs.vue'
 	import ActualsLightImgPreview from '@/assets/images/organization-settings/light/actuals-preview.svg'
 	import ActualsDarkImgPreview from '@/assets/images/organization-settings/dark/actuals-preview.svg'
+
+	const props = defineProps({
+		chart: {
+			type: Object,
+			required: true,
+			default: {}
+		}
+	})
 
 	const infoPopup = ref(),
 		isDialogOpen = ref(false),
@@ -107,6 +112,7 @@
 
 	watch(orgId, (newVal, oldVal) => dashboardInit())
 	watch(dashboards, (newVal, oldVal) => dashboardInit())
+	watch(() => props.chart, newVal => dashboardInit())
 
 	watch(() => store.getters.getIsDarkTheme, async (newVal, oldVal) => {
 		thumbnailImgPreview.value = newVal ? ActualsDarkImgPreview : ActualsLightImgPreview
@@ -140,10 +146,14 @@
 	}
 
 	const dashboardInit = () => {
-		loading.value = true
+		/*loading.value = true
 		dashboard = getDashboard(dashboards.value)
 		chart = getChart(dashboard)
 		invertSign.value = chart?.invert_sign
+		loading.value = false*/
+
+		loading.value = true
+		invertSign.value = props.chart?.invert_sign
 		loading.value = false
 	}
 

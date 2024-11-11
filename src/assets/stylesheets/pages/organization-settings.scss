@@ -150,7 +150,7 @@
 
 		& .revenue__gross__draggable {
 			min-height: 11rem;
-			background-image: url('/src/assets/images/organization-settings/light/dropzone-placeholder.svg');
+			background-image: url('/src/assets/images/organization-settings/icons/dropzone-placeholder.svg');
 			background-repeat: no-repeat;
 			background-size: contain;
 			background-position: center;
@@ -207,6 +207,25 @@
 		display: none;
 	}
 }
+
+.org-settings__dialog__newchart {
+	width: 40.5rem;
+
+	textarea {
+		resize: none;
+	}
+}
+
+.revenue__gross.org-settings__dialog__newchart {
+	& .revenue__gross__draggable {
+		min-height: 3.5rem;
+		background-image: url('/src/assets/images/organization-settings/icons/dropzone-newchart-placeholder.svg');
+		background-repeat: no-repeat;
+		background-size: contain;
+		background-position: center;
+	}
+}
+
 
 @media only screen and (max-width: 430px) {
 	.actuals__panels, .gross__revenue__panels, .forecast__panels,
