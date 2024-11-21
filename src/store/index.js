@@ -368,7 +368,7 @@ const store = createStore({
         await dispatch('loadApps', {dispatch})
       }
 
-      if ( ['Activity', 'Show App', 'Builder', 'Panels', 'Settings'].includes(routeName) ) {
+      if ( ['Activity', 'Show App', 'Builder', 'Panels', 'Settings', 'Rerun'].includes(routeName) ) {
         await dispatch('loadApp', { dispatch, appId: router.currentRoute.value.params.id })
       }
     },

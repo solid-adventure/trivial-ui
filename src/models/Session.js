@@ -10,7 +10,7 @@ export default class Session {
     return new URL(path, TRIVIAL_API_URL)
   }
 
-  static async apiCall(path, method='GET', data, format='json', stream=false) {
+  static async apiCall(path, method='GET', data, format='json', stream=false, streamedResponse=[]) {
     const session = Session.current
 
     const options = {
@@ -27,14 +27,16 @@ export default class Session {
       options.body = JSON.stringify(data)
     }
     return fetch(this.apiUrl(path), options)
-    .then(response => Session.handleResponse(response, format, stream))
+    .then(response => Session.handleResponse(response, format, stream, streamedResponse))
   }
 
-  static async handleResponse(response, format, stream) {
+  static async handleResponse(response, format, stream, streamedResponse) {
     if (!response.ok) {
       return this.handleErrorResponse(response)
     } else if (format == 'csv' && stream == true) {
       return this.handleCSVResponse(response)
+    } else if (format == 'json' && stream == true) {
+      this.handleStreamedJSONResponse(response, streamedResponse)
     } else {
       return this.handleJSONResponse(response)
     }
@@ -64,6 +66,23 @@ export default class Session {
       throw new Error(response.statusText)
     } else {
       throw new Error("Request failed")
+    }
+  }
+
+  static async handleStreamedJSONResponse(response, streamedResponse) {
+    const reader = response.body.getReader()
+    const decoder = new TextDecoder('utf-8')
+    let partialLine = ''
+    let done, value
+    while (!done) {
+      ({ done, value } = await reader.read())
+      if (value) {
+        let chunk = partialLine + decoder.decode(value)
+        const lines = chunk.split('\n')
+        partialLine = lines.pop()
+        const message = JSON.parse(lines[0]).message
+        streamedResponse.push(message)
+      }
     }
   }
 
