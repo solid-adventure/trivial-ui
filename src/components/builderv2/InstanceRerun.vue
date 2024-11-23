@@ -61,7 +61,7 @@
       <button @click="handleReRun">Re-run</button>
     </p>
 
-    <pre>{{ streamedResponse.join('\n') }}</pre>
+    <pre><span v-for="line of streamedResponse">Rerun {{ line.run_id }}, {{ line.message }}<br /></span> </pre>
 
   </div>
 

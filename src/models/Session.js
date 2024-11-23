@@ -80,8 +80,8 @@ export default class Session {
         let chunk = partialLine + decoder.decode(value)
         const lines = chunk.split('\n')
         partialLine = lines.pop()
-        const message = JSON.parse(lines[0]).message
-        streamedResponse.push(message)
+        const data = JSON.parse(lines[0])
+        streamedResponse.push(data)
       }
     }
   }
