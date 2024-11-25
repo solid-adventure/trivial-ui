@@ -20,12 +20,6 @@
 	</nav>
 
 	<nav class="aside__nav aside__nav--secundary">
-		<RouterLink to="/auditlogs" class="aside__nav__link">
-			<div>
-				<Icon icon="fa6-solid:file-lines" />
-				<span>Audit Logs</span>
-			</div>
-		</RouterLink>
 		<RouterLink :to="orgSettingsPath" class="aside__nav__link">
 			<div>
 				<Icon icon="fa6-solid:gear" />
