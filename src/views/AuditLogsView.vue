@@ -105,10 +105,7 @@
         sortField = ref(null),
         sortOrder = ref(null),
         queryFilters = ref([]),
-        filters = ref({
-          user_id: { constraints: [{ value: null, matchMode: 'equals' }] },
-          created_at: { operator: 'and', constraints: [{ value: null, matchMode: 'dateIs' }] }
-        }),
+        filters = ref({}),
         columns = [
             { field: 'created_at', header: 'Timestamp' },
             { field: 'user_id', header: 'User ID' },
@@ -138,23 +135,33 @@
         }
     }))
 
-    watch(orgId, async newVal => newVal ? await loadAuditData() : auditRows.value = [])
+    const defaultFilters = ref({
+        user_id: { constraints: [{ value: null, matchMode: 'equals' }] },
+        created_at: { operator: 'and', constraints: [{ value: null, matchMode: 'dateIs' }]
+        }
+    })
+
+
+    watch(orgId, async (newVal) => loadAuditData())
 
     onMounted(async () => {
         if (Object.keys(route.query).length) {
             getQueryFilters(route.query)
             setQueryFilters()
         }
-        await loadAuditData()
+        filters.value = toRaw(defaultFilters.value)
+        loadAuditData()
     })
 
     const isAddition = line => line.startsWith('+') || line.startsWith('[created]')
     const isRemoval = line => line.startsWith('-') || line.startsWith('[destroyed]')
 
     const loadAuditData = async () => {
-        if (!orgId.value) return
+        if (!orgId.value) {
+            auditRows.value = []
+            return
+        }
         loading.value = true
-
         try {
             const response = await store.state.Session.apiCall(`/organizations/${orgId.value}/audits?${queryString.value}`)
             auditRows.value = response.audits.map(audit => ({
@@ -217,6 +224,8 @@
         return filtersArray.length ? `${query}&search=${encodeURIComponent(JSON.stringify(filtersArray))}` : query
     })
 
+
+// TODO This does a strict equality check on date; date Is will never return results
     const getQueryFilters = async query => {
         // Set pagination and sorting parameters
         rows.value = parseInt(query?.per_page) || 10
@@ -278,42 +287,32 @@
     }
 
     const onFilter = async event => {
-        filters.value = event.filters // Update the filters with the new values
-
         // Reset pagination when filters are applied
         page.value = 1
         first.value = 1
-
-        try {
-            // Reload data with the new filters
-            await loadAuditData()
-        } catch (err) {
-            console.error('Error during filtering:', err)
-        }
+        loadAuditData()
     }
 
     const onFilterClear = async field => {
-        // Reset filters and query parameters specific to 'created_at' or other fields
-        console.log(`TODO: implement clear filter for ${field}`)
-        try {
-            // Reset pagination and load the data with cleared filters
-            page.value = 1
-            await loadAuditData();
-        } catch (err) {
-            console.error('Error clearing filter:', err);
-        }
+        // Reset the value of the filter field without losing reactivity
+        filters.value[field].constraints.forEach(constraint => {
+            constraint.value = null
+        })
+        page.value = 1
+        first.value = 1
+        loadAuditData()
     }
 
     const onPage = async event => {
         first.value = event.first || 0
         rows.value = event.rows || 10
         page.value = event.page + 1
-        await loadAuditData()
+        loadAuditData()
     }
 
     const onSort = async event => {
         sortField.value = event.sortField
         sortOrder.value = event.sortOrder === 1 ? 'ASC' : 'DESC'
-        await loadAuditData()
+        loadAuditData()
     }
 </script>
