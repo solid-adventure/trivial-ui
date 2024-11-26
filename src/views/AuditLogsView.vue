@@ -57,13 +57,13 @@
 
             <template #body="{ data }">
                 <template v-if="col.field === 'audited_changes'">
-                    <p v-for="(item, index) in data[col.field]" :key="index">
+                    <template v-for="(item, index) in data[col.field]" :key="index">
                         <template v-if="item.patch">
                             <!-- Iterate over the lines in the patch so we can apply styles -->
-                            <div class="patch-diff" :class="{'text-ellipsis': item?.patch.split('\n').length > 10}">
+                            <div class="patch-diff">
                                 <template v-for="(line, index) in item?.patch.split('\n')" :key="index">
-                                    <div v-if="line.startsWith('+')" class="text-added">{{ line }}</div>
-                                    <div v-else-if="line.startsWith('-')" class="text-removed">{{ line }}</div>
+                                    <div v-if="isAddition(line)" class="text-added">{{ line }}</div>
+                                    <div v-else-if="isRemoval(line)" class="text-removed">{{ line }}</div>
                                     <div v-else>{{ line }}</div>
                                 </template>
                             </div>
@@ -71,7 +71,7 @@
                         <template v-else>
                             Patch not found
                         </template>
-                    </p>
+                    </template>
                 </template>
                 <template v-else>
                     <div class="whitespace-nowrap">{{ formattedValue(data[col.field], col.field) }}</div>
@@ -110,14 +110,13 @@
           created_at: { operator: 'and', constraints: [{ value: null, matchMode: 'dateIs' }] }
         }),
         columns = [
-            { field: 'id', header: 'Audit ID' },
+            { field: 'created_at', header: 'Timestamp' },
             { field: 'user_id', header: 'User ID' },
             { field: 'user_name', header: 'User' },
             { field: 'reference_type', header: 'Object' },
             { field: 'reference_id', header: 'ID' },
             { field: 'reference_name', header: 'Name' },
             { field: 'audited_changes', header: 'Description' },
-            { field: 'created_at', header: 'Timestamp' }
         ],
         selectOrgMsgInfo = 'Please, select an organization.'
 
@@ -148,6 +147,9 @@
         }
         await loadAuditData()
     })
+
+    const isAddition = line => line.startsWith('+') || line.startsWith('[created]')
+    const isRemoval = line => line.startsWith('-') || line.startsWith('[destroyed]')
 
     const loadAuditData = async () => {
         if (!orgId.value) return
@@ -292,14 +294,7 @@
 
     const onFilterClear = async field => {
         // Reset filters and query parameters specific to 'created_at' or other fields
-        if (field === 'created_at') {
-            resetQueryFilters()
-            clearQueryParams()
-        }
-
-        // Reset the filter for the specific field to its default state
-        setDefaultFilters(field)
-
+        console.log(`TODO: implement clear filter for ${field}`)
         try {
             // Reset pagination and load the data with cleared filters
             page.value = 1
