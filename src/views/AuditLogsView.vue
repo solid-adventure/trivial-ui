@@ -179,16 +179,6 @@
     const openCSVDialog = () => csvDialogVisible.value = true
     const closeCSVDialog = () => csvDialogVisible.value = false
     const setFilterMatchModes = field => field === 'created_at' ? dateFilterMatchModes : textFilterMatchModes
-    const clearQueryParams = () => router.replace({ path: route.path, query: {} })
-
-    const resetQueryFilters = () => {
-        queryFilters.value = []
-        filters.value = {
-            id: { constraints: [{ value: null, matchMode: 'equals' }] },
-            user_id: { constraints: [{ value: null, matchMode: 'equals' }] },
-            created_at: { operator: 'and', constraints: [{ value: null, matchMode: 'dateIs' }] }
-        }
-    }
 
     const setQueryFilters = () => {
         let dateMatchModes = ['dateIs', 'dateAfter', 'dateBefore']
@@ -212,79 +202,55 @@
 
         if (sortField.value) query += `&order_by=${sortField.value}&ordering_direction=${sortOrder.value}`
 
-        Object.entries(filters.value).forEach(([key, { constraints }]) => {
-            constraints?.forEach(({ value, matchMode }) => {
+        // NOTE This is duplicated in SalesView.vue, and should be turned into a class specific to
+        //      mapping the filters we get from the UI to the filters the API expects for dates
+        Object.entries(filters.value).forEach(([column, filter]) => {
+            filter.constraints?.forEach(constraint => {
+                let value = constraint.value
                 if (value) {
-                    const filterItem = { c: key, o: filterMatchModeMapping[matchMode], p: key === 'created_at' ? moment(value).tz(timezone).format() : value }
-                    filtersArray.push(filterItem)
+                    if (column === 'created_at' && filterMatchModeMapping[constraint.matchMode] === '=') {
+                        // Date filter 'Date is'
+                        let selectedDate = {
+                            c: column,
+                            o: filterMatchModeMapping.gte, // ">=",
+                            p: moment(value).tz(timezone).startOf('day').utc().format() // midnight on the specified date
+                        },
+                        tomorrowDate = {
+                            c: column,
+                            o: filterMatchModeMapping.lt, // "<",
+                            p: moment(value).tz(timezone).add({ days: 1 }).startOf('day').utc().format() // midnight on the next day
+                        }
+
+                        filtersArray.push(selectedDate, tomorrowDate)
+                    } else if (column === 'created_at' && filterMatchModeMapping[constraint.matchMode] === '>') {
+                        // Date filter 'Date is on or after'
+                        filtersArray.push({
+                            c: column,
+                            o: filterMatchModeMapping[constraint.matchMode],
+                            p: moment(value).tz(timezone).startOf('day').utc().format()
+                        })
+                    } else if (column === 'created_at' && filterMatchModeMapping[constraint.matchMode] === '<') {
+                        // Date filter 'Date is on or before'
+                        filtersArray.push({
+                            c: column,
+                            o: filterMatchModeMapping[constraint.matchMode],
+                            p: moment(value).tz(timezone).endOf('day').utc().format()
+                        })
+                    } else {
+                        filtersArray.push({
+                            c: column,
+                            o: filterMatchModeMapping[constraint.matchMode],
+                            p: value
+                        })
+                    }
                 }
+
+
             })
         })
 
         return filtersArray.length ? `${query}&search=${encodeURIComponent(JSON.stringify(filtersArray))}` : query
     })
-
-
-// TODO This does a strict equality check on date; date Is will never return results
-    const getQueryFilters = async query => {
-        // Set pagination and sorting parameters
-        rows.value = parseInt(query?.per_page) || 10
-        page.value = parseInt(query?.page) || 1
-        sortField.value = query?.order_by || null
-        sortOrder.value = query?.ordering_direction || null
-
-        // Handle 'search' query parameter
-        if (query?.search) {
-            try {
-                const filtersArray = JSON.parse(query.search) // Parse the search query array
-
-                // Clear existing query filters
-                queryFilters.value = []
-
-                // Map each filter item to the appropriate format
-                filtersArray.forEach(({ c: column, o: operator, p: value }) => {
-                    let filterObj = { key: column, value, matchMode: null }
-
-                    // Determine match mode based on the column and operator
-                    if (column === 'created_at' && moment(value).isValid()) {
-                        switch (operator) {
-                            case '>=':
-                                filterObj.matchMode = 'dateAfter'
-                                filterObj.value = moment(value).tz(timezone).format('L')
-                                break
-                            case '<':
-                                filterObj.matchMode = 'dateBefore'
-                                filterObj.value = moment(value).tz(timezone).format('L')
-                                break
-                            case '=':
-                                filterObj.matchMode = 'dateIs'
-                                filterObj.value = moment(value).tz(timezone).format('L')
-                                break
-                        }
-                    } else {
-                        // Set match mode for other columns
-                        switch (operator) {
-                            case '=':
-                                filterObj.matchMode = 'equals'
-                                filterObj.value = value
-                                break
-                            case '!=':
-                                filterObj.matchMode = 'notEquals'
-                                filterObj.value = value
-                                break
-                        }
-                    }
-
-                    // Push configured filter if match mode is set
-                    if (filterObj.matchMode) {
-                        queryFilters.value.push(filterObj)
-                    }
-                });
-            } catch (error) {
-                console.error('Error parsing search parameter:', error)
-            }
-        }
-    }
 
     const onFilter = async event => {
         // Reset pagination when filters are applied
