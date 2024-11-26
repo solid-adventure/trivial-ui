@@ -68,13 +68,23 @@ export default class Session {
   }
 
   static async handleCSVResponse(response) {
+
     const reader = response.body.getReader()
     const decoder = new TextDecoder('utf-8')
 
     let streamedLines = [];
     let streamedLinesTotal = Number(response.headers.get('x-items-count'))
+
     store.commit("setStreamedLinesTotal", streamedLinesTotal)
     store.commit("setStreamStatus", 'open')
+
+    const contentDisposition = response.headers.get('Content-Disposition')
+    const filename = contentDisposition
+      ? contentDisposition.split('filename=')[1].replace(/["]/g, '')
+      : `export-${Date.now()}.csv`
+    store.commit("setStreamFilename", filename)
+
+
 
     let partialLine = ''
     let done, value

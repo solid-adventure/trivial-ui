@@ -101,7 +101,7 @@
 		</ColumnGroup>
 	</DataTable>
 
-	<CSVExportDialog :csvDialogVisible="csvDialogVisible" :regId="register?.id" :queryString="queryString" :registerName="register?.name" @closeCSVExportDialog="closeCSVDialog" />
+	<CSVExportDialog :csvDialogVisible="csvDialogVisible" :downloadPath="csvDownloadPath" @closeCSVExportDialog="closeCSVDialog" />
 </template>
 
 <script setup>
@@ -484,6 +484,10 @@
 			console.log(err)
 		}
 	}
+
+	const csvDownloadPath = computed(() => {
+		return `/register_items.csv?register_id=${regId.value}&${queryString.value}`
+	})
 
 	const queryString = computed(() => {
 		let query = `per_page=${rows.value}&page=${page.value}`,

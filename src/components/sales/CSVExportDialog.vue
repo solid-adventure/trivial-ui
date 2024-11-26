@@ -70,21 +70,11 @@
 			reqired: true,
 			default: false
 		},
-		regId: {
-			type: Number,
-			required: true,
-			default: 0
-		},
-		queryString: {
+		downloadPath: {
 			type: String,
 			reqired: true,
 			default: ''
 		},
-		registerName: {
-			type: String,
-			required: false,
-			default: 'CSV_Export'
-		}
 	})
 
 	const emit = defineEmits(['closeCSVExportDialog'])
@@ -98,6 +88,7 @@
 	const streamProgress = computed(() => parseInt(Math.floor((streamedLines.value / streamedLinesTotal.value) * 100)))
 	const streamedLines = computed(() => store.getters.getStreamedLines)
 	const streamedLinesTotal = computed(() => store.getters.getStreamedLinesTotal)
+	const streamFilename = computed(() => store.getters.getStreamFilename)
 	const streamPending = computed(() => streamStatus.value === 'pending')
 	const streamOpen = computed(() => streamStatus.value === 'open')
 	const streamClosed = computed(() => streamStatus.value === 'closed')
@@ -130,7 +121,7 @@
 
 		try {
 			let csvData = await store.state.Session.apiCall(
-				`/register_items.csv?register_id=${props.regId}&${props.queryString}`,
+				props.downloadPath,
 				'GET',
 				undefined,
 				'csv',
@@ -157,7 +148,7 @@
 		link = document.createElement('a')
 
 		link.href = url
-		link.setAttribute('download', `${props.registerName}.csv`)
+		link.setAttribute('download', streamFilename.value)
 		document.body.appendChild(link)
 		link.click()
 	}

@@ -57,7 +57,7 @@
 
             <template #body="{ data }">
                 <template v-if="col.field === 'audited_changes'">
-                    <p v-for="(item, index) in data[col.field]" :key="index" class="flex flex-column max-w-24rem m-0" :class="{'text-hidden': index > 9}">
+                    <p v-for="(item, index) in data[col.field]" :key="index">
                         <template v-if="item.patch">
                             <!-- Iterate over the lines in the patch so we can apply styles -->
                             <div class="patch-diff" :class="{'text-ellipsis': item?.patch.split('\n').length > 10}">
@@ -71,10 +71,6 @@
                         <template v-else>
                             Patch not found
                         </template>
-
-                        <router-link v-if="index === 9 || item?.patch.split('\n').length > 10" :to="`/audits/${data.id}`" rel="noopener" class="w-5 inline-block details__link">
-                            <Button label="View Details" link class="text-sm" icon="pi pi-link" iconPos="right" />
-                        </router-link>
                     </p>
                 </template>
                 <template v-else>
@@ -84,7 +80,8 @@
         </Column>
     </DataTable>
 
-    <CSVExportDialog :csvDialogVisible="csvDialogVisible" :regId="register?.id" :queryString="queryString" :registerName="register?.name" @closeCSVExportDialog="closeCSVDialog" />
+    <CSVExportDialog :csvDialogVisible="csvDialogVisible" :downloadPath="csvDownloadPath" @closeCSVExportDialog="closeCSVDialog" />
+
 </template>
 
 <script setup>
@@ -195,6 +192,10 @@
     const formattedValue = (value, column) => {
         return column === 'created_at' ? useFormatDate(value, dateOptions) + ' at ' + useFormatDate(value, timeOptions) : value
     }
+
+    const csvDownloadPath = computed(() => {
+        return `/organizations/${orgId.value}/audits.csv?${queryString.value}`
+    })
 
     const queryString = computed(() => {
         let query = `per_page=${rows.value}&page=${page.value}`;
