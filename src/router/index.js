@@ -12,6 +12,7 @@ import Settings from "../components/Settings.vue";
 import AccountLocked from "../components/AccountLocked.vue";
 import InstanceSettings from "../components/InstanceSettings.vue";
 import InstanceActivity from "../components/builderv2/InstanceActivity.vue";
+import InstanceRerun from "../components/builderv2/InstanceRerun.vue";
 import Builder from "../components/builderv2/Builder.vue";
 import OrganizationSettings from "../components/OrganizationSettings.vue"; //THIS IS DEPRICATED FILE
 import OrganizationInviteUser from "../components/OrganizationInviteUser.vue";
@@ -88,6 +89,10 @@ const routes = [
   { path: "/apps/:id/activity",
     component: InstanceActivity,
     name: "Activity"
+  },
+  { path: "/apps/:id/rerun",
+    component: InstanceRerun,
+    name: "Rerun"
   },
   { path: "/apps/:id/builder2",
     component: Builder,
