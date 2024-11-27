@@ -47,6 +47,7 @@ const store = createStore({
     enableBuildApps: import.meta.env.VITE_ENABLE_BUILD_APPS,
     enableWebhookAppTrigger: import.meta.env.VITE_ENABLE_WEBHOOK_APP_TRIGGER,
     Session: Session,
+    streamFilename: '',
     streamStatus: '', // 'closed'
     streamedLines: 0,
     streamedLinesTotal: 1,
@@ -116,6 +117,9 @@ const store = createStore({
     },
     getStreamedLinesTotal(state) {
       return state.streamedLinesTotal
+    },
+    getStreamFilename(state) {
+      return state.streamFilename
     },
     getStreamStatus(state) {
       return state.streamStatus
@@ -328,6 +332,9 @@ const store = createStore({
     },
     setStreamedLinesTotal(state, value) {
       state.streamedLinesTotal = value
+    },
+    setStreamFilename(state, value) {
+      state.streamFilename = value
     },
     setStreamStatus(state, value) {
       state.streamStatus = value
@@ -615,11 +622,13 @@ const store = createStore({
     async resetStreamInfo({ commit, state }) {
       commit('setStreamedLines', 0)
       commit('setStreamedLinesTotal', 1)
+      commit('setStreamFilename', '')
       commit('setStreamStatus', 'closed')
     },
     async cancelStream({ commit, state }) {
       commit('setStreamedLines', 0)
       commit('setStreamedLinesTotal', 1)
+      commit('setStreamFilename', '')
       commit('setStreamStatus', 'cancelling')
     },
     async setStreamValue({ commit, state }, status) {

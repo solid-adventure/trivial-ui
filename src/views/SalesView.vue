@@ -101,7 +101,7 @@
 		</ColumnGroup>
 	</DataTable>
 
-	<CSVExportDialog :csvDialogVisible="csvDialogVisible" :regId="register?.id" :queryString="queryString" :registerName="register?.name" @closeCSVExportDialog="closeCSVDialog" />
+	<CSVExportDialog :csvDialogVisible="csvDialogVisible" :downloadPath="csvDownloadPath" @closeCSVExportDialog="closeCSVDialog" />
 </template>
 
 <script setup>
@@ -493,6 +493,10 @@
 		}
 	}
 
+	const csvDownloadPath = computed(() => {
+		return `/register_items.csv?register_id=${regId.value}&${queryString.value}`
+	})
+
 	const queryString = computed(() => {
 		let query = `per_page=${rows.value}&page=${page.value}`,
 			filtersArray = []
@@ -501,6 +505,8 @@
 			query += `&order_by=${sortField.value}&ordering_direction=${sortOrder.value}`
 		}
 
+    // NOTE This is duplicated in AuditLogsView.vue, and should be turned into a class specific to
+    //      mapping the filters we get from the UI to the filters the API expects for dates
 		Object.entries(filters.value).forEach(([column, filter]) => {
 			filter.constraints?.forEach(constraint => {
 				let value = constraint.value

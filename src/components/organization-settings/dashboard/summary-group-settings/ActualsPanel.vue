@@ -46,7 +46,6 @@
 
 	<ActualsExampleDialog :visible="isExampleDialogOpen" @closeExampleModal="closeExampleDialog" :selected="selected" />
 
-	<!--<AuditLogs :visible="isAuditLogsOpen" @closeAuditLogsSidebar="closeAuditLogs" />-->
 </template>
 
 <script setup>
@@ -56,7 +55,6 @@
 	import { useToastNotifications } from '@/composable/toastNotification'
 	import CustomizeActualsDialog from './CustomizeActualsDialog.vue'
 	import ActualsExampleDialog from './ActualsExampleDialog.vue'
-	import AuditLogs from './AuditLogs.vue'
 	import ActualsLightImgPreview from '@/assets/images/organization-settings/light/actuals-preview.svg'
 	import ActualsDarkImgPreview from '@/assets/images/organization-settings/dark/actuals-preview.svg'
 
@@ -73,11 +71,11 @@
 						icon: 'pi pi-cog',
 						command: () => openDialog()
 					},
-					/*{
+					{
 						label: 'Audit Logs',
 						icon: 'pi pi-file',
 						command: () => openAuditLogs()
-					}*/
+					}
 				]
 			}
 		]),

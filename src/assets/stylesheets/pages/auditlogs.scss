@@ -1,0 +1,37 @@
+.patch-diff {
+	font-size: .9rem;
+	font-family: monospace;
+	white-space: pre-wrap;
+
+	&.text-ellipsis {
+		display: -webkit-box;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 10;
+	}
+
+	.text-added, .text-removed {
+		color: rgb(10, 48, 105);
+	}
+
+	.text-added {
+		background-color: rgb(209, 248, 217);
+	}
+
+	.text-removed {
+		background-color: rgb(255, 206, 203);
+	}
+}
+
+.details__link {
+	place-self: flex-end;
+}
+
+.whitespace-nowrap {
+	white-space: nowrap;
+}
+
+.text-hidden {
+	display: none !important;
+}
