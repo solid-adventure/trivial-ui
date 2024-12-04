@@ -71,6 +71,10 @@
 						<div class="date">{{ useFormatDate(data.originated_at, dateOptions) }}</div>
 						<div class="time">{{ useFormatDate(data.originated_at, timeOptions) }} {{ useFormatDate(data.originated_at, timeZoneOptions).split(' ')[1] }}</div>
 					</span>
+					<span v-else-if="col.field == 'unique_key'" class="multi-line">
+						<div class="line_one"><strong>{{ data.description }}</strong></div>
+						<div class="line_two">{{ data.unique_key }}</div>
+					</span>
 					<span v-else-if="col.field == 'amount'">{{ useFormatCurrency(data[col.field], 2, data['units']) }}</span>
 					<span v-else-if="col.field == 'activity'">
 						<Button type="button" text :severity="isActivityButtonState(data.id, 'disabled') ? 'danger' : 'secondary'" :icon="isActivityButtonState(data.id, 'disabled') ? 'pi pi-ban': 'pi pi-link'" :loading="isActivityButtonState(data.id, 'loading')" :disabled="isActivityButtonState(data.id, 'disabled')" @click="getActivityLink(data.id)" />
@@ -153,7 +157,7 @@
 	let columns = [],
 		defaultColumns = [
 			{field: 'originated_at', header: 'Date'},
-			{field: 'description', header: 'Description'},
+			{field: 'invoice_id', header: 'Invoice'},
 			{field: 'unique_key', header: 'Unique Key'},
 			{field: 'amount', header: 'Amount'}
 		],
@@ -581,3 +585,19 @@
 		}
 	}
 </script>
+
+<style scoped>
+
+span.multi-line {
+
+	.line_one {
+		font-weight: 600;
+	}
+
+	.line_two {
+		font-size: 0.8em;
+	}
+
+}
+
+</style>
