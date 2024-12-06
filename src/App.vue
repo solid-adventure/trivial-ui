@@ -156,5 +156,18 @@ export default {
       }
     },
   },
+  mounted() {
+    this.setDefaultColorScheme()
+    this.getDefaultColorScheme()
+  },
+  methods: {
+    setDefaultColorScheme() {
+      localStorage.setItem('vueuse-color-scheme', 'light')
+    },
+    getDefaultColorScheme() {
+      let storedDefaultTheme = localStorage.getItem('vueuse-color-scheme')
+      if (storedDefaultTheme === 'light') document.querySelector("html").setAttribute("color-scheme", storedDefaultTheme)
+    }
+  }
 };
 </script>
