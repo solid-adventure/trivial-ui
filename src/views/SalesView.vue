@@ -570,14 +570,25 @@
 			try {
 				filtersArray = JSON.parse(query?.search)
 
-				let dateBefore = { value: moment(filtersArray[0].p).tz(timezone).format('L'), matchMode: 'dateBefore'},
-					dateAfter = { value: moment(filtersArray[1].p).tz(timezone).format('L'), matchMode: 'dateAfter'}
+				let isSameDate = moment(filtersArray[0].p).add(1, 'seconds').isSame(filtersArray[1].p)
 
-				queryFilters.value.push(dateBefore)
-				queryFilters.value.push(dateAfter)
+				if (isSameDate) {
+					let dateIs = setQueryFilterObj(filtersArray[1].p, 'dateIs')
+					queryFilters.value.push(dateIs)
+				} else {
+					let dateBefore = setQueryFilterObj(filtersArray[0].p, 'dateBefore'),
+						dateAfter = setQueryFilterObj(filtersArray[1].p, 'dateAfter')
+
+					queryFilters.value.push(dateBefore)
+					queryFilters.value.push(dateAfter)
+				}
 			} catch (error) {
 				console.error('Error parsing search parameter:', error)
 			}
 		}
+	}
+
+	const setQueryFilterObj = (date, mode) => { 
+		return { value: moment(date).tz(timezone).format('L'), matchMode: mode }
 	}
 </script>
