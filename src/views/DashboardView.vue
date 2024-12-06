@@ -48,8 +48,9 @@
 		if (orgId.value) await dashboardInit(orgId.value)
 	})
 
-	const dashboardInit = async id => {
+	/*const dashboardInit = async id => {
 		await store.dispatch('register')
+
 		if (id === null) {
 			showInfoToast('Info', selectOrgMsgInfo, 3000)
 			loading.value = false
@@ -62,9 +63,47 @@
 			}
 
 			if (dashboard) {
-				let res = await getAllCharts(dashboard.id)
+				const res = await getAllCharts(dashboard.id)
 
-				let sortedCharts = res.charts.filter(chart => chart !== null).sort((a, b) => sortChartsByType(a.chart_type, b.chart_type))
+				const sortedCharts = res.charts.filter(chart => chart !== null).sort((a, b) => sortChartsByType(a.chart_type, b.chart_type))
+
+				// Use Promise.all to wait for all getChartsData calls
+				await Promise.all(
+					sortedCharts.map(async item => item.chart_data = await getChartsData(item))
+				)
+
+				allCharts.value = sortedCharts
+			}
+		}
+	}*/
+
+	const dashboardInit = async id => {
+		await store.dispatch('register')
+
+		if (id === null) {
+			showInfoToast('Info', selectOrgMsgInfo, 3000)
+			loading.value = false
+			return
+		}
+
+		if (id) {
+			if (dashboards.value) {
+				dashboard = getDashboard(dashboards.value)
+			}
+
+			if (dashboard) {
+				// Step 1: Fetch all charts first
+				const res = await getAllCharts(dashboard.id)
+
+				// Step 2: Fetch data for each chart one by one
+				for (const item of res.charts) {
+					if (item !== null) item.chart_data = await getChartsData(item)
+				}
+
+				// Step 3: Filter and sort the charts
+				const sortedCharts = res.charts.filter(chart => chart !== null).sort((a, b) => sortChartsByType(a.chart_type, b.chart_type))
+
+				// Step 4: Update allCharts.value after all data is set
 				allCharts.value = sortedCharts
 			}
 		}
@@ -89,6 +128,36 @@
 		} catch (err) {
 			console.log(err)
 		}
+	}
+
+	const getChartsData = async params => {
+		let chartData = null,
+			groupBy = setGroupBy(params)
+
+		try {
+			chartData = await store.state.Session.apiCall('/reports/item_sum', 'POST', { 
+				register_id: regId.value, 
+				start_at: params?.time_range_bounds.start_at, 
+				end_at: params?.time_range_bounds.end_at, 
+				group_by_period: params?.report_period, 
+				timezone: params?.default_timezones[0], 
+				group_by: groupBy, 
+				invert_sign: params?.invert_sign 
+			})
+
+			chartData.group_by = groupBy
+			return chartData
+		} catch (err) {
+			console.log(err)
+		}
+	}
+
+	const setGroupBy = data => {
+		const orderMap = {}
+		let orderArray = JSON.parse(localStorage.getItem('grColsOrder')) || []
+
+		orderArray.forEach((item, index) => orderMap[item] = index)
+		return Object.keys(data?.report_groups).filter(item => data?.report_groups[item]).sort((a, b) => orderMap[a] - orderMap[b])
 	}
 
 	/************  API Calls Functions ***************/

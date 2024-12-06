@@ -122,8 +122,7 @@
 	}
 
 	const formatChartData = async data => {
-		let groupByChart = [],
-			chartTypeAbbr = data?.chart_type.split('_')[0] || '',
+		let chartTypeAbbr = data?.chart_type.split('_')[0] || '',
 			colorScheme = data?.color_scheme || 'default',
 			chartObj = {
 				name: data?.name || '',
@@ -135,27 +134,12 @@
 				chart: {}
 			}
 
-		groupByChart = await store.dispatch('setGroupBy', data)
+		if (data?.chart_data) {
+			chartObj.title = data?.chart_data?.title || ''
+			chartObj.group = data?.chart_data?.group_by || []
+			chartObj.count = data?.chart_data?.count || []
 
-		const paramObj = {
-			groupBy: groupByChart,
-			invertSign: data?.invert_sign,
-			chartType: 'table'
-		}
-
-		try {
-			let res = await store.dispatch('getChartsData', paramObj)
-
-			if (res) {
-				chartObj.title = res?.title || ''
-				chartObj.group = groupByChart || ''
-				chartObj.count = res?.count || []
-
-				return chartObj // Return the formatted chart object
-			}
-		} catch (err) {
-			console.error(err)
-			return null // Return null if something fails
+			return chartObj // Return the formatted chart object
 		}
 	}
 

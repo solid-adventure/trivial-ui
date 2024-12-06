@@ -633,28 +633,6 @@ const store = createStore({
     },
     async setStreamValue({ commit, state }, status) {
       commit('setStreamStatus', status)
-    },
-    async getChartsData({ commit, state }, params) {
-      let total = null
-      const timezone = 'Etc/GMT+5', // Etc/GMT+5 -> Not support DST | 'America/Detroit' -> support DST | More info at https://appler.dev/time-zone-table
-        end_at = moment.tz(timezone).format(),
-        start_at = moment.tz(timezone).startOf('year').startOf('day').format(),
-        group_by_period = params.chartType !== 'doughnut' ? 'month' : null
-
-      try {
-        total = await Session.apiCall('/reports/item_sum', 'POST', { register_id: state.registerId, start_at, end_at, group_by_period, timezone, group_by: params.groupBy, invert_sign: params.invertSign })
-
-        return total
-      } catch (err) {
-        console.log(err)
-      }
-    },
-    setGroupBy({ commit, state }, data) {
-      const orderMap = {}
-      let orderArray = JSON.parse(localStorage.getItem('grColsOrder')) || []
-
-      orderArray.forEach((item, index) => orderMap[item] = index)
-      return Object.keys(data.report_groups).filter(item => data.report_groups[item]).sort((a, b) => orderMap[a] - orderMap[b])
     }
   }
 })
