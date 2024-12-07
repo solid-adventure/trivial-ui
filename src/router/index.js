@@ -22,6 +22,8 @@ import SalesView from "@/views/SalesView.vue";
 import DashboardView from "@/views/DashboardView.vue";
 import OrganizationSettingsView from "@/views/OrganizationsSettingsView.vue";
 import ContractsView from "@/views/ContractsView.vue";
+import InvoicesView from "@/views/InvoicesView.vue";
+import InvoicesShow from "@/views/InvoicesShow.vue";
 import Session from "../models/Session.js";
 import { useStore } from 'vuex';
 
@@ -139,6 +141,16 @@ const routes = [
     path: "/contracts",
     component: ContractsView,
     name: "Contracts",
+  },
+  {
+    path: "/invoices",
+    component: InvoicesView,
+    name: "Invoices"
+  },
+  {
+    path: "/invoices/:id",
+    component: InvoicesShow,
+    name: "Invoice"
   },
   {
     path: "/organizations/:pathMatch(.*)*",
