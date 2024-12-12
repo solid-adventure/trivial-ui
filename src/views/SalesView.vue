@@ -370,7 +370,7 @@
 		if (field == 'originated_at') {
 				filters.value[field] = { constraints: [
 					{ value: moment().tz(timezone).startOf('month').utc().format('L'), matchMode: 'dateAfter' }
-				]
+				], operator: 'and'
 			}
 		} else {
 			filters.value[field] = { constraints: [{ value: null, matchMode: defaultMatchMode }] }
