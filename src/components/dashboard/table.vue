@@ -4,6 +4,9 @@
 	      <template #header>
 	        <div class="flex justify-content-between align-items-center">
 	          <h2 class="font-semibold">{{ chart.name }}</h2>
+
+	          <Dropdown v-model="groupByPeriod" :options="groupByPeriodOptions()" class="w-14rem" placeholder="Select Date Group" />
+
 	        </div>
 	      </template>
 
@@ -18,6 +21,7 @@
 	        <h3>Loading ...</h3>
 	      </template>
 
+	      <!-- Dynamic group by columns -->
 		    <Column v-for="(title, index) in groupBy"
 		            :key="title"
 		            :field="`group_${index}`"
@@ -25,10 +29,12 @@
 		            sortable :rowspan="groupBy.length"
 		            class="capitalize"
 		            :frozen="index === 0" />
+        <!-- Period group columns -->
 		    <Column v-for="period in periods"
 		            :key="period"
 		            :field="period"
 		            :header="period"
+		            headerClass="header-right"
 		            class="text-right"
 		            sortable>
 		      <template #body="{ data, field }">
@@ -38,6 +44,7 @@
 		    <Column field="grandTotal"
 		            header="Grand Total"
 		            class="text-right font-bold"
+		            headerClass="header-right"
 		            sortable>
 		      <template #body="{ data }">
 		        {{ useFormatCurrency(data.grandTotal, 2) }}
@@ -57,9 +64,10 @@
 </template>
 
 <script setup>
-	import { computed, ref, onMounted } from "vue"
+	import { computed, ref, onMounted, watch } from "vue"
 	import { useStore } from 'vuex'
 	import { useFormatCurrency } from '@/composable/formatCurrency.js'
+	import { groupByPeriodOptions } from '@/composable/groupByPeriodOptions'
 	import loadingImg from '@/assets/images/trivial-loading-optimized.webp'
 	import { useToastNotifications } from '@/composable/toastNotification'
 
@@ -70,6 +78,8 @@
 			default: {}
 		}
 	})
+
+	const groupByPeriod = ref('')
 
 	const { showSuccessToast, showErrorToast, showInfoToast } = useToastNotifications()
 	const selectedQuarters = ref(),
@@ -136,20 +146,30 @@
 	})
 
 	onMounted(() => {
+		setChartDefaults()
 		getData()
 	})
+
+
+	const setChartDefaults = () => {
+		groupByPeriod.value = props.chart.report_period || 'month'
+	}
 
 	const getDataOptions = computed(() => {
 		return {
 			register_id: store.state.registerId,
 			start_at: props.chart.time_range_bounds.start_at,
 			end_at: props.chart.time_range_bounds.end_at,
-			group_by_period: props.chart.report_period,
+			group_by_period: groupByPeriod.value,
 			timezone: props.chart.default_timezones[0],
 			group_by: groupBy.value,
 			invert_sign: props.chart.invertSign
 		}
 	})
+
+	watch([getDataOptions], () => {
+		getData()
+	}, { deep: true })
 
 	const getData = () => {
 		loading.value = true
