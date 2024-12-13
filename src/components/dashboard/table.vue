@@ -5,45 +5,61 @@
 	        <div class="flex justify-content-between align-items-center">
 	          <h2 class="font-semibold">{{ chart.name }}</h2>
 
-	          <div>
-	          	<span class="mr-2">Group By</span>
-							<MultiSelect
-							  v-model="groupBy"
-							  :options="reportGroupOptions"
-							  optionLabel="label"
-							  optionValue="value"
-							  placeholder="Select Groups"
-							  display="chip"
-							  :maxSelectedLabels="4"
-							  class="w-full md:w-20rem"
-							/>
+						<div>
+						  <FloatLabel class="w-full md:w-20rem">
+						    <MultiSelect
+						      id="group-by"
+						      v-model="groupBy"
+						      :options="reportGroupOptions"
+						      optionLabel="label"
+						      optionValue="value"
+						      display="chip"
+						      :maxSelectedLabels="4"
+						      class="w-full"
+						    />
+						    <label for="group-by">Select Groups</label>
+						  </FloatLabel>
 						</div>
 
-	          <div>
-		          <span class="mr-2">Timezone</span>
-		          <Dropdown v-model="timezone" :options="chart.default_timezones" class="w-14rem" placeholder="Select Timezone" />
-		        </div>
+						<div>
+						  <FloatLabel class="w-14rem">
+						    <Dropdown
+						      id="timezone"
+						      v-model="timezone"
+						      :options="chart.default_timezones"
+						      class="w-full"
+						    />
+						    <label for="timezone">Timezone</label>
+						  </FloatLabel>
+						</div>
 
-	          <div>
-		          <span class="mr-2">Dates</span>
-		          <Dropdown v-model="namedDateRange"
-		          	:options="namedDateRanges()"
-		          	optionLabel="label"
-		          	optionValue="value"
-		          	class="w-14rem"
-		          	placeholder="Select Date Range"
-		          />
-		        </div>
+						<div>
+						  <FloatLabel class="w-14rem">
+						    <Dropdown
+						      id="date-range"
+						      v-model="namedDateRange"
+						      :options="namedDateRanges()"
+						      optionLabel="label"
+						      optionValue="value"
+						      class="w-full"
+						    />
+						    <label for="date-range">Dates</label>
+						  </FloatLabel>
+						</div>
 
-	          <div>
-		          <span class="mr-2">Group By</span>
-		          <Dropdown v-model="groupByPeriod" :options="groupByPeriodOptions()" class="w-14rem" placeholder="Select Date Group" />
-		        </div>
+						<div>
+						  <FloatLabel class="w-14rem">
+						    <Dropdown
+						      id="group-by-period"
+						      v-model="groupByPeriod"
+						      :options="groupByPeriodOptions()"
+						      class="w-full"
+						    />
+						    <label for="group-by-period">Group By</label>
+						  </FloatLabel>
+						</div>
 
-		        <div>
-		        	<span class="mr-2">Invert Sign</span>
-		        	<Checkbox v-model="invertSign" :binary="true" />
-		        </div>
+
 
 	        </div>
 	      </template>
@@ -106,7 +122,7 @@
 
 	   	<div class="footer-signature">
 	      <p>{{ formattedStartAt }} - {{ formattedEndAt }}, {{ timezone }} </p>
-				<p> Prepared at {{ new Date().toLocaleString(undefined, { timeZoneName: 'short' }) }}</p>
+				<p> Prepared {{ new Date().toLocaleString(undefined, { timeZoneName: 'short' }) }}</p>
 	    </div>
 
 
@@ -121,6 +137,7 @@
 	import { namedDateRanges, getDateRangeFromNamed } from '@/composable/namedDateRanges'
 	import loadingImg from '@/assets/images/trivial-loading-optimized.webp'
 	import moment from 'moment-timezone'
+	import FloatLabel from 'primevue/floatlabel';
 	import MultiSelect from 'primevue/multiselect';
 	import { useToastNotifications } from '@/composable/toastNotification'
 
