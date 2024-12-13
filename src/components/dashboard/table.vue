@@ -28,7 +28,7 @@
 		            :header="title.replaceAll('_', ' ')"
 		            sortable :rowspan="groupBy.length"
 		            class="capitalize"
-		            :frozen="index === 0" />
+		            frozen alignFrozen="left" />
         <!-- Period group columns -->
 		    <Column v-for="period in periods"
 		            :key="period"
@@ -45,6 +45,7 @@
 		            header="Grand Total"
 		            class="text-right font-bold"
 		            headerClass="header-right"
+								frozen alignFrozen="right"
 		            sortable>
 		      <template #body="{ data }">
 		        {{ useFormatCurrency(data.grandTotal, 2) }}
@@ -53,9 +54,12 @@
 
 				<ColumnGroup type="footer">
 	        <Row>
-	            <Column footer="Totals:" :colspan="groupBy.length" footerStyle="text-align:right" />
+	            <Column footer="Totals:" :colspan="groupBy.length" footerStyle="text-align:right" frozen alignFrozen="left" />
 	            <Column v-for="period in periods" :footer="useFormatCurrency(getTotalForPeriod(period), 2)" class="text-right" />
-	            <Column :footer="useFormatCurrency(grandTotals, 2)" class="text-right font-bold" />
+	            <Column
+	            	:footer="useFormatCurrency(grandTotals, 2)"
+	            	class="text-right font-bold"
+								frozen alignFrozen="right" />
 	        </Row>
 		    </ColumnGroup>
 
