@@ -93,6 +93,11 @@
 	}
 }
 
+th.header-right div.p-column-header-content {
+ 	display: flex;
+	justify-content: flex-end;
+}
+
 div.p-column-filter-buttonbar {
 	& button.p-button[aria-label="Apply"] {
 		color: white;
