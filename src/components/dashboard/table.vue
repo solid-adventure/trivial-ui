@@ -26,7 +26,13 @@
 
 	          <div>
 		          <span class="mr-2">Dates</span>
-		          <Dropdown v-model="namedDateRange" :options="namedDateRanges()" class="w-14rem" placeholder="Select Date Range" />
+		          <Dropdown v-model="namedDateRange"
+		          	:options="namedDateRanges()"
+		          	optionLabel="label"
+		          	optionValue="value"
+		          	class="w-14rem"
+		          	placeholder="Select Date Range"
+		          />
 		        </div>
 
 	          <div>
@@ -43,7 +49,7 @@
 	      </template>
 
 	      <template #empty>
-	        <div class="flex justify-content-between align-items-center">
+	        <div class="flex justify-content-center align-items-center">
 	          <h2 class="font-semibold">No data</h2>
 	        </div>
 	      </template>
@@ -98,8 +104,11 @@
 
 	    </DataTable>
 
-		          <p>Start: {{ startAt }}</p>
-		          <p>End: {{ endAt }}</p>
+	   	<div class="footer-signature">
+	      <p>{{ formattedStartAt }} - {{ formattedEndAt }}, {{ timezone }} </p>
+				<p> Prepared at {{ new Date().toLocaleString(undefined, { timeZoneName: 'short' }) }}</p>
+	    </div>
+
 
 	  </Panel>
 </template>
@@ -211,17 +220,35 @@
 
 	}
 
+	const formatDateRange = (date, isEndDate = false) => {
+	  if (!date || !timezone.value) return null
+	  return moment.utc(date)
+	    .tz(timezone.value)
+	    [isEndDate ? 'endOf' : 'startOf']('day')
+	    .utc()
+	    .toISOString()
+	}
+
+	const formatDisplayDate = (date) => {
+	  if (!date) return null
+	  return moment(date).tz(timezone.value).format('MM/DD/YYYY h:mm A')
+
+	}
+
 	const startAt = computed(() => {
-		if (!namedDateRange.value || !timezone.value) return null
-		let out = getDateRangeFromNamed(namedDateRange.value)[0]
-		return moment(out).tz(timezone.value).startOf('day').utc()
+	  if (!namedDateRange.value) return null
+	  const [start] = getDateRangeFromNamed(namedDateRange.value)
+	  return formatDateRange(start)
 	})
 
 	const endAt = computed(() => {
-		if (!namedDateRange.value || !timezone.value) return null
-		let out = getDateRangeFromNamed(namedDateRange.value)[1]
-		return moment(out).tz(timezone.value).endOf('day').utc()
+	  if (!namedDateRange.value) return null
+	  const [, end] = getDateRangeFromNamed(namedDateRange.value)
+	  return formatDateRange(end, true)
 	})
+
+	const formattedStartAt = computed(() => formatDisplayDate(startAt.value))
+	const formattedEndAt = computed(() => formatDisplayDate(endAt.value))
 
 	const getDataOptions = computed(() => {
 		return {
@@ -255,5 +282,14 @@
 			})
 	}
 
-
 </script>
+
+<style scoped>
+	div.footer-signature {
+		margin-top: 2rem;
+		font-size: 0.8rem;
+		display: flex;
+		justify-content: space-between;
+	}
+
+</style>
