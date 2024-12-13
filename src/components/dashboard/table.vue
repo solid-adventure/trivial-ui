@@ -5,7 +5,39 @@
 	        <div class="flex justify-content-between align-items-center">
 	          <h2 class="font-semibold">{{ chart.name }}</h2>
 
-	          <Dropdown v-model="groupByPeriod" :options="groupByPeriodOptions()" class="w-14rem" placeholder="Select Date Group" />
+	          <div>
+	          	<span class="mr-2">Group By</span>
+							<MultiSelect
+							  v-model="groupBy"
+							  :options="reportGroupOptions"
+							  optionLabel="label"
+							  optionValue="value"
+							  placeholder="Select Groups"
+							  display="chip"
+							  :maxSelectedLabels="4"
+							  class="w-full md:w-20rem"
+							/>
+						</div>
+
+	          <div>
+		          <span class="mr-2">Timezone</span>
+		          <Dropdown v-model="timezone" :options="chart.default_timezones" class="w-14rem" placeholder="Select Timezone" />
+		        </div>
+
+	          <div>
+		          <span class="mr-2">Dates</span>
+		          <Dropdown v-model="namedDateRange" :options="namedDateRanges()" class="w-14rem" placeholder="Select Date Range" />
+		        </div>
+
+	          <div>
+		          <span class="mr-2">Group By</span>
+		          <Dropdown v-model="groupByPeriod" :options="groupByPeriodOptions()" class="w-14rem" placeholder="Select Date Group" />
+		        </div>
+
+		        <div>
+		        	<span class="mr-2">Invert Sign</span>
+		        	<Checkbox v-model="invertSign" :binary="true" />
+		        </div>
 
 	        </div>
 	      </template>
@@ -41,6 +73,7 @@
 		        {{ useFormatCurrency(data[field], 2) }}
 		      </template>
 		    </Column>
+		    <!-- Grand total column -->
 		    <Column field="grandTotal"
 		            header="Grand Total"
 		            class="text-right font-bold"
@@ -51,7 +84,7 @@
 		        {{ useFormatCurrency(data.grandTotal, 2) }}
 		      </template>
 		    </Column>
-
+		    <!-- Totals footer row -->
 				<ColumnGroup type="footer">
 	        <Row>
 	            <Column footer="Totals:" :colspan="groupBy.length" footerStyle="text-align:right" frozen alignFrozen="left" />
@@ -64,6 +97,10 @@
 		    </ColumnGroup>
 
 	    </DataTable>
+
+		          <p>Start: {{ startAt }}</p>
+		          <p>End: {{ endAt }}</p>
+
 	  </Panel>
 </template>
 
@@ -72,7 +109,10 @@
 	import { useStore } from 'vuex'
 	import { useFormatCurrency } from '@/composable/formatCurrency.js'
 	import { groupByPeriodOptions } from '@/composable/groupByPeriodOptions'
+	import { namedDateRanges, getDateRangeFromNamed } from '@/composable/namedDateRanges'
 	import loadingImg from '@/assets/images/trivial-loading-optimized.webp'
+	import moment from 'moment-timezone'
+	import MultiSelect from 'primevue/multiselect';
 	import { useToastNotifications } from '@/composable/toastNotification'
 
 	const props = defineProps({
@@ -84,18 +124,24 @@
 	})
 
 	const groupByPeriod = ref('')
+	const namedDateRange = ref('')
+	const timezone = ref('')
+	const invertSign = ref(false)
+	const groupByColumns = ref([])
+	const groupBy = ref([])
 
 	const { showSuccessToast, showErrorToast, showInfoToast } = useToastNotifications()
 	const selectedQuarters = ref(),
 			loading = ref(false),
-			headerCols = ref([]),
 			store = useStore()
 
 	const	rawData = ref({})
 
-	const groupBy = computed(() => {
-		const obj = props.chart.report_groups || {}
-		return Object.keys(obj).filter(key => obj[key] === true)
+	const reportGroupOptions = computed(() => {
+		return Object.keys(props.chart.report_groups || {}).map(key => ({
+			value: key,
+			label: key.replaceAll('_', ' ')
+		}))
 	})
 
 	const periods = computed(() => {
@@ -151,23 +197,41 @@
 
 	onMounted(() => {
 		setChartDefaults()
-		getData()
 	})
 
 
 	const setChartDefaults = () => {
-		groupByPeriod.value = props.chart.report_period || 'month'
+		namedDateRange.value = props.chart.default_time_range
+		groupByPeriod.value = props.chart.report_period
+		timezone.value = props.chart.default_timezones[0]
+		invertSign.value = props.chart.invert_sign
+
+		const reportGroups = props.chart.report_groups || {}
+		groupBy.value = Object.keys(reportGroups).filter(key => reportGroups[key] === true)
+
 	}
+
+	const startAt = computed(() => {
+		if (!namedDateRange.value || !timezone.value) return null
+		let out = getDateRangeFromNamed(namedDateRange.value)[0]
+		return moment(out).tz(timezone.value).startOf('day').utc()
+	})
+
+	const endAt = computed(() => {
+		if (!namedDateRange.value || !timezone.value) return null
+		let out = getDateRangeFromNamed(namedDateRange.value)[1]
+		return moment(out).tz(timezone.value).endOf('day').utc()
+	})
 
 	const getDataOptions = computed(() => {
 		return {
 			register_id: store.state.registerId,
-			start_at: props.chart.time_range_bounds.start_at,
-			end_at: props.chart.time_range_bounds.end_at,
+			start_at: startAt.value,
+			end_at: endAt.value,
 			group_by_period: groupByPeriod.value,
-			timezone: props.chart.default_timezones[0],
+			timezone: timezone.value,
+			invert_sign: invertSign.value,
 			group_by: groupBy.value,
-			invert_sign: props.chart.invertSign
 		}
 	})
 
