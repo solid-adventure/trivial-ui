@@ -1,5 +1,13 @@
 <template>
 	<div class="flex flex-column row-gap-4 dashboard">
+
+
+		<!-- Feature stub -->
+		<div v-if="createInvoicesEnabled" class="action-row">
+			<Button value="Create Invoices" class="p-button-primary" @click.prevent="handleCreateInvoices">Create Invoices</Button>
+		</div>
+
+
 		<div v-if="allCharts.length === 0" class="flex justify-content-center align-items-center w-full h-screen">
 			<ProgressSpinner aria-label="Loading" />
 		</div>
@@ -13,6 +21,7 @@
 
 <script setup>
 	import { ref, onMounted, computed, watch, toRaw } from 'vue'
+	import { useRoute } from 'vue-router'
 	import { useStore } from 'vuex'
 	import moment from 'moment-timezone'
 	import table from '@/components/dashboard/table.vue'
@@ -36,9 +45,13 @@
 	let dashboard = null,
 		allCharts = ref([])
 
+	const route = useRoute()
 	const orgId = computed(() => store.getters.getOrgId)
 	const regId = computed(() => store.getters.getRegisterId)
 	const dashboards = computed(() => store.getters.getDashboards)
+	const createInvoicesEnabled = computed(() => {
+		return route.query.createInvoices === 'true'
+	})
 
 	watch(orgId, async (newVal, oldVal) => await dashboardInit(newVal))
 	watch(regId, async (newVal, oldVal) => await dashboardInit(orgId.value))
@@ -91,51 +104,16 @@
 		}
 	}
 
-	/************  API Calls Functions ***************/
-	/*
-		channel: null
-		customer_id: null
-		entity_id: null
-		entity_type: null
-		income_account: true
-		warehouse: false
-	*/
-	/*const createChart = async dashId => {
-		try {
-			let res = await store.state.Session.apiCall(`dashboards/${dashId}/charts`, 'POST', {
-				"register_id": regId,
-				"name": "Actuals",
-				"chart_type": "summary_group",
-				"color_scheme": "default",
-				"report_period": "year",
-				"report_groups": {
-				}
-			})
-			
-			console.log('RES CREATED - ', res)
-		} catch (err) {
-			console.log(err)
-		}
+	const handleCreateInvoices = () => {
+		console.log('TODO: Create Invoices')
+		showSuccessToast('Success', 'Invoices created successfully.')
 	}
 
-	const updateChart = async dashId => {
-		try {
-			let res = await store.state.Session.apiCall(`dashboards/${dashId}/charts/5`, 'PUT', {
-				"name": "Example 3",
-				"chart_type": "doughnut",
-				"color_scheme": "red",
-				"report_period": "month",
-				"report_groups": {
-					"income_account": true,
-					"warehouse": true
-				}
-			})
-			
-			console.log('RES UPDATED - ', res)
-		} catch (err) {
-			console.log(err)
-		}
-	}
-
-	*/
 </script>
+
+<style scoped>
+	div.action-row {
+		display: flex;
+		justify-content: flex-end;
+	}
+</style>
