@@ -60,11 +60,11 @@
 	      </template>
 
 	      <!-- Dynamic group by columns -->
-		    <Column v-for="(title, index) in groupBy"
+		    <Column v-for="(title, index) in groupByColumns"
 		            :key="title"
 		            :field="`group_${index}`"
 		            :header="title.replaceAll('_', ' ')"
-		            sortable :rowspan="groupBy.length"
+		            sortable :rowspan="groupByColumns.length"
 		            class="capitalize"
 		            frozen alignFrozen="left" />
         <!-- Period group columns -->
@@ -93,7 +93,7 @@
 		    <!-- Totals footer row -->
 				<ColumnGroup type="footer">
 	        <Row>
-	            <Column footer="Totals:" :colspan="groupBy.length" footerStyle="text-align:right" frozen alignFrozen="left" />
+	            <Column footer="Totals:" :colspan="groupByColumns.length" footerStyle="text-align:right" frozen alignFrozen="left" />
 	            <Column v-for="period in periods" :footer="useFormatCurrency(getTotalForPeriod(period), 2)" class="text-right" />
 	            <Column
 	            	:footer="useFormatCurrency(grandTotals, 2)"
@@ -136,7 +136,6 @@
 	const namedDateRange = ref('')
 	const timezone = ref('')
 	const invertSign = ref(false)
-	const groupByColumns = ref([])
 	const groupBy = ref([])
 
 	const { showSuccessToast, showErrorToast, showInfoToast } = useToastNotifications()
@@ -166,6 +165,10 @@
 	 	}, 0)
 	})
 
+  const groupByColumns = computed(() => {
+  	return groupBy.value.length > 0 ? groupBy.value : [""]
+  })
+
 	const getTotalForPeriod = period => {
 	  if (!rawData.value?.count) return 0
 	  return rawData.value.count.reduce((acc, item) => {
@@ -183,6 +186,7 @@
 	  const groupMap = new Map()
 
 	  rawData.value.count.forEach(item => {
+	  	item.group = Array.isArray(item.group) ? item.group : [item.group]
 	    const groupKey = item.group.join('_')
 	    if (!groupMap.has(groupKey)) {
 	      const row = {

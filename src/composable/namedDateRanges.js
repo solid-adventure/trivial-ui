@@ -15,7 +15,12 @@ export const namedDateRanges = () => {
     'yesterday',
     'last_week',
     'last_month',
+    // 'last_quarter',
     'last_year',
+    // 'this_week',
+    // 'this_month',
+    // 'this_quarter',
+    // 'this_year',
     'ytd',
     'last_365_days',
   ];
