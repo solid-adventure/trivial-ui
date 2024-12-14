@@ -7,7 +7,7 @@
           <MultiSelect
             id="group-by"
             v-model="modelValue.groupBy"
-            :options="reportGroupOptions"
+            :options="modelValue.groupByOptions"
             optionLabel="label"
             optionValue="value"
             display="chip"
@@ -25,7 +25,9 @@
           <Dropdown
             id="timezone"
             v-model="modelValue.timezone"
-            :options="chart.default_timezones"
+            :options="modelValue.timezoneOptions"
+            optionLabel="label"
+            optionValue="value"
             class="w-full"
             @change="emitUpdate"
           />
@@ -79,10 +81,6 @@ const props = defineProps({
     type: Object,
     required: true
   },
-  chart: {
-    type: Object,
-    required: true
-  },
   showGroupBy: {
     type: Boolean,
     default: true
@@ -102,13 +100,6 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:modelValue'])
-
-const reportGroupOptions = computed(() => {
-  return Object.keys(props.chart.report_groups || {}).map(key => ({
-    value: key,
-    label: key.replaceAll('_', ' ')
-  }))
-})
 
 const emitUpdate = () => {
   emit('update:modelValue', props.modelValue)

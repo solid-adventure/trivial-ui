@@ -12,11 +12,10 @@
 			<ProgressSpinner aria-label="Loading" />
 		</div>
 		<div v-else class="flex flex-wrap gap-3 dashboard__carts">
-			<template v-for="(item, index) in allCharts" :key="index">
 	    <ChartControls
-	      v-model="chartSettings[item.id]"
-	      :chart="item"
+	      v-model="masterChartSettings"
 	    />
+			<template v-for="(item, index) in allCharts" :key="index">
 	    <component
 	      :is="dynamicComponents[tableChartTypes.includes(item?.chart_type) ? item?.chart_type : 'chart']"
 	      :chart="item"
@@ -60,6 +59,7 @@
 	const regId = computed(() => store.getters.getRegisterId)
 	const dashboards = computed(() => store.getters.getDashboards)
 	const chartSettings = ref({})
+	const masterChartSettings = ref({})
 
 	const createInvoicesEnabled = computed(() => {
 		return route.query.createInvoices === 'true'
@@ -96,20 +96,37 @@
 		}
 	}
 
-const initializeChartSettings = (charts) => {
-  charts.forEach(chart => {
-    chartSettings.value[chart.id] = {
-      namedDateRange: chart.default_time_range,
-      groupByPeriod: chart.report_period,
-      timezone: chart.default_timezones[0],
-      invertSign: chart.invert_sign,
-      groupBy: Object.keys(chart.report_groups || {})
-        .filter(key => chart.report_groups[key] === true)
-    }
-  })
-}
+	const initializeChartSettings = (charts) => {
+	  charts.forEach(chart => {
+	    chartSettings.value[chart.id] = {
+	      namedDateRange: chart.default_time_range,
+	      groupByPeriod: chart.report_period,
+	      timezone: chart.default_timezones[0],
+	      timezoneOptions: chart.default_timezones.map(timezone => ({
+					label: timezone,
+					value: timezone
+				})),
+	      invertSign: chart.invert_sign,
+	      groupBy: Object.keys(chart.report_groups || {})
+	        .filter(key => chart.report_groups[key] === true),
+	      groupByOptions: Object.keys(chart.report_groups || {}).map(key => ({
+			    value: key,
+			    label: key.replaceAll('_', ' ')
+			  }))
+	    }
+	  })
+	 	masterChartSettings.value = Object.values(chartSettings.value)[0]
+	}
 
-const getChartSettings = (chartId) => chartSettings.value[chartId]
+
+	// watch the masterChartSettings for changes, and set those values to all children chart settings
+	watch(masterChartSettings, (newVal, oldVal) => {
+		// If the old value is empty, this is the initial load and we don't want to overwrite the chart's saved settings
+		if (Object.entries(oldVal).length === 0) return
+		Object.keys(chartSettings.value).forEach(key => {
+			chartSettings.value[key] = newVal
+		})
+	}, { deep: true })
 
 	// Sorting function based on chart type order
 	const sortChartsByType = (chartTypeA, chartTypeB) => {
