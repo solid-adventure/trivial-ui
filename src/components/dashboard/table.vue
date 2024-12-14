@@ -10,12 +10,6 @@
 	      <template #header>
 	        <div class="flex justify-content-between align-items-center">
 	          <h2 class="font-semibold">{{ chart.name }}</h2>
-
-             <ChartControls
-                v-model="chartSettings"
-                :chart="chart"
-              />
-
 	        </div>
 	      </template>
 
@@ -95,7 +89,6 @@
 	import { useFormatCurrency } from '@/composable/formatCurrency.js'
 	import { getDateRangeFromNamed } from '@/composable/namedDateRanges'
 	import loadingImg from '@/assets/images/trivial-loading-optimized.webp'
-  import ChartControls from './ChartControls.vue'
 	import moment from 'moment-timezone'
 	import MultiSelect from 'primevue/multiselect';
 	import { FilterMatchMode, FilterOperator } from 'primevue/api';
@@ -106,16 +99,12 @@
 			type: Object,
 			required: true,
 			default: {}
-		}
+		},
+    chartSettings: {
+      type: Object,
+      required: true
+    }
 	})
-
-  const chartSettings = ref({
-    groupByPeriod: '',
-    namedDateRange: '',
-    timezone: '',
-    invertSign: false,
-    groupBy: []
-  })
 
 	const filters = ref()
 	const rawData = ref({})
@@ -126,15 +115,8 @@
 			loading = ref(false),
 			store = useStore()
 
-	const reportGroupOptions = computed(() => {
-		return Object.keys(props.chart.report_groups || {}).map(key => ({
-			value: key,
-			label: key.replaceAll('_', ' ')
-		}))
-	})
-
   const groupByColumns = computed(() => {
-    return chartSettings.value.groupBy?.length > 0 ? chartSettings.value.groupBy : [""]
+    return props.chartSettings.groupBy?.length > 0 ? props.chartSettings.groupBy : [""]
   })
 
 	// Currently unused, but this allows us to populate a multi-select dropdown
@@ -216,23 +198,14 @@
 	}
 
 	onMounted(() => {
-		setChartDefaults()
+    getData()
+    initFilters()
 	})
 
-  const setChartDefaults = () => {
-    chartSettings.value = {
-      namedDateRange: props.chart.default_time_range,
-      groupByPeriod: props.chart.report_period,
-      timezone: props.chart.default_timezones[0],
-      invertSign: props.chart.invert_sign,
-      groupBy: Object.keys(props.chart.report_groups || {}).filter(key => props.chart.report_groups[key] === true)
-    }
-  }
-
   const formatDateRange = (date, isEndDate = false) => {
-    if (!date || !chartSettings.value.timezone) return null
+    if (!date || !props.chartSettings.timezone) return null
     return moment.utc(date)
-      .tz(chartSettings.value.timezone)
+      .tz(props.chartSettings.timezone)
       [isEndDate ? 'endOf' : 'startOf']('day')
       .utc()
       .toISOString()
@@ -240,19 +213,19 @@
 
   const formatDisplayDate = (date) => {
     if (!date) return null
-    return moment(date).tz(chartSettings.value.timezone).format('MM/DD/YYYY h:mm A')
+    return moment(date).tz(props.chartSettings.timezone).format('MM/DD/YYYY h:mm A')
   }
 
   // Computed properties for dates
   const startAt = computed(() => {
-    if (!chartSettings.value.namedDateRange) return null
-    const [start] = getDateRangeFromNamed(chartSettings.value.namedDateRange)
+    if (!props.chartSettings.namedDateRange) return null
+    const [start] = getDateRangeFromNamed(props.chartSettings.namedDateRange)
     return formatDateRange(start)
   })
 
   const endAt = computed(() => {
-    if (!chartSettings.value.namedDateRange) return null
-    const [, end] = getDateRangeFromNamed(chartSettings.value.namedDateRange)
+    if (!props.chartSettings.namedDateRange) return null
+    const [, end] = getDateRangeFromNamed(props.chartSettings.namedDateRange)
     return formatDateRange(end, true)
   })
 
@@ -264,10 +237,10 @@
 			register_id: store.state.registerId,
 			start_at: startAt.value,
 			end_at: endAt.value,
-      group_by_period: chartSettings.value.groupByPeriod,
-      timezone: chartSettings.value.timezone,
-      invert_sign: chartSettings.value.invertSign,
-      group_by: chartSettings.value.groupBy,
+      group_by_period: props.chartSettings.groupByPeriod,
+      timezone: props.chartSettings.timezone,
+      invert_sign: props.chartSettings.invertSign,
+      group_by: props.chartSettings.groupBy,
 		}
 	})
 
@@ -275,7 +248,7 @@
 		getData()
 	}, { deep: true })
 
-  watch([() => chartSettings.value.groupBy], () => {
+  watch([() => props.chartSettings.groupBy], () => {
     initFilters()
   })
 

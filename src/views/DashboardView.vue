@@ -13,7 +13,16 @@
 		</div>
 		<div v-else class="flex flex-wrap gap-3 dashboard__carts">
 			<template v-for="(item, index) in allCharts" :key="index">
-				<component :is="dynamicComponents[tableChartTypes.includes(item?.chart_type) ? item?.chart_type : 'chart']" :chart="item" />
+	    <ChartControls
+	      v-model="chartSettings[item.id]"
+	      :chart="item"
+	    />
+	    <component
+	      :is="dynamicComponents[tableChartTypes.includes(item?.chart_type) ? item?.chart_type : 'chart']"
+	      :chart="item"
+	      :chart-settings="chartSettings[item.id]"
+	    />
+
 			</template>
 		</div>
 	</div>
@@ -24,6 +33,7 @@
 	import { useRoute } from 'vue-router'
 	import { useStore } from 'vuex'
 	import moment from 'moment-timezone'
+  import ChartControls from '@/components/dashboard/ChartControls.vue'
 	import table from '@/components/dashboard/table.vue'
 	import summary_group from '@/components/dashboard/summary_group.vue'
 	import heatmap from '@/components/dashboard/heatmap.vue'
@@ -49,6 +59,8 @@
 	const orgId = computed(() => store.getters.getOrgId)
 	const regId = computed(() => store.getters.getRegisterId)
 	const dashboards = computed(() => store.getters.getDashboards)
+	const chartSettings = ref({})
+
 	const createInvoicesEnabled = computed(() => {
 		return route.query.createInvoices === 'true'
 	})
@@ -79,9 +91,25 @@
 
 				let sortedCharts = res.charts.filter(chart => chart !== null).sort((a, b) => sortChartsByType(a.chart_type, b.chart_type))
 				allCharts.value = sortedCharts
+				initializeChartSettings(sortedCharts)
 			}
 		}
 	}
+
+const initializeChartSettings = (charts) => {
+  charts.forEach(chart => {
+    chartSettings.value[chart.id] = {
+      namedDateRange: chart.default_time_range,
+      groupByPeriod: chart.report_period,
+      timezone: chart.default_timezones[0],
+      invertSign: chart.invert_sign,
+      groupBy: Object.keys(chart.report_groups || {})
+        .filter(key => chart.report_groups[key] === true)
+    }
+  })
+}
+
+const getChartSettings = (chartId) => chartSettings.value[chartId]
 
 	// Sorting function based on chart type order
 	const sortChartsByType = (chartTypeA, chartTypeB) => {
