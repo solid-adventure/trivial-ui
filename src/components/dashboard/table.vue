@@ -1,10 +1,15 @@
 <template>
 	<Panel class="w-full shadow-2">
-	  <DataTable :value="tableData" :scrollable="true" scroll-height="400px">
+	  <DataTable :value="tableData"
+	  	:scrollable="true"
+	  	scroll-height="500px"
+	  	size="small"
+ 			v-model:filters="filters"
+			filterDisplay="menu"
+	  	>
 	      <template #header>
 	        <div class="flex justify-content-between align-items-center">
 	          <h2 class="font-semibold">{{ chart.name }}</h2>
-
 						<div>
 						  <FloatLabel class="w-full md:w-20rem">
 						    <MultiSelect
@@ -58,9 +63,6 @@
 						    <label for="group-by-period">Group By</label>
 						  </FloatLabel>
 						</div>
-
-
-
 	        </div>
 	      </template>
 
@@ -75,14 +77,20 @@
 	        <h3>Loading ...</h3>
 	      </template>
 
-	      <!-- Dynamic group by columns -->
-		    <Column v-for="(title, index) in groupByColumns"
-		            :key="title"
-		            :field="`group_${index}`"
-		            :header="title.replaceAll('_', ' ')"
-		            sortable :rowspan="groupByColumns.length"
-		            class="capitalize"
-		            frozen alignFrozen="left" />
+				<Column v-for="(title, index) in groupByColumns"
+	        :key="`group_${index}`"
+	        :field="`group_${index}`"
+	        :header="title.replaceAll('_', ' ')"
+	        :filterField="`group_${index}`"
+	        :showFilterMatchModes="false"
+	        sortable
+	        frozen
+	        alignFrozen="left">
+	        <template #filter="{ filterModel }">
+	            <InputText v-model="filterModel.value" type="text" class="p-column-filter" :placeholder="`Search by ${title}`" />
+	        </template>
+				</Column>
+
         <!-- Period group columns -->
 		    <Column v-for="period in periods"
 		            :key="period"
@@ -125,7 +133,6 @@
 				<p> Prepared {{ new Date().toLocaleString(undefined, { timeZoneName: 'short' }) }}</p>
 	    </div>
 
-
 	  </Panel>
 </template>
 
@@ -139,6 +146,7 @@
 	import moment from 'moment-timezone'
 	import FloatLabel from 'primevue/floatlabel';
 	import MultiSelect from 'primevue/multiselect';
+	import { FilterMatchMode, FilterOperator } from 'primevue/api';
 	import { useToastNotifications } from '@/composable/toastNotification'
 
 	const props = defineProps({
@@ -154,13 +162,14 @@
 	const timezone = ref('')
 	const invertSign = ref(false)
 	const groupBy = ref([])
+	const filters = ref()
+	const rawData = ref({})
+	const tableData = ref([])
 
 	const { showSuccessToast, showErrorToast, showInfoToast } = useToastNotifications()
 	const selectedQuarters = ref(),
 			loading = ref(false),
 			store = useStore()
-
-	const	rawData = ref({})
 
 	const reportGroupOptions = computed(() => {
 		return Object.keys(props.chart.report_groups || {}).map(key => ({
@@ -168,6 +177,37 @@
 			label: key.replaceAll('_', ' ')
 		}))
 	})
+
+	const groupByColumns = computed(() =>{
+	  return groupBy.value?.length > 0 ? groupBy.value : [""]
+	})
+
+	// Currently unused, but this allows us to populate a multi-select dropdown
+	const getFilterOptionsForColumn = (columnIndex) => {
+	  if (columnIndex === -1 || !rawData.value?.count?.length) return []
+
+	  const uniqueValues = [...new Set(
+	    rawData.value.count.map(item => item.group[columnIndex])
+	  )].filter(value => value !== undefined && value !== null)
+
+	  return uniqueValues.map(value => ({
+	    label: value?.toString() || '(Empty)',
+	    value: value
+	  })).sort((a, b) => a.label.localeCompare(b.label))
+	}
+
+	const initFilters = () => {
+	  if (!groupByColumns.value) return
+	  const newFilters = {}
+	  groupByColumns.value.forEach((column, index) => {
+	    const key = `group_${index}`
+	    newFilters[key] = {
+	      operator: FilterOperator.AND,
+	      constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }]
+	    }
+	  })
+	  filters.value = newFilters
+	}
 
 	const periods = computed(() => {
 	  if (!rawData.value?.count) return []
@@ -182,10 +222,6 @@
 	 	}, 0)
 	})
 
-  const groupByColumns = computed(() => {
-  	return groupBy.value.length > 0 ? groupBy.value : [""]
-  })
-
 	const getTotalForPeriod = period => {
 	  if (!rawData.value?.count) return 0
 	  return rawData.value.count.reduce((acc, item) => {
@@ -196,13 +232,12 @@
 	  }, 0)
 	}
 
-
 	// Transform data for the table
-	const tableData = computed(() => {
+	const formatForTable = (data) => {
 	  if (!rawData.value?.count) return []
 	  const groupMap = new Map()
 
-	  rawData.value.count.forEach(item => {
+	  data.count.forEach(item => {
 	  	item.group = Array.isArray(item.group) ? item.group : [item.group]
 	    const groupKey = item.group.join('_')
 	    if (!groupMap.has(groupKey)) {
@@ -223,12 +258,11 @@
 	  })
 
 	  return Array.from(groupMap.values())
-	})
+	}
 
 	onMounted(() => {
 		setChartDefaults()
 	})
-
 
 	const setChartDefaults = () => {
 		namedDateRange.value = props.chart.default_time_range
@@ -287,12 +321,17 @@
 		getData()
 	}, { deep: true })
 
+	watch([groupBy], () => {
+		initFilters()
+	})
+
 	const getData = () => {
 		loading.value = true
 		store.state.Session.apiCall(`/reports/item_sum`, 'POST', getDataOptions.value
 			)
 			.then(data => {
 				rawData.value = data
+				tableData.value = formatForTable(data)
 			})
 			.catch(error => {
 				console.error(error)
