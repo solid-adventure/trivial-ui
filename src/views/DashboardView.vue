@@ -20,6 +20,7 @@
 	      :is="dynamicComponents[tableChartTypes.includes(item?.chart_type) ? item?.chart_type : 'chart']"
 	      :chart="item"
 	      :chart-settings="chartSettings[item.id]"
+	      @filter-change="handleFilterChange"
 	    />
 
 			</template>
@@ -63,6 +64,19 @@
 
 	const createInvoicesEnabled = computed(() => {
 		return route.query.createInvoices === 'true'
+	})
+
+	const createInvoicesPayload = computed(() => {
+		return {
+			register_id: regId.value,
+			timezone: masterChartSettings.value.timezone,
+			start_at: null, // TODO: Implement
+			end_at: null, // TODO: Implement
+			group_by: masterChartSettings.value.groupBy,
+			group_by_period: masterChartSettings.value.groupByPeriod,
+			invert_sign: masterChartSettings.value.invertSign,
+			filters: masterChartSettings.filters,
+		}
 	})
 
 	watch(orgId, async (newVal, oldVal) => await dashboardInit(newVal))
@@ -128,6 +142,11 @@
 		})
 	}, { deep: true })
 
+	const handleFilterChange = (newVal) => {
+		// NOTE: This is implemented to receive an update when table filters change, but is not yet re-broadcast to other children
+		masterChartSettings.filters = newVal
+	}
+
 	// Sorting function based on chart type order
 	const sortChartsByType = (chartTypeA, chartTypeB) => {
 		const sortOrder = ['summary_group', 'table', 'bar_graph', 'line', 'doughnut'],
@@ -151,6 +170,8 @@
 
 	const handleCreateInvoices = () => {
 		console.log('TODO: Create Invoices')
+		console.log(`createInvoicesPayload: ${JSON.stringify(createInvoicesPayload.value, null, 2)}`)
+
 		showSuccessToast('Success', 'Invoices created successfully.')
 	}
 

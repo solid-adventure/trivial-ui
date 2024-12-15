@@ -5,6 +5,7 @@
 	  	scroll-height="500px"
 	  	size="small"
  			v-model:filters="filters"
+      @filter="onFilterChange"
 			filterDisplay="menu"
 	  	>
 	      <template #header>
@@ -25,10 +26,10 @@
 	      </template>
 
 				<Column v-for="(title, index) in groupByColumns"
-	        :key="`group_${index}`"
-	        :field="`group_${index}`"
+	        :key="title"
+	        :field="title"
 	        :header="title.replaceAll('_', ' ')"
-	        :filterField="`group_${index}`"
+	        :filterField="title"
 	        :showFilterMatchModes="false"
 	        sortable
 	        frozen
@@ -106,6 +107,8 @@
     }
 	})
 
+  const emit = defineEmits(['filter-change'])
+
 	const filters = ref()
 	const rawData = ref({})
 	const tableData = ref([])
@@ -137,7 +140,7 @@
 	  if (!groupByColumns.value) return
 	  const newFilters = {}
 	  groupByColumns.value.forEach((column, index) => {
-	    const key = `group_${index}`
+      const key = props.chartSettings.groupBy[index]
 	    newFilters[key] = {
 	      operator: FilterOperator.AND,
 	      constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }]
@@ -145,6 +148,10 @@
 	  })
 	  filters.value = newFilters
 	}
+
+  const onFilterChange = (event) => {
+    emit('filter-change', event.filters)
+  }
 
 	const periods = computed(() => {
 	  if (!rawData.value?.count) return []
@@ -180,7 +187,8 @@
 	    if (!groupMap.has(groupKey)) {
 	      const row = {
 	        ...item.group.reduce((acc, val, idx) => {
-	          acc[`group_${idx}`] = val || ''
+            const column_name = props.chartSettings.groupBy[idx]
+	          acc[column_name] = val || ''
 	          return acc
 	        }, {}),
 	        grandTotal: 0
