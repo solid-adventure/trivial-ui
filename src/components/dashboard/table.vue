@@ -87,10 +87,9 @@
 <script setup>
 	import { computed, ref, onMounted, watch } from "vue"
 	import { useStore } from 'vuex'
+  import { useDateRange } from '@/composable/useDateRange'
 	import { useFormatCurrency } from '@/composable/formatCurrency.js'
-	import { getDateRangeFromNamed } from '@/composable/namedDateRanges'
 	import loadingImg from '@/assets/images/trivial-loading-optimized.webp'
-	import moment from 'moment-timezone'
 	import MultiSelect from 'primevue/multiselect';
 	import { FilterMatchMode, FilterOperator } from 'primevue/api';
 	import { useToastNotifications } from '@/composable/toastNotification'
@@ -205,40 +204,26 @@
 	  return Array.from(groupMap.values())
 	}
 
-	onMounted(() => {
+  const { getDateRange, formatDisplayDate } = useDateRange()
+
+  const dateRange = computed(() =>
+    getDateRange(props.chartSettings.namedDateRange, props.chartSettings.timezone)
+  )
+
+  const startAt = computed(() => dateRange.value.startAt)
+  const endAt = computed(() => dateRange.value.endAt)
+
+  const formattedStartAt = computed(() =>
+    formatDisplayDate(startAt.value, props.chartSettings.timezone)
+  )
+  const formattedEndAt = computed(() =>
+    formatDisplayDate(endAt.value, props.chartSettings.timezone)
+  )
+
+  onMounted(() => {
     getData()
     initFilters()
-	})
-
-  const formatDateRange = (date, isEndDate = false) => {
-    if (!date || !props.chartSettings.timezone) return null
-    return moment.utc(date)
-      .tz(props.chartSettings.timezone)
-      [isEndDate ? 'endOf' : 'startOf']('day')
-      .utc()
-      .toISOString()
-  }
-
-  const formatDisplayDate = (date) => {
-    if (!date) return null
-    return moment(date).tz(props.chartSettings.timezone).format('MM/DD/YYYY h:mm A')
-  }
-
-  // Computed properties for dates
-  const startAt = computed(() => {
-    if (!props.chartSettings.namedDateRange) return null
-    const [start] = getDateRangeFromNamed(props.chartSettings.namedDateRange)
-    return formatDateRange(start)
   })
-
-  const endAt = computed(() => {
-    if (!props.chartSettings.namedDateRange) return null
-    const [, end] = getDateRangeFromNamed(props.chartSettings.namedDateRange)
-    return formatDateRange(end, true)
-  })
-
-	const formattedStartAt = computed(() => formatDisplayDate(startAt.value))
-	const formattedEndAt = computed(() => formatDisplayDate(endAt.value))
 
 	const getDataOptions = computed(() => {
 		return {

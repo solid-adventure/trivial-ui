@@ -74,7 +74,7 @@ import FloatLabel from 'primevue/floatlabel'
 import MultiSelect from 'primevue/multiselect'
 import Dropdown from 'primevue/dropdown'
 import { groupByPeriodOptions } from '@/composable/groupByPeriodOptions'
-import { namedDateRanges } from '@/composable/namedDateRanges'
+import { namedDateRanges } from '@/composable/useDateRange'
 
 const props = defineProps({
   modelValue: {

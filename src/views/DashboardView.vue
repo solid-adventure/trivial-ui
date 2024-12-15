@@ -32,8 +32,8 @@
 	import { ref, onMounted, computed, watch, toRaw } from 'vue'
 	import { useRoute } from 'vue-router'
 	import { useStore } from 'vuex'
-	import moment from 'moment-timezone'
   import ChartControls from '@/components/dashboard/ChartControls.vue'
+	import { useDateRange } from '@/composable/useDateRange'
 	import table from '@/components/dashboard/table.vue'
 	import summary_group from '@/components/dashboard/summary_group.vue'
 	import heatmap from '@/components/dashboard/heatmap.vue'
@@ -56,11 +56,19 @@
 		allCharts = ref([])
 
 	const route = useRoute()
+	const { getDateRange } = useDateRange()
 	const orgId = computed(() => store.getters.getOrgId)
 	const regId = computed(() => store.getters.getRegisterId)
 	const dashboards = computed(() => store.getters.getDashboards)
 	const chartSettings = ref({})
 	const masterChartSettings = ref({})
+
+const dateRange = computed(() =>
+  getDateRange(
+    masterChartSettings.value.namedDateRange,
+    masterChartSettings.value.timezone
+  )
+)
 
 	const createInvoicesEnabled = computed(() => {
 		return route.query.createInvoices === 'true'
@@ -70,9 +78,9 @@
 		return {
 			register_id: regId.value,
 			timezone: masterChartSettings.value.timezone,
-			start_at: null, // TODO: Implement
-			end_at: null, // TODO: Implement
-			group_by: masterChartSettings.value.groupBy,
+    	start_at: dateRange.value.startAt,
+    	end_at: dateRange.value.endAt,
+    	group_by: masterChartSettings.value.groupBy,
 			group_by_period: masterChartSettings.value.groupByPeriod,
 			invert_sign: masterChartSettings.value.invertSign,
 			filters: masterChartSettings.filters,
