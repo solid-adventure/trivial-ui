@@ -1,66 +1,16 @@
 <template>
 	<Panel class="w-full shadow-2">
-	  <DataTable :value="tableData" :scrollable="true" scroll-height="400px">
+	  <DataTable :value="tableData"
+	  	:scrollable="true"
+	  	scroll-height="500px"
+	  	size="small"
+ 			v-model:filters="filters"
+      @filter="onFilterChange"
+			filterDisplay="menu"
+	  	>
 	      <template #header>
 	        <div class="flex justify-content-between align-items-center">
 	          <h2 class="font-semibold">{{ chart.name }}</h2>
-
-						<div>
-						  <FloatLabel class="w-full md:w-20rem">
-						    <MultiSelect
-						      id="group-by"
-						      v-model="groupBy"
-						      :options="reportGroupOptions"
-						      optionLabel="label"
-						      optionValue="value"
-						      display="chip"
-						      :maxSelectedLabels="4"
-						      class="w-full"
-						    />
-						    <label for="group-by">Select Groups</label>
-						  </FloatLabel>
-						</div>
-
-						<div>
-						  <FloatLabel class="w-14rem">
-						    <Dropdown
-						      id="timezone"
-						      v-model="timezone"
-						      :options="chart.default_timezones"
-						      class="w-full"
-						    />
-						    <label for="timezone">Timezone</label>
-						  </FloatLabel>
-						</div>
-
-						<div>
-						  <FloatLabel class="w-14rem">
-						    <Dropdown
-						      id="date-range"
-						      v-model="namedDateRange"
-						      :options="namedDateRanges()"
-						      optionLabel="label"
-						      optionValue="value"
-						      class="w-full"
-						    />
-						    <label for="date-range">Dates</label>
-						  </FloatLabel>
-						</div>
-
-						<div>
-						  <FloatLabel class="w-14rem">
-						    <Dropdown
-						      id="group-by-period"
-						      v-model="groupByPeriod"
-						      :options="groupByPeriodOptions()"
-						      class="w-full"
-						    />
-						    <label for="group-by-period">Group By</label>
-						  </FloatLabel>
-						</div>
-
-
-
 	        </div>
 	      </template>
 
@@ -75,14 +25,20 @@
 	        <h3>Loading ...</h3>
 	      </template>
 
-	      <!-- Dynamic group by columns -->
-		    <Column v-for="(title, index) in groupByColumns"
-		            :key="title"
-		            :field="`group_${index}`"
-		            :header="title.replaceAll('_', ' ')"
-		            sortable :rowspan="groupByColumns.length"
-		            class="capitalize"
-		            frozen alignFrozen="left" />
+				<Column v-for="(title, index) in groupByColumns"
+	        :key="title"
+	        :field="title"
+	        :header="title.replaceAll('_', ' ')"
+	        :filterField="title"
+	        :showFilterMatchModes="false"
+	        sortable
+	        frozen
+	        alignFrozen="left">
+	        <template #filter="{ filterModel }">
+	            <InputText v-model="filterModel.value" type="text" class="p-column-filter" :placeholder="`Search by ${title}`" />
+	        </template>
+				</Column>
+
         <!-- Period group columns -->
 		    <Column v-for="period in periods"
 		            :key="period"
@@ -121,10 +77,9 @@
 	    </DataTable>
 
 	   	<div class="footer-signature">
-	      <p>{{ formattedStartAt }} - {{ formattedEndAt }}, {{ timezone }} </p>
+	      <p>{{ formattedStartAt }} - {{ formattedEndAt }}, {{ chartSettings.timezone }} </p>
 				<p> Prepared {{ new Date().toLocaleString(undefined, { timeZoneName: 'short' }) }}</p>
 	    </div>
-
 
 	  </Panel>
 </template>
@@ -132,13 +87,11 @@
 <script setup>
 	import { computed, ref, onMounted, watch } from "vue"
 	import { useStore } from 'vuex'
+  import { useDateRange } from '@/composable/useDateRange'
 	import { useFormatCurrency } from '@/composable/formatCurrency.js'
-	import { groupByPeriodOptions } from '@/composable/groupByPeriodOptions'
-	import { namedDateRanges, getDateRangeFromNamed } from '@/composable/namedDateRanges'
 	import loadingImg from '@/assets/images/trivial-loading-optimized.webp'
-	import moment from 'moment-timezone'
-	import FloatLabel from 'primevue/floatlabel';
 	import MultiSelect from 'primevue/multiselect';
+	import { FilterMatchMode, FilterOperator } from 'primevue/api';
 	import { useToastNotifications } from '@/composable/toastNotification'
 
 	const props = defineProps({
@@ -146,28 +99,58 @@
 			type: Object,
 			required: true,
 			default: {}
-		}
+		},
+    chartSettings: {
+      type: Object,
+      required: true
+    }
 	})
 
-	const groupByPeriod = ref('')
-	const namedDateRange = ref('')
-	const timezone = ref('')
-	const invertSign = ref(false)
-	const groupBy = ref([])
+  const emit = defineEmits(['filter-change'])
+
+	const filters = ref()
+	const rawData = ref({})
+	const tableData = ref([])
 
 	const { showSuccessToast, showErrorToast, showInfoToast } = useToastNotifications()
 	const selectedQuarters = ref(),
 			loading = ref(false),
 			store = useStore()
 
-	const	rawData = ref({})
+  const groupByColumns = computed(() => {
+    return props.chartSettings.groupBy?.length > 0 ? props.chartSettings.groupBy : [""]
+  })
 
-	const reportGroupOptions = computed(() => {
-		return Object.keys(props.chart.report_groups || {}).map(key => ({
-			value: key,
-			label: key.replaceAll('_', ' ')
-		}))
-	})
+	// Currently unused, but this allows us to populate a multi-select dropdown
+	const getFilterOptionsForColumn = (columnIndex) => {
+	  if (columnIndex === -1 || !rawData.value?.count?.length) return []
+
+	  const uniqueValues = [...new Set(
+	    rawData.value.count.map(item => item.group[columnIndex])
+	  )].filter(value => value !== undefined && value !== null)
+
+	  return uniqueValues.map(value => ({
+	    label: value?.toString() || '(Empty)',
+	    value: value
+	  })).sort((a, b) => a.label.localeCompare(b.label))
+	}
+
+	const initFilters = () => {
+	  if (!groupByColumns.value) return
+	  const newFilters = {}
+	  groupByColumns.value.forEach((column, index) => {
+      const key = props.chartSettings.groupBy[index]
+	    newFilters[key] = {
+	      operator: FilterOperator.AND,
+	      constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }]
+	    }
+	  })
+	  filters.value = newFilters
+	}
+
+  const onFilterChange = (event) => {
+    emit('filter-change', event.filters)
+  }
 
 	const periods = computed(() => {
 	  if (!rawData.value?.count) return []
@@ -182,10 +165,6 @@
 	 	}, 0)
 	})
 
-  const groupByColumns = computed(() => {
-  	return groupBy.value.length > 0 ? groupBy.value : [""]
-  })
-
 	const getTotalForPeriod = period => {
 	  if (!rawData.value?.count) return 0
 	  return rawData.value.count.reduce((acc, item) => {
@@ -196,19 +175,19 @@
 	  }, 0)
 	}
 
-
 	// Transform data for the table
-	const tableData = computed(() => {
+	const formatForTable = (data) => {
 	  if (!rawData.value?.count) return []
 	  const groupMap = new Map()
 
-	  rawData.value.count.forEach(item => {
+	  data.count.forEach(item => {
 	  	item.group = Array.isArray(item.group) ? item.group : [item.group]
 	    const groupKey = item.group.join('_')
 	    if (!groupMap.has(groupKey)) {
 	      const row = {
 	        ...item.group.reduce((acc, val, idx) => {
-	          acc[`group_${idx}`] = val || ''
+            const column_name = props.chartSettings.groupBy[idx]
+	          acc[column_name] = val || ''
 	          return acc
 	        }, {}),
 	        grandTotal: 0
@@ -223,63 +202,38 @@
 	  })
 
 	  return Array.from(groupMap.values())
-	})
-
-	onMounted(() => {
-		setChartDefaults()
-	})
-
-
-	const setChartDefaults = () => {
-		namedDateRange.value = props.chart.default_time_range
-		groupByPeriod.value = props.chart.report_period
-		timezone.value = props.chart.default_timezones[0]
-		invertSign.value = props.chart.invert_sign
-
-		const reportGroups = props.chart.report_groups || {}
-		groupBy.value = Object.keys(reportGroups).filter(key => reportGroups[key] === true)
-
 	}
 
-	const formatDateRange = (date, isEndDate = false) => {
-	  if (!date || !timezone.value) return null
-	  return moment.utc(date)
-	    .tz(timezone.value)
-	    [isEndDate ? 'endOf' : 'startOf']('day')
-	    .utc()
-	    .toISOString()
-	}
+  const { getDateRange, formatDisplayDate } = useDateRange()
 
-	const formatDisplayDate = (date) => {
-	  if (!date) return null
-	  return moment(date).tz(timezone.value).format('MM/DD/YYYY h:mm A')
+  const dateRange = computed(() =>
+    getDateRange(props.chartSettings.namedDateRange, props.chartSettings.timezone)
+  )
 
-	}
+  const startAt = computed(() => dateRange.value.startAt)
+  const endAt = computed(() => dateRange.value.endAt)
 
-	const startAt = computed(() => {
-	  if (!namedDateRange.value) return null
-	  const [start] = getDateRangeFromNamed(namedDateRange.value)
-	  return formatDateRange(start)
-	})
+  const formattedStartAt = computed(() =>
+    formatDisplayDate(startAt.value, props.chartSettings.timezone)
+  )
+  const formattedEndAt = computed(() =>
+    formatDisplayDate(endAt.value, props.chartSettings.timezone)
+  )
 
-	const endAt = computed(() => {
-	  if (!namedDateRange.value) return null
-	  const [, end] = getDateRangeFromNamed(namedDateRange.value)
-	  return formatDateRange(end, true)
-	})
-
-	const formattedStartAt = computed(() => formatDisplayDate(startAt.value))
-	const formattedEndAt = computed(() => formatDisplayDate(endAt.value))
+  onMounted(() => {
+    getData()
+    initFilters()
+  })
 
 	const getDataOptions = computed(() => {
 		return {
 			register_id: store.state.registerId,
 			start_at: startAt.value,
 			end_at: endAt.value,
-			group_by_period: groupByPeriod.value,
-			timezone: timezone.value,
-			invert_sign: invertSign.value,
-			group_by: groupBy.value,
+      group_by_period: props.chartSettings.groupByPeriod,
+      timezone: props.chartSettings.timezone,
+      invert_sign: props.chartSettings.invertSign,
+      group_by: props.chartSettings.groupBy,
 		}
 	})
 
@@ -287,12 +241,17 @@
 		getData()
 	}, { deep: true })
 
+  watch([() => props.chartSettings.groupBy], () => {
+    initFilters()
+  })
+
 	const getData = () => {
 		loading.value = true
 		store.state.Session.apiCall(`/reports/item_sum`, 'POST', getDataOptions.value
 			)
 			.then(data => {
 				rawData.value = data
+				tableData.value = formatForTable(data)
 			})
 			.catch(error => {
 				console.error(error)

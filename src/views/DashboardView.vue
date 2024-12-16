@@ -1,19 +1,21 @@
 <template>
 	<div class="flex flex-column row-gap-4 dashboard">
 
-
-		<!-- Feature stub -->
-		<div v-if="createInvoicesEnabled" class="action-row">
-			<Button value="Create Invoices" class="p-button-primary" @click.prevent="handleCreateInvoices">Create Invoices</Button>
-		</div>
-
-
 		<div v-if="allCharts.length === 0" class="flex justify-content-center align-items-center w-full h-screen">
 			<ProgressSpinner aria-label="Loading" />
 		</div>
 		<div v-else class="flex flex-wrap gap-3 dashboard__carts">
+	    <ChartControls
+	      v-model="masterChartSettings"
+	    />
 			<template v-for="(item, index) in allCharts" :key="index">
-				<component :is="dynamicComponents[tableChartTypes.includes(item?.chart_type) ? item?.chart_type : 'chart']" :chart="item" />
+	    <component
+	      :is="dynamicComponents[tableChartTypes.includes(item?.chart_type) ? item?.chart_type : 'chart']"
+	      :chart="item"
+	      :chart-settings="chartSettings[item.id]"
+	      @filter-change="handleFilterChange"
+	    />
+
 			</template>
 		</div>
 	</div>
@@ -23,12 +25,13 @@
 	import { ref, onMounted, computed, watch, toRaw } from 'vue'
 	import { useRoute } from 'vue-router'
 	import { useStore } from 'vuex'
-	import moment from 'moment-timezone'
+  import ChartControls from '@/components/dashboard/ChartControls.vue'
 	import table from '@/components/dashboard/table.vue'
 	import summary_group from '@/components/dashboard/summary_group.vue'
 	import heatmap from '@/components/dashboard/heatmap.vue'
 	import chart from '@/components/dashboard/chart.vue'
 	import { useToastNotifications } from '@/composable/toastNotification'
+	import { searchFromFilter } from '@/composable/searchFromFilter'
 
 	const loading = ref(false),
 		store = useStore(),
@@ -49,9 +52,8 @@
 	const orgId = computed(() => store.getters.getOrgId)
 	const regId = computed(() => store.getters.getRegisterId)
 	const dashboards = computed(() => store.getters.getDashboards)
-	const createInvoicesEnabled = computed(() => {
-		return route.query.createInvoices === 'true'
-	})
+	const chartSettings = ref({})
+	const masterChartSettings = ref({})
 
 	watch(orgId, async (newVal, oldVal) => await dashboardInit(newVal))
 	watch(regId, async (newVal, oldVal) => await dashboardInit(orgId.value))
@@ -79,9 +81,42 @@
 
 				let sortedCharts = res.charts.filter(chart => chart !== null).sort((a, b) => sortChartsByType(a.chart_type, b.chart_type))
 				allCharts.value = sortedCharts
+				initializeChartSettings(sortedCharts)
 			}
 		}
 	}
+
+	const initializeChartSettings = (charts) => {
+	  charts.forEach(chart => {
+	    chartSettings.value[chart.id] = {
+	      namedDateRange: chart.default_time_range,
+	      groupByPeriod: chart.report_period,
+	      timezone: chart.default_timezones[0],
+	      timezoneOptions: chart.default_timezones.map(timezone => ({
+					label: timezone,
+					value: timezone
+				})),
+	      invertSign: chart.invert_sign,
+	      groupBy: Object.keys(chart.report_groups || {})
+	        .filter(key => chart.report_groups[key] === true),
+	      groupByOptions: Object.keys(chart.report_groups || {}).map(key => ({
+			    value: key,
+			    label: key.replaceAll('_', ' ')
+			  }))
+	    }
+	  })
+	 	masterChartSettings.value = Object.values(chartSettings.value)[0]
+	}
+
+
+	// watch the masterChartSettings for changes, and set those values to all children chart settings
+	watch(masterChartSettings, (newVal, oldVal) => {
+		// If the old value is empty, this is the initial load and we don't want to overwrite the chart's saved settings
+		if (Object.entries(oldVal).length === 0) return
+		Object.keys(chartSettings.value).forEach(key => {
+			chartSettings.value[key] = newVal
+		})
+	}, { deep: true })
 
 	// Sorting function based on chart type order
 	const sortChartsByType = (chartTypeA, chartTypeB) => {
@@ -104,16 +139,4 @@
 		}
 	}
 
-	const handleCreateInvoices = () => {
-		console.log('TODO: Create Invoices')
-		showSuccessToast('Success', 'Invoices created successfully.')
-	}
-
 </script>
-
-<style scoped>
-	div.action-row {
-		display: flex;
-		justify-content: flex-end;
-	}
-</style>
