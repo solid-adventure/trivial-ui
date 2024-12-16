@@ -1,13 +1,6 @@
 <template>
 	<div class="flex flex-column row-gap-4 dashboard">
 
-
-		<!-- Feature stub -->
-		<div v-if="createInvoicesEnabled" class="action-row">
-			<Button value="Create Invoices" class="p-button-primary" @click.prevent="handleCreateInvoices">Create Invoices</Button>
-		</div>
-
-
 		<div v-if="allCharts.length === 0" class="flex justify-content-center align-items-center w-full h-screen">
 			<ProgressSpinner aria-label="Loading" />
 		</div>
@@ -33,7 +26,6 @@
 	import { useRoute } from 'vue-router'
 	import { useStore } from 'vuex'
   import ChartControls from '@/components/dashboard/ChartControls.vue'
-	import { useDateRange } from '@/composable/useDateRange'
 	import table from '@/components/dashboard/table.vue'
 	import summary_group from '@/components/dashboard/summary_group.vue'
 	import heatmap from '@/components/dashboard/heatmap.vue'
@@ -57,36 +49,11 @@
 		allCharts = ref([])
 
 	const route = useRoute()
-	const { getDateRange } = useDateRange()
 	const orgId = computed(() => store.getters.getOrgId)
 	const regId = computed(() => store.getters.getRegisterId)
 	const dashboards = computed(() => store.getters.getDashboards)
 	const chartSettings = ref({})
 	const masterChartSettings = ref({})
-
-const dateRange = computed(() =>
-  getDateRange(
-    masterChartSettings.value.namedDateRange,
-    masterChartSettings.value.timezone
-  )
-)
-
-	const createInvoicesEnabled = computed(() => {
-		return route.query.createInvoices === 'true'
-	})
-
-	const createInvoicesPayload = computed(() => {
-		return {
-			register_id: regId.value,
-			timezone: masterChartSettings.value.timezone,
-    	start_at: dateRange.value.startAt,
-    	end_at: dateRange.value.endAt,
-    	group_by: masterChartSettings.value.groupBy,
-			group_by_period: masterChartSettings.value.groupByPeriod,
-			invert_sign: masterChartSettings.value.invertSign,
-			search: searchFromFilter(masterChartSettings.filters),
-		}
-	})
 
 	watch(orgId, async (newVal, oldVal) => await dashboardInit(newVal))
 	watch(regId, async (newVal, oldVal) => await dashboardInit(orgId.value))
@@ -151,11 +118,6 @@ const dateRange = computed(() =>
 		})
 	}, { deep: true })
 
-	const handleFilterChange = (newVal) => {
-		// NOTE: This is used to set invoices create, but does not re-broadcast to other charts
-		masterChartSettings.filters = newVal
-	}
-
 	// Sorting function based on chart type order
 	const sortChartsByType = (chartTypeA, chartTypeB) => {
 		const sortOrder = ['summary_group', 'table', 'bar_graph', 'line', 'doughnut'],
@@ -177,26 +139,4 @@ const dateRange = computed(() =>
 		}
 	}
 
-	const invoiceIds = ref([])
-
-
-	const handleCreateInvoices = () => {
-		console.log('createInvoicesPayload', JSON.stringify(createInvoicesPayload.value, null, 2))
-
-		store.state.Session.apiCall('/invoices/create_from_register', 'POST', createInvoicesPayload.value)
-			.then((response) => {
-				invoiceIds.value = response.invoice_ids
-				console.log('invoiceIds', invoiceIds.value)
-			})
-			.then(() => showSuccessToast('Success', 'Invoices created successfully.'))
-			.catch((e) => showErrorToast('Error', `${e}`))
-	}
-
 </script>
-
-<style scoped>
-	div.action-row {
-		display: flex;
-		justify-content: flex-end;
-	}
-</style>
