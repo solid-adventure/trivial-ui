@@ -4,7 +4,7 @@
       loading...
     </div>
     <!-- Letter sets an 8.5x11 proportion to look like a PDF / piece of paper-->
-    <div class="letter" v-else>
+    <div class="letter shadow-2" v-else>
 
       <!-- Body gives us a vertical division into a footer and everything else-->
       <div class="body">
@@ -131,12 +131,13 @@
   div.letter {
     margin: 1em;
     padding: 4em;
-    border: 1px solid;
+    border-radius: 3px;
     width: 850px;
     height: 1100px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    background-color: var(--surface);
 
     div.body {
       width: 100%;
