@@ -20,12 +20,22 @@
 	</nav>
 
 	<nav class="aside__nav aside__nav--secundary">
+
+		<RouterLink to="/invoices/create" class="aside__nav__link">
+				<div>
+				<!-- <Icon icon="fa6-solid:gear" /> -->
+				<span>Create Invoices</span>
+			</div>
+		</RouterLink>
+
 		<RouterLink :to="orgSettingsPath" class="aside__nav__link">
 			<div>
 				<Icon icon="fa6-solid:gear" />
 				<span>Settings</span>
 			</div>
 		</RouterLink>
+
+
 	</nav>
 </template>
 
