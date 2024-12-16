@@ -39,6 +39,7 @@
 	import heatmap from '@/components/dashboard/heatmap.vue'
 	import chart from '@/components/dashboard/chart.vue'
 	import { useToastNotifications } from '@/composable/toastNotification'
+	import { searchFromFilter } from '@/composable/searchFromFilter'
 
 	const loading = ref(false),
 		store = useStore(),
@@ -83,7 +84,7 @@ const dateRange = computed(() =>
     	group_by: masterChartSettings.value.groupBy,
 			group_by_period: masterChartSettings.value.groupByPeriod,
 			invert_sign: masterChartSettings.value.invertSign,
-			filters: masterChartSettings.filters,
+			search: searchFromFilter(masterChartSettings.filters),
 		}
 	})
 
@@ -151,7 +152,7 @@ const dateRange = computed(() =>
 	}, { deep: true })
 
 	const handleFilterChange = (newVal) => {
-		// NOTE: This is implemented to receive an update when table filters change, but is not yet re-broadcast to other children
+		// NOTE: This is used to set invoices create, but does not re-broadcast to other charts
 		masterChartSettings.filters = newVal
 	}
 
@@ -176,11 +177,19 @@ const dateRange = computed(() =>
 		}
 	}
 
-	const handleCreateInvoices = () => {
-		console.log('TODO: Create Invoices')
-		console.log(`createInvoicesPayload: ${JSON.stringify(createInvoicesPayload.value, null, 2)}`)
+	const invoiceIds = ref([])
 
-		showSuccessToast('Success', 'Invoices created successfully.')
+
+	const handleCreateInvoices = () => {
+		console.log('createInvoicesPayload', JSON.stringify(createInvoicesPayload.value, null, 2))
+
+		store.state.Session.apiCall('/invoices/create_from_register', 'POST', createInvoicesPayload.value)
+			.then((response) => {
+				invoiceIds.value = response.invoice_ids
+				console.log('invoiceIds', invoiceIds.value)
+			})
+			.then(() => showSuccessToast('Success', 'Invoices created successfully.'))
+			.catch((e) => showErrorToast('Error', `${e}`))
 	}
 
 </script>
