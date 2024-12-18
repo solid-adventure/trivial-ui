@@ -38,7 +38,7 @@
 
 	const menuItems = ref([
 		{ path: "/dashboard", title: 'Dashboard', icon: 'fa6-solid:house' },
-		{ path: "/sales", title: 'Sales', icon: 'fa6-solid:sack-dollar' },
+		{ path: "/sales", title: 'Revenue Detail', icon: 'fa6-solid:sack-dollar' },
 		{ 
 			path: "/contracts",
 			title: 'Contracts', 
