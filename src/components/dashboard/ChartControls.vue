@@ -15,7 +15,7 @@
             class="w-full"
             @change="emitUpdate"
           />
-          <label for="group-by">Revenue Groups</label>
+          <label for="group-by">Groups</label>
         </FloatLabel>
       </div>
 

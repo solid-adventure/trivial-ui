@@ -31,7 +31,6 @@
 	import heatmap from '@/components/dashboard/heatmap.vue'
 	import chart from '@/components/dashboard/chart.vue'
 	import { useToastNotifications } from '@/composable/toastNotification'
-	import { searchFromFilter } from '@/composable/searchFromFilter'
 
 	const loading = ref(false),
 		store = useStore(),
