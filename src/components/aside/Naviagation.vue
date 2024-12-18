@@ -20,22 +20,12 @@
 	</nav>
 
 	<nav class="aside__nav aside__nav--secundary">
-
-		<RouterLink to="/invoices/create" class="aside__nav__link">
-				<div>
-				<!-- <Icon icon="fa6-solid:gear" /> -->
-				<span>Create Invoices</span>
-			</div>
-		</RouterLink>
-
 		<RouterLink :to="orgSettingsPath" class="aside__nav__link">
 			<div>
 				<Icon icon="fa6-solid:gear" />
 				<span>Settings</span>
 			</div>
 		</RouterLink>
-
-
 	</nav>
 </template>
 
@@ -49,7 +39,6 @@
 	const menuItems = ref([
 		{ path: "/dashboard", title: 'Dashboard', icon: 'fa6-solid:house' },
 		{ path: "/sales", title: 'Sales', icon: 'fa6-solid:sack-dollar' },
-		// { path: "/invoices", title: 'Invoices', icon: 'fa6-solid:shirt' },
 		{ 
 			path: "/contracts",
 			title: 'Contracts', 
@@ -72,6 +61,7 @@
 				}
 			]
 		},
+		{ path: "/invoices", title: 'Invoices', icon: 'fa6-solid:file-invoice' },
 		//{ path: "/#", title: 'Transactions', icon: 'fa6-solid:book-open' },
 	]),
 	store = useStore()

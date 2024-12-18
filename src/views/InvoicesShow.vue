@@ -138,7 +138,7 @@
       .then(() => {
         showSuccessToast('Success', 'Invoice deleted successfully, redirecting...')
         setTimeout(() => {
-          router.push('/invoices/create')
+          router.push('/invoices')
         }, 2000)
       })
       .catch((e) => showErrorToast('Error', `${e}`))

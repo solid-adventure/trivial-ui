@@ -38,7 +38,7 @@
       </div>
 
       <div class="action-bar space-between">
-        <Button @click="active--">Back</Button>
+        <Button severity="secondary" @click="active--">Back</Button>
         <Button @click="handleProceed">Next</Button>
       </div>
     </div>
@@ -80,7 +80,7 @@
       placeholder="Select customer"
       />
       <div class="action-bar space-between">
-        <Button @click="active--">Back</Button>
+        <Button severity="secondary" @click="active--">Back</Button>
         <Button @click="handleProceed">Create Invoices</Button>
       </div>
     </div>
@@ -102,7 +102,9 @@
       </div>
 
       <div class="action-bar">
-        <Button @click="handleReset">Done</Button>
+        <RouterLink to="/invoices">
+          <Button class="mx-3">Done</Button>
+        </RouterLink >
       </div>
 
     </div>
@@ -155,7 +157,8 @@
   })
 
   const invoiceStrategyOptions = ref([
-    { label: 'One invoice for all customers', value: 'single' },
+    // TODO, when we bring in the real customer options, briing this back
+    // { label: 'One invoice for all customers', value: 'single' },
     { label: 'Separate invoice per customer' , value: 'per_customer_id'},
   ])
 
