@@ -7,13 +7,13 @@
 
     <!-- Step 1 -->
     <div v-if="active==0">
-      <p>Step 1, select dates and charge  groups</p>
+      <p>Step 1, select charge  groups and dates</p>
       <ChartControls
         v-model="chartSettings"
       />
 
       <div class="action-bar">
-        <Button @click="handleProceed()">Next</Button>
+        <Button @click="handleProceed">Next</Button>
       </div>
     </div>
 
@@ -21,7 +21,7 @@
     <!-- Step 2 -->
     <div v-if="active==1">
       <h4 class="headroom">Step 2</h4>
-      <p>Review charges and scope to specific customers</p>
+      <p>Review charges and filter to specific customers</p>
 
       <ChartControls
         v-model="chartSettings"
@@ -39,19 +39,72 @@
 
       <div class="action-bar space-between">
         <Button @click="active--">Back</Button>
-        <Button @click="handleProceed()">Create Invoices</Button>
+        <Button @click="handleProceed">Next</Button>
       </div>
     </div>
 
 
     <!-- Step 3 -->
     <div v-if="active==2">
-      <p>Step 3,create invoices and download</p>
+      <p>Commit charges to invoices</p>
 
+      <Dropdown v-model="invoiceStrategy"
+      :options="invoiceStrategyOptions"
+      optionLabel="label"
+      optionValue="value"
+      placeholder="Select invoice options"
+      />
+
+
+      <template v-if="invoiceStrategy == 'per_customer_id'">
+        <div v-if="!hasCustomerIdGroup">
+          <p><InlineMessage severity="error">Missing Customer ID groups</InlineMessage></p>
+          <p>You must select a Customer ID group to create an invoice per customer</p>
+        </div>
+
+        <div v-if="!hasValidCustomerIdValues">
+          <p><InlineMessage severity="error">Missing Customer ID values</InlineMessage></p>
+          <p>All rows must contain a customer ID to create an invoice per customer</p>
+        </div>
+
+        <div v-if="hasCustomerIdGroup && hasValidCustomerIdValues">
+          <p>The Customer ID column will be used to create an invoice for each customer. This will create
+            <strong>{{ uniqueCustomerIds.length }} invoice(s).</strong></p>
+        </div>
+      </template>
+
+      <Dropdown v-if="invoiceStrategy=='single' " v-model="customer"
+      :options="customerOptions"
+      optionLabel="label"
+      optionValue="value"
+      placeholder="Select customer"
+      />
       <div class="action-bar space-between">
-        <Button @click="handleProceed()" class="secondary">Done</Button>
-        <Button @click="handleReset">+ Create more invoices</Button>
+        <Button @click="active--">Back</Button>
+        <Button @click="handleProceed">Create Invoices</Button>
       </div>
+    </div>
+
+
+    <div v-if="active==3">
+
+      <div v-if="creatingInvoices">
+        <h3>Creating invoices...</h3>
+      </div>
+
+      <div v-else class="headroom">
+        <h3>Done</h3>
+
+        <p>{{ invoiceIds.length }} invoices created</p>
+        <li v-for="invoiceId in invoiceIds" :key="invoiceId">
+          <a :href="`/invoices/${invoiceId}`" target="_blank">Invoice {{ invoiceId }}</a>
+        </li>
+      </div>
+
+      <div class="action-bar">
+        <Button @click="handleReset">Done</Button>
+      </div>
+
     </div>
 
   </Panel>
@@ -62,9 +115,13 @@
   import { ref, onMounted, computed, watch } from 'vue'
   import { useRoute } from 'vue-router'
   import { useStore } from 'vuex'
+  import InlineMessage from 'primevue/inlinemessage';
   import Steps from 'primevue/steps';
   import ChartControls from '@/components/dashboard/ChartControls.vue'
   import table from '@/components/dashboard/table.vue'
+  import { useDateRange } from '@/composable/useDateRange'
+  import { searchFromFilter } from '@/composable/searchFromFilter'
+  import { useToastNotifications } from '@/composable/toastNotification'
 
   const steps = ref([
       {
@@ -74,37 +131,65 @@
           label: 'Review charges'
       },
       {
-          label: 'Download invoices'
+          label: 'Create invoices'
       }
   ]);
 
   const active = ref(0);
 
+  const customer = ref()
+  const invoiceStrategy = ref('per_customer_id')
+
+  const hasCustomerIdGroup = computed(() => {
+    return chartSettings.value.groupBy.includes('customer_id')
+  })
+
+  const hasValidCustomerIdValues = computed(() => {
+    // Ensure all rows have a non-empty customer_id
+    const customerIds = tableData.value.map(row => row.customer_id).filter(id => id !== null && id !== '')
+    return customerIds.length === tableData.value.length
+  })
+
+  const uniqueCustomerIds = computed(() => {
+    return [...new Set(tableData.value.map(row => row.customer_id))]
+  })
+
+  const invoiceStrategyOptions = ref([
+    { label: 'One invoice for all customers', value: 'single' },
+    { label: 'Separate invoice per customer' , value: 'per_customer_id'},
+  ])
+
+  // TODO Fetch organizations with customer tags from API
+  const customerOptions = ref([
+    { label: 'All customers', value: 'all' },
+    { label: 'Acme Co', value: 'acme' },
+    { label: 'Beta Co', value: 'beta' },
+   ])
+
   const handleProceed = () => {
-
-    if (active.value <= steps.value.length) {
-      active.value++
-    }
-
     switch (active.value) {
+      case 0:
+        active.value++
+        break;
       case 1:
-        console.log("TODO Review charges")
+        active.value++
         break;
       case 2:
-        console.log("TODO Create Invoices")
-        break;
-      default:
-        alert('Nice job!')
-        setTimeout(() => {
-          active.value = 0 // TEMP Redirect home
-        }, 2000)
+        active.value++
+        handleCreateInvoices()
         break;
     }
+  }
+
+  const handleReset = () => {
+    // reload the page to get a clean slate
+    location.reload()
   }
 
   const store = useStore()
   const orgId = computed(() => store.getters.getOrgId)
   const regId = computed(() => store.getters.getRegisterId)
+  const { showSuccessToast, showErrorToast, showInfoToast } = useToastNotifications()
   const dashboards = computed(() => store.getters.getDashboards)
   const dashboard = ref(null)
   const loading = ref(false)
@@ -118,14 +203,18 @@
     groupBy: [],
     groupByOptions: []
   })
+  const tableData = ref([])
 
+  const { getDateRange } = useDateRange()
+  const creatingInvoices = ref(false)
+  const invoiceIds = ref([])
 
   onMounted(async () => {
     store.dispatch('register')
     init()
   })
 
-  watch([dashboards, orgId], async (newVal, oldVal) => {
+  watch([dashboards, orgId, regId], async (newVal, oldVal) => {
     init()
   })
 
@@ -162,9 +251,47 @@
     }
   }
 
-  const handleFilterChange = (filters) => {
-    console.log('Filters', filters)
+  const handleCreateInvoices = () => {
+    creatingInvoices.value = true
+    console.log('createInvoicesPayload', JSON.stringify(createInvoicesPayload.value, null, 2))
+
+    store.state.Session.apiCall('/invoices/create_from_register', 'POST', createInvoicesPayload.value)
+      .then((response) => {
+        invoiceIds.value = response.invoice_ids
+        console.log('invoiceIds', invoiceIds.value)
+      })
+      .then(() => showSuccessToast('Success', 'Invoices created successfully.'))
+      .catch((e) => showErrorToast('Error', `${e}`))
+      .finally(() => creatingInvoices.value = false)
   }
+
+  const createInvoicesPayload = computed(() => {
+    return {
+      register_id: regId.value,
+      timezone: chartSettings.value.timezone,
+      start_at: dateRange.value.startAt,
+      end_at: dateRange.value.endAt,
+      group_by: chartSettings.value.groupBy,
+      group_by_period: chartSettings.value.groupByPeriod,
+      invert_sign: chartSettings.value.invertSign,
+      search: searchFromFilter(chartSettings.filters),
+      strategy: invoiceStrategy.value,
+      payor_customer_id: customer.value,
+    }
+  })
+
+
+  const handleFilterChange = (newVal, filteredResults) => {
+    chartSettings.filters = newVal
+    tableData.value = filteredResults
+  }
+
+  const dateRange = computed(() =>
+    getDateRange(
+      chartSettings.value.namedDateRange,
+      chartSettings.value.timezone
+    )
+  )
 
 
 </script>

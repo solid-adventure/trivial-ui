@@ -31,13 +31,13 @@
           <div class="address-block">
             <span class="address-title"></span>
             <div class="payee">
-              {{ invoice.payee.name }}
+              {{ invoice.payee_name }}
             </div>
           </div>
           <div class="address-block">
             <span class="address-title">Bill to</span>
             <div class="payor">
-              {{ invoice.payor.name }}
+              {{ invoice.payor_name }}
             </div>
           </div>
         </div>
@@ -77,17 +77,24 @@
       </div>
 
     </div>
+
+    <div v-if="!loading"class="action-bar">
+      <Button @click="deleteInvoice" severity="danger" >Delete Invoice</Button>
+    </div>
+
   </div>
+
 
 </template>
 
 <script setup>
   import { ref, onMounted, computed } from 'vue'
-  import { useRoute } from 'vue-router'
+  import { useRoute, useRouter } from 'vue-router'
   import { useStore } from 'vuex'
   import { useDateTimeZoneOptions } from '@/composable/dateTimeZoneOptions.js'
   import { useFormatCurrency } from '@/composable/formatCurrency.js'
   import { useFormatDate } from '@/composable/formatDate.js'
+  import { useToastNotifications } from '@/composable/toastNotification'
 
   const loading = ref(false)
   const invoice = ref({
@@ -97,7 +104,9 @@
   })
   const store = useStore()
   const route = useRoute()
+  const router = useRouter()
   const {dateOptions, timeOptions, timeZoneOptions} = useDateTimeZoneOptions()
+  const { showSuccessToast, showErrorToast, showInfoToast } = useToastNotifications()
 
   onMounted(async () => {
       loadInvoice()
@@ -123,6 +132,18 @@
         loading.value = false
     }
   }
+
+  const deleteInvoice = () => {
+    store.state.Session.apiCall(`/invoices/${route.params.id}`, 'DELETE')
+      .then(() => {
+        showSuccessToast('Success', 'Invoice deleted successfully, redirecting...')
+        setTimeout(() => {
+          router.push('/invoices/create')
+        }, 2000)
+      })
+      .catch((e) => showErrorToast('Error', `${e}`))
+  }
+
 
 
 </script>
@@ -208,6 +229,11 @@
 
     }
 
+  }
+
+  div.action-bar {
+    margin-top: 3em;
+    margin-left: 1em;
   }
 
 </style>

@@ -112,6 +112,9 @@
 	const rawData = ref({})
 	const tableData = ref([])
 
+	const regId = computed(() => store.getters.getRegisterId)
+
+
 	const { showSuccessToast, showErrorToast, showInfoToast } = useToastNotifications()
 	const selectedQuarters = ref(),
 			loading = ref(false),
@@ -149,7 +152,8 @@
 	}
 
   const onFilterChange = (event) => {
-    emit('filter-change', event.filters)
+    emit('filter-change', event.filters, event.filteredValue)
+
   }
 
 	const periods = computed(() => {
@@ -227,7 +231,7 @@
 
 	const getDataOptions = computed(() => {
 		return {
-			register_id: store.state.registerId,
+			register_id: regId.value,
 			start_at: startAt.value,
 			end_at: endAt.value,
       group_by_period: props.chartSettings.groupByPeriod,
@@ -246,7 +250,10 @@
   })
 
 	const getData = () => {
+		if (!regId.value) return
 		loading.value = true
+    rawData.value = {}
+    tableData.value = []
 		store.state.Session.apiCall(`/reports/item_sum`, 'POST', getDataOptions.value
 			)
 			.then(data => {
