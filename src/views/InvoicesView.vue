@@ -34,7 +34,7 @@
         :class="column.class"
         :sortable="true">
           <template #body="{ data, field }">
-            <RouterLink :to="`/invoices/${data.id}`" target="_blank" >
+            <RouterLink :to="`/invoices/${data.id}`">
               <template v-if="field == 'total'">
                 {{ useFormatCurrency(data[field], 2) }}
               </template>

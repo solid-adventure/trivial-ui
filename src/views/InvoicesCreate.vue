@@ -97,7 +97,7 @@
 
         <p>{{ invoiceIds.length }} invoices created</p>
         <li v-for="invoiceId in invoiceIds" :key="invoiceId">
-          <a :href="`/invoices/${invoiceId}`" target="_blank">Invoice {{ invoiceId }}</a>
+          <a :href="`/invoices/${invoiceId}`">Invoice {{ invoiceId }}</a>
         </li>
       </div>
 
