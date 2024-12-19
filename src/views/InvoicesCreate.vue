@@ -34,6 +34,7 @@
           :chart="chart"
           :chart-settings="chartSettings"
           @filter-change="handleFilterChange"
+          :non-editable-search="[{c: 'invoice_id', o: '', p: 'IS NULL'}]"
         />
       </div>
 
