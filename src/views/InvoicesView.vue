@@ -1,11 +1,13 @@
 <template>
-
   <Panel class="w-full shadow-2">
-    <DataTable :value="tableData"
+    <DataTable :value="invoices"
       :scrollable="true"
       :loading="loading"
       scroll-height="500px"
       size="small"
+      :filters="filters"
+      filterDisplay="menu"
+      ref="dataTable"
       >
 
       <template #header>
@@ -15,7 +17,7 @@
                 <RouterLink to="/invoices/create">
                   <Button severity="secondary" class="mx-3">Create Invoices</Button>
                 </RouterLink >
-                <Button label="Export as CSV" aria-label="Download CSV" icon="pi pi-download" class="registers_table--csv-btn" @click="openCSVDialog" :disabled="tableData.length === 0" />
+                <Button label="Export as CSV" aria-label="Download CSV" icon="pi pi-download" class="registers_table--csv-btn" @click="openCSVDialog" :disabled="invoices.length === 0" />
               </div>
           </div>
       </template>
@@ -32,17 +34,38 @@
         :header="column.header"
         :headerClass="column.headerClass"
         :class="column.class"
-        :sortable="true">
-          <template #body="{ data, field }">
-            <RouterLink :to="`/invoices/${data.id}`">
-              <template v-if="field == 'total'">
-                {{ useFormatCurrency(data[field], 2) }}
-              </template>
-              <template v-else>
-                {{ data[field] }}
-              </template>
-            </RouterLink>
-          </template>
+        :sortable="column.sortable"
+        :showAddButton="column.showAddButton"
+        :showFilterOperator="column.showFilterOperator"
+        :showFilterMatchModes="column.showFilterMatchModes"
+        :filter="column.filter"
+        >
+
+        <template #filter="{ filterModel }" v-if="column.field === 'date'">
+            <Calendar
+                v-model="filters[column.field].constraints[0].value"
+                dateFormat="mm/dd/yy"
+                placeholder="Select Date"
+                @date-select="closeFilter"
+            />
+        </template>
+
+        <template #body="{ data, field }">
+          <RouterLink :to="`/invoices/${data.id}`">
+            <template v-if="field == 'total'">
+              {{ useFormatCurrency(data[field], 2) }}
+            </template>
+
+            <template v-else-if="field == 'date'">
+               {{ formatDate(data[field]) }}
+            </template>
+
+            <template v-else>
+              {{ data[field] }}
+            </template>
+          </RouterLink>
+        </template>
+
       </Column>
     </DataTable>
 
@@ -51,40 +74,84 @@
 
   </Panel>
 
+  <CSVExportDialog
+    :csvDialogVisible="csvDialogVisible"
+    :downloadPath="csvDownloadPath"
+    @closeCSVExportDialog="closeCSVDialog"
+  />
 
-  <CSVExportDialog :csvDialogVisible="csvDialogVisible" :downloadPath="csvDownloadPath" @closeCSVExportDialog="closeCSVDialog" />
 </template>
 
 <script setup>
-  import { ref, onMounted, computed, watch, toRaw } from 'vue'
-  import { useRouter, useRoute } from 'vue-router'
+  import { ref, onMounted, computed, watch } from 'vue'
   import { useStore } from 'vuex'
   import { useFormatCurrency } from '@/composable/formatCurrency.js'
+  import { searchFromFilter } from '@/composable/searchFromFilter'
   import CSVExportDialog from '@/components/sales/CSVExportDialog'
+  import Calendar from 'primevue/calendar';
+  import { FilterMatchMode, FilterOperator } from 'primevue/api';
 
   const loading = ref(false)
   const invoices = ref([])
   const orgId = computed(() => store.getters.getOrgId)
   const store = useStore()
-  const tableData = ref([])
   const columns = ref([
-    { field: 'id', header: 'ID' },
-    { field: 'date', header: 'Date' },
-    { field: 'payee_name', header: 'Payee' },
-    { field: 'payor_name', header: 'Payor' },
-    { field: 'total', header: 'Total', headerClass: 'header-right',  class: 'text-right font-bold' },
-    ])
+    { field: 'id', header: 'ID', sortable: true },
+    {
+      field: 'date',
+      header: 'Date',
+      defaultFilter: {
+        operator: FilterOperator.AND,
+        constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }]
+      },
+      showAddButton: false,
+      showFilterOperator: false,
+      showFilterMatchModes: false,
+      sortable: true
+    },
+    { field: 'payee_name', header: 'Payee', sortable: true },
+    { field: 'payor_name', header: 'Payor', sortable: true },
+    { field: 'total', header: 'Total', headerClass: 'header-right',  class: 'text-right font-bold', sortable: true },
+  ])
+
+  const filters = ref({})
+  const searchParams = ref([])
+
+
   const csvDialogVisible = ref(false)
   const openCSVDialog = () => csvDialogVisible.value = true
   const closeCSVDialog = () => csvDialogVisible.value = false
   const csvDownloadPath = computed(() => {
-      return `/organizations/${orgId.value}/invoices.csv` // TODO add filters as search
+      return `${apiUrl('csv')}`
   })
   watch(orgId, async (newVal) => loadInvoices())
 
   onMounted(async () => {
-      loadInvoices()
+    initFilters()
+    loadInvoices()
   })
+
+  const apiUrl = (format='json') => {
+    let url = `/organizations/${orgId.value}/invoices.${format}`
+
+    const searchParams = searchFromFilter(filters.value)
+    if (searchParams.length > 0) {
+        url += `?search=${[JSON.stringify(searchParams)]}`
+    }
+    return url
+  }
+
+  watch(filters, async (newVal) => {
+    loadInvoices()
+  }, {deep: true})
+
+  const initFilters = () => {
+    columns.value.forEach((column) => {
+      if (column.defaultFilter) {
+        filters.value[column.field] = column.defaultFilter
+      }
+    })
+  }
 
   const loadInvoices = async () => {
       if (!orgId.value) {
@@ -93,10 +160,9 @@
       }
       loading.value = true
       try {
-          const response = await store.state.Session.apiCall(`/organizations/${orgId.value}/invoices`)
-          invoices.value = response
-          tableData.value = response.invoices
-
+          const response = await store.state.Session.apiCall(apiUrl())
+          invoices.value = response.invoices
+          parseDates()
 
       } catch (err) {
           console.error(err)
@@ -105,7 +171,29 @@
       }
   }
 
+  const parseDates = () => {
+    invoices.value.forEach((invoice) => {
+      invoice.date = new Date(invoice.date)
+      // TODO Need to apply the TZ it was created in to guarantee the expected date.
+      //      This will happen to be correct for EST/PST users but not for others.
+    })
+  }
 
+  const formatDate = (value) => {
+      return value.toLocaleDateString('en-US', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+      });
+  };
+
+
+  const closeFilter = () => {
+    // The timeout lets us break out of the reactivity flow, and prevent it from immediately re-opening
+    setTimeout(() => {
+      document.body.click()
+    }, 0)
+  }
 
 </script>
 

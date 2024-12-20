@@ -1,9 +1,17 @@
+import { formatDateRange } from '@/composable/useDateRange'
+import { useDateTimeZoneOptions } from '@/composable/dateTimeZoneOptions';
+
+const { timeZoneOptions } = useDateTimeZoneOptions()
+
 export function searchFromFilter(filters) {
   if (!filters) return []
 
-  return Object.entries(filters).reduce((acc, [column, filter]) => {
+  // Pre-process filters to handle dateIs
+  const processedFilters = preprocessFilters(filters)
+
+  return Object.entries(processedFilters).reduce((acc, [column, filter]) => {
     // Skip if no constraints
-    if (!filter.constraints.length) return acc
+    if (!filter.constraints?.length) return acc
 
     // Process each constraint
     filter.constraints.forEach(constraint => {
@@ -43,6 +51,12 @@ export function searchFromFilter(filters) {
         case 'gte':
           operator = '>='
           break
+        case 'dateAfter':
+          operator = '>'
+          break
+        case 'dateBefore':
+          operator = '<'
+          break
         // Add more cases as needed
       }
 
@@ -55,4 +69,37 @@ export function searchFromFilter(filters) {
 
     return acc
   }, [])
+}
+
+function preprocessFilters(filters) {
+  if (!filters) return {}
+  const processedFilters = {}
+  Object.entries(filters).forEach(([column, filter]) => {
+
+    // dateIs comes as a single filter, which we expand to a midnight-midnight range
+    processedFilters[column] = expandDateIsToRange(filter)
+  })
+  return processedFilters
+}
+
+function expandDateIsToRange(filter) {
+  // Skip if no constraints
+  if (!filter.constraints?.length) return filter
+
+  // Skip if not dateIs
+  if (filter.constraints[0].matchMode != 'dateIs') return filter
+
+  // convert to pair of midnight to midnight dates in the default TZ
+  return {
+    constraints: [
+      {
+        value: formatDateRange(filter.constraints[0].value, timeZoneOptions.timeZone),
+        matchMode: 'gte'
+      },
+      {
+        value: formatDateRange(filter.constraints[0].value, timeZoneOptions.timeZone, true),
+        matchMode: 'lte'
+      }
+    ]
+  }
 }

@@ -257,12 +257,9 @@
 
   const handleCreateInvoices = () => {
     creatingInvoices.value = true
-    console.log('createInvoicesPayload', JSON.stringify(createInvoicesPayload.value, null, 2))
-
     store.state.Session.apiCall('/invoices/create_from_register', 'POST', createInvoicesPayload.value)
       .then((response) => {
         invoiceIds.value = response.invoice_ids
-        console.log('invoiceIds', invoiceIds.value)
       })
       .then(() => showSuccessToast('Success', 'Invoices created successfully.'))
       .catch((e) => showErrorToast('Error', `${e}`))
