@@ -115,7 +115,7 @@
 	const filters = ref()
 	const rawData = ref({})
 	const tableData = ref([])
-
+	const filteredTableData = ref([])
 	const regId = computed(() => store.getters.getRegisterId)
 
 
@@ -156,8 +156,8 @@
 	}
 
   const onFilterChange = (event) => {
+  	filteredTableData.value = event.filteredValue
     emit('filter-change', event.filters, event.filteredValue)
-
   }
 
 	const periods = computed(() => {
@@ -165,21 +165,18 @@
 	  return [...new Set(rawData.value.count.map(item => item.period))]
 	})
 
-  const grandTotals = computed(() => {
-	  if (!rawData.value?.count) return 0
-	  return rawData.value.count.reduce((acc, item) => {
-	    acc += parseFloat(item.value) || 0
+	const grandTotals = computed(() => {
+	  if (!filteredTableData.value?.length) return 0
+	  return filteredTableData.value.reduce((acc, item) => {
+	    acc += parseFloat(item.grandTotal) || 0
 	    return acc
-	 	}, 0)
+	  }, 0)
 	})
 
 	const getTotalForPeriod = period => {
-	  if (!rawData.value?.count) return 0
-	  return rawData.value.count.reduce((acc, item) => {
-	    if (item.period === period) {
-	      acc += parseFloat(item.value) || 0
-	    }
-	    return acc
+	  if (!filteredTableData.value?.length) return 0
+	  return filteredTableData.value.reduce((acc, item) => {
+	   	return acc += parseFloat(item[period]) || 0
 	  }, 0)
 	}
 
