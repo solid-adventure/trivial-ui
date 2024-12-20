@@ -163,12 +163,12 @@
     { label: 'Separate invoice per customer' , value: 'per_customer_id'},
   ])
 
-  // TODO Fetch organizations with customer tags from API
-  const customerOptions = ref([
-    { label: 'All customers', value: 'all' },
-    { label: 'Acme Co', value: 'acme' },
-    { label: 'Beta Co', value: 'beta' },
-   ])
+  // TODO To support 'single' strategy, fetch organizations with customer tags from API
+  // const customerOptions = ref([
+  //   { label: 'All customers', value: 'all' },
+  //   { label: 'Acme Co', value: 'acme' },
+  //   { label: 'Beta Co', value: 'beta' },
+  //  ])
 
   const handleProceed = () => {
     switch (active.value) {
