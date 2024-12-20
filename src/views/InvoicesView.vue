@@ -8,6 +8,7 @@
       :filters="filters"
       filterDisplay="menu"
       ref="dataTable"
+      stripedRows
       >
 
       <template #header>
@@ -17,7 +18,7 @@
                 <RouterLink to="/invoices/create">
                   <Button severity="secondary" class="mx-3">Create Invoices</Button>
                 </RouterLink >
-                <Button label="Export as CSV" aria-label="Download CSV" icon="pi pi-download" class="registers_table--csv-btn" @click="openCSVDialog" :disabled="invoices.length === 0" />
+                <Button label="Export as CSV" aria-label="Download CSV" icon="pi pi-download" class="registers_table--csv-btn" @click="openCSVDialog('invoices')" :disabled="invoices.length === 0" />
               </div>
           </div>
       </template>
@@ -42,28 +43,43 @@
         >
 
         <template #filter="{ filterModel }" v-if="column.field === 'date'">
-            <Calendar
-                v-model="filters[column.field].constraints[0].value"
-                dateFormat="mm/dd/yy"
-                placeholder="Select Date"
-                @date-select="closeFilter"
-            />
+          <Calendar
+              v-model="filters[column.field].constraints[0].value"
+              dateFormat="mm/dd/yy"
+              placeholder="Select Date"
+              @date-select="closeFilter"
+          />
         </template>
 
         <template #body="{ data, field }">
-          <RouterLink :to="`/invoices/${data.id}`">
-            <template v-if="field == 'total'">
+          <template v-if="field == 'total'">
+            <RouterLink :to="`/invoices/${data.id}`">
               {{ useFormatCurrency(data[field], 2) }}
-            </template>
+            </RouterLink>
+          </template>
 
-            <template v-else-if="field == 'date'">
-               {{ formatDate(data[field]) }}
-            </template>
+          <template v-else-if="field == 'date'">
+             {{ formatDate(data[field]) }}
+          </template>
 
-            <template v-else>
+
+          <template v-else-if="field =='backup'">
+
+            <Button
+              icon="pi pi-download"
+              label="Export Backup"
+              severity="secondary"
+              @click="openCSVDialog('register_items', data.id)">
+              Export Backup
+            </Button>
+
+          </template>
+
+          <template v-else>
+            <RouterLink :to="`/invoices/${data.id}`">
               {{ data[field] }}
-            </template>
-          </RouterLink>
+            </RouterLink>
+          </template>
         </template>
 
       </Column>
@@ -94,6 +110,7 @@
   const loading = ref(false)
   const invoices = ref([])
   const orgId = computed(() => store.getters.getOrgId)
+  const regId = computed(() => store.getters.getRegisterId)
   const store = useStore()
   const columns = ref([
     { field: 'id', header: 'ID', sortable: true },
@@ -111,19 +128,28 @@
     },
     { field: 'payee_name', header: 'Payee', sortable: true },
     { field: 'payor_name', header: 'Payor', sortable: true },
+    { field: 'backup', header: 'Backup'},
     { field: 'total', header: 'Total', headerClass: 'header-right',  class: 'text-right font-bold', sortable: true },
   ])
 
   const filters = ref({})
   const searchParams = ref([])
-
-
+  const csvDownloadPath = ref('')
   const csvDialogVisible = ref(false)
-  const openCSVDialog = () => csvDialogVisible.value = true
+  const openCSVDialog = (resource, options) => {
+    switch (resource) {
+    case 'invoices':
+      csvDownloadPath.value = `${apiUrl('csv')}`
+      break
+    case 'register_items':
+      csvDownloadPath.value = `/register_items.csv?register_id=${regId.value}&search=[{"c":"invoice_id","o":"=","p":"${options}"}]`
+      break
+    default:
+      throw "Unable to determine CSV path for resource"
+    }
+    csvDialogVisible.value = true
+  }
   const closeCSVDialog = () => csvDialogVisible.value = false
-  const csvDownloadPath = computed(() => {
-      return `${apiUrl('csv')}`
-  })
   watch(orgId, async (newVal) => loadInvoices())
 
   onMounted(async () => {
@@ -186,7 +212,6 @@
           year: 'numeric'
       });
   };
-
 
   const closeFilter = () => {
     // The timeout lets us break out of the reactivity flow, and prevent it from immediately re-opening

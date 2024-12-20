@@ -214,7 +214,6 @@
   const invoiceIds = ref([])
 
   onMounted(async () => {
-    store.dispatch('register')
     init()
   })
 
