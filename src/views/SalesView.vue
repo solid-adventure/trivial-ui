@@ -19,8 +19,6 @@
 		@page="onPage"
 		@sort="onSort"
 		@filter="onFilter"
-		editMode="cell" 
-		@cell-edit-complete="onCellEditComplete" 
 		:pt="{
 				column: {
 					bodycell: ({ state }) => ({ class: [{ 'pt-0 pb-0': state['d_editing'] }] }),
@@ -70,6 +68,15 @@
 					<span v-if="col.field == 'originated_at'">
 						<div class="date">{{ useFormatDate(data.originated_at, dateOptions) }}</div>
 						<div class="time">{{ useFormatDate(data.originated_at, timeOptions) }} {{ useFormatDate(data.originated_at, timeZoneOptions).split(' ')[1] }}</div>
+					</span>
+
+					<span v-else-if="col.field == 'invoice_id'">
+						<RouterLink :to="`/invoices/${data.invoice_id}`">{{ data.invoice_id }}</RouterLink>
+					</span>
+
+					<span v-else-if="col.field == 'unique_key'" class="multi-line">
+						<div class="line_one"><strong>{{ data.description }}</strong></div>
+						<div class="line_two">{{ data.unique_key }}</div>
 					</span>
 					<span v-else-if="col.field == 'amount'">{{ useFormatCurrency(data[col.field], 2, data['units']) }}</span>
 					<span v-else-if="col.field == 'activity'">
@@ -153,8 +160,8 @@
 	let columns = [],
 		defaultColumns = [
 			{field: 'originated_at', header: 'Date'},
-			{field: 'description', header: 'Description'},
 			{field: 'unique_key', header: 'Unique Key'},
+			{field: 'invoice_id', header: 'Invoice'},
 			{field: 'amount', header: 'Amount'}
 		],
 		activityColumn = { field: 'activity', header: 'Activity' },
@@ -581,3 +588,19 @@
 		}
 	}
 </script>
+
+<style scoped>
+
+span.multi-line {
+
+	.line_one {
+		font-weight: 600;
+	}
+
+	.line_two {
+		font-size: 0.8em;
+	}
+
+}
+
+</style>

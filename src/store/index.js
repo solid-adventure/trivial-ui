@@ -350,7 +350,7 @@ const store = createStore({
         await dispatch('loadResources', { dispatch, router })
         await dispatch('checkURLState')
         await dispatch('dashboards')
-
+        await dispatch('register')
       } catch (error) {
         console.error('[store][init] Error: ', error)
         notifications.error(`Failed to load apps: ${error.message}`)

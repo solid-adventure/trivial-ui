@@ -128,6 +128,9 @@ export default {
           if (displayName == "Show App" && store?.state?.app?.descriptive_name) {
             displayName = store.state.app.descriptive_name;
           }
+          if (displayName == "Invoice") {
+            displayName = `Invoice #${this.$route?.params?.id}`;
+          }
           if (
             displayName == "PanelType" &&
             (this.$route?.params?.paneltype ||

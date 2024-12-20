@@ -103,7 +103,11 @@
     chartSettings: {
       type: Object,
       required: true
-    }
+    },
+    nonEditableSearch: {
+    	type: Object,
+    	required: false
+    },
 	})
 
   const emit = defineEmits(['filter-change'])
@@ -111,6 +115,9 @@
 	const filters = ref()
 	const rawData = ref({})
 	const tableData = ref([])
+	const filteredTableData = ref([])
+	const regId = computed(() => store.getters.getRegisterId)
+
 
 	const { showSuccessToast, showErrorToast, showInfoToast } = useToastNotifications()
 	const selectedQuarters = ref(),
@@ -149,7 +156,8 @@
 	}
 
   const onFilterChange = (event) => {
-    emit('filter-change', event.filters)
+  	filteredTableData.value = event.filteredValue
+    emit('filter-change', event.filters, event.filteredValue)
   }
 
 	const periods = computed(() => {
@@ -157,21 +165,18 @@
 	  return [...new Set(rawData.value.count.map(item => item.period))]
 	})
 
-  const grandTotals = computed(() => {
-	  if (!rawData.value?.count) return 0
-	  return rawData.value.count.reduce((acc, item) => {
-	    acc += parseFloat(item.value) || 0
+	const grandTotals = computed(() => {
+	  if (!filteredTableData.value?.length) return 0
+	  return filteredTableData.value.reduce((acc, item) => {
+	    acc += parseFloat(item.grandTotal) || 0
 	    return acc
-	 	}, 0)
+	  }, 0)
 	})
 
 	const getTotalForPeriod = period => {
-	  if (!rawData.value?.count) return 0
-	  return rawData.value.count.reduce((acc, item) => {
-	    if (item.period === period) {
-	      acc += parseFloat(item.value) || 0
-	    }
-	    return acc
+	  if (!filteredTableData.value?.length) return 0
+	  return filteredTableData.value.reduce((acc, item) => {
+	   	return acc += parseFloat(item[period]) || 0
 	  }, 0)
 	}
 
@@ -227,13 +232,16 @@
 
 	const getDataOptions = computed(() => {
 		return {
-			register_id: store.state.registerId,
+			register_id: regId.value,
 			start_at: startAt.value,
 			end_at: endAt.value,
       group_by_period: props.chartSettings.groupByPeriod,
       timezone: props.chartSettings.timezone,
       invert_sign: props.chartSettings.invertSign,
       group_by: props.chartSettings.groupBy,
+      search: props.nonEditableSearch
+      // NOTE These are the only search terms passed to the API, the rest are applied at render.
+      //      It's possible we'll want to revisit this in the future.
 		}
 	})
 
@@ -246,7 +254,10 @@
   })
 
 	const getData = () => {
+		if (!regId.value) return
 		loading.value = true
+    rawData.value = {}
+    tableData.value = []
 		store.state.Session.apiCall(`/reports/item_sum`, 'POST', getDataOptions.value
 			)
 			.then(data => {
